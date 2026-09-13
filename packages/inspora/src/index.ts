@@ -60,7 +60,7 @@ export interface InsporaPost {
   creatorName: string | null;
   /** 作者主页（多为 x.com） */
   creatorUrl: string | null;
-  /** 作者头像（本地路径） */
+  /** 作者头像（inspora 为本地路径，bestx 为 CDN 热链） */
   creatorAvatar: string | null;
   description: string | null;
   category: string | null;
@@ -75,6 +75,10 @@ export interface InsporaPost {
   media: InsporaMedia[];
   /** 上游原始 JSON（详情页 RSC 里提取的完整帖子对象） */
   raw: unknown;
+  /** 数据来源：inspora（灵感站）或 bestx（Best Designs on X） */
+  source: 'inspora' | 'bestx';
+  /** 归一化后的原作推文 id，跨源去重键（详情补全前 inspora 行可能为空） */
+  tweetId: string | null;
 }
 
 export interface InsporaCategory {
@@ -115,6 +119,8 @@ interface PostRow {
   published_at: string | null;
   is_featured: number;
   raw_json: string | null;
+  source: string;
+  tweet_id: string | null;
 }
 
 interface MediaRow {
@@ -176,7 +182,8 @@ function toPost(row: PostRow, media: InsporaMedia[]): InsporaPost {
     title: row.title,
     creatorName: row.creator_name,
     creatorUrl: row.creator_url,
-    creatorAvatar: mediaUrl(row.creator_avatar, null),
+    // inspora 头像是本地 public 路径；bestx 头像是 https 直链，本地不存在时按原链返回
+    creatorAvatar: mediaUrl(row.creator_avatar, row.creator_avatar?.startsWith('https://') ? row.creator_avatar : null),
     description: row.description,
     category: row.category,
     industries: parseJsonArray(row.industries),
@@ -188,20 +195,38 @@ function toPost(row: PostRow, media: InsporaMedia[]): InsporaPost {
     isFeatured: row.is_featured === 1,
     media,
     raw,
+    source: row.source === 'bestx' ? 'bestx' : 'inspora',
+    tweetId: row.tweet_id,
   };
 }
 
+/**
+ * 跨源去重：同一原作推文被两个源都收录时，只展示 inspora 版本（数据更全）。
+ * inspora 行、无 tweet_id 的行始终可见。整体括号包裹，便于与其他条件 AND 连用。
+ */
+const VISIBLE_POSTS = `(
+  source = 'inspora' OR tweet_id IS NULL
+  OR NOT EXISTS (
+    SELECT 1 FROM posts AS twin
+    WHERE twin.source = 'inspora' AND twin.tweet_id = posts.tweet_id
+  )
+)`;
+
+const MEDIA_CHUNK = 900; // SQLite 变量数上限以内，分批查媒体
+
 function mediaForPosts(postIds: string[]): Map<string, InsporaMedia[]> {
   const map = new Map<string, InsporaMedia[]>();
-  if (postIds.length === 0) return map;
-  const placeholders = postIds.map(() => '?').join(',');
-  const rows = conn()
-    .prepare(`SELECT * FROM media WHERE post_id IN (${placeholders}) ORDER BY position`)
-    .all(...postIds) as unknown as MediaRow[];
-  for (const row of rows) {
-    const list = map.get(row.post_id) ?? [];
-    list.push(toMedia(row));
-    map.set(row.post_id, list);
+  for (let offset = 0; offset < postIds.length; offset += MEDIA_CHUNK) {
+    const chunk = postIds.slice(offset, offset + MEDIA_CHUNK);
+    const placeholders = chunk.map(() => '?').join(',');
+    const rows = conn()
+      .prepare(`SELECT * FROM media WHERE post_id IN (${placeholders}) ORDER BY position`)
+      .all(...chunk) as unknown as MediaRow[];
+    for (const row of rows) {
+      const list = map.get(row.post_id) ?? [];
+      list.push(toMedia(row));
+      map.set(row.post_id, list);
+    }
   }
   return map;
 }
@@ -209,16 +234,16 @@ function mediaForPosts(postIds: string[]): Map<string, InsporaMedia[]> {
 /** 全部帖子，按发布时间倒序 */
 export function listPosts(): InsporaPost[] {
   const rows = conn()
-    .prepare('SELECT * FROM posts ORDER BY created_at DESC')
+    .prepare(`SELECT * FROM posts WHERE ${VISIBLE_POSTS} ORDER BY created_at DESC`)
     .all() as unknown as PostRow[];
   const mediaMap = mediaForPosts(rows.map((r) => r.id));
   return rows.map((r) => toPost(r, mediaMap.get(r.id) ?? []));
 }
 
 export function getPostBySlug(slug: string): InsporaPost | undefined {
-  const row = conn().prepare('SELECT * FROM posts WHERE slug = ?').get(slug) as
-    | PostRow
-    | undefined;
+  const row = conn()
+    .prepare(`SELECT * FROM posts WHERE slug = ? AND ${VISIBLE_POSTS}`)
+    .get(slug) as PostRow | undefined;
   if (!row) return undefined;
   const mediaMap = mediaForPosts([row.id]);
   return toPost(row, mediaMap.get(row.id) ?? []);
@@ -240,7 +265,7 @@ export function getAdjacentPosts(post: InsporaPost): {
   next: Pick<InsporaPost, 'slug' | 'title'> | null;
 } {
   const rows = conn()
-    .prepare('SELECT slug, title, created_at FROM posts ORDER BY created_at DESC')
+    .prepare(`SELECT slug, title, created_at FROM posts WHERE ${VISIBLE_POSTS} ORDER BY created_at DESC`)
     .all() as unknown as { slug: string; title: string; created_at: string }[];
   const idx = rows.findIndex((r) => r.slug === post.slug);
   const prevRow = idx > 0 ? rows[idx - 1] : undefined;

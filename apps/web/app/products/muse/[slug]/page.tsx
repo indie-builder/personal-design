@@ -13,10 +13,15 @@ import { categoryLabel } from '@/lib/category-label';
 import { MuseMediaCarousel } from '@/components/inspora-media-carousel';
 import styles from './page.module.css';
 
-export const dynamicParams = false;
+// 灵感集两条数据源合计条目较多：详情页按需渲染（不预生成全站），
+// 浏览列表只携带当前位置附近的窗口，控制每页 RSC 负载；小集合不受影响。
+const BROWSE_WINDOW = 240;
 
-export function generateStaticParams() {
-  return listPosts().map((post) => ({ slug: post.slug }));
+function windowed<T extends { href: string }>(entries: T[], currentHref: string): T[] {
+  const index = entries.findIndex((entry) => entry.href === currentHref);
+  if (index < 0 || entries.length <= BROWSE_WINDOW * 2 + 1) return entries;
+  const start = Math.max(0, Math.min(index - BROWSE_WINDOW, entries.length - (BROWSE_WINDOW * 2 + 1)));
+  return entries.slice(start, start + BROWSE_WINDOW * 2 + 1);
 }
 
 interface PageProps {
@@ -48,6 +53,7 @@ export default async function MuseDetailPage({ params }: PageProps) {
     category: entry.category ?? '未分类',
     search: [entry.creatorName ?? '', [entry.category, ...entry.industries, ...entry.styles].filter(Boolean).join(' '), categoryLabel(entry.category ?? '未分类')],
   }));
+  const currentHref = `/products/muse/${post.slug}`;
 
   const media = post.media
     .filter((m) => m.src)
@@ -71,9 +77,9 @@ export default async function MuseDetailPage({ params }: PageProps) {
   return (
     <main className={styles.page}>
       <BrowseNavigation appearance="text" listPath="/products/muse" storageKey="muse-return" returnLabel="返回灵感集" fallbackHref={listHref}
-        browseEntries={browseEntries}
-        currentHref={`/products/muse/${post.slug}`}
-        entries={group.map(entry => ({ href:`/products/muse/${entry.slug}`, title:entry.title }))} />
+        browseEntries={windowed(browseEntries, currentHref)}
+        currentHref={currentHref}
+        entries={windowed(group.map(entry => ({ href:`/products/muse/${entry.slug}`, title:entry.title })), currentHref)} />
       <header className={styles.heading}>
         <h1 className={styles.title}>{post.title || '未命名灵感'}</h1>
         <div className={styles.byline}>

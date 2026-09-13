@@ -1,8 +1,8 @@
 import type { NextConfig } from 'next';
 import path from 'node:path';
 
-// 媒体热链的上游域名（inspora 原站 CDN + 布局参考上游仓库的 jsDelivr）
-const UPSTREAM_HOSTS = ['media.inspora.design', 'cdn.jsdelivr.net'];
+// 媒体热链的上游域名（inspora 原站 CDN + 布局参考上游仓库的 jsDelivr + Best Designs on X 的媒体镜像）
+const UPSTREAM_HOSTS = ['media.inspora.design', 'cdn.jsdelivr.net', 'cdn.bestdesignsonx.com'];
 
 // 媒体迁到对象存储后（NEXT_PUBLIC_MEDIA_BASE_URL），允许 next/image 从该域名拉取
 const mediaBase = process.env.NEXT_PUBLIC_MEDIA_BASE_URL;

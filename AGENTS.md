@@ -57,13 +57,15 @@ Co-Authored-By: (the agent model's name and attribution byline)
 
 ## inspora 包
 
-- 从 inspora.design 增量同步的灵感库：`inspora.db`（SQLite，`node:sqlite` 读写）+ `apps/web/public/inspora/`（海报/缩略图/头像本地化），两者都是生成物但随仓库提交；大图与视频不入库，查询 API 按本地文件存在性自动回退热链原站（media.inspora.design）
-- 列表优先从各分类页面 HTML 的 RSC `initialPage` 读取，覆盖不足才请求 `/api/posts` 翻页；Playwright 遇到 Vercel checkpoint 时通过 `ego-browser nodejs` 使用正常浏览器会话，需本机 ego lite 可用。详情从 `/posts/<slug>` HTML 的 RSC payload 提取（脚本头部注释有完整说明）
-- 增量逻辑：各分类遇到本次运行前已入库 id 即停，全部分类发现完整后事务写入，分页失败不留下会截断后续增量的半批数据；`enriched_at IS NULL` 才补详情；媒体按文件存在性跳过——可随时中断重跑
-- 查询一律用 `src/index.ts` 的 API（`listPosts`、`getPostBySlug`、`listCategories`、`upstreamUrl`…），不在 app 里读 DB、不拼路径
+- 灵感库，两条数据源、一条同步管线（`pnpm sync:inspora`；`--source=inspora|bestx` 单跑，`--full` 全量）：`inspora.db`（SQLite，`node:sqlite` 读写）+ `apps/web/public/inspora/`（inspora 的海报/缩略图/头像本地化），都是生成物但随仓库提交
+- inspora 源（scripts/source-inspora.mjs）：从 inspora.design 增量同步，列表优先读分类页 HTML 的 RSC `initialPage`，覆盖不足才请求 `/api/posts` 翻页；Playwright 遇到 Vercel checkpoint 时通过 `ego-browser nodejs` 使用正常浏览器会话，需本机 ego lite 可用。详情从 `/posts/<slug>` HTML 的 RSC payload 提取（脚本头部注释有完整说明）。媒体只下海报/缩略图/头像，大图与视频热链原站（media.inspora.design）
+- bestx 源（scripts/source-bestx.mjs，2026-09-13 增）：Best Designs on X 的公开 Supabase REST + CDN（cdn.bestdesignsonx.com）直链，无需浏览器、全部媒体热链不入库；`posts.slug` 形如 `x-<tweet_id>`
+- 跨源去重：两源的原作都是 X 推文，`posts.tweet_id` 为归一化去重键（每次同步前从 inspora 的 `source_url` 回填存量）；同一推文两源都收录时读取侧只展示 inspora 版本（`src/index.ts` 的可见性过滤），被隐藏的 bestx 行连详情一起 404
+- 查询一律用 `src/index.ts` 的 API（`listPosts`、`getPostBySlug`、`listCategories`、`upstreamUrl`…），不在 app 里读 DB、不拼路径。`posts` 表已达万级：媒体查询分批，muse 网格页模块级一次载入，详情页按需渲染且浏览列表只携带当前位置附近窗口（`BROWSE_WINDOW`），不要把全量列表塞回详情页
+- 增量逻辑：inspora 各分类、bestx 按 published_at 倒序，遇到本次运行前已入库 id/tweet_id 即停，完整发现后事务写入，分页失败不留下会截断后续增量的半批数据；inspora `enriched_at IS NULL` 才补详情；媒体按文件存在性跳过——可随时中断重跑。两源互相独立，单源失败不阻塞另一源，整体非零退出
 - 详情面向访客，只展示作品、作者、分类、实际说明和「查看原作」出处链接；不展示原始 JSON、同步信息、文件大小/分辨率、内部标签或空信息占位。原始数据只在包内保留（2026-09-07 用户明确）。
 - 产品对外的名字是「灵感集」，路由 `/products/muse`；**访客可见处（文案、链接、metadata）一律不得出现来源站点名**，事实性描述只留在本文件与包/脚本注释里
-- 灵感集使用 plate-wall.tsx 网格与中文分类，首批24件、滚动追加；原生作品链接进详情，返回恢复分类和位置。图片与视频预览保留，视频详情原生控制，图片可放大；支持搜索，无放映机或旋钮。旧post参数跳转对应详情。
+- 灵感集使用 plate-wall.tsx 网格与中文分类，首批24件、滚动追加；原生作品链接进详情，返回恢复分类和位置。图片与视频预览保留，视频详情原生控制，图片可放大；支持搜索，无放映机或旋钮。旧post参数跳转对应详情。bestx 条目暂无上游分类，归入「未分类」。
 
 ## 当前用户故事约束（2026-09-12）
 
