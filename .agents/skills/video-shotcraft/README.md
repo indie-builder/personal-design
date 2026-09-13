@@ -15,7 +15,7 @@
 <a href="https://trendshift.io/repositories/88911?utm_source=trendshift-badge&utm_medium=badge&utm_campaign=badge-trendshift-88911" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/88911/daily?language=TypeScript" alt="Vincentwei1021%2Fvideo-shotcraft | Trendshift" width="250" height="55"/></a>
 <a href="https://trendshift.io/repositories/88911?utm_source=trendshift-badge&utm_medium=badge&utm_campaign=badge-trendshift-88911" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/88911/weekly?language=TypeScript" alt="Vincentwei1021%2Fvideo-shotcraft | Trendshift" width="250" height="55"/></a>
 
-**An agent skill for crafting cinematic product videos: 152 shot recipe cards · 209 styles · 209 motion previews · a production-ready template**
+**An agent skill for crafting cinematic product videos: 157 shot recipe cards · 214 styles · 214 motion previews · a production-ready template**
 
 [English](README.md) | [中文](README_CN.md) | [日本語](README_JA.md)
 
@@ -27,32 +27,53 @@ sound-designs a cinematic promo, marketing, launch, or demo video with
 [Remotion](https://www.remotion.dev/) — real page captures, 2.5D camera moves,
 beat-synced cuts, and film-grade SFX included.
 
-🖼️ [**Browse all 209 motion previews in the live Gallery »**](https://vincentwei1021.github.io/video-shotcraft/)
+🖼️ [**Browse all 214 motion previews in the live Gallery »**](https://vincentwei1021.github.io/video-shotcraft/)
 
 ## ✨ What's new
 
 > [!IMPORTANT]
-> ### 🆕 2026-08 · 48 new shot recipe cards
-> The library grows from 104 to **152 cards / 209 previews**. Distilled from
-> 209 candidate motions through eight rounds of frame-by-frame review against
-> reference footage, then folded into the regular Gallery categories with full
-> recipe cards, native Remotion components
-> (`demos/<category>/<name>/<Component>.tsx`, deterministic and driven by the
-> normalized progress `t` — see demos/README.md for the wiring snippet), and
-> motion previews. All de-branded: neutral placeholder copy and a single
-> swappable `ACCENT` color variable.
+> ### 🔥 2026-08 · New in the series: **video-talkcraft**, for narration videos
+> [**video-talkcraft**](https://github.com/Vincentwei1021/video-talkcraft) is the
+> narration-video installment of this series. Hand it a script plus a finished
+> voiceover and every motion beat locks to the voice: word-level timestamps
+> aligned locally (median 20–40 ms per character), **78 motion recipe cards**, a
+> 7-layer anti-slideshow shot system (continuous camera curves, parallax planes,
+> idle/yield lifecycle, breathing environment), plain-cut subtitles, and
+> triple-gate QA. Same recipe-card + Remotion workflow as here, retuned for
+> talking content.
+>
+> 🎙️ [**Project page »**](https://github.com/Vincentwei1021/video-talkcraft) ·
+> 🖼️ [**Browse all 78 narration motion previews »**](https://vincentwei1021.github.io/video-talkcraft/)
 
-- **2026-08 · JianYing (CapCut CN) project export** — after final delivery the
-  film can be exported as an editable JianYing draft: the plate is cut per
+> [!IMPORTANT]
+> ### 🛠️ 2026-09 · New: the **Motion Workbench** — keep editing the delivered film in your browser
+> After delivery the skill opens a CapCut-style workbench
+> (`node workbench/scripts/open.mjs <project>`). The film is decomposed into
+> shot / transition / caption / SFX tracks exactly as authored; select any shot
+> and edit its copy, font sizes and colours in a schema-driven inspector, move,
+> trim or speed-ramp clips, drag any of the **216 demo motions** in from the
+> library, then export with Remotion. Preview and render are frame-identical
+> (pixel-parity verified).
+>
+> ![Motion Workbench](workbench/docs/overview.png)
+>
+> 🧭 [**Workbench guide — every panel and feature, with screenshots »**](workbench/GUIDE.md) (Chinese) ·
+> 🔌 [**Integration contract »**](references/workbench.md)
+
+- 🌟 **2026-08 · 48 new shot recipe cards** — the library grows from 104 to
+  **152 cards / 209 previews**. Distilled from 209 candidate motions through
+  eight rounds of frame-by-frame review against reference footage, then folded
+  into the regular Gallery categories with full recipe cards, native Remotion
+  components (`demos/<category>/<name>/<Component>.tsx`, deterministic and
+  driven by the normalized progress `t` — see demos/README.md for the wiring
+  snippet), and motion previews. All de-branded: neutral placeholder copy and a
+  single swappable `ACCENT` color variable.
+- 🎞️ **2026-08 · JianYing (CapCut CN) project export** — after final delivery
+  the film can be exported as an editable JianYing draft: the plate is cut per
   shot (retime/reorder/grade), captions are rebuilt as native text tracks
   (content/size/color editable), SFX/BGM land on separate audio tracks.
   Verified on JianYing Pro 11.2 for macOS; see
   [references/jianying-export.md](references/jianying-export.md).
-- **2026-07 · Audio library restructure** — `bgm/` + `sfx/<category>/` with 149
-  SFX across 16 scene/material categories, md5-deduplicated with license URLs
-  restored.
-- **2026-07 · Gallery upgrades** — multi-category card tags, flat alphabetized
-  All view, auto-deploy to GitHub Pages with preview mp4s served from a release.
 
 ## 🎬 Showcase
 
@@ -145,13 +166,14 @@ With these three flags, frame renders from the bundled template work.
 
 | Content | Description |
 | --- | --- |
-| 152 shot recipe cards | Purpose, energy, suggested duration, parameters, implementation notes, and known pitfalls |
-| 209 motion previews | Covering 209 styles; searchable and filterable in the online Gallery |
+| 157 shot recipe cards | Purpose, energy, suggested duration, parameters, implementation notes, and known pitfalls |
+| 214 motion previews | Covering 214 styles; searchable and filterable in the online Gallery |
 | Remotion implementations | Tuned TSX demos containing the actual easing and timing parameters for each card |
 | Complete video template | A validated 36.2-second, 1920×1080, 30fps product promo with 10 shots |
 | Components and assets | 2.5D page camera, captions, flash cuts, digit rolls, SFX, and capture scripts |
 | Production methodology | Capture, visual direction, storyboarding, sound design, beat sync, and final QA |
 | JianYing project export | Load the film into JianYing (CapCut CN) for further editing — per-shot speed, captions, and audio all editable (verified on macOS 11.2) |
+| Motion workbench | Browser timeline editor opened after delivery: split the film into tracks, edit exposed shot properties, retime, drag in any of the 216 demo motions, export via Remotion |
 
 The toolkit primarily targets web and desktop product promos, while individual
 shot cards can also be used in feature demos, brand films, launch videos, and
@@ -164,16 +186,18 @@ video-shotcraft/
 ├── SKILL.md                 # Agent entry point and core production rules
 ├── references/
 │   ├── pipeline.md          # End-to-end production workflow
-│   ├── shots/               # 152 shot recipe cards in 10 functional categories
+│   ├── shots/               # 157 shot recipe cards in 10 functional categories
 │   ├── sequences/           # Reusable full-video structures and sequence patterns
 │   ├── aesthetic-rules.md   # Visual QA criteria
 │   ├── music-beat-sync.md   # BGM analysis and beat-sync methodology
 │   ├── sound-design.md      # Sound-design guidance and examples
-│   └── jianying-export.md   # JianYing (CapCut CN) project-export guide
+│   ├── jianying-export.md   # JianYing (CapCut CN) project-export guide
+│   └── workbench.md         # Motion workbench: manifest contract + editability rules
 ├── demos/                   # Remotion reference implementations (same categories)
 ├── gallery/                 # Static motion-preview Gallery
 ├── template/                # Runnable complete video template
 ├── jianying-export/         # JianYing draft installers (mac tested / win untested)
+├── workbench/               # Post-delivery motion workbench (Vite + Remotion Player)
 └── assets/
     ├── lib/                 # Reusable Remotion components
     ├── scripts/             # Page-asset capture scripts
