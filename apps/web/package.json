@@ -7,13 +7,13 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --max-warnings=0 .",
+    "lint": "oxlint --deny-warnings .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@personal-design/personal-sites": "workspace:*",
     "@personal-design/inspora": "workspace:*",
     "@personal-design/layout-compositions": "workspace:*",
+    "@personal-design/personal-sites": "workspace:*",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "1.37.0",
@@ -27,8 +27,7 @@
     "@types/node": "26.4.0",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
-    "eslint": "9.39.5",
-    "eslint-config-next": "16.3.3",
+    "oxlint": "^1.83.0",
     "postcss": "8.5.26",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3"

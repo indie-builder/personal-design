@@ -27,7 +27,7 @@ Co-Authored-By: (the agent model's name and attribution byline)
 | Task | Command |
 | --- | --- |
 | Typecheck (one pkg) | `pnpm --filter @personal-design/web typecheck` |
-| Lint (one file) | `pnpm --filter @personal-design/web exec eslint <file>` |
+| Lint (one file) | `pnpm --filter @personal-design/web exec oxlint <file>` |
 | Sync layout images | `pnpm sync:layouts`（幂等，已生成的 WebP 会跳过） |
 | Sync inspora 数据 | `pnpm sync:inspora`（增量；`-- --full` 全量 backfill；需先 `pnpm --filter @personal-design/inspora exec playwright install chromium`） |
 
