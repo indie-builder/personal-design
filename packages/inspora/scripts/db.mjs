@@ -52,14 +52,22 @@ export function openDatabase(dbPath) {
   `);
 
   // 已存在的库补列（SQLite 没有 ADD COLUMN IF NOT EXISTS）
-  const columns = new Set(db.prepare('PRAGMA table_info(posts)').all().map((column) => column.name));
-  if (!columns.has('source')) db.exec("ALTER TABLE posts ADD COLUMN source TEXT NOT NULL DEFAULT 'inspora'");
+  const columns = new Set(
+    db
+      .prepare('PRAGMA table_info(posts)')
+      .all()
+      .map((column) => column.name),
+  );
+  if (!columns.has('source'))
+    db.exec("ALTER TABLE posts ADD COLUMN source TEXT NOT NULL DEFAULT 'inspora'");
   if (!columns.has('tweet_id')) db.exec('ALTER TABLE posts ADD COLUMN tweet_id TEXT');
   db.exec('CREATE INDEX IF NOT EXISTS idx_posts_tweet ON posts(tweet_id)');
 
   const stmts = {
     hasPost: db.prepare('SELECT 1 FROM posts WHERE id = ?'),
-    needsEnrich: db.prepare('SELECT slug FROM posts WHERE enriched_at IS NULL AND source = \'inspora\''),
+    needsEnrich: db.prepare(
+      "SELECT slug FROM posts WHERE enriched_at IS NULL AND source = 'inspora'",
+    ),
     upsertPost: db.prepare(`
       INSERT INTO posts (id, slug, title, creator_name, creator_url, creator_avatar,
         description, category, industries, colors, styles, source_url,
@@ -119,9 +127,13 @@ export function openDatabase(dbPath) {
         AND json_extract(raw_json, '$.creator.avatarUrl') IS NOT NULL
     `),
     // 限定 inspora 行：两个源的展示名可能重名，不能让头像回填跨源覆盖
-    updateAvatar: db.prepare("UPDATE posts SET creator_avatar = ? WHERE creator_name = ? AND source = 'inspora'"),
+    updateAvatar: db.prepare(
+      "UPDATE posts SET creator_avatar = ? WHERE creator_name = ? AND source = 'inspora'",
+    ),
     knownTweetIds: (source) =>
-      db.prepare('SELECT tweet_id FROM posts WHERE source = ? AND tweet_id IS NOT NULL').all(source)
+      db
+        .prepare('SELECT tweet_id FROM posts WHERE source = ? AND tweet_id IS NOT NULL')
+        .all(source)
         .map((row) => row.tweet_id),
   };
   return { db, stmts };

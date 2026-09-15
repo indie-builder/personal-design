@@ -62,20 +62,33 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
   const query = searchParams.get('q') ?? '';
   const setQuery = (q: string) => {
     const params = new URLSearchParams(window.location.search);
-    if (q) params.set('q', q); else params.delete('q');
+    if (q) params.set('q', q);
+    else params.delete('q');
     window.history.replaceState(null, '', `${pathname}${params.size ? `?${params}` : ''}`);
   };
   const returnHref = `${pathname}${searchParams.size ? `?${searchParams}` : ''}`;
   const [shown, setShown] = useState(batchSize);
   const moreRef = useRef<HTMLDivElement>(null);
 
-  const filtered = useMemo(() => items.filter(item => (active === '全部' || item.category === active) && matchesSearch(query, [item.name, item.lead, item.keywords, categoryLabel(item.category)])), [active, items, query]);
+  const filtered = useMemo(
+    () =>
+      items.filter(
+        (item) =>
+          (active === '全部' || item.category === active) &&
+          matchesSearch(query, [item.name, item.lead, item.keywords, categoryLabel(item.category)]),
+      ),
+    [active, items, query],
+  );
 
   const visible = filtered.slice(0, shown);
   const remember = (key: string) => {
-    try { sessionStorage.setItem(browseMemoryKey('muse-return', returnHref), JSON.stringify({ href: returnHref, shown, y: window.scrollY, key })); } catch {}
+    try {
+      sessionStorage.setItem(
+        browseMemoryKey('muse-return', returnHref),
+        JSON.stringify({ href: returnHref, shown, y: window.scrollY, key }),
+      );
+    } catch {}
   };
-
 
   // 切分类时重置分批（render 期间调整 state，避免 effect 级联）
   const filterKey = `${active}|${query}`;
@@ -89,14 +102,23 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
   useEffect(() => {
     let frame = 0;
     try {
-      const memoryKey = browseMemoryKey('muse-return', window.location.pathname + window.location.search);
-      const saved = JSON.parse(sessionStorage.getItem(memoryKey) ?? sessionStorage.getItem('muse-return') ?? 'null');
-      if (typeof saved?.href === 'string' && browseMemoryKey('muse-return', saved.href) === memoryKey) {
+      const memoryKey = browseMemoryKey(
+        'muse-return',
+        window.location.pathname + window.location.search,
+      );
+      const saved = JSON.parse(
+        sessionStorage.getItem(memoryKey) ?? sessionStorage.getItem('muse-return') ?? 'null',
+      );
+      if (
+        typeof saved?.href === 'string' &&
+        browseMemoryKey('muse-return', saved.href) === memoryKey
+      ) {
         frame = requestAnimationFrame(() => {
           setShown(Math.max(batchSize, Number(saved.shown) || batchSize));
           frame = requestAnimationFrame(() => {
             window.scrollTo(0, Number(saved.y) || 0);
-            if (typeof saved.key === 'string') document.getElementById(`muse-${saved.key}`)?.focus({ preventScroll: true });
+            if (typeof saved.key === 'string')
+              document.getElementById(`muse-${saved.key}`)?.focus({ preventScroll: true });
           });
         });
       }
@@ -107,11 +129,14 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
   useEffect(() => {
     const sentinel = moreRef.current;
     if (!sentinel || shown >= filtered.length) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry?.isIntersecting) return;
-      observer.disconnect();
-      setShown(count => Math.min(count + batchSize, filtered.length));
-    }, { rootMargin: '600px 0px' });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        observer.disconnect();
+        setShown((count) => Math.min(count + batchSize, filtered.length));
+      },
+      { rootMargin: '600px 0px' },
+    );
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, [shown, filtered.length, filterKey, batchSize]);
@@ -119,26 +144,63 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
   const clear = () => window.history.replaceState(null, '', pathname);
   return (
     <section aria-label="灵感浏览">
-      <CollectionToolbar actions={<CollectionSearch value={query} onChange={setQuery} placeholder="搜索灵感" label="搜索标题、作者或标签" />}>
+      <CollectionToolbar
+        actions={
+          <CollectionSearch
+            value={query}
+            onChange={setQuery}
+            placeholder="搜索灵感"
+            label="搜索标题、作者或标签"
+          />
+        }
+      >
         <CategoryTabs categories={categories} active={active} onSelect={select} />
       </CollectionToolbar>
       <div className={styles.results}>
         <p role="status">{filtered.length} 件灵感</p>
-        {query || active !== '全部' ? <Button variant="ghost" onClick={clear}>清除筛选</Button> : null}
+        {query || active !== '全部' ? (
+          <Button variant="ghost" onClick={clear}>
+            清除筛选
+          </Button>
+        ) : null}
       </div>
-      {filtered.length === 0 ? <div className={styles.empty}>
-        <h2>{items.length ? '没有找到匹配的灵感' : '还没有收录内容'}</h2>
-        <p>{items.length ? '试试其他关键词或分类，或清除筛选。' : '内容收录后会出现在这里。'}</p>
-        {items.length ? <Button onClick={clear}>查看全部灵感</Button> : null}
-      </div> : <div className={styles.grid}>
-        {visible.map((item, index) => <PlateCell key={item.key} item={item} priority={index < 8} href={browseHref(item.href, returnHref)} onNavigate={remember} />)}
-      </div>}
-      {visible.length < filtered.length ? <div ref={moreRef} className={styles.more} aria-hidden="true" /> : null}
+      {filtered.length === 0 ? (
+        <div className={styles.empty}>
+          <h2>{items.length ? '没有找到匹配的灵感' : '还没有收录内容'}</h2>
+          <p>{items.length ? '试试其他关键词或分类，或清除筛选。' : '内容收录后会出现在这里。'}</p>
+          {items.length ? <Button onClick={clear}>查看全部灵感</Button> : null}
+        </div>
+      ) : (
+        <div className={styles.grid}>
+          {visible.map((item, index) => (
+            <PlateCell
+              key={item.key}
+              item={item}
+              priority={index < 8}
+              href={browseHref(item.href, returnHref)}
+              onNavigate={remember}
+            />
+          ))}
+        </div>
+      )}
+      {visible.length < filtered.length ? (
+        <div ref={moreRef} className={styles.more} aria-hidden="true" />
+      ) : null}
     </section>
   );
 }
 
-function PlateCell({ item, href, onNavigate, priority }: { item: PlateWallItem; href: string; onNavigate: (key: string) => void; priority: boolean }) {
+function PlateCell({
+  item,
+  href,
+  onNavigate,
+  priority,
+}: {
+  item: PlateWallItem;
+  href: string;
+  onNavigate: (key: string) => void;
+  priority: boolean;
+}) {
   const router = useRouter();
   const prefetch = () => router.prefetch(href);
   const preview = item.kind === 'video' ? item.poster : item.src;
@@ -148,9 +210,14 @@ function PlateCell({ item, href, onNavigate, priority }: { item: PlateWallItem; 
   useEffect(() => {
     if (item.kind !== 'video' || !preview) return;
     const poster = new window.Image();
-    poster.onload = () => { setReady(true); setFailed(false); };
+    poster.onload = () => {
+      setReady(true);
+      setFailed(false);
+    };
     poster.src = preview;
-    return () => { poster.onload = null; };
+    return () => {
+      poster.onload = null;
+    };
   }, [item.kind, preview]);
   useEffect(() => {
     const cell = cellRef.current;
@@ -158,22 +225,74 @@ function PlateCell({ item, href, onNavigate, priority }: { item: PlateWallItem; 
     let timer: ReturnType<typeof setTimeout> | undefined;
     const observer = new IntersectionObserver(([entry]) => {
       if (entry?.isIntersecting && !timer) timer = setTimeout(() => setFailed(true), 15000);
-      else if (!entry?.isIntersecting && timer) { clearTimeout(timer); timer = undefined; }
+      else if (!entry?.isIntersecting && timer) {
+        clearTimeout(timer);
+        timer = undefined;
+      }
     });
     observer.observe(cell);
-    return () => { observer.disconnect(); clearTimeout(timer); };
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
   }, [ready, failed]);
-  return <Link ref={cellRef} id={`muse-${item.key}`} href={href} prefetch={false} onPointerEnter={prefetch} onFocus={prefetch} className={styles.cell} onClick={() => onNavigate(item.key)}>
-    <figure>
-      <div className={styles.media}>
-        {item.kind === 'video' && item.src ? <MotionVideo src={item.src} poster={preview ?? undefined} aria-label={item.name} onLoadedMetadata={() => { setReady(true); setFailed(false); }} onLoadedData={() => { setReady(true); setFailed(false); }} onError={() => setFailed(true)} /> : preview ? <Image src={preview} alt="" fill loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : undefined} sizes="(min-width: 1200px) 25vw, (min-width: 760px) 33vw, (min-width: 360px) 50vw, 100vw" onLoad={() => { setReady(true); setFailed(false); }} onError={() => setFailed(true)} /> : null}
-        {failed ? <span className={styles.failure}>预览暂不可用<span>查看作品与出处</span></span> : null}
-        {(item.mediaCount ?? 0) > 1 ? <span className={styles.badge}>{item.mediaCount} 项</span> : null}
-      </div>
-      <figcaption className={styles.caption}>
-        <h2 className={styles.title}>{item.name || '未命名灵感'}</h2>
-        {item.lead ? <span className={styles.meta}>{item.lead}</span> : null}
-      </figcaption>
-    </figure>
-  </Link>;
+  return (
+    <Link
+      ref={cellRef}
+      id={`muse-${item.key}`}
+      href={href}
+      prefetch={false}
+      onPointerEnter={prefetch}
+      onFocus={prefetch}
+      className={styles.cell}
+      onClick={() => onNavigate(item.key)}
+    >
+      <figure>
+        <div className={styles.media}>
+          {item.kind === 'video' && item.src ? (
+            <MotionVideo
+              src={item.src}
+              poster={preview ?? undefined}
+              aria-label={item.name}
+              onLoadedMetadata={() => {
+                setReady(true);
+                setFailed(false);
+              }}
+              onLoadedData={() => {
+                setReady(true);
+                setFailed(false);
+              }}
+              onError={() => setFailed(true)}
+            />
+          ) : preview ? (
+            <Image
+              src={preview}
+              alt=""
+              fill
+              loading={priority ? 'eager' : 'lazy'}
+              fetchPriority={priority ? 'high' : undefined}
+              sizes="(min-width: 1200px) 25vw, (min-width: 760px) 33vw, (min-width: 360px) 50vw, 100vw"
+              onLoad={() => {
+                setReady(true);
+                setFailed(false);
+              }}
+              onError={() => setFailed(true)}
+            />
+          ) : null}
+          {failed ? (
+            <span className={styles.failure}>
+              预览暂不可用<span>查看作品与出处</span>
+            </span>
+          ) : null}
+          {(item.mediaCount ?? 0) > 1 ? (
+            <span className={styles.badge}>{item.mediaCount} 项</span>
+          ) : null}
+        </div>
+        <figcaption className={styles.caption}>
+          <h2 className={styles.title}>{item.name || '未命名灵感'}</h2>
+          {item.lead ? <span className={styles.meta}>{item.lead}</span> : null}
+        </figcaption>
+      </figure>
+    </Link>
+  );
 }

@@ -7,11 +7,14 @@ import styles from './category-tabs.module.css';
 import { cn } from '@/lib/utils';
 
 /** ?cat= 参数读写：active 派生 + select（replace 不产生历史记录） */
-export function useCatParam(allowed?: readonly string[]): [active: string, select: (name: string) => void] {
+export function useCatParam(
+  allowed?: readonly string[],
+): [active: string, select: (name: string) => void] {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const requested = searchParams.get('cat') ?? '全部';
-  const active = requested === '全部' || !allowed || allowed.includes(requested) ? requested : '全部';
+  const active =
+    requested === '全部' || !allowed || allowed.includes(requested) ? requested : '全部';
   useEffect(() => {
     if (requested === active) return;
     const params = new URLSearchParams(searchParams.toString());
@@ -52,7 +55,9 @@ export function CategoryTabs({
           aria-pressed={active === category.name}
           onClick={() => onSelect(category.name)}
           className={styles.tab}
-          onFocus={(event) => event.currentTarget.scrollIntoView({ block: 'nearest', inline: 'nearest' })}
+          onFocus={(event) =>
+            event.currentTarget.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+          }
         >
           {categoryLabel(category.name)}
         </button>

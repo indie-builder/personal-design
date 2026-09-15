@@ -8,14 +8,17 @@
   },
   "scripts": {
     "sync": "node scripts/sync.mjs",
-    "render:promo": "node scripts/render-promo.mjs"
+    "render:promo": "node scripts/render-promo.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@remotion/cli": "4.0.484",
+    "@types/node": "26.4.0",
     "@types/react": "19.2.17",
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "remotion": "4.0.484",
-    "sharp": "^0.35.4"
+    "sharp": "^0.35.4",
+    "typescript": "^7.0.2"
   }
 }

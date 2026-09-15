@@ -16,6 +16,7 @@
 - 按实际数据路径覆盖加载、空、错误、有内容、极端内容；不为满足参考案例虚构账户、支付、客服等功能。
 - 类型检查：`pnpm --filter @personal-design/web typecheck`。
 - 单文件 lint：在 `apps/web` 路径下执行 `pnpm exec oxlint <file>`；规则集在 `.oxlintrc.json`（对等原 eslint-config-next：correctness 全量 + nextjs/react/jsx-a11y/typescript 插件，jsx-a11y 交互类 5 条规则显式关闭）。改交互或布局时检查对应页面的桌面、键盘与主题（用户当前明确移动端暂不作为设计重点）。
+- 格式化：根目录 `pnpm format`（oxfmt，TS/TSX/MJS）。`*.module.css` 是刻意保持的紧凑单行手写风格，不参与 oxfmt，也不要手工展开。TypeScript 用 TS7（Go 原生编译器，`tsc` 即原生 CLI）。
 
 <!-- BEGIN:nextjs-agent-rules -->
 

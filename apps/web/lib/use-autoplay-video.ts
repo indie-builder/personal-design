@@ -11,13 +11,24 @@ export function useAutoplayVideo() {
     let disposed = false;
     const allowed = () => !disposed && visible && !document.hidden && !motion.matches;
     const update = () => {
-      if (!allowed()) { video.pause(); return; }
-      void video.play().then(() => { if (!allowed()) video.pause(); }).catch(() => {});
+      if (!allowed()) {
+        video.pause();
+        return;
+      }
+      void video
+        .play()
+        .then(() => {
+          if (!allowed()) video.pause();
+        })
+        .catch(() => {});
     };
-    const observer = new IntersectionObserver(([entry]) => {
-      visible = !!entry && entry.isIntersecting && entry.intersectionRatio >= 0.25;
-      update();
-    }, { threshold: [0, 0.25] });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = !!entry && entry.isIntersecting && entry.intersectionRatio >= 0.25;
+        update();
+      },
+      { threshold: [0, 0.25] },
+    );
     observer.observe(video);
     motion.addEventListener('change', update);
     document.addEventListener('visibilitychange', update);

@@ -1,13 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import {
-  ArrowUpRight,
-} from 'lucide-react';
-import {
-  getPostBySlug,
-  listPosts,
-} from '@personal-design/inspora';
+import { ArrowUpRight } from 'lucide-react';
+import { getPostBySlug, listPosts } from '@personal-design/inspora';
 import { BrowseNavigation } from '@/components/browse-navigation';
 import { categoryLabel } from '@/lib/category-label';
 import { MuseMediaCarousel } from '@/components/inspora-media-carousel';
@@ -20,7 +15,10 @@ const BROWSE_WINDOW = 240;
 function windowed<T extends { href: string }>(entries: T[], currentHref: string): T[] {
   const index = entries.findIndex((entry) => entry.href === currentHref);
   if (index < 0 || entries.length <= BROWSE_WINDOW * 2 + 1) return entries;
-  const start = Math.max(0, Math.min(index - BROWSE_WINDOW, entries.length - (BROWSE_WINDOW * 2 + 1)));
+  const start = Math.max(
+    0,
+    Math.min(index - BROWSE_WINDOW, entries.length - (BROWSE_WINDOW * 2 + 1)),
+  );
   return entries.slice(start, start + BROWSE_WINDOW * 2 + 1);
 }
 
@@ -46,12 +44,16 @@ export default async function MuseDetailPage({ params }: PageProps) {
   if (!post) notFound();
 
   const posts = listPosts();
-  const group = posts.filter(entry => !post.category || entry.category === post.category);
-  const browseEntries = posts.map(entry => ({
+  const group = posts.filter((entry) => !post.category || entry.category === post.category);
+  const browseEntries = posts.map((entry) => ({
     href: `/products/muse/${entry.slug}`,
     title: entry.title,
     category: entry.category ?? '未分类',
-    search: [entry.creatorName ?? '', [entry.category, ...entry.industries, ...entry.styles].filter(Boolean).join(' '), categoryLabel(entry.category ?? '未分类')],
+    search: [
+      entry.creatorName ?? '',
+      [entry.category, ...entry.industries, ...entry.styles].filter(Boolean).join(' '),
+      categoryLabel(entry.category ?? '未分类'),
+    ],
   }));
   const currentHref = `/products/muse/${post.slug}`;
 
@@ -76,26 +78,62 @@ export default async function MuseDetailPage({ params }: PageProps) {
 
   return (
     <main className={styles.page}>
-      <BrowseNavigation appearance="text" listPath="/products/muse" storageKey="muse-return" returnLabel="返回灵感集" fallbackHref={listHref}
+      <BrowseNavigation
+        appearance="text"
+        listPath="/products/muse"
+        storageKey="muse-return"
+        returnLabel="返回灵感集"
+        fallbackHref={listHref}
         browseEntries={windowed(browseEntries, currentHref)}
         currentHref={currentHref}
-        entries={windowed(group.map(entry => ({ href:`/products/muse/${entry.slug}`, title:entry.title })), currentHref)} />
+        entries={windowed(
+          group.map((entry) => ({ href: `/products/muse/${entry.slug}`, title: entry.title })),
+          currentHref,
+        )}
+      />
       <header className={styles.heading}>
         <h1 className={styles.title}>{post.title || '未命名灵感'}</h1>
         <div className={styles.byline}>
-          {post.creatorName ? <p className={styles.author}>
-            {post.creatorAvatar ? (
-              // eslint-disable-next-line @next/next/no-img-element -- Local author thumbnail.
-              <img src={post.creatorAvatar} alt="" />
-            ) : null}
-            {post.creatorUrl ? <a href={post.creatorUrl} target="_blank" rel="noreferrer">{post.creatorName}</a> : <span>{post.creatorName}</span>}
-          </p> : null}
-          {post.category ? <Link href={listHref} className={styles.category}>{categoryLabel(post.category)}</Link> : null}
-          {post.sourceUrl ? <a href={post.sourceUrl} target="_blank" rel="noreferrer" className={styles.source}>查看原作<ArrowUpRight size={18} strokeWidth={1.6} aria-hidden /></a> : null}
+          {post.creatorName ? (
+            <p className={styles.author}>
+              {post.creatorAvatar ? (
+                // eslint-disable-next-line @next/next/no-img-element -- Local author thumbnail.
+                <img src={post.creatorAvatar} alt="" />
+              ) : null}
+              {post.creatorUrl ? (
+                <a href={post.creatorUrl} target="_blank" rel="noreferrer">
+                  {post.creatorName}
+                </a>
+              ) : (
+                <span>{post.creatorName}</span>
+              )}
+            </p>
+          ) : null}
+          {post.category ? (
+            <Link href={listHref} className={styles.category}>
+              {categoryLabel(post.category)}
+            </Link>
+          ) : null}
+          {post.sourceUrl ? (
+            <a href={post.sourceUrl} target="_blank" rel="noreferrer" className={styles.source}>
+              查看原作
+              <ArrowUpRight size={18} strokeWidth={1.6} aria-hidden />
+            </a>
+          ) : null}
         </div>
       </header>
-      {media.length ? <MuseMediaCarousel key={post.slug} media={media} /> : <div className={styles.empty}><p>作品暂时无法显示</p></div>}
-      {hasDescription ? <div className={styles.information}><p className={styles.description}>{description}</p></div> : null}
+      {media.length ? (
+        <MuseMediaCarousel key={post.slug} media={media} />
+      ) : (
+        <div className={styles.empty}>
+          <p>作品暂时无法显示</p>
+        </div>
+      )}
+      {hasDescription ? (
+        <div className={styles.information}>
+          <p className={styles.description}>{description}</p>
+        </div>
+      ) : null}
     </main>
   );
 }

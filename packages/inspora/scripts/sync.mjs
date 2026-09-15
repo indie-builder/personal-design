@@ -38,7 +38,10 @@ if (ONLY && !['inspora', 'bestx'].includes(ONLY)) {
 
 const sources = [
   { name: 'bestx', run: ({ db, stmts }) => syncBestx({ db, stmts, full: FULL }) },
-  { name: 'inspora', run: ({ db, stmts }) => syncInspora({ db, stmts, full: FULL, maxPages: MAX_PAGES }) },
+  {
+    name: 'inspora',
+    run: ({ db, stmts }) => syncInspora({ db, stmts, full: FULL, maxPages: MAX_PAGES }),
+  },
 ].filter((source) => !ONLY || source.name === ONLY);
 
 const { db, stmts } = openDatabase(DB_PATH);
@@ -46,9 +49,11 @@ const failed = [];
 
 /** 老的 inspora 行详情补全时才会写 tweet_id；每次同步前从 source_url 直接补齐，跨源去重才能覆盖存量 */
 function backfillTweetIds() {
-  const rows = db.prepare(
-    "SELECT id, source_url FROM posts WHERE source = 'inspora' AND tweet_id IS NULL AND source_url LIKE '%/status/%'",
-  ).all();
+  const rows = db
+    .prepare(
+      "SELECT id, source_url FROM posts WHERE source = 'inspora' AND tweet_id IS NULL AND source_url LIKE '%/status/%'",
+    )
+    .all();
   const update = db.prepare('UPDATE posts SET tweet_id = ? WHERE id = ?');
   db.exec('BEGIN');
   try {

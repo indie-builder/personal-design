@@ -26,7 +26,10 @@ export function tweetIdOf(postUrl) {
 
 /** 标题取推文首行非链接文本（首行常是作品链接），截断 120 字符；空推文回退 @handle */
 export function deriveTitle(tweetText, handle) {
-  const lines = (tweetText ?? '').split('\n').map((line) => line.trim()).filter(Boolean);
+  const lines = (tweetText ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
   const first = lines.find((line) => !/^https?:\/\//i.test(line)) ?? lines[0] ?? '';
   const title = first.length > 120 ? `${first.slice(0, 119)}…` : first;
   return title || `@${handle ?? 'unknown'}`;
@@ -47,11 +50,27 @@ function mapMedia(entry, tweetId, position) {
   const width = intOf(entry.width);
   const height = intOf(entry.height);
   if (entry.type === 'photo' && entry.image) {
-    return { id: `bestx-${tweetId}-${position}`, type: 'image', url: entry.image, posterUrl: null, width, height, raw: entry };
+    return {
+      id: `bestx-${tweetId}-${position}`,
+      type: 'image',
+      url: entry.image,
+      posterUrl: null,
+      width,
+      height,
+      raw: entry,
+    };
   }
   // video 与 animated_gif（X 的 gif 实为 mp4）都按视频处理
   if ((entry.type === 'video' || entry.type === 'animated_gif') && entry.video_url) {
-    return { id: `bestx-${tweetId}-${position}`, type: 'video', url: entry.video_url, posterUrl: entry.cover ?? null, width, height, raw: entry };
+    return {
+      id: `bestx-${tweetId}-${position}`,
+      type: 'video',
+      url: entry.video_url,
+      posterUrl: entry.cover ?? null,
+      width,
+      height,
+      raw: entry,
+    };
   }
   return null;
 }
@@ -76,17 +95,29 @@ export function mapBestxPost(row) {
     creatorUrl: row.handle ? `https://x.com/${row.handle}` : null,
     // 头像存 CDN 直链，查询层按 https 前缀识别为热链（见 src/index.ts）
     creatorAvatar: row.avatar ?? null,
-    sourceUrl: row.post_url?.startsWith('/') ? `https://x.com${row.post_url}` : row.post_url ?? null,
+    sourceUrl: row.post_url?.startsWith('/')
+      ? `https://x.com${row.post_url}`
+      : (row.post_url ?? null),
     category: null,
     createdAt,
     publishedAt: isoOf(row.published_at),
     isFeatured: row.featured === true,
     raw: {
-      id: row.id, handle: row.handle, user_id: row.user_id, post_url: row.post_url,
-      tweet_text: row.tweet_text, time: row.time, published_at: row.published_at,
-      tags: row.tags, featured: row.featured, interaction: row.interaction, media: row.media,
+      id: row.id,
+      handle: row.handle,
+      user_id: row.user_id,
+      post_url: row.post_url,
+      tweet_text: row.tweet_text,
+      time: row.time,
+      published_at: row.published_at,
+      tags: row.tags,
+      featured: row.featured,
+      interaction: row.interaction,
+      media: row.media,
     },
-    media: (row.media ?? []).map((entry, position) => mapMedia(entry, tweetId, position)).filter(Boolean),
+    media: (row.media ?? [])
+      .map((entry, position) => mapMedia(entry, tweetId, position))
+      .filter(Boolean),
   };
 }
 

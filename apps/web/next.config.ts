@@ -24,21 +24,24 @@ const nextConfig: NextConfig = {
       headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
     }));
   },
-  transpilePackages: [
-    '@personal-design/layout-compositions',
-    '@personal-design/inspora',
-  ],
+  transpilePackages: ['@personal-design/layout-compositions', '@personal-design/inspora'],
   allowedDevOrigins: ['personal-design.localhost', '*.personal-design.localhost'],
   // dev 指示器默认在右上，恰好压住主题切换钮；挪到左下（仅 dev 有效）
   devIndicators: { position: 'bottom-left' },
   images: {
     localPatterns: [
       { pathname: '/**', search: '' },
-      ...(mediaVersion ? mediaDirectories.map(directory => ({ pathname: `/${directory}/**`, search: `?v=${mediaVersion}` })) : []),
+      ...(mediaVersion
+        ? mediaDirectories.map((directory) => ({
+            pathname: `/${directory}/**`,
+            search: `?v=${mediaVersion}`,
+          }))
+        : []),
     ],
-    remotePatterns: [...UPSTREAM_HOSTS, ...(mediaHost ? [mediaHost] : [])].map(
-      (hostname) => ({ protocol: 'https' as const, hostname }),
-    ),
+    remotePatterns: [...UPSTREAM_HOSTS, ...(mediaHost ? [mediaHost] : [])].map((hostname) => ({
+      protocol: 'https' as const,
+      hostname,
+    })),
     // 本地开发走 fake-ip 代理时上游域名会解析到 198.18.x.x（私有段），
     // Next 的 SSRF 防护会拒绝优化器拉取；remotePatterns 已限制域名白名单，风险可控
     dangerouslyAllowLocalIP: true,

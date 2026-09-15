@@ -48,10 +48,17 @@ if (response.challenge === 'challenge') {
 }
 cliLog('SYNC_RESULT:' + JSON.stringify(response));`;
   try {
-    const { stdout, stderr } = await execFileAsync('/bin/zsh', ['-c', `ego-browser nodejs <<'EGO_SYNC_SCRIPT'\n${script}\nEGO_SYNC_SCRIPT`], {
-      timeout: 90000, maxBuffer: 10 * 1024 * 1024,
-    });
-    const result = `${stdout}\n${stderr}`.split('\n').find((line) => line.startsWith('SYNC_RESULT:'));
+    const { stdout, stderr } = await execFileAsync(
+      '/bin/zsh',
+      ['-c', `ego-browser nodejs <<'EGO_SYNC_SCRIPT'\n${script}\nEGO_SYNC_SCRIPT`],
+      {
+        timeout: 90000,
+        maxBuffer: 10 * 1024 * 1024,
+      },
+    );
+    const result = `${stdout}\n${stderr}`
+      .split('\n')
+      .find((line) => line.startsWith('SYNC_RESULT:'));
     if (!result) throw new Error('ego-browser 未返回同步数据');
     return JSON.parse(result.slice('SYNC_RESULT:'.length));
   } catch {
@@ -62,7 +69,9 @@ cliLog('SYNC_RESULT:' + JSON.stringify(response));`;
 }
 
 export async function syncInspora({ db, stmts, full = false, maxPages = Infinity }) {
-  console.log(`模式: ${full ? '全量 backfill' : '增量'}${maxPages < Infinity ? `（最多 ${maxPages} 页）` : ''}`);
+  console.log(
+    `模式: ${full ? '全量 backfill' : '增量'}${maxPages < Infinity ? `（最多 ${maxPages} 页）` : ''}`,
+  );
 
   const browser = await chromium.launch({ headless: true });
   try {
@@ -75,31 +84,49 @@ export async function syncInspora({ db, stmts, full = false, maxPages = Infinity
     console.log(`已进入站点（${title}）`);
 
     // 分类从实际导航读取，避免上游新增分类时静默漏同步。
-    const categories = await page.locator('a[href*="category="]').evaluateAll((links) =>
-      [...new Set(links.map((link) => new URL(link.href).searchParams.get('category')).filter(Boolean))],
-    );
+    const categories = await page
+      .locator('a[href*="category="]')
+      .evaluateAll((links) => [
+        ...new Set(
+          links.map((link) => new URL(link.href).searchParams.get('category')).filter(Boolean),
+        ),
+      ]);
     if (categories.length === 0) throw new Error('未找到分类导航，停止同步以避免漏数据');
     // 增量只对比本源的 id：另一个源的作品与这里无关
     const knownIds = new Set(
-      db.prepare("SELECT id FROM posts WHERE source = 'inspora'").all().map((row) => row.id),
+      db
+        .prepare("SELECT id FROM posts WHERE source = 'inspora'")
+        .all()
+        .map((row) => row.id),
     );
-    const feed = await collectFeed(categories, knownIds, async (category, cursor) => {
-      const query = new URLSearchParams({ category, view: 'latest' });
-      if (cursor) query.set('cursor', cursor);
-      const url = `${cursor ? '/api/posts' : '/'}?${query}`;
-      let response = await page.evaluate(async (url) => {
-        const res = await fetch(url);
-        return { status: res.status, challenge: res.headers.get('x-vercel-mitigated'), body: await res.text() };
-      }, url);
-      if (response.challenge === 'challenge') response = await verifiedFetch(url);
-      if (response.status !== 200) {
-        throw new Error(`${category}: HTTP ${response.status}${response.challenge === 'challenge' ? ' Vercel checkpoint' : ''}，分类列表未完整读取，未写入新增作品`);
-      }
-      const data = cursor ? JSON.parse(response.body) : extractInitialPage(response.body);
-      console.log(`分类 ${category}${cursor ? ' 翻页' : ' 首屏'}: ${data.items.length} 条`);
-      await sleep(300);
-      return data;
-    }, { full, maxPages });
+    const feed = await collectFeed(
+      categories,
+      knownIds,
+      async (category, cursor) => {
+        const query = new URLSearchParams({ category, view: 'latest' });
+        if (cursor) query.set('cursor', cursor);
+        const url = `${cursor ? '/api/posts' : '/'}?${query}`;
+        let response = await page.evaluate(async (url) => {
+          const res = await fetch(url);
+          return {
+            status: res.status,
+            challenge: res.headers.get('x-vercel-mitigated'),
+            body: await res.text(),
+          };
+        }, url);
+        if (response.challenge === 'challenge') response = await verifiedFetch(url);
+        if (response.status !== 200) {
+          throw new Error(
+            `${category}: HTTP ${response.status}${response.challenge === 'challenge' ? ' Vercel checkpoint' : ''}，分类列表未完整读取，未写入新增作品`,
+          );
+        }
+        const data = cursor ? JSON.parse(response.body) : extractInitialPage(response.body);
+        console.log(`分类 ${category}${cursor ? ' 翻页' : ' 首屏'}: ${data.items.length} 条`);
+        await sleep(300);
+        return data;
+      },
+      { full, maxPages },
+    );
 
     let newPosts = 0;
     db.exec('BEGIN');
@@ -169,12 +196,19 @@ export async function syncInspora({ db, stmts, full = false, maxPages = Infinity
       try {
         let response = await page.evaluate(async (p) => {
           const res = await fetch(p, { headers: { accept: 'text/html' } });
-          return { status: res.status, challenge: res.headers.get('x-vercel-mitigated'), body: await res.text() };
+          return {
+            status: res.status,
+            challenge: res.headers.get('x-vercel-mitigated'),
+            body: await res.text(),
+          };
         }, `/posts/${slug}`);
         if (response.challenge === 'challenge') {
           response = await verifiedFetch(`/posts/${slug}`);
         }
-        if (response.status !== 200) throw new Error(`HTTP ${response.status}${response.challenge ? ' Vercel checkpoint' : ''}`);
+        if (response.status !== 200)
+          throw new Error(
+            `HTTP ${response.status}${response.challenge ? ' Vercel checkpoint' : ''}`,
+          );
         const html = response.body;
         const detail = html && extractDetailPost(html, postId);
         if (!detail) throw new Error('详情对象提取失败');
@@ -273,9 +307,11 @@ export async function syncInspora({ db, stmts, full = false, maxPages = Infinity
     }
 
     const total = db.prepare("SELECT COUNT(*) AS c FROM posts WHERE source = 'inspora'").get().c;
-    const totalMedia = db.prepare(
-      "SELECT COUNT(*) AS c FROM media WHERE post_id IN (SELECT id FROM posts WHERE source = 'inspora')",
-    ).get().c;
+    const totalMedia = db
+      .prepare(
+        "SELECT COUNT(*) AS c FROM media WHERE post_id IN (SELECT id FROM posts WHERE source = 'inspora')",
+      )
+      .get().c;
     console.log(`inspora 完成。posts=${total} media=${totalMedia}`);
     if (enriched < toEnrich.length || mediaResults.failed > 0 || avatarFailed > 0) {
       throw new Error('详情、媒体或头像未全部同步成功，下次增量会继续补齐');
@@ -284,7 +320,10 @@ export async function syncInspora({ db, stmts, full = false, maxPages = Infinity
   } finally {
     await browser.close();
     if (state.usedEgo && !state.egoFailed) {
-      await execFileAsync('/bin/zsh', ['-c', `ego-browser nodejs <<'EGO_SYNC_SCRIPT'\ncliLog(await completeTaskSpace(${JSON.stringify(EGO_TASK)}, { keep: false }));\nEGO_SYNC_SCRIPT`]);
+      await execFileAsync('/bin/zsh', [
+        '-c',
+        `ego-browser nodejs <<'EGO_SYNC_SCRIPT'\ncliLog(await completeTaskSpace(${JSON.stringify(EGO_TASK)}, { keep: false }));\nEGO_SYNC_SCRIPT`,
+      ]);
     }
   }
 }

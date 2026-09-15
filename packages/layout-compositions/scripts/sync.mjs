@@ -13,13 +13,7 @@
 import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import {
-  createReadStream,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  statSync,
-} from 'node:fs';
+import { createReadStream, existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
 import { readFile, rm, writeFile } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
 import path from 'node:path';
@@ -32,10 +26,7 @@ const pkgDir = path.resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
 const upstreamDir = path.join(pkgDir, '.upstream');
 const tarballPath = path.join(upstreamDir, 'repo.tar.gz');
 const extractDir = path.join(upstreamDir, 'extracted');
-const outBase = path.resolve(
-  pkgDir,
-  '../../apps/web/public/layout-compositions',
-);
+const outBase = path.resolve(pkgDir, '../../apps/web/public/layout-compositions');
 
 const TARBALL_URL =
   'https://codeload.github.com/nevertoday/350-layout-compositions/tar.gz/refs/heads/main';
@@ -43,12 +34,8 @@ const CONCURRENCY = 8;
 /** 默认只出缩略图（线上热链上游原图）；--with-images 才生成无损高清图 */
 const WITH_IMAGES = process.argv.includes('--with-images');
 
-const catalog = JSON.parse(
-  await readFile(path.join(pkgDir, 'catalog.json'), 'utf8'),
-);
-const corrections = JSON.parse(
-  await readFile(path.join(pkgDir, 'corrections.json'), 'utf8'),
-);
+const catalog = JSON.parse(await readFile(path.join(pkgDir, 'catalog.json'), 'utf8'));
+const corrections = JSON.parse(await readFile(path.join(pkgDir, 'corrections.json'), 'utf8'));
 const catalogById = new Map(catalog.map((item) => [item.id, item]));
 
 /**
@@ -79,9 +66,7 @@ function resolveSource(item) {
 
 async function downloadTarball() {
   if (existsSync(tarballPath) && statSync(tarballPath).size > 1024 * 1024) {
-    console.log(
-      `[sync] 复用已下载的 tarball (${(statSync(tarballPath).size / 1e6).toFixed(0)}MB)`,
-    );
+    console.log(`[sync] 复用已下载的 tarball (${(statSync(tarballPath).size / 1e6).toFixed(0)}MB)`);
     return;
   }
   mkdirSync(upstreamDir, { recursive: true });
@@ -130,20 +115,9 @@ async function convertOne(root, item) {
   const source = resolveSource(item);
   if (!source) return 'missing';
 
-  const imageOut = path.join(
-    outBase,
-    'images',
-    item.category_slug,
-    `${item.id}.webp`,
-  );
-  const thumbOut = path.join(
-    outBase,
-    'thumbnails',
-    item.category_slug,
-    `${item.id}.webp`,
-  );
-  const imageDone =
-    !WITH_IMAGES || (existsSync(imageOut) && statSync(imageOut).size > 0);
+  const imageOut = path.join(outBase, 'images', item.category_slug, `${item.id}.webp`);
+  const thumbOut = path.join(outBase, 'thumbnails', item.category_slug, `${item.id}.webp`);
+  const imageDone = !WITH_IMAGES || (existsSync(imageOut) && statSync(imageOut).size > 0);
   const thumbDone = existsSync(thumbOut) && statSync(thumbOut).size > 0;
   if (imageDone && thumbDone) return 'skipped';
 
@@ -153,9 +127,7 @@ async function convertOne(root, item) {
   if (source.sha256) {
     const digest = await sha256(srcImage);
     if (digest !== source.sha256) {
-      throw new Error(
-        `sha256 校验失败: ${item.id} ${item.name} (${digest} != ${source.sha256})`,
-      );
+      throw new Error(`sha256 校验失败: ${item.id} ${item.name} (${digest} != ${source.sha256})`);
     }
   }
 
@@ -164,19 +136,12 @@ async function convertOne(root, item) {
 
   const jobs = [];
   if (!imageDone) {
-    jobs.push(
-      sharp(srcImage).webp({ lossless: true }).toFile(imageOut),
-    );
+    jobs.push(sharp(srcImage).webp({ lossless: true }).toFile(imageOut));
   }
   if (!thumbDone) {
     // 缩略图也从 PNG 原图缩放（上游 JPG 缩略图本身已压缩，再压会糊）；
     // 720 宽覆盖灵感墙卡片 3x DPR（208px CSS ≈ 624px）
-    jobs.push(
-      sharp(srcImage)
-        .resize({ width: 720 })
-        .webp({ quality: 82 })
-        .toFile(thumbOut),
-    );
+    jobs.push(sharp(srcImage).resize({ width: 720 }).webp({ quality: 82 }).toFile(thumbOut));
   }
   await Promise.all(jobs);
   return 'converted';
@@ -193,9 +158,7 @@ async function main() {
   let missing = 0;
   for (let i = 0; i < catalog.length; i += CONCURRENCY) {
     const batch = catalog.slice(i, i + CONCURRENCY);
-    const results = await Promise.all(
-      batch.map((item) => convertOne(root, item)),
-    );
+    const results = await Promise.all(batch.map((item) => convertOne(root, item)));
     for (const r of results) {
       if (r === 'converted') converted += 1;
       else if (r === 'missing') missing += 1;
@@ -207,9 +170,7 @@ async function main() {
     }
   }
 
-  console.log(
-    `[sync] 完成: 新转换 ${converted}，跳过 ${skipped}，上游缺失 ${missing}`,
-  );
+  console.log(`[sync] 完成: 新转换 ${converted}，跳过 ${skipped}，上游缺失 ${missing}`);
   if (converted + skipped + missing !== catalog.length) {
     throw new Error('条目数不匹配');
   }

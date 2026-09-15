@@ -22,6 +22,7 @@ pnpm install        # 安装依赖
 pnpm dev            # 启动开发服务器
 pnpm build          # 构建
 pnpm lint           # oxlint
+pnpm format         # oxfmt 格式化 TS/TSX/MJS（CSS 不参与）
 pnpm typecheck      # 全部包 TypeScript 检查
 pnpm sync:layouts   # 从上游同步布局图片（下载 tarball → sha256 校验 → 转 WebP）
 ```

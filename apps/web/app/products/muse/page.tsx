@@ -7,8 +7,7 @@ import { PlateWall, type PlateWallItem } from '@/components/plate-wall';
 
 export const metadata: Metadata = {
   title: '灵感集 · 图像、界面与动效',
-  description:
-    '浏览图像、界面与动效，发现值得参考的设计与创作者，直接访问作品出处。',
+  description: '浏览图像、界面与动效，发现值得参考的设计与创作者，直接访问作品出处。',
 };
 
 const posts = listPosts();
@@ -28,21 +27,24 @@ const items: PlateWallItem[] = posts.flatMap((post) => {
       kind: first?.type ?? 'image',
       src: src ?? '',
       poster: first?.poster ?? first?.thumb,
-      fullSrc:
-        first?.type === 'image' ? (first.src ?? first.thumb ?? undefined) : undefined,
+      fullSrc: first?.type === 'image' ? (first.src ?? first.thumb ?? undefined) : undefined,
       width: first?.width ?? 4,
       height: first?.height ?? 3,
       mediaCount: post.media.length,
       keywords: [post.category, ...post.industries, ...post.styles].filter(Boolean).join(' '),
-
     },
   ];
 });
 
-const tabs = listCategories().map((category) => ({ ...category, count: items.filter((item) => item.category === category.name).length })).filter((category) => category.count > 0);
+const tabs = listCategories()
+  .map((category) => ({
+    ...category,
+    count: items.filter((item) => item.category === category.name).length,
+  }))
+  .filter((category) => category.count > 0);
 const uncategorized = items.filter((item) => item.category === '未分类').length;
-if (uncategorized && !tabs.some((category) => category.name === '未分类')) tabs.push({ name: '未分类', count: uncategorized });
-
+if (uncategorized && !tabs.some((category) => category.name === '未分类'))
+  tabs.push({ name: '未分类', count: uncategorized });
 
 export default async function MusePage() {
   await connection();
@@ -50,12 +52,14 @@ export default async function MusePage() {
     <main className={styles.page}>
       <div>
         {/* PlateWall 内用 useSearchParams 恢复分类现场，需要 Suspense 边界 */}
-        <Suspense fallback={<p role="status" className="py-8 text-ink-soft">正在准备灵感列表…</p>}>
-          <PlateWall
-            categories={tabs}
-            items={items}
-            batchSize={24}
-          />
+        <Suspense
+          fallback={
+            <p role="status" className="py-8 text-ink-soft">
+              正在准备灵感列表…
+            </p>
+          }
+        >
+          <PlateWall categories={tabs} items={items} batchSize={24} />
         </Suspense>
       </div>
     </main>

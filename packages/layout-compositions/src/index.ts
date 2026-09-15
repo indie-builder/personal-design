@@ -89,20 +89,13 @@ export function getLayoutById(id: string): LayoutItem | undefined {
 }
 
 /** 媒体 base：缺省为空（本地 public 路径）；设 NEXT_PUBLIC_MEDIA_BASE_URL（对象存储公开域名）后返回绝对 URL */
-const MEDIA_BASE = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? '').replace(
-  /\/+$/,
-  '',
-);
+const MEDIA_BASE = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? '').replace(/\/+$/, '');
 const MEDIA_VERSION = process.env.NEXT_PUBLIC_MEDIA_VERSION;
 
 /** 上游仓库的 jsDelivr CDN（热链原图用，免自建存储） */
-const UPSTREAM_CDN =
-  'https://cdn.jsdelivr.net/gh/nevertoday/350-layout-compositions@main/';
+const UPSTREAM_CDN = 'https://cdn.jsdelivr.net/gh/nevertoday/350-layout-compositions@main/';
 
-const PUBLIC_DIR = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  '../../../apps/web/public',
-);
+const PUBLIC_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../../../apps/web/public');
 
 type Corrections = Record<string, { v2?: string; v1?: string; missing?: boolean }>;
 const corrections = rawCorrections as Corrections;
@@ -160,14 +153,9 @@ export function itemsByCategory(categorySlug: string): LayoutItem[] {
 }
 
 /** 按二级分类取条目，保持 id 顺序。 */
-export function itemsBySubcategory(
-  categorySlug: string,
-  subcategorySlug: string,
-): LayoutItem[] {
+export function itemsBySubcategory(categorySlug: string, subcategorySlug: string): LayoutItem[] {
   return catalog.filter(
-    (item) =>
-      item.category_slug === categorySlug &&
-      item.subcategory_slug === subcategorySlug,
+    (item) => item.category_slug === categorySlug && item.subcategory_slug === subcategorySlug,
   );
 }
 

@@ -161,19 +161,12 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     }
     // 关闭动画的目标：重新测量触发元素（marquee/滚动后原 rect 已失效）
     const current = activeRef.current;
-    setCloseRect(
-      current?.sourceEl?.isConnected
-        ? current.sourceEl.getBoundingClientRect()
-        : null,
-    );
+    setCloseRect(current?.sourceEl?.isConnected ? current.sourceEl.getBoundingClientRect() : null);
     closingRef.current = true;
     setExpanded(false);
     // 兜底通道：动画结束事件丢失时也保证卸载
     clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = window.setTimeout(
-      () => setActive(null),
-      EXIT_DURATION + 80,
-    );
+    closeTimerRef.current = window.setTimeout(() => setActive(null), EXIT_DURATION + 80);
   }, [reducedMotion]);
 
   const go = useCallback((dir: 1 | -1) => {
@@ -187,8 +180,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     setExpanded(true);
     setActive((cur) => {
       if (!cur || cur.siblings.length === 0) return cur;
-      const next =
-        (cur.index + dir + cur.siblings.length) % cur.siblings.length;
+      const next = (cur.index + dir + cur.siblings.length) % cur.siblings.length;
       const item = cur.siblings[next];
       // sourceEl 已不指向当前条目：之后关闭原地淡出，而不是飞回第一张
       return item ? { ...cur, item, index: next, sourceEl: null } : cur;
@@ -200,7 +192,9 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!active || fullReady || loadError) return;
-    const timer = window.setTimeout(() => { setLoadError(true); }, 12000);
+    const timer = window.setTimeout(() => {
+      setLoadError(true);
+    }, 12000);
     return () => clearTimeout(timer);
   }, [active, attempt, fullReady, loadError]);
 
@@ -208,16 +202,21 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
   const dialogReady = isOpen && frame !== null;
 
   useEffect(() => {
-    if (active && !previousFocusRef.current) previousFocusRef.current = active.sourceEl ?? document.activeElement;
+    if (active && !previousFocusRef.current)
+      previousFocusRef.current = active.sourceEl ?? document.activeElement;
   }, [active]);
 
   // 打开后双帧展开；锁背景滚动；body 挂标记（暂停灵感墙 marquee）
   useEffect(() => {
     if (!isOpen) return;
     let inner = 0;
-    const raf = instant ? 0 : requestAnimationFrame(() => {
-      inner = requestAnimationFrame(() => { if (!closingRef.current) setExpanded(true); });
-    });
+    const raf = instant
+      ? 0
+      : requestAnimationFrame(() => {
+          inner = requestAnimationFrame(() => {
+            if (!closingRef.current) setExpanded(true);
+          });
+        });
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     document.body.dataset.lightboxOpen = 'true';
@@ -239,11 +238,17 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!dialogReady) return;
     const background = Array.from(document.body.children).filter(
-      (element): element is HTMLElement => element instanceof HTMLElement && element !== dialogRef.current,
+      (element): element is HTMLElement =>
+        element instanceof HTMLElement && element !== dialogRef.current,
     );
     const previous = background.map((element) => element.inert);
-    background.forEach((element) => { element.inert = true; });
-    return () => background.forEach((element, index) => { element.inert = previous[index] ?? false; });
+    background.forEach((element) => {
+      element.inert = true;
+    });
+    return () =>
+      background.forEach((element, index) => {
+        element.inert = previous[index] ?? false;
+      });
   }, [dialogReady]);
 
   // 关闭后焦点还源到触发元素
@@ -258,11 +263,16 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!active) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+        return;
       if (event.key === 'Escape') {
         event.preventDefault();
         close();
-      } else if (event.defaultPrevented || (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable=true]'))) {
+      } else if (
+        event.defaultPrevented ||
+        (event.target instanceof HTMLElement &&
+          event.target.closest('input, textarea, select, [contenteditable=true]'))
+      ) {
         return;
       } else if (event.key === 'ArrowLeft') {
         event.preventDefault();
@@ -281,10 +291,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     if (!active || !expanded || active.siblings.length < 2) return;
     for (const dir of [-1, 1]) {
       const sibling =
-        active.siblings[
-          (active.index + dir + active.siblings.length) %
-            active.siblings.length
-        ];
+        active.siblings[(active.index + dir + active.siblings.length) % active.siblings.length];
       if (sibling) {
         const img = new window.Image();
         img.src = sibling.src;
@@ -296,7 +303,13 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
   useLayoutEffect(() => {
     if (!active) return;
     const compute = () => {
-      const aspect = naturalRatio ?? (active.item.width && active.item.height ? active.item.width / active.item.height : active.initialRect.width > 0 && active.initialRect.height > 0 ? active.initialRect.width / active.initialRect.height : 1);
+      const aspect =
+        naturalRatio ??
+        (active.item.width && active.item.height
+          ? active.item.width / active.item.height
+          : active.initialRect.width > 0 && active.initialRect.height > 0
+            ? active.initialRect.width / active.initialRect.height
+            : 1);
       const maxW = Math.max(1, window.innerWidth - (window.innerWidth < 640 ? 32 : 144));
       const maxH = Math.max(1, window.innerHeight - 210);
       let width = maxW;
@@ -331,18 +344,24 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const transition = reducedMotion || instant
-    ? 'none'
-    : `transform ${expanded ? DURATION : EXIT_DURATION}ms ${EASE}, opacity ${expanded ? DURATION : EXIT_DURATION}ms ${EASE}`;
+  const transition =
+    reducedMotion || instant
+      ? 'none'
+      : `transform ${expanded ? DURATION : EXIT_DURATION}ms ${EASE}, opacity ${expanded ? DURATION : EXIT_DURATION}ms ${EASE}`;
   const hasSiblings = (active?.siblings.length ?? 0) > 1;
   // 关闭动画是否有回飞目标（无目标时 thumb 也要淡出，否则结尾硬切）
-  const hasOrigin = Boolean(
-    closeRect ?? (active?.sourceEl ? active.initialRect : null),
-  );
+  const hasOrigin = Boolean(closeRect ?? (active?.sourceEl ? active.initialRect : null));
 
   // 移动端 swipe 翻图（手写 pointer，零依赖；纵向手势不拦截）
   const onSwipeStart = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (swipeStateRef.current || event.pointerType === 'mouse' || !hasSiblings || !expanded || (event.target instanceof Element && event.target.closest('button, a'))) return;
+    if (
+      swipeStateRef.current ||
+      event.pointerType === 'mouse' ||
+      !hasSiblings ||
+      !expanded ||
+      (event.target instanceof Element && event.target.closest('button, a'))
+    )
+      return;
     suppressSwipeClick.current = false;
     // 清掉上一次回弹残留的 transition（否则后续拖拽全程慢半拍）
     if (swipeRef.current) swipeRef.current.style.transition = 'none';
@@ -373,8 +392,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
       // 尾部速度（指数平滑），「慢拖后发力甩」也能触发
       const dt = event.timeStamp - s.lastT;
       if (dt > 0) {
-        s.velocity =
-          0.8 * s.velocity + 0.2 * ((event.clientX - s.lastX) / dt);
+        s.velocity = 0.8 * s.velocity + 0.2 * ((event.clientX - s.lastX) / dt);
         s.lastX = event.clientX;
         s.lastT = event.timeStamp;
       }
@@ -386,7 +404,8 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     const el = swipeRef.current;
     if (!s || !el || event.pointerId !== s.pointerId) return;
     swipeStateRef.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (event.currentTarget.hasPointerCapture(event.pointerId))
+      event.currentTarget.releasePointerCapture(event.pointerId);
     if (s.active) {
       suppressSwipeClick.current = true;
       if (Math.abs(s.dx) > 64 || Math.abs(s.velocity) > 0.5) {
@@ -397,9 +416,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
         return;
       }
       // 未达到阈值：回弹
-      el.style.transition = reducedMotion
-        ? 'none'
-        : `transform 150ms ${EASE}`;
+      el.style.transition = reducedMotion ? 'none' : `transform 150ms ${EASE}`;
       el.style.transform = '';
     }
   };
@@ -422,10 +439,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     if (event.shiftKey && (current === first || !dialog.contains(current))) {
       event.preventDefault();
       last.focus();
-    } else if (
-      !event.shiftKey &&
-      (current === last || !dialog.contains(current))
-    ) {
+    } else if (!event.shiftKey && (current === last || !dialog.contains(current))) {
       event.preventDefault();
       first.focus();
     }
@@ -446,184 +460,225 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
               className={styles.surface}
               onKeyDown={onDialogKeyDown}
             >
-          {/* 遮罩：毛玻璃 + 加深，明暗两种背景下都能分离层次。
+              {/* 遮罩：毛玻璃 + 加深，明暗两种背景下都能分离层次。
              灯箱是恒定暗房表面（不随主题翻转），色值取自暗色 palette 原值而非 token */}
-          <div
-            aria-hidden
-            className={styles.backdrop}
-            style={{
-              opacity: expanded ? 1 : 0,
-              transition: reducedMotion || instant
-                ? 'none'
-                : `opacity ${DURATION}ms ${EASE}`,
-            }}
-            onClick={close}
-          />
+              <div
+                aria-hidden
+                className={styles.backdrop}
+                style={{
+                  opacity: expanded ? 1 : 0,
+                  transition: reducedMotion || instant ? 'none' : `opacity ${DURATION}ms ${EASE}`,
+                }}
+                onClick={close}
+              />
 
-          {/* 图片 + 图注：swipe 容器（移动端滑动翻图） */}
-          <div
-            ref={swipeRef}
-            className="absolute inset-0 touch-pan-y"
-            onPointerDown={onSwipeStart}
-            onPointerMove={onSwipeMove}
-            onPointerUp={onSwipeEnd}
-            onPointerCancel={event => {
-              if (swipeStateRef.current?.pointerId !== event.pointerId) return;
-              swipeStateRef.current = null;
-              if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-              if (swipeRef.current) swipeRef.current.style.transform = '';
-            }}
-            onClick={(event) => {
-              if (suppressSwipeClick.current) { suppressSwipeClick.current = false; return; }
-              if (event.target === event.currentTarget) close();
-            }}
-          >
-            {/* thumb 打底（首屏/新图未就绪时可见） */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              key={`thumb-${active.item.src}`}
-              onError={() => setThumbError(true)}
-              src={active.item.thumb ?? active.item.src}
-              alt=""
-              aria-hidden
-              draggable={false}
-              className="absolute object-contain"
-              style={{
-                ...frame,
-                transform: expanded ? 'none' : startTransform,
-                opacity: thumbError ? 0 : expanded ? 1 : hasOrigin ? 0.99 : 0,
-                transition,
-              }}
-            />
-            {/* 当前高清图 */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              key={`${active.item.src}-${attempt}`}
-              src={active.item.src}
-              alt={active.item.alt}
-              draggable={false}
-              className="absolute object-contain"
-              style={{
-                ...frame,
-                transform: expanded ? 'none' : startTransform,
-                opacity: expanded && fullReady ? 1 : 0,
-                transition,
-              }}
-              ref={(el) => {
-                // 缓存图可能在监听挂载前就加载完，onLoad 不会触发，挂载时补检
-                if (el?.complete && el.naturalWidth > 0) setFullReady(true);
-              }}
-              onError={() => { setLoadError(true); }}
-              onLoad={(event) => { setFullReady(true); setLoadError(false); if (event.currentTarget.naturalHeight) setNaturalRatio(event.currentTarget.naturalWidth / event.currentTarget.naturalHeight); }}
-              onTransitionEnd={(event) => {
-              if (event.propertyName === 'transform' && closingRef.current) {
-                clearTimeout(closeTimerRef.current);
-                setActive(null);
-              }
-            }}
-          />
+              {/* 图片 + 图注：swipe 容器（移动端滑动翻图） */}
+              <div
+                ref={swipeRef}
+                className="absolute inset-0 touch-pan-y"
+                onPointerDown={onSwipeStart}
+                onPointerMove={onSwipeMove}
+                onPointerUp={onSwipeEnd}
+                onPointerCancel={(event) => {
+                  if (swipeStateRef.current?.pointerId !== event.pointerId) return;
+                  swipeStateRef.current = null;
+                  if (event.currentTarget.hasPointerCapture(event.pointerId))
+                    event.currentTarget.releasePointerCapture(event.pointerId);
+                  if (swipeRef.current) swipeRef.current.style.transform = '';
+                }}
+                onClick={(event) => {
+                  if (suppressSwipeClick.current) {
+                    suppressSwipeClick.current = false;
+                    return;
+                  }
+                  if (event.target === event.currentTarget) close();
+                }}
+              >
+                {/* thumb 打底（首屏/新图未就绪时可见） */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  key={`thumb-${active.item.src}`}
+                  onError={() => setThumbError(true)}
+                  src={active.item.thumb ?? active.item.src}
+                  alt=""
+                  aria-hidden
+                  draggable={false}
+                  className="absolute object-contain"
+                  style={{
+                    ...frame,
+                    transform: expanded ? 'none' : startTransform,
+                    opacity: thumbError ? 0 : expanded ? 1 : hasOrigin ? 0.99 : 0,
+                    transition,
+                  }}
+                />
+                {/* 当前高清图 */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  key={`${active.item.src}-${attempt}`}
+                  src={active.item.src}
+                  alt={active.item.alt}
+                  draggable={false}
+                  className="absolute object-contain"
+                  style={{
+                    ...frame,
+                    transform: expanded ? 'none' : startTransform,
+                    opacity: expanded && fullReady ? 1 : 0,
+                    transition,
+                  }}
+                  ref={(el) => {
+                    // 缓存图可能在监听挂载前就加载完，onLoad 不会触发，挂载时补检
+                    if (el?.complete && el.naturalWidth > 0) setFullReady(true);
+                  }}
+                  onError={() => {
+                    setLoadError(true);
+                  }}
+                  onLoad={(event) => {
+                    setFullReady(true);
+                    setLoadError(false);
+                    if (event.currentTarget.naturalHeight)
+                      setNaturalRatio(
+                        event.currentTarget.naturalWidth / event.currentTarget.naturalHeight,
+                      );
+                  }}
+                  onTransitionEnd={(event) => {
+                    if (event.propertyName === 'transform' && closingRef.current) {
+                      clearTimeout(closeTimerRef.current);
+                      setActive(null);
+                    }
+                  }}
+                />
 
-          {!fullReady && expanded ? <div className={styles.status} role="status">
-            <span>{loadError ? (active.item.thumb && !thumbError ? '高清图暂时无法加载，当前显示预览图。' : '图片暂时无法加载。') : '正在加载高清图…'}</span>
-            {loadError ? <button type="button" className={buttonClassName({ className: styles.control })} onClick={() => { setLoadError(false); setFullReady(false); setAttempt((value) => value + 1); }}>重新加载</button> : null}
-          </div> : null}
-          {/* 图注：编号 + 名称 + 计数 + 详情入口（移动端切换按钮并入此栏） */}
-          <div
-            className={styles.caption}
-            style={{
-              left: window.innerWidth < 640 ? 16 : 72,
-              top: frame.top + frame.height + 12,
-              width: window.innerWidth - (window.innerWidth < 640 ? 32 : 144),
-              opacity: expanded ? 1 : 0,
-              transition: reducedMotion || instant
-                ? 'none'
-                : `opacity ${DURATION}ms ${EASE}`,
-            }}
-          >
-            <p className="flex min-w-0 items-center truncate text-[#edf1f6]">
+                {!fullReady && expanded ? (
+                  <div className={styles.status} role="status">
+                    <span>
+                      {loadError
+                        ? active.item.thumb && !thumbError
+                          ? '高清图暂时无法加载，当前显示预览图。'
+                          : '图片暂时无法加载。'
+                        : '正在加载高清图…'}
+                    </span>
+                    {loadError ? (
+                      <button
+                        type="button"
+                        className={buttonClassName({ className: styles.control })}
+                        onClick={() => {
+                          setLoadError(false);
+                          setFullReady(false);
+                          setAttempt((value) => value + 1);
+                        }}
+                      >
+                        重新加载
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
+                {/* 图注：编号 + 名称 + 计数 + 详情入口（移动端切换按钮并入此栏） */}
+                <div
+                  className={styles.caption}
+                  style={{
+                    left: window.innerWidth < 640 ? 16 : 72,
+                    top: frame.top + frame.height + 12,
+                    width: window.innerWidth - (window.innerWidth < 640 ? 32 : 144),
+                    opacity: expanded ? 1 : 0,
+                    transition: reducedMotion || instant ? 'none' : `opacity ${DURATION}ms ${EASE}`,
+                  }}
+                >
+                  <p className="flex min-w-0 items-center truncate text-[#edf1f6]">
+                    {hasSiblings ? (
+                      <span className="mr-2 inline-flex shrink-0 gap-1 sm:hidden">
+                        <button
+                          type="button"
+                          data-direction="previous"
+                          aria-label="上一张"
+                          onClick={() => go(-1)}
+                          className={buttonClassName({ icon: true, className: styles.control })}
+                        >
+                          <ArrowLeft className="size-4" />
+                        </button>
+                        <button
+                          type="button"
+                          data-direction="next"
+                          aria-label="下一张"
+                          onClick={() => go(1)}
+                          className={buttonClassName({ icon: true, className: styles.control })}
+                        >
+                          <ArrowRight className="size-4" />
+                        </button>
+                      </span>
+                    ) : null}
+                    {active.item.serial ? (
+                      <span className="mr-2 shrink-0 font-mono text-xs text-[#bdbdbd]">
+                        {active.item.serial}
+                      </span>
+                    ) : null}
+                    <span className="truncate">{active.item.alt}</span>
+                  </p>
+                  <span className="flex shrink-0 items-center gap-3">
+                    {hasSiblings ? (
+                      <span className="font-mono text-xs text-[#bdbdbd]">
+                        {active.index + 1} / {active.siblings.length}
+                      </span>
+                    ) : null}
+                    {active.item.href ? (
+                      <Link
+                        href={active.item.href}
+                        onClick={() => {
+                          clearTimeout(closeTimerRef.current);
+                          setActive(null);
+                        }}
+                        className="inline-flex items-center gap-1 text-[#c3ccd8] underline-offset-4 transition-colors hover:text-white hover:underline"
+                      >
+                        查看详情
+                        <ArrowRight size={18} strokeWidth={1.6} aria-hidden />
+                      </Link>
+                    ) : null}
+                  </span>
+                </div>
+              </div>
+
+              {/* 关闭按钮（移动端常驻可见，触屏无 Esc；初始聚焦目标） */}
+              <button
+                ref={closeButtonRef}
+                type="button"
+                aria-label="关闭"
+                onClick={close}
+                className={buttonClassName({
+                  icon: true,
+                  className: `${styles.control} ${styles.close}`,
+                })}
+              >
+                <X className="size-5" />
+              </button>
+
+              {/* 同组左右切换（桌面侧翼；移动端在图注栏内） */}
               {hasSiblings ? (
-                <span className="mr-2 inline-flex shrink-0 gap-1 sm:hidden">
+                <>
                   <button
                     type="button"
                     data-direction="previous"
                     aria-label="上一张"
                     onClick={() => go(-1)}
-                    className={buttonClassName({ icon: true, className: styles.control })}
+                    className={buttonClassName({
+                      icon: true,
+                      className: `${styles.control} ${styles.previous}`,
+                    })}
                   >
-                    <ArrowLeft className="size-4" />
+                    <ArrowLeft className="size-5" />
                   </button>
                   <button
                     type="button"
                     data-direction="next"
                     aria-label="下一张"
                     onClick={() => go(1)}
-                    className={buttonClassName({ icon: true, className: styles.control })}
+                    className={buttonClassName({
+                      icon: true,
+                      className: `${styles.control} ${styles.next}`,
+                    })}
                   >
-                    <ArrowRight className="size-4" />
+                    <ArrowRight className="size-5" />
                   </button>
-                </span>
+                </>
               ) : null}
-              {active.item.serial ? (
-                <span className="mr-2 shrink-0 font-mono text-xs text-[#bdbdbd]">
-                  {active.item.serial}
-                </span>
-              ) : null}
-              <span className="truncate">{active.item.alt}</span>
-            </p>
-            <span className="flex shrink-0 items-center gap-3">
-              {hasSiblings ? (
-                <span className="font-mono text-xs text-[#bdbdbd]">
-                  {active.index + 1} / {active.siblings.length}
-                </span>
-              ) : null}
-              {active.item.href ? (
-                <Link
-                  href={active.item.href}
-                  onClick={() => { clearTimeout(closeTimerRef.current); setActive(null); }}
-                  className="inline-flex items-center gap-1 text-[#c3ccd8] underline-offset-4 transition-colors hover:text-white hover:underline"
-                >
-                  查看详情
-                  <ArrowRight size={18} strokeWidth={1.6} aria-hidden />
-                </Link>
-              ) : null}
-            </span>
-          </div>
-          </div>
-
-          {/* 关闭按钮（移动端常驻可见，触屏无 Esc；初始聚焦目标） */}
-          <button
-            ref={closeButtonRef}
-            type="button"
-            aria-label="关闭"
-            onClick={close}
-            className={buttonClassName({ icon: true, className: `${styles.control} ${styles.close}` })}
-          >
-            <X className="size-5" />
-          </button>
-
-          {/* 同组左右切换（桌面侧翼；移动端在图注栏内） */}
-          {hasSiblings ? (
-            <>
-              <button
-                type="button"
-                data-direction="previous"
-                    aria-label="上一张"
-                onClick={() => go(-1)}
-                className={buttonClassName({ icon: true, className: `${styles.control} ${styles.previous}` })}
-              >
-                <ArrowLeft className="size-5" />
-              </button>
-              <button
-                type="button"
-                data-direction="next"
-                    aria-label="下一张"
-                onClick={() => go(1)}
-                className={buttonClassName({ icon: true, className: `${styles.control} ${styles.next}` })}
-              >
-                <ArrowRight className="size-5" />
-              </button>
-            </>
-          ) : null}
             </div>,
             document.body,
           )

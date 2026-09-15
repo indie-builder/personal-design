@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@11.24.0",
   "engines": {
-    "node": ">=22.19.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "dev": "portless",
@@ -12,12 +12,15 @@
     "build": "pnpm --filter @personal-design/web build",
     "start": "pnpm --filter @personal-design/web start",
     "lint": "pnpm --filter @personal-design/web lint",
+    "format": "oxfmt --write 'apps/web/{app,components,lib}/**/*.{ts,tsx}' 'apps/web/*.{ts,mjs}' 'packages/*/src/**/*.ts' 'packages/*/scripts/**/*.mjs'",
+    "format:check": "oxfmt --check 'apps/web/{app,components,lib}/**/*.{ts,tsx}' 'apps/web/*.{ts,mjs}' 'packages/*/src/**/*.ts' 'packages/*/scripts/**/*.mjs'",
     "typecheck": "pnpm -r typecheck",
     "sync:layouts": "pnpm --filter @personal-design/layout-compositions sync",
     "sync:personal-sites": "pnpm --filter @personal-design/personal-sites sync",
     "sync:inspora": "pnpm --filter @personal-design/inspora sync"
   },
   "devDependencies": {
+    "oxfmt": "^0.68.0",
     "playwright": "1.62.1"
   }
 }

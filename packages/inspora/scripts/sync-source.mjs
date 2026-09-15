@@ -3,14 +3,22 @@ export function extractInitialPage(html) {
   const marker = '"initialPage":';
   const index = text.indexOf(marker);
   const page = index < 0 ? null : JSON.parse(extractBalancedObject(text, index + marker.length));
-  if (!Array.isArray(page?.items) || !(page.nextCursor === null || typeof page.nextCursor === 'string')) {
+  if (
+    !Array.isArray(page?.items) ||
+    !(page.nextCursor === null || typeof page.nextCursor === 'string')
+  ) {
     throw new Error('页面缺少有效 initialPage，可能是校验页或上游结构变化');
   }
   return page;
 }
 
 // 完整发现后才交给调用方写库，分页失败不会留下会截断下次增量的半页数据。
-export async function collectFeed(categories, knownIds, fetchPage, { full = false, maxPages = Infinity } = {}) {
+export async function collectFeed(
+  categories,
+  knownIds,
+  fetchPage,
+  { full = false, maxPages = Infinity } = {},
+) {
   const items = new Map();
   for (const category of categories) {
     let cursor = null;

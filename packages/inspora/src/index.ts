@@ -13,10 +13,7 @@ const DB_PATH = path.resolve(PKG_DIR, '../inspora.db');
 const PUBLIC_DIR = path.resolve(PKG_DIR, '../../../apps/web/public');
 
 /** 媒体 base：缺省为空（本地 public 路径）；设 NEXT_PUBLIC_MEDIA_BASE_URL（对象存储公开域名）后返回绝对 URL */
-const MEDIA_BASE = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? '').replace(
-  /\/+$/,
-  '',
-);
+const MEDIA_BASE = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? '').replace(/\/+$/, '');
 const MEDIA_VERSION = process.env.NEXT_PUBLIC_MEDIA_VERSION;
 
 /** 本地副本存在用本地（含外置 base），否则回退热链原站 */
@@ -87,13 +84,42 @@ export interface InsporaCategory {
 }
 
 /** Use the provider's existing lightweight clip for simultaneous previews; full playback keeps src. */
-export function videoPreviewUrl(post: Pick<InsporaPost, 'raw'>, media: Pick<InsporaMedia, 'id' | 'type' | 'src'>): string | null {
-  if (media.type !== 'video' || !post.raw || typeof post.raw !== 'object' || !('media' in post.raw) || !Array.isArray(post.raw.media)) return media.src;
-  const record = post.raw.media.find(entry => entry && typeof entry === 'object' && entry.id === media.id);
+export function videoPreviewUrl(
+  post: Pick<InsporaPost, 'raw'>,
+  media: Pick<InsporaMedia, 'id' | 'type' | 'src'>,
+): string | null {
+  if (
+    media.type !== 'video' ||
+    !post.raw ||
+    typeof post.raw !== 'object' ||
+    !('media' in post.raw) ||
+    !Array.isArray(post.raw.media)
+  )
+    return media.src;
+  const record = post.raw.media.find(
+    (entry) => entry && typeof entry === 'object' && entry.id === media.id,
+  );
   const preview = record?.videoPreview;
-  if (!preview || typeof preview !== 'object' || typeof preview.url !== 'string' || !preview.url.startsWith('https://')) return media.src;
-  const smallerResolution = preview.width > 0 && preview.height > 0 && record.width > 0 && record.height > 0 && preview.width * preview.height < record.width * record.height;
-  if (preview.bytes > 0 && record.sizeBytes > 0 && preview.bytes >= record.sizeBytes && !smallerResolution) return media.src;
+  if (
+    !preview ||
+    typeof preview !== 'object' ||
+    typeof preview.url !== 'string' ||
+    !preview.url.startsWith('https://')
+  )
+    return media.src;
+  const smallerResolution =
+    preview.width > 0 &&
+    preview.height > 0 &&
+    record.width > 0 &&
+    record.height > 0 &&
+    preview.width * preview.height < record.width * record.height;
+  if (
+    preview.bytes > 0 &&
+    record.sizeBytes > 0 &&
+    preview.bytes >= record.sizeBytes &&
+    !smallerResolution
+  )
+    return media.src;
   return preview.url;
 }
 
@@ -183,7 +209,10 @@ function toPost(row: PostRow, media: InsporaMedia[]): InsporaPost {
     creatorName: row.creator_name,
     creatorUrl: row.creator_url,
     // inspora 头像是本地 public 路径；bestx 头像是 https 直链，本地不存在时按原链返回
-    creatorAvatar: mediaUrl(row.creator_avatar, row.creator_avatar?.startsWith('https://') ? row.creator_avatar : null),
+    creatorAvatar: mediaUrl(
+      row.creator_avatar,
+      row.creator_avatar?.startsWith('https://') ? row.creator_avatar : null,
+    ),
     description: row.description,
     category: row.category,
     industries: parseJsonArray(row.industries),
@@ -252,7 +281,7 @@ export function getPostBySlug(slug: string): InsporaPost | undefined {
 export function listCategories(): InsporaCategory[] {
   const rows = conn()
     .prepare(
-      "SELECT category AS name, COUNT(*) AS count FROM posts WHERE category IS NOT NULL GROUP BY category ORDER BY count DESC",
+      'SELECT category AS name, COUNT(*) AS count FROM posts WHERE category IS NOT NULL GROUP BY category ORDER BY count DESC',
     )
     .all() as unknown as { name: string; count: number }[];
   // node:sqlite 返回 null 原型对象，RSC 序列化只认普通对象
@@ -265,7 +294,9 @@ export function getAdjacentPosts(post: InsporaPost): {
   next: Pick<InsporaPost, 'slug' | 'title'> | null;
 } {
   const rows = conn()
-    .prepare(`SELECT slug, title, created_at FROM posts WHERE ${VISIBLE_POSTS} ORDER BY created_at DESC`)
+    .prepare(
+      `SELECT slug, title, created_at FROM posts WHERE ${VISIBLE_POSTS} ORDER BY created_at DESC`,
+    )
     .all() as unknown as { slug: string; title: string; created_at: string }[];
   const idx = rows.findIndex((r) => r.slug === post.slug);
   const prevRow = idx > 0 ? rows[idx - 1] : undefined;

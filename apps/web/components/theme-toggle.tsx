@@ -10,7 +10,11 @@ export function ThemeToggle() {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
     const syncSystem = () => {
       let saved: string | null = null;
-      try { saved = localStorage.getItem('theme'); } catch { /* Use OS preference when storage is unavailable. */ }
+      try {
+        saved = localStorage.getItem('theme');
+      } catch {
+        /* Use OS preference when storage is unavailable. */
+      }
       if (saved !== 'light' && saved !== 'dark') {
         document.documentElement.dataset.theme = media.matches ? 'dark' : 'light';
       }
@@ -30,8 +34,7 @@ export function ThemeToggle() {
     };
   }, []);
   const toggle = () => {
-    const next =
-      document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
     try {
       localStorage.setItem('theme', next);
