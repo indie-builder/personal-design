@@ -10,6 +10,7 @@ import { buttonClassName } from './button';
 import { MotionVideo } from './motion-video';
 import { BookSpines } from './layout-bookshelf';
 import { SiteReceiptPreview } from './site-receipt-preview';
+import { TimelineWalker } from './timeline-walker';
 import { WorkspaceLink } from './workspace-shell';
 import styles from './home-view.module.css';
 
@@ -169,6 +170,7 @@ export function HomeView({
   const drag = useRef({ start: 0, scroll: 0, down: false, moved: false });
   const viewport = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ start: true, end: true });
+  const [hitDate, setHitDate] = useState<number | null>(null);
   const ordered = [...products].sort((a, b) => a.date.localeCompare(b.date));
 
   useEffect(() => {
@@ -274,6 +276,7 @@ export function HomeView({
               }}
             >
               <ol className={styles.entries}>
+                <TimelineWalker stops={ordered.length} onHit={setHitDate} />
                 {ordered.map((product, index) => {
                   const previews =
                     product.slug === 'layout-compositions'
@@ -286,6 +289,7 @@ export function HomeView({
                     <li
                       key={product.slug}
                       className={styles.entry}
+                      data-hit={hitDate === index || undefined}
                       style={{ '--order': index } as CSSProperties}
                     >
                       <time dateTime={product.date} className={styles.date}>

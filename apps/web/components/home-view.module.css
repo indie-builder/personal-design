@@ -3,11 +3,12 @@
 .intro h1 { margin:0; font-size:28px; font-weight:500; line-height:1.35; letter-spacing:0; }
 .period { display:flex; align-items:center; gap:16px; color:var(--color-ink-soft); font-size:12px; font-variant-numeric:tabular-nums; }
 .timeline { position:relative; margin-top:94px; }
-.viewport { overflow-x:auto; overscroll-behavior-x:contain; padding:0 var(--gutter) 24px 152px; scroll-padding-left:152px; scrollbar-width:thin; scrollbar-color:var(--color-hairline-strong) transparent; }
+.viewport { overflow-x:auto; overscroll-behavior-x:contain; padding:30px var(--gutter) 24px 152px; scroll-padding-left:152px; scrollbar-width:thin; scrollbar-color:var(--color-hairline-strong) transparent; }
 .viewport:focus-visible { outline:2px solid var(--color-ink); outline-offset:-2px; }
-.entries { display:flex; width:max-content; min-width:100%; list-style:none; padding:0; margin:0; }
+.entries { position:relative; display:flex; width:max-content; min-width:100%; list-style:none; padding:0; margin:0; }
 .entry { width:var(--column); flex:none; }
-.date { display:block; color:var(--color-ink-soft); font-size:13px; line-height:20px; font-variant-numeric:tabular-nums; }
+.date { display:block; color:var(--color-ink-soft); font-size:13px; line-height:20px; font-variant-numeric:tabular-nums; transform:translateY(-30px); }
+.entry[data-hit=true] .date { animation:timeline-date-bump 520ms var(--ease-out) both; color:var(--color-ink); }
 .rule { position:relative; height:1px; background:var(--color-hairline-strong); margin:27px 0 29px; }
 .node { position:absolute; left:0; top:50%; width:7px; height:7px; border-radius:50%; background:var(--color-ink); transform:translateY(-50%); }
 .rule::after { content:''; position:absolute; top:-3px; left:50%; height:7px; width:1px; background:var(--color-hairline-strong); }
@@ -71,6 +72,7 @@
   .entry .project { transition:opacity 260ms var(--ease-out),translate 260ms var(--ease-out),transform 140ms var(--ease-out); transition-delay:calc(var(--order,0) * 40ms),calc(var(--order,0) * 40ms),0ms; }
   @starting-style { .entry .project { opacity:.65; translate:0 6px; } }
 }
+@keyframes timeline-date-bump { 0% { transform:translateY(-30px); } 36% { transform:translateY(-37px); } 68% { transform:translateY(-29px); } 100% { transform:translateY(-30px); } }
 .project:focus-visible *, .project:focus-visible { transition:none; }
 
 /* The workspace owns route entry; nested starting-style movement would shift its title target. */
