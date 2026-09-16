@@ -14,6 +14,7 @@ import { WorkspaceLink } from './workspace-shell';
 import styles from './home-view.module.css';
 
 type Preview = { src: string; alt: string; videoSrc?: string };
+type ToolPreviewItem = { name: string; category: string; icon: string | null };
 
 function PreviewImage({ src, alt, priority = false }: Preview & { priority?: boolean }) {
   const [failed, setFailed] = useState(false);
@@ -98,16 +99,72 @@ function BookPreview({ categories }: { categories: { name: string; count: number
   );
 }
 
+function ToolPreview({ tools }: { tools: ToolPreviewItem[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(-1);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || !tools.length) return;
+    let visible = false;
+    let timer = 0;
+    const stop = () => {
+      window.clearTimeout(timer);
+      setActive(-1);
+    };
+    const advance = () => {
+      if (!visible || instantMotion() || document.hidden) return stop();
+      setActive((current) => (current + 1) % tools.length);
+      timer = window.setTimeout(advance, 1800);
+    };
+    const update = () => {
+      window.clearTimeout(timer);
+      if (visible && !instantMotion() && !document.hidden) advance();
+      else stop();
+    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = !!entry?.isIntersecting && entry.intersectionRatio >= 0.3;
+        update();
+      },
+      { threshold: 0.3 },
+    );
+    observer.observe(element);
+    const removePolicyListener = observeMotionPolicy(update);
+    document.addEventListener('visibilitychange', update);
+    return () => {
+      window.clearTimeout(timer);
+      observer.disconnect();
+      removePolicyListener();
+      document.removeEventListener('visibilitychange', update);
+    };
+  }, [tools.length]);
+  return (
+    <div ref={ref} className={styles.toolPreview} aria-hidden="true">
+      {tools.map((tool, index) => (
+        <span key={tool.name} data-active={index === active || undefined}>
+          <i>
+            {tool.icon && <Image src={tool.icon} alt="" width={16} height={16} />}
+            <ArrowUpRight size={16} strokeWidth={1.6} />
+          </i>
+          <b>{tool.name}</b>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function HomeView({
   products,
   layoutPreviews = [],
   musePreviews = [],
+  toolsPreview = [],
   layoutCategories = [],
 }: {
   products: Product[];
   layoutCategories?: { name: string; count: number }[];
   layoutPreviews?: Preview[];
   musePreviews?: Preview[];
+  toolsPreview?: ToolPreviewItem[];
 }) {
   const drag = useRef({ start: 0, scroll: 0, down: false, moved: false });
   const viewport = useRef<HTMLDivElement>(null);
@@ -258,6 +315,8 @@ export function HomeView({
                         >
                           {isLayout ? (
                             <BookPreview categories={layoutCategories} />
+                          ) : product.slug === 'design-engineer-tools' ? (
+                            <ToolPreview tools={toolsPreview} />
                           ) : product.slug === 'personal-sites' ? (
                             <SiteReceiptPreview />
                           ) : previews[0]?.videoSrc ? (

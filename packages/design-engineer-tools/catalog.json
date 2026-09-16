@@ -1,0 +1,741 @@
+{
+  "sourceUrl": "https://designengineer.tools/",
+  "syncedAt": "2026-09-16T15:52:47.058Z",
+  "categories": [
+    {
+      "id": "Inspiration",
+      "tools": [
+        {
+          "name": "60fps",
+          "url": "https://60fps.design/",
+          "icon": "/design-engineer-tools/icons/3fc1bbdc29d225a1.png"
+        },
+        {
+          "name": "Awwwards",
+          "url": "https://www.awwwards.com/",
+          "icon": "/design-engineer-tools/icons/3bb690a206a51974.png"
+        },
+        {
+          "name": "Cosmos",
+          "url": "https://www.cosmos.so/",
+          "icon": "/design-engineer-tools/icons/e57a39c9c73b82be.png"
+        },
+        {
+          "name": "Curated Design",
+          "url": "https://www.curated.design/",
+          "icon": "/design-engineer-tools/icons/a47ada2a46f656ce.png"
+        },
+        {
+          "name": "Design Spells",
+          "url": "https://www.designspells.com/",
+          "icon": "/design-engineer-tools/icons/17e97c7ec15f656a.png"
+        },
+        {
+          "name": "Game UI Database",
+          "url": "https://www.gameuidatabase.com/",
+          "icon": "/design-engineer-tools/icons/42ee260420da3e3d.png"
+        },
+        {
+          "name": "Godly",
+          "url": "https://godly.website/",
+          "icon": "/design-engineer-tools/icons/935cdb2492cc35ad.png"
+        },
+        {
+          "name": "HUDS+GUIS",
+          "url": "https://www.hudsandguis.com/",
+          "icon": "/design-engineer-tools/icons/48736b1e5e07a6f3.png"
+        },
+        {
+          "name": "Interface In Game",
+          "url": "https://interfaceingame.com/",
+          "icon": "/design-engineer-tools/icons/46166ac25ee0cd49.png"
+        },
+        {
+          "name": "Layers",
+          "url": "https://layers.to/explore",
+          "icon": "/design-engineer-tools/icons/d0e4720acafe8d2e.png"
+        },
+        {
+          "name": "loadmo.re",
+          "url": "https://loadmo.re/",
+          "icon": "/design-engineer-tools/icons/68e860d781cce9cc.png"
+        },
+        {
+          "name": "Minimal Gallery",
+          "url": "https://minimal.gallery/",
+          "icon": "/design-engineer-tools/icons/a42f7d0623724c49.png"
+        },
+        {
+          "name": "Minimum",
+          "url": "https://mnmm.xyz/",
+          "icon": "/design-engineer-tools/icons/885cd9b405cf7987.png"
+        },
+        {
+          "name": "Mobbin",
+          "url": "https://mobbin.com/",
+          "icon": "/design-engineer-tools/icons/09e440f57396fc70.png"
+        },
+        {
+          "name": "Pinterest",
+          "url": "https://pinterest.com/",
+          "icon": "/design-engineer-tools/icons/a8ff8f783a11de6e.png"
+        },
+        {
+          "name": "Rebrand",
+          "url": "https://www.rebrand.gallery/",
+          "icon": "/design-engineer-tools/icons/499662c694eeafcd.png"
+        },
+        {
+          "name": "Saaspo",
+          "url": "https://saaspo.com/",
+          "icon": "/design-engineer-tools/icons/5fa3daaf5ad13997.png"
+        },
+        {
+          "name": "Same Energy",
+          "url": "https://same.energy/",
+          "icon": "/design-engineer-tools/icons/008591ba8211427f.png"
+        },
+        {
+          "name": "SearchSystem",
+          "url": "https://searchsystem.co/",
+          "icon": "/design-engineer-tools/icons/58a7e25b60df699c.png"
+        },
+        {
+          "name": "SEESAW",
+          "url": "https://www.seesaw.website/",
+          "icon": "/design-engineer-tools/icons/dc905172b1397e44.png"
+        },
+        {
+          "name": "SOOT SPIRAL",
+          "url": "https://spiral.soot.com/spiral",
+          "icon": "/design-engineer-tools/icons/14ee3526a32d31cd.png"
+        },
+        {
+          "name": "Supahero",
+          "url": "https://www.supahero.io/",
+          "icon": "/design-engineer-tools/icons/a25089af9b3213a7.png"
+        }
+      ]
+    },
+    {
+      "id": "AI Code",
+      "tools": [
+        {
+          "name": "Bolt.new",
+          "url": "https://bolt.new/",
+          "icon": "/design-engineer-tools/icons/34ea67d75a31b417.png"
+        },
+        {
+          "name": "Claude Code",
+          "url": "https://claude.com/product/claude-code",
+          "icon": "/design-engineer-tools/icons/bd01975189345986.png"
+        },
+        {
+          "name": "Cline",
+          "url": "https://cline.bot/",
+          "icon": "/design-engineer-tools/icons/78c111bf205abbc8.png"
+        },
+        {
+          "name": "Cursor",
+          "url": "https://www.cursor.com/",
+          "icon": "/design-engineer-tools/icons/abf0e5309a4f0e36.png"
+        },
+        {
+          "name": "OpenAI Codex",
+          "url": "https://openai.com/codex/",
+          "icon": "/design-engineer-tools/icons/ac8bc5b8d08d758f.png"
+        },
+        {
+          "name": "Skills",
+          "url": "https://skills.sh/",
+          "icon": "/design-engineer-tools/icons/73699a0dedd8c8f2.png"
+        },
+        {
+          "name": "v0 by Vercel",
+          "url": "https://v0.dev/",
+          "icon": "/design-engineer-tools/icons/e8b28fd1c0bb081b.png"
+        },
+        {
+          "name": "Windsurf",
+          "url": "https://codeium.com/windsurf",
+          "icon": "/design-engineer-tools/icons/2d10e118ad40fd69.png"
+        },
+        {
+          "name": "Zed",
+          "url": "https://zed.dev/agentic",
+          "icon": "/design-engineer-tools/icons/496552a3314ee855.png"
+        }
+      ]
+    },
+    {
+      "id": "Components",
+      "tools": [
+        {
+          "name": "21st.dev",
+          "url": "https://21st.dev/",
+          "icon": "/design-engineer-tools/icons/db45f546308b042b.png"
+        },
+        {
+          "name": "Component Gallery",
+          "url": "https://component.gallery/",
+          "icon": "/design-engineer-tools/icons/8c89ed0fa74acc0e.png"
+        },
+        {
+          "name": "Cursify",
+          "url": "https://cursify.vercel.app/",
+          "icon": "/design-engineer-tools/icons/dcfbcb90d8c76d99.png"
+        },
+        {
+          "name": "Fancy Components",
+          "url": "https://www.fancycomponents.dev/",
+          "icon": "/design-engineer-tools/icons/cd25e960ca310b32.png"
+        },
+        {
+          "name": "Framer University Resources",
+          "url": "https://framer.university/resources",
+          "icon": "/design-engineer-tools/icons/287b3625ea3e2af7.png"
+        },
+        {
+          "name": "Motion Primitives",
+          "url": "https://motion-primitives.com/",
+          "icon": "/design-engineer-tools/icons/7c42461964f0be28.png"
+        },
+        {
+          "name": "NumberFlow",
+          "url": "https://number-flow.barvian.me/",
+          "icon": "/design-engineer-tools/icons/5ab542fb27e77804.png"
+        },
+        {
+          "name": "React Bits",
+          "url": "https://www.reactbits.dev/",
+          "icon": "/design-engineer-tools/icons/64729983841879cf.png"
+        },
+        {
+          "name": "shadcn/ui",
+          "url": "https://ui.shadcn.com/",
+          "icon": "/design-engineer-tools/icons/11217e97399022d9.png"
+        }
+      ]
+    },
+    {
+      "id": "Web Utility",
+      "tools": [
+        {
+          "name": "Color.review",
+          "url": "https://color.review/",
+          "icon": "/design-engineer-tools/icons/3d6992cd3c596deb.png"
+        },
+        {
+          "name": "Easing Editor",
+          "url": "https://animejs.com/easing-editor",
+          "icon": "/design-engineer-tools/icons/eca34546e0317d6d.png"
+        },
+        {
+          "name": "Easing Functions",
+          "url": "https://easings.net/",
+          "icon": "/design-engineer-tools/icons/90b777d56f3df91c.png"
+        },
+        {
+          "name": "Easing Gradients",
+          "url": "https://larsenwork.com/easing-gradients/",
+          "icon": "/design-engineer-tools/icons/a2bfbebc91950efa.png"
+        },
+        {
+          "name": "OKLCH Color Picker",
+          "url": "https://oklch.com/",
+          "icon": "/design-engineer-tools/icons/7394029c04671cb4.png"
+        },
+        {
+          "name": "Ray.so",
+          "url": "https://ray.so/",
+          "icon": "/design-engineer-tools/icons/31f749edd1e69673.png"
+        },
+        {
+          "name": "RegExr",
+          "url": "https://regexr.com/",
+          "icon": "/design-engineer-tools/icons/eb44d756013f2ff8.png"
+        },
+        {
+          "name": "SVGOMG",
+          "url": "https://jakearchibald.github.io/svgomg/",
+          "icon": "/design-engineer-tools/icons/c470a93eaf1fe54b.png"
+        },
+        {
+          "name": "ui.camera",
+          "url": "https://ui.camera/",
+          "icon": "/design-engineer-tools/icons/052dc9cf0b1ec046.png"
+        }
+      ]
+    },
+    {
+      "id": "Desktop Utility",
+      "tools": [
+        {
+          "name": "Claude Cowork",
+          "url": "https://claude.com/product/cowork",
+          "icon": "/design-engineer-tools/icons/719155c62686ead4.png"
+        },
+        {
+          "name": "Deskflow",
+          "url": "https://deskflow.org",
+          "icon": "/design-engineer-tools/icons/8129dcdc95831c6b.png"
+        },
+        {
+          "name": "Granola",
+          "url": "https://www.granola.ai/",
+          "icon": "/design-engineer-tools/icons/815cf02d7caba778.png"
+        },
+        {
+          "name": "LocalSend",
+          "url": "https://localsend.org/",
+          "icon": "/design-engineer-tools/icons/d0c48581e1659fb4.png"
+        },
+        {
+          "name": "Raycast",
+          "url": "https://www.raycast.com/",
+          "icon": "/design-engineer-tools/icons/54cd3c13de79a789.png"
+        },
+        {
+          "name": "Warp",
+          "url": "https://www.warp.dev/",
+          "icon": "/design-engineer-tools/icons/8d73894f4f6f87fe.png"
+        },
+        {
+          "name": "Wispr Flow",
+          "url": "https://wisprflow.ai/",
+          "icon": "/design-engineer-tools/icons/e30205625400ec7e.png"
+        }
+      ]
+    },
+    {
+      "id": "Video & Capture",
+      "tools": [
+        {
+          "name": "DaVinci Resolve",
+          "url": "https://www.blackmagicdesign.com/products/davinciresolve",
+          "icon": "/design-engineer-tools/icons/0ba1074a19f29fde.png"
+        },
+        {
+          "name": "LosslessCut",
+          "url": "https://mifi.no/losslesscut/",
+          "icon": "/design-engineer-tools/icons/7f098caf6b85ac56.png"
+        },
+        {
+          "name": "NVIDIA ShadowPlay",
+          "url": "https://www.nvidia.com/en-us/software/nvidia-app/#shadowplay",
+          "icon": "/design-engineer-tools/icons/6cea571208a7caeb.png"
+        },
+        {
+          "name": "OBS Studio",
+          "url": "https://obsproject.com/",
+          "icon": "/design-engineer-tools/icons/5cc0e67257c0cc09.png"
+        },
+        {
+          "name": "OpenCut",
+          "url": "https://opencut.app/",
+          "icon": "/design-engineer-tools/icons/f6bc708fb68be790.png"
+        },
+        {
+          "name": "Parsec",
+          "url": "https://parsec.app/",
+          "icon": "/design-engineer-tools/icons/d998dc42eedee5dd.png"
+        },
+        {
+          "name": "Recordly",
+          "url": "https://recordly.dev/",
+          "icon": "/design-engineer-tools/icons/99a0adc4ef546146.png"
+        },
+        {
+          "name": "Screen Studio",
+          "url": "https://screen.studio/",
+          "icon": "/design-engineer-tools/icons/bb0dc81dd5fd229c.png"
+        },
+        {
+          "name": "ShareX",
+          "url": "https://getsharex.com/",
+          "icon": "/design-engineer-tools/icons/ad68baf9bbabbb52.png"
+        }
+      ]
+    },
+    {
+      "id": "Whiteboard",
+      "tools": [
+        {
+          "name": "Excalidraw",
+          "url": "https://excalidraw.com/",
+          "icon": "/design-engineer-tools/icons/85794320b9feb680.png"
+        },
+        {
+          "name": "FigJam",
+          "url": "https://www.figma.com/figjam/",
+          "icon": "/design-engineer-tools/icons/c0c745b10eefa5d6.png"
+        },
+        {
+          "name": "Miro",
+          "url": "https://miro.com/",
+          "icon": "/design-engineer-tools/icons/eb640f905ca92aa4.png"
+        },
+        {
+          "name": "Muse",
+          "url": "https://museapp.com/",
+          "icon": "/design-engineer-tools/icons/cb4ebc1e54955283.png"
+        },
+        {
+          "name": "tldraw",
+          "url": "https://www.tldraw.com/",
+          "icon": "/design-engineer-tools/icons/48b5d8aa79163370.png"
+        }
+      ]
+    },
+    {
+      "id": "Organization",
+      "tools": [
+        {
+          "name": "AFFiNE",
+          "url": "https://affine.pro/",
+          "icon": "/design-engineer-tools/icons/beacad3f444fa779.png"
+        },
+        {
+          "name": "Are.na",
+          "url": "https://www.are.na/",
+          "icon": "/design-engineer-tools/icons/3f15e5373f5c5f4f.png"
+        },
+        {
+          "name": "Eagle",
+          "url": "https://en.eagle.cool/",
+          "icon": "/design-engineer-tools/icons/9416c15d5e386975.png"
+        },
+        {
+          "name": "Linear",
+          "url": "https://linear.app/",
+          "icon": "/design-engineer-tools/icons/0d09434b854f7374.png"
+        },
+        {
+          "name": "Obsidian",
+          "url": "https://obsidian.md/",
+          "icon": "/design-engineer-tools/icons/f18916e4fda284a0.png"
+        },
+        {
+          "name": "Trello",
+          "url": "https://trello.com/",
+          "icon": "/design-engineer-tools/icons/24ac848c23685fb0.png"
+        }
+      ]
+    },
+    {
+      "id": "Fonts",
+      "tools": [
+        {
+          "name": "Best Free Fonts",
+          "url": "https://bestfreefonts.com/",
+          "icon": "/design-engineer-tools/icons/89e13b0b250fc121.png"
+        },
+        {
+          "name": "Fonts In Use",
+          "url": "https://fontsinuse.com/",
+          "icon": "/design-engineer-tools/icons/7cea10086deaf296.png"
+        },
+        {
+          "name": "Fontshare",
+          "url": "https://www.fontshare.com/",
+          "icon": "/design-engineer-tools/icons/e86acb6c317ac86a.png"
+        },
+        {
+          "name": "Free Faces",
+          "url": "https://www.freefaces.gallery/",
+          "icon": null
+        },
+        {
+          "name": "UNCUT",
+          "url": "https://uncut.wtf/",
+          "icon": "/design-engineer-tools/icons/6ac510bc5fb66415.png"
+        }
+      ]
+    },
+    {
+      "id": "Visual",
+      "tools": [
+        {
+          "name": "Bitspace",
+          "url": "https://bitspace.sh/",
+          "icon": null
+        },
+        {
+          "name": "cables",
+          "url": "https://cables.gl/",
+          "icon": null
+        },
+        {
+          "name": "Nodes",
+          "url": "https://nodes.io/",
+          "icon": "/design-engineer-tools/icons/d3471ec46de37bd4.png"
+        },
+        {
+          "name": "NodeToy",
+          "url": "https://nodetoy.co/",
+          "icon": "/design-engineer-tools/icons/36147bdd3dff7066.png"
+        },
+        {
+          "name": "ShaderToy",
+          "url": "https://www.shadertoy.com/",
+          "icon": null
+        },
+        {
+          "name": "TouchDesigner",
+          "url": "https://derivative.ca/",
+          "icon": "/design-engineer-tools/icons/200093c156771796.png"
+        },
+        {
+          "name": "Unicorn.studio",
+          "url": "https://www.unicorn.studio/",
+          "icon": "/design-engineer-tools/icons/62c3f8819462db25.png"
+        }
+      ]
+    },
+    {
+      "id": "Interface",
+      "tools": [
+        {
+          "name": "Figma",
+          "url": "https://figma.com",
+          "icon": "/design-engineer-tools/icons/0e00e402f4cc9c26.png"
+        },
+        {
+          "name": "Framer",
+          "url": "https://www.framer.com/",
+          "icon": "/design-engineer-tools/icons/b48bc03253fb4ccc.png"
+        },
+        {
+          "name": "Paper",
+          "url": "https://paper.design/",
+          "icon": "/design-engineer-tools/icons/e5e9be570570154f.png"
+        },
+        {
+          "name": "Penpot",
+          "url": "https://penpot.app/",
+          "icon": "/design-engineer-tools/icons/5c1849993c1cb4f1.png"
+        },
+        {
+          "name": "Rive",
+          "url": "https://rive.app",
+          "icon": "/design-engineer-tools/icons/a69034dde468b5bd.png"
+        },
+        {
+          "name": "Stitch by Google Labs",
+          "url": "https://stitch.withgoogle.com/",
+          "icon": "/design-engineer-tools/icons/e8a778988ec09b71.png"
+        }
+      ]
+    },
+    {
+      "id": "Motion",
+      "tools": [
+        {
+          "name": "Cavalry",
+          "url": "https://cavalry.scenegroup.co/",
+          "icon": "/design-engineer-tools/icons/4cedd844ede8328e.png"
+        },
+        {
+          "name": "Jitter",
+          "url": "https://jitter.video/",
+          "icon": "/design-engineer-tools/icons/cb97c7ea6f1c63fd.png"
+        },
+        {
+          "name": "Lottie Creator",
+          "url": "https://lottiefiles.com/lottie-creator",
+          "icon": "/design-engineer-tools/icons/fc1fa6c57a350513.png"
+        },
+        {
+          "name": "Lottielab",
+          "url": "https://www.lottielab.com/",
+          "icon": "/design-engineer-tools/icons/d9cf5436ba30050b.png"
+        },
+        {
+          "name": "Theatre.js",
+          "url": "https://www.theatrejs.com/",
+          "icon": "/design-engineer-tools/icons/d9974a5739d1d2e8.png"
+        }
+      ]
+    },
+    {
+      "id": "Audio",
+      "tools": [
+        {
+          "name": "ElevenLabs",
+          "url": "https://elevenlabs.io/",
+          "icon": "/design-engineer-tools/icons/5a71dcde353b55d6.png"
+        },
+        {
+          "name": "FMOD",
+          "url": "https://www.fmod.com/",
+          "icon": "/design-engineer-tools/icons/9f9c9e89ce78aa4c.png"
+        },
+        {
+          "name": "Splice",
+          "url": "https://splice.com/features/sounds",
+          "icon": "/design-engineer-tools/icons/c84a7e0ed12d7afa.png"
+        }
+      ]
+    },
+    {
+      "id": "Volumetric",
+      "tools": [
+        {
+          "name": "Depthkit",
+          "url": "https://www.depthkit.tv/",
+          "icon": "/design-engineer-tools/icons/db230a0bf639576b.png"
+        },
+        {
+          "name": "KIRI Engine",
+          "url": "https://www.kiriengine.app/",
+          "icon": "/design-engineer-tools/icons/ec82d04effdd3786.png"
+        },
+        {
+          "name": "Luma AI",
+          "url": "https://lumalabs.ai/interactive-scenes",
+          "icon": "/design-engineer-tools/icons/59726c47ac456c1c.png"
+        },
+        {
+          "name": "Polycam",
+          "url": "https://poly.cam/",
+          "icon": "/design-engineer-tools/icons/12e6a5e10b02ab56.png"
+        },
+        {
+          "name": "RealityScan",
+          "url": "https://www.unrealengine.com/en-US/realityscan",
+          "icon": "/design-engineer-tools/icons/4f6a6f0814d72de8.png"
+        },
+        {
+          "name": "SuperSplat Editor",
+          "url": "https://superspl.at/editor",
+          "icon": "/design-engineer-tools/icons/6cde6a55cb044267.png"
+        }
+      ]
+    },
+    {
+      "id": "3D",
+      "tools": [
+        {
+          "name": "Bezi",
+          "url": "https://www.bezi.com/",
+          "icon": "/design-engineer-tools/icons/4f50fc9e70a05f83.png"
+        },
+        {
+          "name": "Blender",
+          "url": "https://www.blender.org/",
+          "icon": "/design-engineer-tools/icons/10c38833207c9dae.png"
+        },
+        {
+          "name": "Houdini",
+          "url": "https://www.sidefx.com/",
+          "icon": "/design-engineer-tools/icons/5c8cd08d01fb6bfb.png"
+        },
+        {
+          "name": "Spline",
+          "url": "https://spline.design/",
+          "icon": "/design-engineer-tools/icons/4fac1cca87d56091.png"
+        },
+        {
+          "name": "Womp",
+          "url": "https://womp.com/",
+          "icon": "/design-engineer-tools/icons/44f20475c284f15c.png"
+        }
+      ]
+    },
+    {
+      "id": "glTF",
+      "tools": [
+        {
+          "name": "gltfjsx",
+          "url": "https://github.com/pmndrs/gltfjsx",
+          "icon": "/design-engineer-tools/icons/25dec028287078b3.png"
+        },
+        {
+          "name": "gltfpack",
+          "url": "https://github.com/zeux/meshoptimizer/blob/master/gltf/README.md",
+          "icon": "/design-engineer-tools/icons/2ef7ee813afc9c78.png"
+        },
+        {
+          "name": "Needle Viewer",
+          "url": "https://viewer.needle.tools/",
+          "icon": "/design-engineer-tools/icons/15e9de45f2e499eb.png"
+        }
+      ]
+    },
+    {
+      "id": "Digital Fashion",
+      "tools": [
+        {
+          "name": "CLO",
+          "url": "https://www.clo3d.com/",
+          "icon": "/design-engineer-tools/icons/fa4a68239c794c16.png"
+        },
+        {
+          "name": "Marvelous Designer",
+          "url": "https://www.marvelousdesigner.com/",
+          "icon": "/design-engineer-tools/icons/19b4b0a8487e5808.png"
+        },
+        {
+          "name": "Style3D",
+          "url": "https://www.linctex.com/",
+          "icon": "/design-engineer-tools/icons/745e23c08bc722b3.png"
+        }
+      ]
+    },
+    {
+      "id": "Research",
+      "tools": [
+        {
+          "name": "ChatGPT",
+          "url": "https://chatgpt.com/",
+          "icon": "/design-engineer-tools/icons/5d9354f7cb0eac0c.png"
+        },
+        {
+          "name": "Google Gemini",
+          "url": "https://gemini.google.com/",
+          "icon": "/design-engineer-tools/icons/5b7d54409f2a9b2a.png"
+        },
+        {
+          "name": "NotebookLM",
+          "url": "https://notebooklm.google/",
+          "icon": "/design-engineer-tools/icons/67710e994bff5b14.png"
+        }
+      ]
+    },
+    {
+      "id": "Browser",
+      "tools": [
+        {
+          "name": "Arc",
+          "url": "https://arc.net/",
+          "icon": "/design-engineer-tools/icons/0b851f7076b12092.png"
+        },
+        {
+          "name": "Brave",
+          "url": "https://brave.com/",
+          "icon": "/design-engineer-tools/icons/9f119e082bdda57b.png"
+        },
+        {
+          "name": "Firefox",
+          "url": "https://www.mozilla.org/firefox/new/",
+          "icon": "/design-engineer-tools/icons/2f121a893c128b6e.png"
+        },
+        {
+          "name": "Zen",
+          "url": "https://zen-browser.app/",
+          "icon": "/design-engineer-tools/icons/20bbce1a48869323.png"
+        }
+      ]
+    },
+    {
+      "id": "Emoji",
+      "tools": [
+        {
+          "name": "MakeEmoji",
+          "url": "https://makeemoji.com/",
+          "icon": "/design-engineer-tools/icons/9a4fcff8672cc388.png"
+        }
+      ]
+    }
+  ]
+}

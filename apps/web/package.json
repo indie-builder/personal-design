@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@personal-design/design-engineer-tools": "workspace:*",
     "@personal-design/inspora": "workspace:*",
     "@personal-design/layout-compositions": "workspace:*",
     "@personal-design/personal-sites": "workspace:*",

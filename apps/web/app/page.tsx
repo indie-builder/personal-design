@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { catalog, categories, hasImage, thumbnailUrl } from '@personal-design/layout-compositions';
 import { listPosts, videoPreviewUrl } from '@personal-design/inspora';
+import { toolPreview } from '@personal-design/design-engineer-tools';
 import { products } from '@/lib/products';
 import { HomeView } from '@/components/home-view';
 
@@ -33,6 +34,7 @@ export default function HomePage() {
       products={products}
       layoutPreviews={layoutPreviews}
       musePreviews={musePreviews}
+      toolsPreview={toolPreview}
     />
   );
 }

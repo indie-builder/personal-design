@@ -16,6 +16,7 @@
     "format:check": "oxfmt --check 'apps/web/{app,components,lib}/**/*.{ts,tsx}' 'apps/web/*.{ts,mjs}' 'packages/*/src/**/*.ts' 'packages/*/scripts/**/*.mjs'",
     "typecheck": "pnpm -r typecheck",
     "sync:layouts": "pnpm --filter @personal-design/layout-compositions sync",
+    "sync:design-engineer-tools": "pnpm --filter @personal-design/design-engineer-tools sync",
     "sync:personal-sites": "pnpm --filter @personal-design/personal-sites sync",
     "sync:inspora": "pnpm --filter @personal-design/inspora sync"
   },

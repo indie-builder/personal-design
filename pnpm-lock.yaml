@@ -17,6 +17,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@personal-design/design-engineer-tools':
+        specifier: workspace:*
+        version: link:../../packages/design-engineer-tools
       '@personal-design/inspora':
         specifier: workspace:*
         version: link:../../packages/inspora
@@ -69,6 +72,15 @@ importers:
       tailwindcss:
         specifier: 4.3.3
         version: 4.3.3
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+
+  packages/design-engineer-tools:
+    devDependencies:
+      '@types/node':
+        specifier: 26.4.0
+        version: 26.4.0
       typescript:
         specifier: 7.0.2
         version: 7.0.2

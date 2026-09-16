@@ -4,8 +4,9 @@
  * 然后在这里注册一条。独立部署的作品直接注册线上地址。
  */
 import { personalSite } from '@personal-design/personal-sites';
+import { toolCategoryCount, toolCount } from '@personal-design/design-engineer-tools';
 
-export type LineId = 'muse' | 'layouts' | 'sites';
+export type LineId = 'muse' | 'layouts' | 'tools' | 'sites';
 
 export interface Product {
   slug: string;
@@ -49,5 +50,16 @@ export const products: Product[] = [
     cover: '/inspora/thumbnails/54c9d760-395c-4ff7-8446-4432034d9f44.webp',
     stats: [],
     line: 'muse' as const,
+  },
+  {
+    slug: 'design-engineer-tools',
+    name: '设计工程工具',
+    tagline: '设计工程师常用工具目录',
+    description: '按灵感、AI 编程、组件、动效、三维与研究等分类整理的工具入口。',
+    date: '2026-09-04',
+    href: '/products/design-engineer-tools',
+    cover: '',
+    stats: [`${toolCount} 个工具`, `${toolCategoryCount} 个分类`],
+    line: 'tools' as const,
   },
 ].sort((a, b) => a.date.localeCompare(b.date));

@@ -54,6 +54,17 @@
 }
 
 .motionPreview video { width:100%; height:100%; object-fit:contain; }
+.toolPreview { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; height:100%; background:var(--color-paper); outline:1px solid var(--color-hairline-strong); outline-offset:-1px; }
+.toolPreview span { display:flex; align-items:center; gap:8px; min-width:0; padding:16px; overflow:hidden; color:var(--color-ink-soft); font-size:14px; line-height:1.35; overflow-wrap:anywhere; transition:color 180ms ease,background-color 180ms ease; }
+.toolPreview span:nth-child(odd) { border-right:1px solid var(--color-hairline); }
+.toolPreview span:nth-child(-n+2) { border-bottom:1px solid var(--color-hairline); }
+.toolPreview i { position:relative; width:16px; height:16px; flex:none; overflow:hidden; border-radius:var(--radius-control); }
+.toolPreview i :global(img),.toolPreview i svg { position:absolute; inset:0; width:16px; height:16px; object-fit:contain; transition:opacity 180ms ease,transform 180ms var(--ease-out); }
+.toolPreview i svg { opacity:0; }
+.toolPreview span[data-active=true] { color:var(--color-ink); background:var(--color-plate); }
+.toolPreview span[data-active=true] i :global(img) { opacity:0; transform:scale(.78); }
+.toolPreview span[data-active=true] i svg { opacity:1; transform:translate(1px,-1px); }
+.toolPreview b { min-width:0; overflow-wrap:anywhere; font-weight:400; }
 .viewport[data-dragging], .viewport[data-dragging] a { cursor:grabbing; user-select:none; }
 /* Short, visible-by-default introduction; never replay a keyframed entrance on filtering. */
 @media(prefers-reduced-motion:no-preference) {

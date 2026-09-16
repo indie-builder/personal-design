@@ -24,7 +24,11 @@ const nextConfig: NextConfig = {
       headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
     }));
   },
-  transpilePackages: ['@personal-design/layout-compositions', '@personal-design/inspora'],
+  transpilePackages: [
+    '@personal-design/layout-compositions',
+    '@personal-design/inspora',
+    '@personal-design/design-engineer-tools',
+  ],
   allowedDevOrigins: ['personal-design.localhost', '*.personal-design.localhost'],
   // dev 指示器默认在右上，恰好压住主题切换钮；挪到左下（仅 dev 有效）
   devIndicators: { position: 'bottom-left' },
