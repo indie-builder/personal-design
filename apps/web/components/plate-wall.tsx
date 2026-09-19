@@ -39,15 +39,24 @@ export interface PlateWallItem {
 
 interface PlateWallProps {
   categories: { name: string; count: number }[];
+  /** 服务端按当前筛选下发的首屏窗口；完整列表留在服务端，随滚动经分片接口追加 */
   items: PlateWallItem[];
+  /** 当前筛选命中总数（服务端统计） */
+  total: number;
   /** 首屏与每批数量 */
   batchSize?: number;
 }
 
 const DEFAULT_BATCH = 48;
+const SEARCH_DEBOUNCE = 200;
 
 /** Stable gallery: one native link per work, visible motion previews, scroll-triggered batching. */
-export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: PlateWallProps) {
+export function PlateWall({
+  categories,
+  items,
+  total: initialTotal,
+  batchSize = DEFAULT_BATCH,
+}: PlateWallProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [active, select] = useCatParam(categories.map((category) => category.name));
@@ -60,27 +69,48 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
     if (post) router.replace(browseHref(`${pathname}/${encodeURIComponent(post)}`, listHref));
   }, [searchParams, pathname, router]);
   const query = searchParams.get('q') ?? '';
-  const setQuery = (q: string) => {
-    const params = new URLSearchParams(window.location.search);
-    if (q) params.set('q', q);
-    else params.delete('q');
-    window.history.replaceState(null, '', `${pathname}${params.size ? `?${params}` : ''}`);
+  // 输入即时回显在本地，停顿后写入 URL（URL 是筛选的唯一事实源）
+  const [input, setInput] = useState(query);
+  useEffect(() => setInput(query), [query]);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const setQuery = (value: string) => {
+    setInput(value);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (value) params.set('q', value);
+      else params.delete('q');
+      window.history.replaceState(null, '', `${pathname}${params.size ? `?${params}` : ''}`);
+    }, SEARCH_DEBOUNCE);
   };
   const returnHref = `${pathname}${searchParams.size ? `?${searchParams}` : ''}`;
+  const filterKey = `${active}|${query}`;
+
+  // 与筛选同步的数据窗口；key 落后于 filterKey 时为待同步，先用已载入窗口本地过滤回显
+  const [synced, setSynced] = useState({ key: filterKey, items, total: initialTotal });
   const [shown, setShown] = useState(batchSize);
   const moreRef = useRef<HTMLDivElement>(null);
 
-  const filtered = useMemo(
+  const stale = synced.key !== filterKey;
+  const listed = useMemo(
     () =>
-      items.filter(
-        (item) =>
-          (active === '全部' || item.category === active) &&
-          matchesSearch(query, [item.name, item.lead, item.keywords, categoryLabel(item.category)]),
-      ),
-    [active, items, query],
+      stale
+        ? synced.items.filter(
+            (item) =>
+              (active === '全部' || item.category === active) &&
+              matchesSearch(query, [
+                item.name,
+                item.lead,
+                item.keywords,
+                categoryLabel(item.category),
+              ]),
+          )
+        : synced.items,
+    [stale, synced.items, active, query],
   );
+  const moreTotal = stale ? listed.length : synced.total;
+  const visible = listed.slice(0, shown);
 
-  const visible = filtered.slice(0, shown);
   const remember = (key: string) => {
     try {
       sessionStorage.setItem(
@@ -90,13 +120,40 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
     } catch {}
   };
 
-  // 切分类时重置分批（render 期间调整 state，避免 effect 级联）
-  const filterKey = `${active}|${query}`;
+  // 切筛选时重置分批（render 期间调整 state，避免 effect 级联）
   const [prevKey, setPrevKey] = useState(filterKey);
   if (prevKey !== filterKey) {
     setPrevKey(filterKey);
     setShown(batchSize);
   }
+
+  // 筛选变化：防抖拉取当前筛选的完整首窗
+  const fetchIdRef = useRef(0);
+  useEffect(() => {
+    if (!stale) return;
+    const fetchId = ++fetchIdRef.current;
+    const timer = setTimeout(() => {
+      void (async () => {
+        const params = new URLSearchParams();
+        if (query) params.set('q', query);
+        if (active !== '全部') params.set('cat', active);
+        params.set('offset', '0');
+        params.set('limit', String(Math.max(batchSize, shown)));
+        try {
+          const res = await fetch(`/products/muse/api/posts?${params}`);
+          if (!res.ok) return;
+          const data = (await res.json()) as { items?: PlateWallItem[]; total?: number };
+          if (fetchIdRef.current !== fetchId || !Array.isArray(data.items)) return;
+          setSynced({
+            key: `${active}|${query}`,
+            items: data.items,
+            total: Number(data.total) || data.items.length,
+          });
+        } catch {}
+      })();
+    }, SEARCH_DEBOUNCE);
+    return () => clearTimeout(timer);
+  }, [stale, active, query, batchSize, shown]);
 
   // URL is the query source of truth, including browser back/forward.
   useEffect(() => {
@@ -113,33 +170,93 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
         typeof saved?.href === 'string' &&
         browseMemoryKey('muse-return', saved.href) === memoryKey
       ) {
-        frame = requestAnimationFrame(() => {
-          setShown(Math.max(batchSize, Number(saved.shown) || batchSize));
+        const target = Math.max(batchSize, Number(saved.shown) || batchSize);
+        const restore = () => {
           frame = requestAnimationFrame(() => {
-            window.scrollTo(0, Number(saved.y) || 0);
-            if (typeof saved.key === 'string')
-              document.getElementById(`muse-${saved.key}`)?.focus({ preventScroll: true });
+            setShown(target);
+            frame = requestAnimationFrame(() => {
+              window.scrollTo(0, Number(saved.y) || 0);
+              if (typeof saved.key === 'string')
+                document.getElementById(`muse-${saved.key}`)?.focus({ preventScroll: true });
+            });
           });
-        });
+        };
+        if (target <= items.length) {
+          restore();
+          return () => cancelAnimationFrame(frame);
+        }
+        // 保存的分批超出首窗：先补齐窗口再恢复位置，保证恢复的滚动高度有效
+        const params = new URLSearchParams(window.location.search);
+        if (query) params.set('q', query);
+        if (active !== '全部') params.set('cat', active);
+        params.set('offset', String(items.length));
+        params.set('limit', String(target - items.length));
+        fetch(`/products/muse/api/posts?${params}`)
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data: { items?: PlateWallItem[]; total?: number } | null) => {
+            const slice = Array.isArray(data?.items) ? data.items : [];
+            if (slice.length) {
+              setSynced((prev) =>
+                prev.key === filterKey
+                  ? {
+                      key: prev.key,
+                      items: [...prev.items, ...slice],
+                      total: Number(data?.total) || prev.total,
+                    }
+                  : prev,
+              );
+            }
+          })
+          .catch(() => {})
+          .finally(restore);
       }
     } catch {}
     return () => cancelAnimationFrame(frame);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 仅挂载时按存储恢复一次
   }, [batchSize]);
 
+  // 滚动追加：本地还有未展示批次则直接扩显示数，否则向分片接口取下一片
   useEffect(() => {
     const sentinel = moreRef.current;
-    if (!sentinel || shown >= filtered.length) return;
+    if (!sentinel || visible.length >= moreTotal) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
         observer.disconnect();
-        setShown((count) => Math.min(count + batchSize, filtered.length));
+        if (shown < listed.length) {
+          setShown((count) => Math.min(count + batchSize, listed.length));
+        } else if (!stale && synced.items.length < synced.total) {
+          const offset = synced.items.length;
+          const key = `${active}|${query}`;
+          void (async () => {
+            const params = new URLSearchParams();
+            if (query) params.set('q', query);
+            if (active !== '全部') params.set('cat', active);
+            params.set('offset', String(offset));
+            params.set('limit', String(batchSize));
+            try {
+              const res = await fetch(`/products/muse/api/posts?${params}`);
+              if (!res.ok) return;
+              const data = (await res.json()) as { items?: PlateWallItem[]; total?: number };
+              const slice = data.items;
+              if (!Array.isArray(slice) || !slice.length) return;
+              setSynced((prev) => {
+                if (prev.key !== key || prev.items.length !== offset) return prev;
+                return {
+                  key: prev.key,
+                  items: [...prev.items, ...slice],
+                  total: Number(data.total) || prev.total,
+                };
+              });
+            } catch {}
+          })();
+        }
       },
       { rootMargin: '600px 0px' },
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [shown, filtered.length, filterKey, batchSize]);
+  }, [shown, listed.length, visible.length, stale, synced, moreTotal, batchSize, active, query]);
 
   const clear = () => window.history.replaceState(null, '', pathname);
   return (
@@ -147,7 +264,7 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
       <CollectionToolbar
         actions={
           <CollectionSearch
-            value={query}
+            value={input}
             onChange={setQuery}
             placeholder="搜索灵感"
             label="搜索标题、作者或标签"
@@ -157,18 +274,22 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
         <CategoryTabs categories={categories} active={active} onSelect={select} />
       </CollectionToolbar>
       <div className={styles.results}>
-        <p role="status">{filtered.length} 件灵感</p>
+        <p role="status">{moreTotal} 件灵感</p>
         {query || active !== '全部' ? (
           <Button variant="ghost" onClick={clear}>
             清除筛选
           </Button>
         ) : null}
       </div>
-      {filtered.length === 0 ? (
+      {listed.length === 0 ? (
         <div className={styles.empty}>
-          <h2>{items.length ? '没有找到匹配的灵感' : '还没有收录内容'}</h2>
-          <p>{items.length ? '试试其他关键词或分类，或清除筛选。' : '内容收录后会出现在这里。'}</p>
-          {items.length ? <Button onClick={clear}>查看全部灵感</Button> : null}
+          <h2>{query || active !== '全部' ? '没有找到匹配的灵感' : '还没有收录内容'}</h2>
+          <p>
+            {query || active !== '全部'
+              ? '试试其他关键词或分类，或清除筛选。'
+              : '内容收录后会出现在这里。'}
+          </p>
+          {query || active !== '全部' ? <Button onClick={clear}>查看全部灵感</Button> : null}
         </div>
       ) : (
         <div className={styles.grid}>
@@ -183,7 +304,7 @@ export function PlateWall({ categories, items, batchSize = DEFAULT_BATCH }: Plat
           ))}
         </div>
       )}
-      {visible.length < filtered.length ? (
+      {visible.length < moreTotal ? (
         <div ref={moreRef} className={styles.more} aria-hidden="true" />
       ) : null}
     </section>

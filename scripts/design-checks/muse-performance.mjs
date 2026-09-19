@@ -10,6 +10,7 @@ const response = await fetch(new URL('/products/muse', base));
 assert.equal(response.status, 200);
 const html = await response.text();
 assert.equal((html.match(/id="muse-/g) || []).length, 24, '首批24件必须在服务器 HTML 中呈现');
+assert.ok(html.length < 400_000, `网格页 HTML 必须保持窗口化（当前 ${(html.length / 1024).toFixed(0)}KB）`);
 const poster = html.match(/poster="([^"]+)"/)?.[1]?.replaceAll('&amp;', '&');
 assert.ok(poster, '首屏视频必须有可直接请求的封面');
 const posterUrl = new URL(poster, base);
@@ -22,4 +23,9 @@ assert.doesNotMatch(plain.headers.get('cache-control') || '', /immutable/, '无�
 const filtered = await fetch(new URL('/products/muse?q=brand%20work', base)).then(r => r.text());
 assert.match(filtered, /id="muse-brand-work"/);
 assert.doesNotMatch(filtered, /id="muse-cartridge-portfolio"/);
-console.log('PASS: SSR首批24件、搜索首屏、版本化媒体缓存、无版本缓存保护');
+const slice = await fetch(new URL('/products/muse/api/posts?offset=24&limit=24', base));
+assert.equal(slice.status, 200);
+const sliceData = await slice.json();
+assert.ok(Array.isArray(sliceData.items) && sliceData.items.length === 24, '分片接口必须返回整批窗口');
+assert.ok(sliceData.total > sliceData.items.length, '分片接口必须给出筛选命中总数');
+console.log('PASS: SSR首批24件、窗口化负载、搜索首屏、版本化媒体缓存、无版本缓存保护、分片接口');
