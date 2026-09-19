@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { connection } from 'next/server';
 import { LightboxProvider } from '@/components/lifeline/lightbox';
 import {
   catalog,
@@ -32,12 +31,16 @@ const tabs = categories.map((category) => ({
   count: items.filter((item) => item.category === category.name).length,
 }));
 
-export default async function LayoutCompositionsPage() {
-  // Render the requested spread on the server so its images do not wait for hydration.
-  await connection();
+export default function LayoutCompositionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   return (
     <main>
-      {/* Keep navigation transitions within the existing Suspense boundary. */}
+      {/* Keep navigation transitions within the existing Suspense boundary.
+          searchParams 在 Suspense 内 await：预渲染期必然挂起，首屏只由请求时分叉
+          按当前筛选输出跨页图片，不会在预渲染外壳里重复一份空参数渲染。 */}
       <Suspense
         fallback={
           <p className="p-6 text-ink-soft" role="status">
@@ -45,10 +48,22 @@ export default async function LayoutCompositionsPage() {
           </p>
         }
       >
-        <LightboxProvider>
-          <LayoutBookshelf categories={tabs} items={items} />
-        </LightboxProvider>
+        <Bookshelf searchParams={searchParams} />
       </Suspense>
     </main>
+  );
+}
+
+async function Bookshelf({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  await searchParams;
+  // Render the requested spread on the server so its images do not wait for hydration.
+  return (
+    <LightboxProvider>
+      <LayoutBookshelf categories={tabs} items={items} />
+    </LightboxProvider>
   );
 }

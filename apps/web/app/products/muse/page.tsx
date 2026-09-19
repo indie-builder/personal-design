@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { connection } from 'next/server';
 import styles from './page.module.css';
 import { listCategories, listPosts, videoPreviewUrl } from '@personal-design/inspora';
 import { PlateWall, type PlateWallItem } from '@/components/plate-wall';
@@ -46,12 +45,16 @@ const uncategorized = items.filter((item) => item.category === '未分类').leng
 if (uncategorized && !tabs.some((category) => category.name === '未分类'))
   tabs.push({ name: '未分类', count: uncategorized });
 
-export default async function MusePage() {
-  await connection();
+export default function MusePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   return (
     <main className={styles.page}>
       <div>
-        {/* PlateWall 内用 useSearchParams 恢复分类现场，需要 Suspense 边界 */}
+        {/* searchParams 转发进 Suspense 内 await：预渲染期必然挂起，外壳不预渲染网格，
+            首屏只由请求时分叉输出（服务端按当前筛选，设计契约） */}
         <Suspense
           fallback={
             <p role="status" className="py-8 text-ink-soft">
@@ -59,9 +62,18 @@ export default async function MusePage() {
             </p>
           }
         >
-          <PlateWall categories={tabs} items={items} batchSize={24} />
+          <MuseGrid searchParams={searchParams} />
         </Suspense>
       </div>
     </main>
   );
+}
+
+async function MuseGrid({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  await searchParams;
+  return <PlateWall categories={tabs} items={items} batchSize={24} />;
 }

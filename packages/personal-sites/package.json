@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@remotion/cli": "4.0.526",
-    "@types/node": "26.6.1",
+    "@types/node": "24.13.6",
     "@types/react": "19.3.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",

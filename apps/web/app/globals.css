@@ -1,18 +1,12 @@
 @import 'tailwindcss';
 @custom-variant dark (&:where(html[data-theme='dark'] *));
 
-@font-face {
-  font-family: 'Albert Sans';
-  src: url('/fonts/AlbertSans-VariableFont_wght.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-}
+/* Albert Sans 由 next/font/local 接管（app/layout.tsx），家族名经 --font-albert-sans 注入 */
 
 /* Source roles: OpenDesign tokens.css. Adaptations live in execution/contract.md. */
 @theme {
-  --font-sans: 'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-display: 'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-sans: var(--font-albert-sans), -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-display: var(--font-albert-sans), -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --color-workspace: #ffffff;
   --color-paper: #ffffff;

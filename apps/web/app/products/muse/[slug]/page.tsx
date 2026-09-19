@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import { getPostBySlug, listPostRefs } from '@personal-design/inspora';
@@ -45,7 +46,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function MuseDetailPage({ params }: PageProps) {
+export default function MuseDetailPage({ params }: PageProps) {
+  return (
+    <main className={styles.page}>
+      {/* params 属请求时数据，转发进 Suspense 内的子组件再 await：外壳可预渲染，内容照旧服务端输出 */}
+      <Suspense fallback={null}>
+        <Detail params={params} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function Detail({ params }: PageProps) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) notFound();

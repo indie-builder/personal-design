@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { catalog, getLayoutById, hasImage } from '@personal-design/layout-compositions';
 
-export const dynamicParams = false;
 export function generateStaticParams() {
   return catalog.map((item) => ({ id: item.id }));
 }

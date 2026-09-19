@@ -11,6 +11,8 @@ const mediaVersion = process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.MEDIA_VERS
 const mediaDirectories = ['inspora', 'layout-compositions', 'personal-sites'];
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
+  reactCompiler: true,
   outputFileTracingRoot: path.join(import.meta.dirname, '../..'),
   outputFileTracingIncludes: {
     '/products/muse': ['../../packages/inspora/inspora.db', './public/inspora/**/*'],
