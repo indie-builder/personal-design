@@ -1,8 +1,8 @@
 {
   "base": "http://localhost:3001",
   "results": [
-    "home → muse → query → lightbox → detail → JSON/source → return restores query",
-    "home → layouts → category → lightbox → detail → original image link → category return"
+    "home → muse → query → detail with source link → return restores query",
+    "home → layouts → open book → album flip → zoom as detail → Esc layering → back to home"
   ],
   "errors": [],
   "passed": true
