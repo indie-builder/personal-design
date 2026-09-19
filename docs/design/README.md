@@ -85,7 +85,7 @@
 
 ## 修改后的验收要求
 
-性能约束：灵感集和布局画册在服务器输出当前筛选首屏，媒体不能等客户端脚本才出现。灵感网格链接在悬停或键盘聚焦后预取；视频保留可视自动播放，远离视口的装饰性预览可释放并重载，原生／手动播放器保留播放位置。本地媒体 URL 使用部署提交号作为版本（Vercel 自动提供；其他部署可设置 `MEDIA_VERSION` 为40位提交号），只有带版本号的地址使用长期缓存。回归运行 `node scripts/design-checks/muse-performance.mjs <生产构建地址>` 和 `node scripts/design-checks/layout-first-paint.mjs <生产构建地址>`；前者需要带版本号的构建。
+性能约束：灵感集和布局画册在服务器输出当前筛选首屏，媒体不能等客户端脚本才出现。灵感网格链接在悬停或键盘聚焦后预取；视频保留可视自动播放，远离视口的装饰性预览可释放并重载，原生／手动播放器保留播放位置。本地媒体 URL 使用部署提交号作为版本（Vercel 自动提供；其他部署可设置 `MEDIA_VERSION` 为40位提交号），只有带版本号的地址使用长期缓存。标准行为套件用 `node scripts/design-checks/run-all.mjs` 一键运行（对生产构建地址，`DESIGN_BASE_URL` 指定）；性能回归另运行 `node scripts/design-checks/muse-performance.mjs <生产构建地址>` 和 `node scripts/design-checks/layout-first-paint.mjs <生产构建地址>`，前者需要带版本号的构建。
 
 本节是要求，不是所有现有代码已达标的声明。
 
