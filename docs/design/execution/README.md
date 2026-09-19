@@ -12,6 +12,7 @@
 | 布局书架与画册：翻页步长、页码目录、放大即详情、缺图、高清降级、旧链接与 404 | [layouts.md](layouts.md) | `node scripts/design-checks/layouts-check.mjs` 与 `layouts-states.mjs`；[列表](evidence/layouts-check.json)、[状态](evidence/layouts-states.json) |
 | 灯箱滚动锁/焦点/组内翻图、自动播放、404 | [shared.md](shared.md) | `node scripts/design-checks/shared-browser.cjs` 与 `shared-autoplay.cjs` |
 | 两条从首页出发的完整浏览路径 | [生产结果](evidence/journeys.json) | `node scripts/design-checks/journeys.mjs` |
+| 个人网站宣传片播放/键盘控制/失败重试/外链 | —（实现见 site-showcase-media.tsx） | `node scripts/design-checks/personal-sites.mjs` |
 | 全量静态路由 | [路由结果](evidence/routes.json) | `node scripts/verify-design-routes.mjs` |
 | 视觉与原规则独立复核 | [finish-review.md](finish-review.md) | ship；初轮发现与修复已关闭 |
 | 来源完整性 | [source-integrity.json](evidence/source-integrity.json) | 25份来源快照哈希一致 |

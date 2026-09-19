@@ -22,6 +22,7 @@ const suites = [
   'shared-browser.cjs',
   'shared-autoplay.cjs',
   'journeys.mjs',
+  'personal-sites.mjs',
 ].filter((name) => {
   try {
     statSync(join(here, name));
