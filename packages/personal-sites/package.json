@@ -12,12 +12,12 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@remotion/cli": "4.0.484",
-    "@types/node": "26.4.0",
-    "@types/react": "19.2.17",
-    "react": "19.2.7",
-    "react-dom": "19.2.7",
-    "remotion": "4.0.484",
+    "@remotion/cli": "4.0.526",
+    "@types/node": "26.6.1",
+    "@types/react": "19.3.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remotion": "4.0.526",
     "sharp": "^0.35.4",
     "typescript": "^7.0.2"
   }

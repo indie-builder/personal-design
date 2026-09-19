@@ -2,7 +2,7 @@
   "name": "personal-design",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@11.24.0",
+  "packageManager": "pnpm@12.4.2",
   "engines": {
     "node": ">=24.0.0"
   },
@@ -23,6 +23,6 @@
   },
   "devDependencies": {
     "oxfmt": "^0.68.0",
-    "playwright": "1.62.1"
+    "playwright": "1.63.0"
   }
 }
