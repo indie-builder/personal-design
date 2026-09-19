@@ -10,6 +10,16 @@ const mediaHost = mediaBase ? new URL(mediaBase).hostname : null;
 const mediaVersion = process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.MEDIA_VERSION ?? '';
 const mediaDirectories = ['inspora', 'layout-compositions', 'personal-sites'];
 
+// 全站安全基线；CSP 需要给主题初始化内联脚本与 Next flight 脚本配 nonce，
+// 属中间件级改造，暂不纳入
+const securityHeaders = [
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+];
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   reactCompiler: true,
@@ -20,11 +30,14 @@ const nextConfig: NextConfig = {
   // A new deployment gets new media URLs; unversioned URLs keep revalidation.
   env: { NEXT_PUBLIC_MEDIA_VERSION: mediaVersion },
   async headers() {
-    return mediaDirectories.map((directory) => ({
-      source: `/${directory}/:path*`,
-      has: [{ type: 'query' as const, key: 'v', value: '[a-f0-9]{40}' }],
-      headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-    }));
+    return [
+      { source: '/:path*', headers: securityHeaders },
+      ...mediaDirectories.map((directory) => ({
+        source: `/${directory}/:path*`,
+        has: [{ type: 'query' as const, key: 'v', value: '[a-f0-9]{40}' }],
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      })),
+    ];
   },
   transpilePackages: [
     '@personal-design/layout-compositions',

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import localFont from 'next/font/local';
 import { WorkspaceShell } from '@/components/workspace-shell';
+import { siteUrl } from '@/lib/site-url';
 import './globals.css';
 
 // next/font 自动预加载并生成 size-adjust 回退度量，避免 swap 时布局抖动
@@ -14,11 +15,18 @@ const albertSans = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: siteUrl,
   title: {
     default: '作品时间轴',
     template: '%s · 作品时间轴',
   },
   description: '设计工具与参考产品集。',
+  openGraph: {
+    type: 'website',
+    siteName: '作品时间轴',
+    locale: 'zh_CN',
+  },
+  twitter: { card: 'summary' },
 };
 
 // 主题初始化：首帧前读 localStorage('theme')，缺省跟系统；同步脚本防 FOUC
