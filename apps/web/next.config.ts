@@ -23,6 +23,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   cacheComponents: true,
   reactCompiler: true,
+  // 预取只拉静态外壳，动态分叉在导航时流式到达（配合 cacheComponents 的官方推荐档）
+  partialPrefetching: true,
   outputFileTracingRoot: path.join(import.meta.dirname, '../..'),
   outputFileTracingIncludes: {
     '/products/muse': ['../../packages/inspora/inspora.db', './public/inspora/**/*'],
