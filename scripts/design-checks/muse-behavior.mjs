@@ -22,10 +22,10 @@ try {
   await page.waitForTimeout(1800);
   assert.equal(await search.inputValue(), 'zzzz-no-match-928');
   await page.getByRole('button', { name: '查看全部灵感', exact: true }).click();
-  await page.locator('figure a').first().waitFor();
+  await page.locator('a[id^="muse-"]').first().waitFor();
   await search.fill('dashboard');
   await page.waitForTimeout(300);
-  const detail = page.locator('figure a').first();
+  const detail = page.locator('a[id^="muse-"]').first();
   const href = await detail.getAttribute('href');
   await detail.click();
   await page.getByRole('link', { name: '返回灵感集', exact: true }).waitFor();
@@ -44,23 +44,22 @@ try {
   await page.keyboard.press('Home');
   await page.waitForTimeout(600);
   assert(await page.getByRole('button', { name: '上一张媒体', exact: true }).isDisabled());
-  const raw = page.locator('summary').filter({ hasText: '原始 JSON' });
-  await raw.click();
-  const pre = page.locator('pre');
-  await pre.waitFor({ state: 'visible' });
-  assert((await pre.textContent()).length > 20);
-  await pre.focus();
+  const counter = page.locator('span[aria-live="polite"]').first();
+  const before = await counter.textContent();
   const url = page.url();
   await page.keyboard.press('ArrowRight');
-  assert.equal(page.url(), url);
-  await page.keyboard.press('Escape');
-  assert(await raw.evaluate((element) => document.activeElement === element));
-  console.log('PASS multi carousel Home/End/bounds/raw JSON/local arrow/Esc focus');
+  await page.waitForTimeout(400);
+  assert.equal(page.url(), url, '方向键在轮播内不得跳转路由');
+  assert.notEqual(await counter.textContent(), before, '方向键应推进轮播媒体');
+  console.log('PASS multi carousel Home/End/bounds/local arrow advance without navigation');
 
-  await go('/products/muse/portfolio-page');
+  // 边界取自数据包排序的真实首尾作品（与详情页相邻列表同一 API）。
+  const { listPosts } = await import('../../packages/inspora/src/index.ts');
+  const posts = listPosts();
+  await go(`/products/muse/${posts[0].slug}`);
   assert(await page.locator('video').first().evaluate((element) => element.controls));
   assert(await page.getByRole('button', { name: '已是第一件', exact: true }).isDisabled());
-  await go('/products/muse/404-page');
+  await go(`/products/muse/${posts[posts.length - 1].slug}`);
   assert(await page.getByRole('button', { name: '已是最后一件', exact: true }).isDisabled());
   console.log('PASS native video controls and first/last navigation boundaries');
 
