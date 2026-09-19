@@ -425,6 +425,23 @@ function BookReader({
     }
     onZoomHandled();
   }, [zoomId, onZoomHandled]);
+  // Fetching and decoding must finish before a flip starts, or the incoming
+  // pages pop in mid-animation; one spread each way covers both flip directions.
+  const warmed = useRef(new Set<string>());
+  useEffect(() => {
+    for (const page of [
+      pages[spread - 2],
+      pages[spread - 1],
+      pages[spread + 2],
+      pages[spread + 3],
+    ]) {
+      if (!page?.thumb || warmed.current.has(page.thumb)) continue;
+      warmed.current.add(page.thumb);
+      const image = new window.Image();
+      image.src = page.thumb;
+      void image.decode().catch(() => {});
+    }
+  }, [pages, spread]);
   function jump(id: string) {
     const index = pages.findIndex((page) => page.id === id);
     if (index < 0) return;
