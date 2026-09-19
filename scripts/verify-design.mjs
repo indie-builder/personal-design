@@ -18,7 +18,7 @@ try {
     await theme('light'); await page.emulateMedia({ colorScheme: 'dark' }); await theme('dark');
   });
   await check('manual theme persists and overrides OS', async () => {
-    await page.getByRole('button', { name: '切换明暗主题' }).click(); await theme('light');
+    await page.getByRole('button', { name: '切换为浅色主题' }).click(); await theme('light');
     await page.reload({ waitUntil: 'domcontentloaded' }); await theme('light');
   });
   await check('theme storage syncs across tabs and invalid value falls back to OS', async () => {
@@ -28,10 +28,12 @@ try {
     await other.close();
   });
   await check('keyboard skip link reaches main content', async () => {
-    await go(); await page.keyboard.press('Tab');
-    assert.equal(await page.locator(':focus').getAttribute('href'), '#workspace-content');
+    await go();
+    await page.getByRole('link', { name: '跳至内容' }).waitFor();
+    await page.keyboard.press('Tab');
+    await page.waitForFunction(() => document.activeElement?.getAttribute('href') === '#workspace-content');
     await page.keyboard.press('Enter');
-    assert.equal(await page.locator(':focus').getAttribute('id'), 'workspace-content');
+    await page.waitForFunction(() => document.activeElement?.id === 'workspace-content');
   });
   const routes = ['/', '/products/muse', '/products/layout-compositions', '/products/muse/file-management-dashboard', '/products/layout-compositions/001', '/missing-page'];
   for (const width of [320, 720]) {
@@ -40,6 +42,7 @@ try {
       const response = await go(route); assert.equal(response.status(), route === '/missing-page' ? 404 : 200);
       const sizes = await page.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
       assert.ok(sizes[0] <= sizes[1], JSON.stringify(sizes));
+      await page.getByRole('main').waitFor();
       assert.equal(await page.getByRole('main').count(), 1);
       await page.getByRole('heading', { level: 1 }).waitFor({ state: 'visible' });
     });
@@ -49,7 +52,7 @@ try {
     await isolated.addInitScript(() => Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('denied', 'SecurityError'); } }));
     const p = await isolated.newPage(); await p.goto(base, { waitUntil: 'domcontentloaded' });
     await p.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
-    await p.getByRole('button', { name: '切换明暗主题' }).click();
+    await p.getByRole('button', { name: '切换为浅色主题' }).click();
     await p.waitForFunction(() => document.documentElement.dataset.theme === 'light'); await isolated.close();
   });
   assert.deepEqual(errors, []);

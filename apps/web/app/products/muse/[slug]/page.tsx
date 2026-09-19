@@ -94,8 +94,9 @@ async function Detail({ params }: PageProps) {
   const description = post.description?.trim();
   const hasDescription = description && description !== post.title.trim();
 
+  // main 地标由外壳的 Suspense 之外提供；此处若再渲染会产生嵌套重复地标。
   return (
-    <main className={styles.page}>
+    <>
       <BrowseNavigation
         appearance="text"
         listPath="/products/muse"
@@ -152,6 +153,6 @@ async function Detail({ params }: PageProps) {
           <p className={styles.description}>{description}</p>
         </div>
       ) : null}
-    </main>
+    </>
   );
 }
