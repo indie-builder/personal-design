@@ -123,11 +123,6 @@ export function videoPreviewUrl(
   return preview.url;
 }
 
-/** inspora 原帖链接 */
-export function upstreamUrl(post: Pick<InsporaPost, 'slug'>): string {
-  return `https://www.inspora.design/posts/${post.slug}`;
-}
-
 interface PostRow {
   id: string;
   slug: string;
@@ -320,23 +315,4 @@ export function listCategories(): InsporaCategory[] {
     .all() as unknown as { name: string; count: number }[];
   // node:sqlite 返回 null 原型对象，RSC 序列化只认普通对象
   return rows.map((row) => ({ name: row.name, count: row.count }));
-}
-
-/** 同分类内的前后帖（按发布时间倒序的位置），用于详情页翻页 */
-export function getAdjacentPosts(post: InsporaPost): {
-  prev: Pick<InsporaPost, 'slug' | 'title'> | null;
-  next: Pick<InsporaPost, 'slug' | 'title'> | null;
-} {
-  const rows = conn()
-    .prepare(
-      `SELECT slug, title, created_at FROM posts WHERE ${VISIBLE_POSTS} ORDER BY created_at DESC`,
-    )
-    .all() as unknown as { slug: string; title: string; created_at: string }[];
-  const idx = rows.findIndex((r) => r.slug === post.slug);
-  const prevRow = idx > 0 ? rows[idx - 1] : undefined;
-  const nextRow = idx >= 0 && idx < rows.length - 1 ? rows[idx + 1] : undefined;
-  return {
-    prev: prevRow ? { slug: prevRow.slug, title: prevRow.title } : null,
-    next: nextRow ? { slug: nextRow.slug, title: nextRow.title } : null,
-  };
 }
