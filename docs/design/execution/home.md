@@ -44,3 +44,7 @@
 ## 可复现检查
 
 执行 `node scripts/design-checks/home.mjs`；可设置 `DESIGN_BASE_URL`（默认 `http://localhost:3000`）。脚本通过项目的 `playwright` 依赖运行，将断言结果写入 `docs/design/execution/evidence/home-behavior.json`，不采集截图。脚本从日志观察升级为失败即退出的断言；首次严格复跑发现部分帧率下 End 会在末端前 3px 停滞。经主任务授权，rAF 改为保存内部小数坐标，不再把浏览器取整后的 scrollLeft 作为下一帧积分值；复跑全部断言通过，End 精确到 512px，下一节点禁用。修改后的 timeline 文件 lint 通过。
+
+## 2026-09-19 更正
+
+首页几经迭代（时间轴漫步者、文案与按钮调整），上文「验证」「可复现检查」描述的脚本行为已过时。`scripts/design-checks/home.mjs` 已重写对齐现行契约：翻页步长必须等于作品条目宽（守护漫步者不得缩小步长的回归）、方向键一步一列、拖动实质移动且停留在首页、reduced-motion 即时到位、窄屏无页面级横溢；原生 End/Home 与垂直滚轮不再断言（现代 Chromium 无对应默认行为，且非应用契约）；封面失败仅拦截图片优化通道做无页面错误冒烟。上文历史数值（410px、512px、「封面暂时无法显示」×2 等）仅描述当时版本。

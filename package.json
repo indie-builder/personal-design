@@ -12,6 +12,7 @@
     "build": "pnpm --filter @personal-design/web build",
     "start": "pnpm --filter @personal-design/web start",
     "lint": "pnpm --filter @personal-design/web lint",
+    "test": "node --test \"apps/web/lib/*.test.mjs\" \"packages/*/src/*.test.mjs\" \"packages/*/scripts/*.test.mjs\"",
     "format": "oxfmt --write 'apps/web/{app,components,lib}/**/*.{ts,tsx}' 'apps/web/*.{ts,mjs}' 'packages/*/src/**/*.ts' 'packages/*/scripts/**/*.mjs'",
     "format:check": "oxfmt --check 'apps/web/{app,components,lib}/**/*.{ts,tsx}' 'apps/web/*.{ts,mjs}' 'packages/*/src/**/*.ts' 'packages/*/scripts/**/*.mjs'",
     "typecheck": "pnpm -r typecheck",

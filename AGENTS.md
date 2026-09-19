@@ -29,6 +29,7 @@ Co-Authored-By: (the agent model's name and attribution byline)
 | Typecheck (one pkg) | `pnpm --filter @personal-design/web typecheck` |
 | Lint (one file) | `pnpm --filter @personal-design/web exec oxlint <file>` |
 | Format | `pnpm format`（oxfmt，TS/TSX/MJS；CSS 保持手写紧凑风格不参与，生成 JSON 已忽略） |
+| Test | `pnpm test`（node:test 单元测试；首页行为回归需先起生产服务再跑 `node scripts/design-checks/home.mjs`，见 docs/design/execution/README.md） |
 | Sync layout images | `pnpm sync:layouts`（幂等，已生成的 WebP 会跳过） |
 | Sync inspora 数据 | `pnpm sync:inspora`（增量；`-- --full` 全量 backfill；需先 `pnpm --filter @personal-design/inspora exec playwright install chromium`） |
 

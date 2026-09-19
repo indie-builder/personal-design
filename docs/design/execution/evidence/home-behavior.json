@@ -1,35 +1,31 @@
 {
-  "baseURL": "http://localhost:3001",
+  "baseURL": "http://localhost:3100",
   "checks": {
     "baseline": {
       "scroll": 0,
-      "width": 1184,
-      "total": 1696,
-      "height": 646
+      "max": 630,
+      "column": 420
     },
-    "nextOffset": 412,
+    "nextStep": 420,
     "end": {
-      "left": 512,
-      "max": 512
+      "scroll": 630,
+      "max": 630,
+      "column": 420
     },
+    "arrowBack": 210,
     "drag": {
-      "offset": 512,
+      "offset": 200,
       "pathname": "/"
     },
-    "wheelOffset": 450,
     "reduced": {
-      "left": 512,
-      "max": 512
+      "scroll": 420,
+      "max": 630,
+      "column": 420
     },
     "mobile": {
       "width": 390,
       "scroll": 390
-    },
-    "mobileRegion": {
-      "height": 623,
-      "scroll": 1400
-    },
-    "failedCovers": 2
+    }
   },
   "pageErrors": [],
   "passed": true

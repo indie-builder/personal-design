@@ -7,7 +7,7 @@
 | 范围 | 实现与状态报告 | 可复现检查 |
 | --- | --- | --- |
 | 基础控件、主题、导航、重排 | [foundation.md](foundation.md) | `node scripts/verify-design.mjs`；[17项生产断言](evidence/foundation.json) |
-| 首页时间轴、拖动、终点、封面失败 | [home.md](home.md) | `node scripts/design-checks/home.mjs`；[结果](evidence/home-behavior.json) |
+| 首页时间轴翻页步长、方向键、拖动、减少动态效果、窄屏（封面失败为冒烟） | [home.md](home.md) | `node scripts/design-checks/home.mjs`；[结果](evidence/home-behavior.json) |
 | 灵感检索、URL/返回、媒体轮播、超时恢复 | [muse.md](muse.md) | `node scripts/design-checks/muse-behavior.mjs` 与 `muse-recovery.mjs` |
 | 布局分类、双行运动、缺图、高清降级、前后边界 | [layouts.md](layouts.md) | `node scripts/design-checks/layouts-check.mjs` 与 `layouts-states.mjs`；[列表](evidence/layouts-check.json)、[状态](evidence/layouts-states.json) |
 | 灯箱、焦点、触摸、JSON、自动播放、404 | [shared.md](shared.md) | `node scripts/design-checks/shared-browser.cjs` 与 `shared-autoplay.cjs` |
