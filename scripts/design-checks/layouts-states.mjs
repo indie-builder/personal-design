@@ -1,36 +1,97 @@
-import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
+import { chromium } from 'playwright';
 
-const base = (process.env.DESIGN_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
-const evidenceDir = '.impeccable/review/full-design';
-
-const results = [];
-let failure = null;
-const browser=await chromium.launch({headless:true});
+// 布局参考状态与兼容路径回归：对齐 docs/design/README.md 契约——
+// 旧图鉴链接按缺图/有图分流（缺图定位书页不弹放大、未知编号 404）、
+// 高清挂起时灯箱缩略图兜底并可重试恢复、直达地址不重播抽书动画、
+// reduced-motion 下 Esc 即时返回书架。
+const baseURL = (process.env.DESIGN_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+const evidenceURL = new URL('../../docs/design/execution/evidence/layouts-states.json', import.meta.url);
+const evidence = { baseURL, checks: {}, pageErrors: [] };
+const browser = await chromium.launch({ headless: true });
 try {
-const page=await browser.newPage({viewport:{width:1024,height:768}});
-const assert=(x,s)=>{if(!x)throw new Error(s);results.push(s)};
-await page.route('**/_next/image?*',route=>{const u=new URL(route.request().url()).searchParams.get('url')??'';return u.startsWith('https:')?new Promise(()=>{}):route.continue()});
-await page.goto(base + '/products/layout-compositions/001',{waitUntil:'domcontentloaded'});
-await page.getByText('高清图暂不可用，已显示预览；可点击放大后重试',{exact:true}).waitFor({timeout:16000});results.push('12 second stalled HD falls back to preview');
-await page.getByRole('link',{name:'构图逻辑',exact:true}).focus();await page.keyboard.press('ArrowRight');await page.waitForTimeout(200);assert(page.url().endsWith('/001'),'focused link arrow not hijacked');
-await page.evaluate(()=>{document.body.tabIndex=-1;document.body.focus()});await page.keyboard.press('ArrowRight');await page.waitForURL('**/002',{waitUntil:'domcontentloaded'});results.push('body arrow navigates next detail');
-await page.goBack({waitUntil:'domcontentloaded'});await page.waitForURL('**/001',{waitUntil:'domcontentloaded'});results.push('browser back restores preceding detail');
-await page.goto(base + '/products/layout-compositions/015',{waitUntil:'domcontentloaded'});await page.getByText('已是本主题最后一张',{exact:true}).waitFor();results.push('last theme boundary');
-await page.goto(base + '/products/layout-compositions',{waitUntil:'domcontentloaded'});
-await page.getByRole('button',{name:'暂停自动浏览',exact:true}).waitFor();
-const row=page.getByRole('region',{name:'第一行图鉴，横向浏览',exact:true});await row.hover();const before=await row.evaluate(e=>e.scrollLeft);await page.waitForTimeout(250);assert(before===await row.evaluate(e=>e.scrollLeft),'hover pauses row');
-await page.mouse.move(0,0);await row.locator('button').first().focus();const focus=await row.evaluate(e=>e.scrollLeft);await page.waitForTimeout(250);assert(focus===await row.evaluate(e=>e.scrollLeft),'focus pauses row');
-await page.evaluate(()=>document.documentElement.dataset.theme='dark');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'1024 dark no horizontal page overflow');
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  page.on('pageerror', (error) => evidence.pageErrors.push(error.message));
 
+  // 旧缺图链接：定位书页但不弹放大。
+  await page.goto(`${baseURL}/products/layout-compositions/063`, { waitUntil: 'domcontentloaded' });
+  await page.locator('button[data-page-id="063"]').waitFor();
+  assert(
+    new URL(page.url()).searchParams.get('cat') === '构图逻辑',
+    '旧缺图链接应重定向到对应分类',
+  );
+  assert(
+    (await page.locator('[role="dialog"]').count()) === 0,
+    '缺图条目不应打开放大',
+  );
+  assert(
+    await page.getByText('此图鉴暂缺图片').isVisible(),
+    '旧缺图链接应显示缺图占位',
+  );
+  evidence.checks.legacyMissing = '063 lands on its page without zoom dialog';
 
+  // 未知编号：渲染 404 UI。cacheComponents 下动态段流式响应状态为 200，
+  // 依赖官方自动注入的 noindex 阻止收录（Next 文档 loading#Status Codes）。
+  const unknown = await page.goto(`${baseURL}/products/layout-compositions/999`, {
+    waitUntil: 'domcontentloaded',
+  });
+  await page.getByText('找不到这个页面', { exact: true }).waitFor();
+  assert(
+    (await page.locator('meta[name="robots"][content="noindex"]').count()) > 0,
+    '流式 404 必须带 noindex',
+  );
+  evidence.checks.unknownId = `404 UI + noindex (streamed status ${unknown?.status()})`;
+
+  // 直达带 cat/page 的地址：不重播抽书动画，画册直接可见。
+  await page.goto(`${baseURL}/products/layout-compositions?cat=构图逻辑&page=003`, {
+    waitUntil: 'domcontentloaded',
+  });
+  await page.locator('select[aria-label="跳转到图鉴"]').waitFor();
+  assert(
+    (await page.locator('[data-opening]').count()) === 0,
+    '直达地址不应重播抽书动画',
+  );
+  const directStatus = await page
+    .locator('[aria-label$="画册"] p[role="status"]')
+    .getAttribute('aria-label');
+  assert(directStatus === '第3至4页，共86页', `直达应定位第3至4页，实际「${directStatus}」`);
+
+  // 高清挂起：灯箱先显示缩略图兜底与明确提示，可重试；放行后恢复高清。
+  // 前提：003 的高清图走上游 CDN；若 sync 生成其本地 webp，需换无本地图的编号。
+  await page.route('**/cdn.jsdelivr.net/**', () => {});
+  await page.locator('button[data-page-id]').first().click();
+  await page.locator('[role="dialog"]').waitFor();
+  await page.getByText('高清图暂时无法加载，当前显示预览图。', { exact: true }).waitFor({ timeout: 16000 });
+  await page.unroute('**/cdn.jsdelivr.net/**');
+  await page.getByRole('button', { name: '重新加载' }).click();
+  await page.getByText('高清图暂时无法加载，当前显示预览图。', { exact: true }).waitFor({
+    state: 'detached',
+    timeout: 30000,
+  });
+  await page.keyboard.press('Escape');
+  await page.locator('[role="dialog"]').waitFor({ state: 'detached' });
+  evidence.checks.hdFallback = 'stalled HD falls back to thumb with retry, recovers after release';
+
+  // reduced-motion：Esc 即时返回书架（无合册动画等待）。
+  const rm = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  rm.on('pageerror', (error) => evidence.pageErrors.push(error.message));
+  await rm.goto(`${baseURL}/products/layout-compositions`, { waitUntil: 'domcontentloaded' });
+  await rm.locator('[class*="shelf"] button').first().click();
+  await rm.locator('select[aria-label="跳转到图鉴"]').waitFor();
+  await rm.keyboard.press('Escape');
+  await rm.locator('select[aria-label="跳转到图鉴"]').waitFor({ state: 'detached', timeout: 2000 });
+  await rm.close();
+  evidence.checks.reducedMotion = 'Esc returns to shelf instantly';
+
+  assert(evidence.pageErrors.length === 0, `页面报错：${evidence.pageErrors.join(' | ')}`);
 } catch (error) {
-  failure = error instanceof Error ? error.message : String(error);
+  evidence.failure = error instanceof Error ? error.message : String(error);
   throw error;
 } finally {
   await browser.close();
-  await mkdir(evidenceDir, { recursive: true });
-  const evidence = { base, passed: failure === null, checks: results, failure };
-  await writeFile(`${evidenceDir}/layouts-states.json`, JSON.stringify(evidence, null, 2) + '\n');
+  await mkdir(new URL('../../docs/design/execution/evidence/', import.meta.url), { recursive: true });
+  evidence.passed = !evidence.failure;
+  await writeFile(evidenceURL, `${JSON.stringify(evidence, null, 2)}\n`);
   console.log(JSON.stringify(evidence, null, 2));
 }

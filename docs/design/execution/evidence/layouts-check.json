@@ -1,22 +1,16 @@
 {
-  "base": "http://localhost:3000",
-  "passed": true,
-  "checks": [
-    "two native rows",
-    "342 original reachable cards",
-    "opposite auto movement",
-    "explicit pause freezes both rows",
-    "pause preference survives reload",
-    "invalid category recovery removes URL query",
-    "first theme boundary",
-    "external HD truthful open-link semantics",
-    "detail category returns matching URL",
-    "missing image explanation",
-    "missing image no false resource action",
-    "mobile reduced motion keeps all cards",
-    "keyboard last card scrolls into view in manual mode",
-    "390px no page horizontal overflow",
-    "long-title detail no mobile horizontal overflow"
-  ],
-  "failure": null
+  "baseURL": "http://localhost:3001",
+  "checks": {
+    "shelf": {
+      "books": 8
+    },
+    "prewarm": {
+      "flippedTo": "第7至8页",
+      "prewarmedBeforeClick": true
+    },
+    "escExits": "zoom→page, reader→spine focus restored",
+    "narrow": "390px shelf and reader without page overflow"
+  },
+  "pageErrors": [],
+  "passed": true
 }

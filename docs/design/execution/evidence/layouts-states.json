@@ -1,15 +1,11 @@
 {
-  "base": "http://localhost:3000",
-  "passed": true,
-  "checks": [
-    "12 second stalled HD falls back to preview",
-    "focused link arrow not hijacked",
-    "body arrow navigates next detail",
-    "browser back restores preceding detail",
-    "last theme boundary",
-    "hover pauses row",
-    "focus pauses row",
-    "1024 dark no horizontal page overflow"
-  ],
-  "failure": null
+  "baseURL": "http://localhost:3001",
+  "checks": {
+    "legacyMissing": "063 lands on its page without zoom dialog",
+    "unknownId": "404 UI + noindex (streamed status 200)",
+    "hdFallback": "stalled HD falls back to thumb with retry, recovers after release",
+    "reducedMotion": "Esc returns to shelf instantly"
+  },
+  "pageErrors": [],
+  "passed": true
 }

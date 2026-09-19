@@ -50,6 +50,10 @@
 
 ## 可复现脚本
 
+> 2026-09-19 更正：上文的图鉴墙验收针对已移除的旧 UI，两个脚本已重写对齐
+> 现行书架＋画册契约（见 `docs/design/README.md`），证据文件路径不变。
+> 本节以下为重写后的现状，历史验收记录保留在上方供追溯。
+
 在仓库根目录运行（先启动站点，并安装 Playwright Chromium）：
 
 ```sh
@@ -57,4 +61,13 @@ node scripts/design-checks/layouts-check.mjs
 node scripts/design-checks/layouts-states.mjs
 ```
 
-两者从 `playwright` 包导入，读取 `DESIGN_BASE_URL`（默认 `http://localhost:3000`）。相对仓库根输出 `.impeccable/review/full-design/layouts-check.json` 和 `layouts-states.json`，保留已通过断言及失败原因，并在失败时关闭浏览器。断言针对当前 350/342 条数据与默认仅缩略图的媒体策略；states 脚本故意挂起远端高清优化请求验证 12 秒超时。
+`layouts-check.mjs` 覆盖书架＋画册行为：八本书架、开册写入 URL、单跨页翻页步长、
+首末边界禁用、页码目录直接定位、图片点击放大即详情且 Esc 分层退出（焦点回书页再回书脊）、
+翻入页必须预取（守护翻页不闪现）、搜索命中缺图条目定位单页画册、无效 cat 回书架、
+390px 无横向溢出。`layouts-states.mjs` 覆盖状态与兼容：旧缺图链接定位书页不弹放大、
+未知编号渲染 404 UI（流式响应带 noindex）、高清挂起时缩略图兜底并可重试恢复、
+直达地址不重播抽书、reduced-motion 下 Esc 即时返回。
+
+两者从 `playwright` 包导入，读取 `DESIGN_BASE_URL`（默认 `http://localhost:3000`）。
+证据输出 `docs/design/execution/evidence/layouts-check.json` 和 `layouts-states.json`，
+保留断言结果与失败原因，失败时关闭浏览器。
