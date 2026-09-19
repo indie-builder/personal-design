@@ -195,7 +195,9 @@ export function HomeView({
   function move(direction: number) {
     const element = viewport.current;
     if (!element) return;
-    const cell = element.querySelector('li');
+    // Step by a real timeline entry; decorative list items (the walker) must not shrink it.
+    const entryClass = styles.entry;
+    const cell = entryClass ? element.querySelector(`li.${CSS.escape(entryClass)}`) : null;
     const step = cell?.getBoundingClientRect().width ?? element.clientWidth;
     element.scrollBy({ left: direction * step, behavior: instantMotion() ? 'instant' : 'smooth' });
   }
