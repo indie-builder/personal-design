@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
-import { getPostBySlug, listPosts } from '@personal-design/inspora';
+import { getPostBySlug, listPostRefs } from '@personal-design/inspora';
 import { BrowseNavigation } from '@/components/browse-navigation';
 import { categoryLabel } from '@/lib/category-label';
 import { MuseMediaCarousel } from '@/components/inspora-media-carousel';
@@ -12,9 +12,16 @@ import styles from './page.module.css';
 // 浏览列表只携带当前位置附近的窗口，控制每页 RSC 负载；小集合不受影响。
 const BROWSE_WINDOW = 240;
 
+// 浏览上下文只依赖轻量字段：模块级一次载入索引（与网格页惯例一致），
+// 详情数据仍按需单条查询；窗口只携带当前位置附近，控制每页 RSC 负载。
+const postRefs = listPostRefs();
+
 function windowed<T extends { href: string }>(entries: T[], currentHref: string): T[] {
   const index = entries.findIndex((entry) => entry.href === currentHref);
-  if (index < 0 || entries.length <= BROWSE_WINDOW * 2 + 1) return entries;
+  // 索引快照落后于数据库（运行期间同步且未重启）时，当前条目可能不在索引里：
+  // 回退为有界切片，避免把全量列表塞进单次 RSC 负载。
+  if (index < 0) return entries.slice(0, BROWSE_WINDOW);
+  if (entries.length <= BROWSE_WINDOW * 2 + 1) return entries;
   const start = Math.max(
     0,
     Math.min(index - BROWSE_WINDOW, entries.length - (BROWSE_WINDOW * 2 + 1)),
@@ -43,9 +50,8 @@ export default async function MuseDetailPage({ params }: PageProps) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  const posts = listPosts();
-  const group = posts.filter((entry) => !post.category || entry.category === post.category);
-  const browseEntries = posts.map((entry) => ({
+  const group = postRefs.filter((entry) => !post.category || entry.category === post.category);
+  const browseEntries = postRefs.map((entry) => ({
     href: `/products/muse/${entry.slug}`,
     title: entry.title,
     category: entry.category ?? '未分类',

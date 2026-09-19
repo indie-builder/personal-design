@@ -269,6 +269,40 @@ export function listPosts(): InsporaPost[] {
   return rows.map((r) => toPost(r, mediaMap.get(r.id) ?? []));
 }
 
+/** 浏览导航用的轻量条目：不含媒体与 raw，避免每次请求全量加载万级媒体行和大 JSON */
+export interface InsporaPostRef {
+  slug: string;
+  title: string;
+  creatorName: string | null;
+  category: string | null;
+  industries: string[];
+  styles: string[];
+}
+
+/** 全部可见帖子的轻量索引，按发布时间倒序（与 listPosts 同序），只取浏览导航所需字段 */
+export function listPostRefs(): InsporaPostRef[] {
+  const rows = conn()
+    .prepare(
+      `SELECT slug, title, creator_name, category, industries, styles FROM posts WHERE ${VISIBLE_POSTS} ORDER BY created_at DESC`,
+    )
+    .all() as unknown as {
+    slug: string;
+    title: string;
+    creator_name: string | null;
+    category: string | null;
+    industries: string | null;
+    styles: string | null;
+  }[];
+  return rows.map((row) => ({
+    slug: row.slug,
+    title: row.title,
+    creatorName: row.creator_name,
+    category: row.category,
+    industries: parseJsonArray(row.industries),
+    styles: parseJsonArray(row.styles),
+  }));
+}
+
 export function getPostBySlug(slug: string): InsporaPost | undefined {
   const row = conn()
     .prepare(`SELECT * FROM posts WHERE slug = ? AND ${VISIBLE_POSTS}`)
