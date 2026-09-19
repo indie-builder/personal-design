@@ -34,6 +34,13 @@
 
 ## 可复现命令
 
+> 2026-09-19 更正：两个脚本已重写对齐现行契约。shared-browser 聚焦灯箱
+> 滚动锁、焦点环、组内方向键、Esc 焦点回归与真 404 出口（muse 集合与画册
+> 的入口专属行为分别由 muse-behavior、layouts-* 覆盖，JSON 查看器已按契约
+> 移除不再断言）；shared-autoplay 因原 hook 删除改为对 MotionVideo 的真实
+> 浏览器断言（可视自动播、离屏暂停、回视恢复、reduced-motion 不自动播）。
+> 下方命令用法不变，历史验证记录保留在上方供追溯。
+
 先运行 `pnpm dev:direct`（或使用已有预览），再运行：
 
 ```sh
@@ -41,4 +48,4 @@ node scripts/design-checks/shared-autoplay.cjs
 node scripts/design-checks/shared-browser.cjs
 ```
 
-浏览器脚本使用根依赖 `playwright`；可通过 `DESIGN_BASE_URL` 指定预览地址，默认 `http://localhost:3000`。自动播放脚本使用 web 包已有 TypeScript，源码路径从脚本位置解析，不依赖调用工作目录。脚本输出 PASS/断言失败作为证据，不生成截图或修改数据。
+浏览器脚本使用根依赖 `playwright`；可通过 `DESIGN_BASE_URL` 指定预览地址，默认 `http://localhost:3000`。脚本输出 PASS/断言失败作为证据，不生成截图或修改数据。
