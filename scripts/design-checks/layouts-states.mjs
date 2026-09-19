@@ -31,17 +31,12 @@ try {
   );
   evidence.checks.legacyMissing = '063 lands on its page without zoom dialog';
 
-  // 未知编号：渲染 404 UI。cacheComponents 下动态段流式响应状态为 200，
-  // 依赖官方自动注入的 noindex 阻止收录（Next 文档 loading#Status Codes）。
+  // 未知编号：dynamicParams=false 让路由层直接 404，不依赖流式 noindex。
   const unknown = await page.goto(`${baseURL}/products/layout-compositions/999`, {
     waitUntil: 'domcontentloaded',
   });
-  await page.getByText('找不到这个页面', { exact: true }).waitFor();
-  assert(
-    (await page.locator('meta[name="robots"][content="noindex"]').count()) > 0,
-    '流式 404 必须带 noindex',
-  );
-  evidence.checks.unknownId = `404 UI + noindex (streamed status ${unknown?.status()})`;
+  assert(unknown?.status() === 404, `未知编号应返回 404，实际 ${unknown?.status()}`);
+  evidence.checks.unknownId = 'true 404 at routing level';
 
   // 直达带 cat/page 的地址：不重播抽书动画，画册直接可见。
   await page.goto(`${baseURL}/products/layout-compositions?cat=构图逻辑&page=003`, {

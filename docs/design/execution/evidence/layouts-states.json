@@ -2,7 +2,7 @@
   "baseURL": "http://localhost:3001",
   "checks": {
     "legacyMissing": "063 lands on its page without zoom dialog",
-    "unknownId": "404 UI + noindex (streamed status 200)",
+    "unknownId": "true 404 at routing level",
     "hdFallback": "stalled HD falls back to thumb with retry, recovers after release",
     "reducedMotion": "Esc returns to shelf instantly"
   },

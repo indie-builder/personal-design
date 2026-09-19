@@ -65,7 +65,8 @@ node scripts/design-checks/layouts-states.mjs
 首末边界禁用、页码目录直接定位、图片点击放大即详情且 Esc 分层退出（焦点回书页再回书脊）、
 翻入页必须预取（守护翻页不闪现）、搜索命中缺图条目定位单页画册、无效 cat 回书架、
 390px 无横向溢出。`layouts-states.mjs` 覆盖状态与兼容：旧缺图链接定位书页不弹放大、
-未知编号渲染 404 UI（流式响应带 noindex）、高清挂起时缩略图兜底并可重试恢复、
+未知编号经 proxy 前置判定返回真 404（cacheComponents 流式响应无法改状态码）、
+高清挂起时缩略图兜底并可重试恢复、
 直达地址不重播抽书、reduced-motion 下 Esc 即时返回。
 
 两者从 `playwright` 包导入，读取 `DESIGN_BASE_URL`（默认 `http://localhost:3000`）。
