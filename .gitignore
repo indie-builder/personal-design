@@ -15,3 +15,6 @@ packages/layout-compositions/.upstream/
 # impeccable 技能运行产物（评审截图、构建状态机）；config/design.json 是系统记录，入库
 .impeccable/review/
 .impeccable/build/
+
+# 同步脚本中断残留的下载临时文件（成功后改名为目标，残留即垃圾）
+*.part

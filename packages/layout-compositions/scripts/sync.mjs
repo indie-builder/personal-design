@@ -14,7 +14,7 @@ import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createReadStream, existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
-import { readFile, rm, writeFile } from 'node:fs/promises';
+import { readFile, rename } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -77,8 +77,7 @@ async function downloadTarball() {
   }
   const tmp = `${tarballPath}.part`;
   await pipeline(res.body, (await import('node:fs')).createWriteStream(tmp));
-  await writeFile(tarballPath, await readFile(tmp));
-  await rm(tmp);
+  await rename(tmp, tarballPath);
   console.log('[sync] 下载完成');
 }
 
