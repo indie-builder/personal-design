@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { catalog, categories, hasImage, thumbnailUrl } from '@personal-design/layout-compositions';
 import { listPosts, videoPreviewUrl } from '@personal-design/inspora';
 import { toolPreview } from '@personal-design/design-engineer-tools';
+import { graphEdges, graphNodes } from '@personal-design/ai-coding-dictionary/graph';
 import { products } from '@/lib/products';
 import { HomeView } from '@/components/home-view';
 
@@ -28,6 +29,27 @@ export default function HomePage() {
       alt: motionPost.title,
       videoSrc: videoPreviewUrl(motionPost, motionMedia) ?? motionMedia.src,
     });
+  const agent = graphNodes.find((node) => node.slug === 'agent');
+  const nodeBySlug = new Map(graphNodes.map((node) => [node.slug, node]));
+  const fromAgent = (slug: string) => {
+    const point = nodeBySlug.get(slug)?.position;
+    return point && agent
+      ? Math.hypot(...point.map((value, axis) => value - agent.position[axis]!))
+      : Infinity;
+  };
+  const previewSlugs = new Set([
+    'agent',
+    'model',
+    'context',
+    'session',
+    'harness',
+    'turn',
+    'token',
+    ...(agent?.links
+      .slice()
+      .sort((a, b) => fromAgent(a) - fromAgent(b))
+      .slice(0, 20) ?? []),
+  ]);
   return (
     <HomeView
       layoutCategories={categories.map(({ name, count }) => ({ name, count }))}
@@ -35,6 +57,12 @@ export default function HomePage() {
       layoutPreviews={layoutPreviews}
       musePreviews={musePreviews}
       toolsPreview={toolPreview}
+      dictionaryPreview={{
+        nodes: graphNodes.filter((node) => previewSlugs.has(node.slug)),
+        edges: graphEdges.filter(
+          (edge) => previewSlugs.has(edge.source) && previewSlugs.has(edge.target),
+        ),
+      }}
     />
   );
 }
