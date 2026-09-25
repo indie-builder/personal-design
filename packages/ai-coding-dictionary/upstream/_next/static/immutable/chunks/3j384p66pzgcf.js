@@ -1,1 +1,0 @@
-(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,44841,e=>{"use strict";var r=e.i(43662);e.i(90072),e.s(["WebGPURenderer",()=>r.WebGPURenderer])}]);
