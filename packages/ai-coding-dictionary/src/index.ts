@@ -1,4 +1,4 @@
-/** Bilingual reading data synchronized from indie-builder/dictionary-of-ai-coding. */
+/** Bilingual reading data from indie-builder/dictionary-of-ai-coding@ed1ebed. */
 import catalog from '../catalog.json';
 
 export type Language = 'zh' | 'en';
