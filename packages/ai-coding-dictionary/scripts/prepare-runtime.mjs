@@ -1,4 +1,4 @@
-import { readdir, readFile, mkdir, writeFile, copyFile } from 'node:fs/promises';
+import { readdir, readFile, mkdir, writeFile, copyFile, rm } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -114,9 +114,8 @@ async function copy(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const from = join(directory, entry.name),
       rel = relative(source, from),
-      to = join(destination, rel);
+      to = join(destination, rel.replace(/^_next(?=\/)/, 'vendor'));
     if (entry.isDirectory()) {
-      if (rel === '_next') continue;
       await copy(from);
       continue;
     }
@@ -301,7 +300,7 @@ async function copy(directory) {
         );
       }
       text = text
-        .replaceAll('/_next/', '/ai-coding-atlas/_next/')
+        .replaceAll('/_next/', '/ai-coding-atlas/vendor/')
         .replaceAll('"/fonts/', '"/ai-coding-atlas/fonts/')
         .replaceAll("'/fonts/", "'/ai-coding-atlas/fonts/")
         .replaceAll(
@@ -331,6 +330,8 @@ async function copy(directory) {
     records.push({ path: rel, sha256: createHash('sha256').update(originalBytes).digest('hex') });
   }
 }
+for (const directory of ['_next', 'vendor'])
+  await rm(join(destination, directory), { recursive: true, force: true });
 await copy(source);
 
 const globalStyles = await readFile(join(root, '../../apps/web/app/globals.css'), 'utf8');
