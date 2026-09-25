@@ -15,7 +15,7 @@ export interface Product {
   description: string;
   /** 上线日期（ISO），首页时间轴按它排序 */
   date: string;
-  /** 未提供上线日期时，明确标记为收录日期 */
+  /** 日期性质只供 API 使用；首页时间轴仅显示 date，不显示任何日期后缀 */
   dateLabel?: string;
   href: string;
   /** 首页卡片封面图（public 下路径） */

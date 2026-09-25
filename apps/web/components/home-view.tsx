@@ -367,7 +367,6 @@ export function HomeView({
                     >
                       <time dateTime={product.date} className={styles.date}>
                         {product.date.replaceAll('-', '.')}
-                        {product.dateLabel && ` · ${product.dateLabel}`}
                       </time>
                       <div className={styles.rule} aria-hidden="true">
                         <span className={styles.node} />

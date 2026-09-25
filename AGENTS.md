@@ -46,6 +46,7 @@ Co-Authored-By: (the agent model's name and attribution byline)
 - `packages/<product>` — 每个产品的内容/数据包（catalog、类型、同步脚本）
 - 新增产品：`packages/<product>` + `apps/web/app/products/<slug>/` + 在 `apps/web/lib/products.ts` 注册（现有类型要求 `date` 上线日期，注册表按它排序；`line` 是保留的注册字段，当前页面不显示线路色，不要求新增装饰色）；需要独立部署才拆 `apps/<product>`
 - 首页是按 `date` 升序的稀疏单色横向作品时间轴，使用 `home-view.tsx`；每件作品一个入口，仅溢出时显示翻页按钮。不恢复地铁、站牌、LED、全站菜单或侧栏。`line` 是历史保留注册字段，不要求新增线路色。
+- 首页时间轴的日期只显示日期值，不在日期后追加“收录”、上线状态或其他文字标签；今后新增作品也遵守此规则。
 - 灵感集使用 plate-wall.tsx 网格和中文分类；原生链接进入详情，支持搜索，无放映台。布局参考使用 `layout-bookshelf.tsx` 八本分类书籍与双页画册，书架按分类或既有theme链接筛选后定位跨页，画册页码目录可直接选图鉴；旧图鉴链接重定向同一画册并放大；图片点击放大即详情，不增加二次详情跳转。缺图条目保留。
 - 站点内图片一律放 `apps/web/public/`，由包的同步脚本生成，不手写路径
 - 首页不放关于、署名、许可或额外宣传说明；用户要求个人自用、简洁优先。不要再添加或转存这类额外说明。
