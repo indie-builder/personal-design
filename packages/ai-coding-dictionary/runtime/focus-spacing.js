@@ -25,7 +25,9 @@ function atlasSpaceFocus(frame, delta, selected) {
         const font =
           (2.1 + (2 * (tR[index] - 2.2)) / 6.5) * pixels * (index === selected ? 1.15 : 1);
         atlasSpacingPoint.fromArray(tD, 3 * index);
-        atlasSpacingPoint.y += tP[index];
+        atlasSpacingPoint.x += matrix[4] * tP[index];
+        atlasSpacingPoint.y += matrix[5] * tP[index];
+        atlasSpacingPoint.z += matrix[6] * tP[index];
         atlasSpacingPoint.project(camera);
         parts.push({
           x: ((atlasSpacingPoint.x + 1) * size.width) / 2 - baseX,

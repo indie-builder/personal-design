@@ -27,3 +27,7 @@
 
 /* A single text layer carries the selected work into its page heading. */
 .travelTitle { position:fixed; z-index:100; margin:0; padding:0; pointer-events:none; transform-origin:0 0; white-space:nowrap; }
+
+/* Dictionary navigation floats on the canvas instead of reserving a header row. */
+.canvasHeader { position:fixed; z-index:40; top:0; left:0; width:auto; max-width:none; justify-content:flex-start; gap:12px; background:transparent; pointer-events:none; }
+.canvasHeader > * { pointer-events:auto; }

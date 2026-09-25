@@ -9,6 +9,7 @@ const catalog = JSON.parse(await readFile(join(root, 'catalog.json'), 'utf8'));
 const original = JSON.parse(await readFile(join(source, 'atlas.json'), 'utf8'));
 const initialLocation = await readFile(join(root, 'runtime/initial-location.js'), 'utf8');
 const focusSpacing = await readFile(join(root, 'runtime/focus-spacing.js'), 'utf8');
+const palette = ['#bdced9', '#c7d6c1', '#e2d3be', '#e2cbd0', '#d6cee5', '#bfdad3', '#ded8bd'];
 const originals = new Map(original.nodes.map((node) => [node.title, node]));
 const chineseWords = new Intl.Segmenter('zh-CN', { granularity: 'word' });
 function chineseSearchTerms(text) {
@@ -124,6 +125,16 @@ async function copy(directory) {
     if (/\.(js|css|html)$/.test(entry.name)) {
       let text = originalBytes.toString();
       if (entry.name === '24s8s-b_jlfxf.js') {
+        text = replaceOne(
+          text,
+          '["#FFD79E","#ffffff","#000000","#000000","#ffffff","#000000","#ffffff"]',
+          JSON.stringify(palette),
+        );
+        text = replaceOne(
+          text,
+          'return 2.2+Math.log1p(e)/Math.log1p(37)*6.5',
+          'return 1.15*(2.2+Math.log1p(e)/Math.log1p(37)*6.5)',
+        );
         const data = /t\.exports=JSON\.parse\(("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')\)/;
         if (!data.test(text)) throw new Error('Atlas data module not found');
         text = text.replace(
@@ -148,6 +159,20 @@ async function copy(directory) {
         );
       }
       if (entry.name === '11nhf1x4-3r97.js') {
+        // The local bilingual reading panel replaces the original detail component,
+        // so share/clipboard/carousel controls are never mounted.
+        text = replaceOne(text, '(0,f.jsx)(t8,{})', 'null');
+        for (const [en, zh] of Object.entries({
+          'Full definition': '英文原文',
+          'Read more': '展开全文',
+          'Show less': '收起全文',
+          'Connects to': '关联术语',
+          Prev: '上一个',
+          Next: '下一个',
+          'Search the dictionary': '搜索词典',
+          Search: '搜索',
+        }))
+          text = text.replaceAll(JSON.stringify(en), JSON.stringify(zh));
         // Remove the controls and their sound entry points, including audio loading.
         text = replaceOne(text, '(0,f.jsx)(ss,{shifted:j})', 'null');
         text = replaceOne(text, '(0,f.jsx)(sW,{shifted:j})', 'null');
@@ -168,7 +193,48 @@ async function copy(directory) {
         );
       }
       if (entry.name === '10jcl7iozmh4t.js') {
+        text = replaceOne(
+          text,
+          'color:new er.Color(ty.NEUTRAL_INK),radius:',
+          'color:new er.Color(ty.SECTION_COLORS[e.section]),radius:',
+        );
+        text = replaceOne(
+          text,
+          'col = mix(col, uAccent, hot);',
+          'col = mix(col, col * 0.78, hot);',
+        );
+        text = replaceOne(
+          text,
+          'vec3 col = mix(shadow, highlight, l);',
+          'float chroma = max(inputColor.r,max(inputColor.g,inputColor.b))-min(inputColor.r,min(inputColor.g,inputColor.b));\n    vec3 col = mix(mix(shadow, highlight, l),inputColor.rgb,smoothstep(0.015,0.06,chroma));',
+        );
+        text = replaceOne(
+          text,
+          'y.current.set(s?ty.SECTION_COLORS[o]??ty.NEUTRAL_INK:ty.NEUTRAL_INK),x.current.set(s?ty.SECTION_PAPERS[o]??ty.BG:ty.BG)',
+          'y.current.set(window.__atlasTheme?.ink??ty.NEUTRAL_INK),x.current.set(window.__atlasTheme?.paper??ty.BG)',
+        );
+        text = replaceOne(text, 'opacity:n.width<800?.07:.16', 'opacity:.025');
+        text = replaceOne(text, 'title:e.title.toUpperCase()', 'title:e.title');
+        text = text.replaceAll(
+          '/fonts/mono/JetBrainsMono-Medium.ttf',
+          '/fonts/AlbertSans-Medium.ttf',
+        );
+        text = replaceOne(
+          text,
+          'if(r.smoothTime=.5,',
+          'if(r.smoothTime=window.__atlasInstant?0:.5,',
+        );
+        text = replaceOne(
+          text,
+          'a.rotate(.045*r*(y*y*(3-2*y)),0,!0)',
+          'window.__atlasInstant||a.rotate(.045*r*(y*y*(3-2*y)),0,!0)',
+        );
         text = replaceOne(text, 'function tJ(e,t){', `${focusSpacing}\nfunction tJ(e,t){`);
+        text = replaceOne(
+          text,
+          'let r=e.clock.elapsedTime,a=tb.useBoot.getState();',
+          'window.__atlasInstant&&(tS.done=!0,tS.t=1);let r=window.__atlasInstant?0:e.clock.elapsedTime,a=tb.useBoot.getState();',
+        );
         text = replaceOne(
           text,
           'tM.needsUpdate=!0}function tQ()',
@@ -198,7 +264,7 @@ async function copy(directory) {
         text = replaceOne(
           text,
           'a.uniforms.uRingR.value=(g+y)/x',
-          'a.uniforms.uSelectedRadius.value=n?g/x:0,a.uniforms.uRingR.value=(g+y)/x',
+          'a.uniforms.uColor.value.set(n?ty.SECTION_COLORS[ty.nodeBySlug.get(n)?.section]??ty.ACCENT:ty.ACCENT),a.uniforms.uSelectedRadius.value=n?g/x:0,a.uniforms.uRingR.value=(g+y)/x',
         );
         text = replaceOne(
           text,
@@ -213,7 +279,19 @@ async function copy(directory) {
         text = replaceOne(
           text,
           's.color=A?a:i,y&&',
-          's.color=A?a:i,s.fontSize=l.fontSize*(A&&c?1.15:1),s.material.depthTest=!A,s.renderOrder=A?12:10,y&&',
+          's.color=A?a:i,s.fontSize=l.fontSize*(A&&c?1.15:1),s.material.depthTest=!1,s.renderOrder=A?13:12,y&&',
+        );
+        // Labels are screen-facing annotations, not surfaces to occlude with foreground discs.
+        text = replaceOne(
+          text,
+          '"material-depthWrite":!1,"material-depthTest":!0',
+          '"material-depthWrite":!1,"material-depthTest":!1',
+        );
+        text = replaceOne(text, 'renderOrder:10,font:', 'renderOrder:12,font:');
+        text = replaceOne(
+          text,
+          'm=tD[3*f],v=tD[3*f+1]+tP[f],g=tD[3*f+2],y=t.current[r]',
+          'm=tD[3*f]+h.matrixWorld.elements[4]*tP[f],v=tD[3*f+1]+h.matrixWorld.elements[5]*tP[f],g=tD[3*f+2]+h.matrixWorld.elements[6]*tP[f],y=t.current[r]',
         );
         text = replaceOne(
           text,
@@ -235,9 +313,17 @@ async function copy(directory) {
           /<link[^>]+rel="(?:canonical|author|manifest|icon|apple-touch-icon)"[^>]*>/g,
           '',
         );
-        const config = JSON.stringify({ entries }).replaceAll('<', '\\u003c');
-        const injection = `<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' data: blob:; font-src 'self' data:; media-src 'self'; worker-src 'self' blob:"><link rel="stylesheet" href="/ai-coding-atlas/adapt.css"><script>window.__dictionaryCatalog=${config};${initialLocation}</script><script src="/ai-coding-atlas/bridge.js" defer></script>`;
-        text = text.replace('<head>', '<head>' + injection);
+        const config = JSON.stringify({ entries, sections: catalog.sections, palette }).replaceAll(
+          '<',
+          '\\u003c',
+        );
+        const injection = `<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' data: blob:; font-src 'self' data:; media-src 'self'; worker-src 'self' blob:"><script>window.__dictionaryCatalog=${config};${initialLocation}</script><script src="/ai-coding-atlas/bridge.js" defer></script>`;
+        text = text
+          .replace('<head>', '<head>' + injection)
+          .replace(
+            '</head>',
+            '<link rel="stylesheet" href="/ai-coding-atlas/tokens.css"><link rel="stylesheet" href="/ai-coding-atlas/adapt.css"><link rel="stylesheet" href="/ai-coding-atlas/detail.css"></head>',
+          );
       }
       await writeFile(to, text);
     } else await copyFile(from, to);
@@ -245,7 +331,23 @@ async function copy(directory) {
   }
 }
 await copy(source);
-for (const file of ['bridge.js', 'adapt.css'])
+
+const globalStyles = await readFile(join(root, '../../apps/web/app/globals.css'), 'utf8');
+const lightTokens = globalStyles.match(/@theme\s*\{([^}]+)\}/)[1];
+const darkTokens = globalStyles.match(/html\[data-theme='dark'\]\s*\{([^}]+)\}/)[1];
+await writeFile(
+  join(destination, 'tokens.css'),
+  `:root{${lightTokens}}html[data-theme='dark']{${darkTokens}}`,
+);
+await copyFile(
+  join(root, '../../apps/web/app/fonts/AlbertSans-VariableFont_wght.woff2'),
+  join(destination, 'fonts/AlbertSans.woff2'),
+);
+await copyFile(
+  join(root, 'runtime/AlbertSans-Medium.ttf'),
+  join(destination, 'fonts/AlbertSans-Medium.ttf'),
+);
+for (const file of ['bridge.js', 'adapt.css', 'detail.css'])
   await copyFile(join(root, 'runtime', file), join(destination, file));
 await writeFile(
   join(destination, 'empty.js'),

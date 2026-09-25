@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { WorkspaceLink } from './workspace-shell';
+import { useLayoutEffect, useRef } from 'react';
 import styles from './dictionary-map.module.css';
 
 function runtimeUrl(term: string | null, query: string) {
@@ -14,9 +13,12 @@ function runtimeUrl(term: string | null, query: string) {
 /** The captured original frontend runs in its own document so its CSS and renderer remain intact. */
 export function DictionaryMap() {
   const frame = useRef<HTMLIFrameElement>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const iframe = frame.current;
+    if (!iframe) return;
     const receive = (event: MessageEvent) => {
       if (
+        location.pathname !== '/products/ai-coding-dictionary' ||
         event.origin !== location.origin ||
         event.source !== frame.current?.contentWindow ||
         event.data?.type !== 'dictionary-state'
@@ -43,13 +45,16 @@ export function DictionaryMap() {
       else history.replaceState(null, '', target);
     };
     const restore = () => {
+      if (location.pathname !== '/products/ai-coding-dictionary') return;
       const params = new URLSearchParams(location.search);
-      frame.current?.contentWindow?.location.replace(
-        runtimeUrl(params.get('term'), params.get('q') ?? ''),
+      iframe.contentWindow?.location.replace(
+        new URL(runtimeUrl(params.get('term'), params.get('q') ?? ''), location.origin).href,
       );
     };
     addEventListener('message', receive);
     addEventListener('popstate', restore);
+    // Next Activity retains DOM across routes; each activation needs a fresh graph instance.
+    restore();
     return () => {
       removeEventListener('message', receive);
       removeEventListener('popstate', restore);
@@ -64,9 +69,6 @@ export function DictionaryMap() {
         sandbox="allow-scripts allow-same-origin"
         className={styles.frame}
       />
-      <WorkspaceLink href="/" className={styles.back}>
-        返回作品
-      </WorkspaceLink>
     </main>
   );
 }

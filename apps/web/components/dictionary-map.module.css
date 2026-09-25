@@ -1,6 +1,2 @@
-.page { position:fixed; z-index:30; inset:0; background:#f2f2f0; }
+.page { position:fixed; inset:0; z-index:30; background:var(--color-paper); }
 .frame { display:block; width:100%; height:100%; border:0; }
-.back { position:absolute; z-index:5; left:32px; bottom:28px; padding:8px 12px; border:1px solid #d3d3d0; border-radius:999px; background:#f2f2f0; color:#1a1a19; font:500 13px/1.5 var(--font-sans); text-decoration:none; }
-.back:hover { border-color:#1a1a19; }
-.back:focus-visible { outline:2px solid #1a1a19; outline-offset:3px; }
-@media(max-width:640px) { .back { left:16px; bottom:16px; } }

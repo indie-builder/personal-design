@@ -67,12 +67,11 @@
 .toolPreview span[data-active=true] i svg { opacity:1; transform:translate(1px,-1px); }
 .toolPreview b { min-width:0; overflow-wrap:anywhere; font-weight:400; }
 .dictionaryPreview { position:relative; width:100%; height:100%; background:var(--color-plate); }
-.dictionaryPreview svg { position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:var(--color-ink); stroke-width:.6; opacity:.2; }
-.dictionaryPreview span { position:absolute; z-index:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--color-ink-soft); font-size:9px; font-weight:500; letter-spacing:.04em; }
-.dictionaryPreview span:nth-child(1) { left:21%; top:22%; }.dictionaryPreview span:nth-child(2) { left:45%; top:10%; }.dictionaryPreview span:nth-child(3) { left:71%; top:30%; }.dictionaryPreview span:nth-child(4) { left:23%; top:65%; }.dictionaryPreview span:nth-child(5) { left:49%; top:59%; }.dictionaryPreview span:nth-child(6) { left:73%; top:72%; }
-.dictionaryPreview i { display:block; width:18px; height:18px; border-radius:50%; background:var(--color-ink); opacity:.55; transition:transform 220ms var(--ease-out); }
-.dictionaryPreview span:nth-child(2) i,.dictionaryPreview span:nth-child(3) i { width:28px; height:28px; opacity:.82; }
-.project:is(:hover,:focus-visible) .dictionaryPreview i { transform:translateY(-5px); }
+.dictionaryPreview > svg { display:block; width:100%; height:100%; }
+.dictionaryEdges { fill:none; stroke:var(--color-ink-soft); stroke-width:1; opacity:.4; }
+.dictionaryPreview text { fill:var(--color-ink-soft); font:500 9px var(--font-sans); }
+.dictionaryRuntime { position:absolute; inset:0; pointer-events:none; }
+.dictionaryRuntime iframe { display:block; width:100%; height:100%; border:0; pointer-events:none; }
 .viewport[data-dragging], .viewport[data-dragging] a { cursor:grabbing; user-select:none; }
 /* Short, visible-by-default introduction; never replay a keyframed entrance on filtering. */
 @media(prefers-reduced-motion:no-preference) {

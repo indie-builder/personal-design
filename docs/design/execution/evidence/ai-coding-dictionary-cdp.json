@@ -90,5 +90,197 @@
       "medianMs": 8.3,
       "p95Ms": 9
     }
+  },
+  "visualAdaptation": {
+    "layout": "Original full-screen atlas and one-third detail panel restored at user request",
+    "viewport": {
+      "width": 1280,
+      "height": 720,
+      "iframeTop": 0,
+      "panelWidth": 426.6640625
+    },
+    "searchCollapsedWidth": 38.3984375,
+    "sharedButtonOverrides": 0,
+    "background": "rgb(255, 255, 255)",
+    "font": "Albert Sans",
+    "nodeRadiusScale": 1.15,
+    "chapterPalette": [
+      "#bdced9",
+      "#c7d6c1",
+      "#e2d3be",
+      "#e2cbd0",
+      "#d6cee5",
+      "#bfdad3",
+      "#ded8bd"
+    ],
+    "nextNavigation": "system-prompt",
+    "browserBack": "agent",
+    "chineseDefinitionCopies": 1,
+    "build": "passed",
+    "supersededBy": "detailsRedesign: original detail component replaced at the user’s explicit request; graph retained."
+  },
+  "labelOcclusionRevision": {
+    "visualTerms": [
+      "session",
+      "context"
+    ],
+    "labelsAboveDiscsAndSelectionRing": true,
+    "cameraUpLabelOffset": true,
+    "spacingUsesSameLabelOffset": true,
+    "dragReleaseKeptFocus": "session",
+    "validation": "Built-in browser CDP screenshots before/after and renderer syntax check; original radial layout and button UI retained."
+  },
+  "detailsRedesign": {
+    "status": "passed",
+    "review": "Impeccable Ship for supplied visual/code evidence; focus-restoration follow-up also Ship",
+    "originalDetailComponents": 0,
+    "shareAndCopyControls": 0,
+    "fullBilingualBody": true,
+    "relatedPresentation": "compact chapter-grouped native link directory",
+    "contextTableRows": 4,
+    "jumpNavigationKeepsTerm": true,
+    "relatedJump": {
+      "from": "context",
+      "to": "agent",
+      "scrollTop": 0,
+      "graphDetailAndUrlAgree": true
+    },
+    "closeFocus": "搜索词典",
+    "escapeClosesAndRestoresFocus": true,
+    "firstTerm": {
+      "slug": "ai",
+      "previousDisabled": true
+    },
+    "lastTerm": {
+      "slug": "dark-factory",
+      "nextDisabled": true
+    },
+    "searchRelatedJump": {
+      "from": "prefix-cache",
+      "query": "缓存",
+      "to": "model-provider",
+      "queryCleared": true
+    },
+    "browserBackRestores": {
+      "term": "prefix-cache",
+      "query": "缓存"
+    },
+    "mobile": {
+      "width": 390,
+      "documentWidth": 390,
+      "returnLinkAbovePanel": true
+    },
+    "darkTheme": {
+      "background": "rgb(32, 32, 32)",
+      "text": "rgb(237, 237, 237)"
+    },
+    "build": "passed",
+    "lint": "passed",
+    "impeccableDetectorFindings": 0
+  },
+  "sharedNavigation": {
+    "status": "passed",
+    "viewportWidth": 815,
+    "homeEntryClicked": true,
+    "headerHeight": 72,
+    "headerTop": 0,
+    "backLeft": 24,
+    "iframeTop": 72,
+    "searchLeft": 24,
+    "searchTopWithinAtlas": 24,
+    "duplicateBackLinks": 0,
+    "openedTerm": "model",
+    "headerPositionStableWithTerm": true,
+    "headerReturnTarget": "/",
+    "recordedExitAnimationMs": 180,
+    "browserBackRestores": "model",
+    "build": "passed",
+    "lint": "passed",
+    "supersededBy": "canvasNavigation: user requested navigation over the full-screen canvas rather than a separate header row."
+  },
+  "canvasNavigation": {
+    "status": "passed",
+    "viewport": {
+      "width": 815,
+      "height": 860
+    },
+    "iframe": {
+      "top": 0,
+      "left": 0,
+      "width": 815,
+      "height": 860
+    },
+    "navigation": "transparent overlay at top-left using WorkspaceShell title/back link",
+    "navigationBackground": "rgba(0, 0, 0, 0)",
+    "search": "right of visible canvas; reserves detail-panel width",
+    "collapsedSearchTop": 16,
+    "expandedSearchTop": 72,
+    "navigationBottom": 72,
+    "searchFocusAfterPointerClick": "atlas-search",
+    "returnExitAnimationMs": 180,
+    "build": "passed",
+    "lint": "passed"
+  },
+  "compactSearch": {
+    "position": "bottom-right of visible canvas",
+    "expandedWidth": 224,
+    "bottomGap": 24,
+    "viewport": {
+      "width": 815,
+      "height": 860
+    },
+    "focusedInput": "atlas-search",
+    "query": "缓存",
+    "matches": [
+      "prefix-cache"
+    ],
+    "queryClearedAfterCheck": true
+  },
+  "homepagePreviewAndFreshEntry": {
+    "date": "2026-09-26",
+    "preview": "original atlas runtime with nodes and connections",
+    "previewMode": true,
+    "previewCanvas": true,
+    "previewMotionAllowed": true,
+    "previewDetailControls": 0,
+    "previewDoesNotChangeHomeUrl": true,
+    "previewRemovedAfterEntry": true,
+    "staticFallback": "connected SVG for reduced motion or keyboard interaction",
+    "cycles": [
+      {
+        "before": {
+          "term": "prefix-cache",
+          "query": "缓存",
+          "instanceOrigin": 1790352428005.9
+        },
+        "after": {
+          "term": null,
+          "query": "",
+          "panel": "false",
+          "instanceOrigin": 1790352458588.1
+        }
+      },
+      {
+        "before": {
+          "term": "prefix-cache",
+          "query": "缓存",
+          "instanceOrigin": 1790352458588.1
+        },
+        "after": {
+          "term": null,
+          "query": "",
+          "panel": "false",
+          "instanceOrigin": 1790352459954.5
+        }
+      }
+    ],
+    "build": "passed",
+    "lint": "passed",
+    "finalReentryCheck": {
+      "term": null,
+      "query": "",
+      "panel": "false",
+      "url": "http://localhost:3102/products/ai-coding-dictionary"
+    }
   }
 }

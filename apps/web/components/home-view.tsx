@@ -100,6 +100,77 @@ function BookPreview({ categories }: { categories: { name: string; count: number
   );
 }
 
+/** Reuse the atlas renderer only while this timeline item is visible and motion is allowed. */
+function DictionaryPreview() {
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = host.current;
+    if (!element) return;
+    let visible = false;
+    let frame: HTMLIFrameElement | null = null;
+    const update = () => {
+      if (visible && !document.hidden && !instantMotion()) {
+        if (frame) return;
+        frame = document.createElement('iframe');
+        frame.src = '/ai-coding-atlas/index.html?preview=1&term=agent';
+        frame.title = 'AI Coding 知识图谱预览';
+        frame.tabIndex = -1;
+        frame.setAttribute('aria-hidden', 'true');
+        frame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+        element.append(frame);
+      } else {
+        frame?.remove();
+        frame = null;
+      }
+    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = !!entry?.isIntersecting && entry.intersectionRatio >= 0.3;
+        update();
+      },
+      { threshold: 0.3 },
+    );
+    observer.observe(element);
+    const stop = observeMotionPolicy(update);
+    return () => {
+      observer.disconnect();
+      stop();
+      frame?.remove();
+    };
+  }, []);
+  const nodes = [
+    { name: 'Model', x: 58, y: 55, r: 12, color: '#bdced9' },
+    { name: 'Token', x: 147, y: 32, r: 10, color: '#bdced9' },
+    { name: 'Agent', x: 162, y: 102, r: 18, color: '#c7d6c1' },
+    { name: 'Harness', x: 68, y: 148, r: 11, color: '#bdced9' },
+    { name: 'Context', x: 261, y: 64, r: 14, color: '#c7d6c1' },
+    { name: 'MCP', x: 267, y: 157, r: 10, color: '#e2d3be' },
+  ];
+  return (
+    <div className={styles.dictionaryPreview} aria-hidden="true">
+      <svg viewBox="0 0 320 196">
+        <g className={styles.dictionaryEdges}>
+          {nodes
+            .filter((node) => node.name !== 'Agent')
+            .map((node) => (
+              <line key={node.name} x1="162" y1="102" x2={node.x} y2={node.y} />
+            ))}
+          <path d="M58 55 Q106 8 147 32 M147 32 Q211 23 261 64 M68 148 Q161 179 267 157" />
+        </g>
+        {nodes.map((node) => (
+          <g key={node.name}>
+            <circle cx={node.x} cy={node.y} r={node.r} fill={node.color} />
+            <text x={node.x} y={node.y - node.r - 6} textAnchor="middle">
+              {node.name}
+            </text>
+          </g>
+        ))}
+      </svg>
+      <div ref={host} className={styles.dictionaryRuntime} />
+    </div>
+  );
+}
+
 function ToolPreview({ tools }: { tools: ToolPreviewItem[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(-1);
@@ -324,35 +395,7 @@ export function HomeView({
                           ) : product.slug === 'design-engineer-tools' ? (
                             <ToolPreview tools={toolsPreview} />
                           ) : product.slug === 'ai-coding-dictionary' ? (
-                            <div className={styles.dictionaryPreview} aria-hidden="true">
-                              <span>
-                                <i />
-                                MODEL
-                              </span>
-                              <span>
-                                <i />
-                                TOKEN
-                              </span>
-                              <span>
-                                <i />
-                                AGENT
-                              </span>
-                              <span>
-                                <i />
-                                HARNESS
-                              </span>
-                              <span>
-                                <i />
-                                CONTEXT
-                              </span>
-                              <span>
-                                <i />
-                                MCP
-                              </span>
-                              <svg viewBox="0 0 320 196" preserveAspectRatio="none">
-                                <path d="M80 65 160 41 244 81 175 129 85 143 80 65 M160 41 175 129 M244 81 85 143" />
-                              </svg>
-                            </div>
+                            <DictionaryPreview />
                           ) : product.slug === 'personal-sites' ? (
                             <SiteReceiptPreview />
                           ) : previews[0]?.videoSrc ? (

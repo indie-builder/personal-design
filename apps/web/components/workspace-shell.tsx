@@ -245,7 +245,9 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
           <a href="#workspace-content" className={styles.skip}>
             跳至内容
           </a>
-          <header className={`${styles.header} ${isHome ? '' : styles.innerHeader}`}>
+          <header
+            className={`${styles.header} ${isHome ? '' : styles.innerHeader} ${currentProduct?.slug === 'ai-coding-dictionary' ? styles.canvasHeader : ''}`}
+          >
             <div className={styles.identity}>
               {isHome && <TaichiAvatar />}
               {back ? (

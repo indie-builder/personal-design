@@ -1,12 +1,40 @@
 /* Host-specific content changes; captured atlas CSS remains intact. */
 [class*="loading-screen-module"],[class*="aihero-badge-module"],button[aria-label="About this project"],a[class*="__source"],[class*="__shareRow"],[class*="__shareActions"] { display:none !important; }
 a:not([href]) { cursor:inherit; }
-.atlas-chinese-definition { letter-spacing:0 !important; font-family:Arial,"PingFang SC","Microsoft YaHei",sans-serif; line-height:1.7 !important; margin-bottom:14px !important; }
+.atlas-chinese-definition { letter-spacing:0 !important; font-family:var(--font-sans); line-height:1.7 !important; margin-bottom:14px !important; }
 .atlas-chinese-definition + p { font-size:15px !important; line-height:1.65 !important; opacity:.8; }
-.atlas-chinese-body { padding-top:24px; margin-top:24px; border-top:1px solid #d3d3d0; }
-.atlas-chinese-body h3 { margin:0 0 16px; font:600 12px/1.6 Arial,"PingFang SC",sans-serif; letter-spacing:0; }
-.atlas-chinese-body p { margin:0 0 16px; font:400 15px/1.85 Arial,"PingFang SC","Microsoft YaHei",sans-serif; letter-spacing:0; white-space:pre-wrap; }
+.atlas-chinese-body { padding-top:24px; margin-top:24px; border-top:1px solid var(--color-hairline-strong); }
+.atlas-chinese-body h3 { margin:0 0 16px; font:600 12px/1.6 var(--font-sans); letter-spacing:0; }
+.atlas-chinese-body p { margin:0 0 16px; font:400 15px/1.85 var(--font-sans); letter-spacing:0; white-space:pre-wrap; }
 
 button[aria-label^="Share "] { display:none !important; }
 a[hidden] { display:none !important; }
 p[hidden] { display:none !important; }
+
+/* Keep upstream geometry, spacing, button shapes and interaction; only adapt the host palette/font. */
+@font-face { font-family:'Albert Sans'; src:url('/ai-coding-atlas/fonts/AlbertSans.woff2') format('woff2'); font-weight:100 900; font-display:swap; }
+:root { --font-sans:'Albert Sans',-apple-system,system-ui,'PingFang SC','Microsoft YaHei',sans-serif; color-scheme:light; }
+html[data-theme='dark'] { color-scheme:dark; }
+body,.radix-themes,[class*='node-detail-module'] { --sans:var(--font-sans) !important; --paper:var(--color-paper) !important; --panel-fill:var(--color-paper) !important; --ink:var(--color-ink) !important; --hair:var(--color-hairline-strong) !important; font-family:var(--font-sans) !important; }
+body,.radix-themes { background:var(--color-paper) !important; color:var(--color-body) !important; }
+button,input { font-family:var(--font-sans) !important; }
+html { scrollbar-color:var(--color-border-hover) var(--color-paper); scrollbar-width:thin; }
+::selection { background:color-mix(in srgb,var(--color-ink) 16%,transparent); color:var(--color-ink); }
+:focus-visible { outline:2px solid var(--color-ink); outline-offset:3px; }
+#atlas-search:focus-visible { outline:none; }
+[class*='atlas-search-module'][class$='__field']:focus-within { outline:2px solid var(--color-ink); outline-offset:3px; }
+[class*='node-detail-module'][class$='__label'],[class*='node-detail-module'][class$='__readMore'],[class*='node-detail-module'][class$='__pagerKicker'] { letter-spacing:0 !important; }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; } }
+html[data-input='keyboard'] *,html[data-input='keyboard'] *::before,html[data-input='keyboard'] *::after { animation:none !important; transition:none !important; }
+
+/* A compact search stays anchored to the lower-right of the visible graph. */
+[class*='atlas-search-module'][class$='__root'] { top:auto; bottom:24px; left:auto; right:24px; align-items:flex-end; gap:0; }
+[class*='atlas-search-module'][class$='__field'] { flex-direction:row-reverse; }
+[class*='atlas-search-module'][class$='__field']:focus-within,[class*='atlas-search-module'][class$='__field'][data-active='true'] { width:min(224px,calc(100vw - 40px)); }
+[class*='atlas-search-module'][class$='__hint'] { position:absolute; right:8px; bottom:calc(100% + 8px); white-space:nowrap; }
+@media(min-width:801px) { body:has(.dictionary-detail[data-open='true']) [class*='atlas-search-module'][class$='__root'] { right:calc(var(--dictionary-detail-width) + 24px); } }
+@media(max-width:800px) { [class*='atlas-search-module'][class$='__root'] { right:20px; bottom:20px; } body:has(.dictionary-detail[data-open='true']) [class*='atlas-search-module'][class$='__root'] { bottom:calc(68dvh + 16px); } }
+
+/* Home thumbnail uses the same graph without page controls or panel framing. */
+html[data-preview='true'] [class*='atlas-search-module'],html[data-preview='true'] .dictionary-detail { display:none !important; }
+html[data-preview='true'] [class*='experience-module'][class$='__canvas'] { transform:none !important; }
