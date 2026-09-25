@@ -116,6 +116,7 @@ async function copy(directory) {
       rel = relative(source, from),
       to = join(destination, rel);
     if (entry.isDirectory()) {
+      if (rel === '_next') continue;
       await copy(from);
       continue;
     }

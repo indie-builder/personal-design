@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node ../../packages/ai-coding-dictionary/scripts/prepare-runtime.mjs && next dev --turbopack",
-    "build": "next build",
+    "build": "node ../../packages/ai-coding-dictionary/scripts/prepare-runtime.mjs && next build",
     "start": "next start",
     "lint": "oxlint --deny-warnings .",
     "typecheck": "tsc --noEmit"
