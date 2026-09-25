@@ -323,6 +323,36 @@ export function HomeView({
                             <BookPreview categories={layoutCategories} />
                           ) : product.slug === 'design-engineer-tools' ? (
                             <ToolPreview tools={toolsPreview} />
+                          ) : product.slug === 'ai-coding-dictionary' ? (
+                            <div className={styles.dictionaryPreview} aria-hidden="true">
+                              <span>
+                                <i />
+                                MODEL
+                              </span>
+                              <span>
+                                <i />
+                                TOKEN
+                              </span>
+                              <span>
+                                <i />
+                                AGENT
+                              </span>
+                              <span>
+                                <i />
+                                HARNESS
+                              </span>
+                              <span>
+                                <i />
+                                CONTEXT
+                              </span>
+                              <span>
+                                <i />
+                                MCP
+                              </span>
+                              <svg viewBox="0 0 320 196" preserveAspectRatio="none">
+                                <path d="M80 65 160 41 244 81 175 129 85 143 80 65 M160 41 175 129 M244 81 85 143" />
+                              </svg>
+                            </div>
                           ) : product.slug === 'personal-sites' ? (
                             <SiteReceiptPreview />
                           ) : previews[0]?.videoSrc ? (

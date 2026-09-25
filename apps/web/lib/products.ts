@@ -62,4 +62,16 @@ export const products: Product[] = [
     stats: [`${toolCount} 个工具`, `${toolCategoryCount} 个分类`],
     line: 'tools' as const,
   },
+  {
+    slug: 'ai-coding-dictionary',
+    name: 'AI Coding 词典',
+    tagline: '在知识网中探索 AI Coding 术语',
+    description: '通过可搜索的知识网阅读 AI Coding 术语，在详情中英对照。',
+    date: '2026-09-25',
+    dateLabel: '收录',
+    href: '/products/ai-coding-dictionary',
+    cover: '',
+    stats: [],
+    line: 'tools' as const,
+  },
 ].sort((a, b) => a.date.localeCompare(b.date));

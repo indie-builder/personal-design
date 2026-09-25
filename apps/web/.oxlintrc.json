@@ -17,5 +17,5 @@
     "browser": true,
     "node": true
   },
-  "ignorePatterns": [".next/**", "out/**", "next-env.d.ts"]
+  "ignorePatterns": [".next/**", "out/**", "next-env.d.ts", "public/ai-coding-atlas/**"]
 }

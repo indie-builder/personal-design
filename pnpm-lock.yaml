@@ -175,6 +175,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@personal-design/ai-coding-dictionary':
+        specifier: workspace:*
+        version: link:../../packages/ai-coding-dictionary
       '@personal-design/design-engineer-tools':
         specifier: workspace:*
         version: link:../../packages/design-engineer-tools
@@ -236,6 +239,8 @@ importers:
       typescript:
         specifier: 7.0.2
         version: 7.0.2
+
+  packages/ai-coding-dictionary: {}
 
   packages/design-engineer-tools:
     devDependencies:

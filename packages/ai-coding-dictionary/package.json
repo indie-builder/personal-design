@@ -1,0 +1,13 @@
+{
+  "name": "@personal-design/ai-coding-dictionary",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "sync": "node scripts/sync.mjs && node scripts/prepare-runtime.mjs",
+    "prepare:runtime": "node scripts/prepare-runtime.mjs"
+  }
+}

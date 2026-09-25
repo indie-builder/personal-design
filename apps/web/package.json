@@ -4,13 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "dev": "node ../../packages/ai-coding-dictionary/scripts/prepare-runtime.mjs && next dev --turbopack",
+    "build": "node ../../packages/ai-coding-dictionary/scripts/prepare-runtime.mjs && next build",
     "start": "next start",
     "lint": "oxlint --deny-warnings .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@personal-design/ai-coding-dictionary": "workspace:*",
     "@personal-design/design-engineer-tools": "workspace:*",
     "@personal-design/inspora": "workspace:*",
     "@personal-design/layout-compositions": "workspace:*",

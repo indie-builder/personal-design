@@ -1,0 +1,232 @@
+{
+  "origin": "https://www.aicodingdictionary.com",
+  "capturedAt": "2026-09-25T12:02:26.108Z",
+  "method": "URLs and runtime inspected in Codex in-app browser CDP",
+  "files": [
+    {
+      "path": "_next/static/immutable/chunks/0mj48rzg_7xua.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0mj48rzg_7xua.js",
+      "bytes": 876
+    },
+    {
+      "path": "_next/static/immutable/chunks/turbopack-3tq2-umw4om7l.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/turbopack-3tq2-umw4om7l.js",
+      "bytes": 10943
+    },
+    {
+      "path": "_next/static/immutable/chunks/2_plnyvlxk8xx.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/2_plnyvlxk8xx.js",
+      "bytes": 14645
+    },
+    {
+      "path": "index.html",
+      "url": "https://www.aicodingdictionary.com/",
+      "bytes": 55991
+    },
+    {
+      "path": "_next/static/immutable/chunks/0ip5_nr7_-wxe.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0ip5_nr7_-wxe.js",
+      "bytes": 173185
+    },
+    {
+      "path": "_next/static/immutable/chunks/1b5i599pj1y68.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/1b5i599pj1y68.js",
+      "bytes": 254751
+    },
+    {
+      "path": "_next/static/immutable/chunks/1hq0chzfvrsl0.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/1hq0chzfvrsl0.js",
+      "bytes": 22771
+    },
+    {
+      "path": "_next/static/immutable/chunks/3-_l2ocw7csfm.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/3-_l2ocw7csfm.js",
+      "bytes": 52216
+    },
+    {
+      "path": "_next/static/immutable/chunks/08855pud07mv5.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/08855pud07mv5.js",
+      "bytes": 26435
+    },
+    {
+      "path": "_next/static/immutable/chunks/1ha0ruy261rdw.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/1ha0ruy261rdw.js",
+      "bytes": 80092
+    },
+    {
+      "path": "_next/static/immutable/chunks/11nhf1x4-3r97.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/11nhf1x4-3r97.js",
+      "bytes": 307770
+    },
+    {
+      "path": "_next/static/immutable/chunks/0z3tfvwzionsl.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0z3tfvwzionsl.js",
+      "bytes": 517210
+    },
+    {
+      "path": "_next/static/immutable/chunks/0i21v9pany17z.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0i21v9pany17z.js",
+      "bytes": 1962
+    },
+    {
+      "path": "_next/static/immutable/chunks/3yy8igpageua8.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/3yy8igpageua8.js",
+      "bytes": 1206
+    },
+    {
+      "path": "_next/static/immutable/chunks/1tfnu6p7e_gxt.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/1tfnu6p7e_gxt.js",
+      "bytes": 2587
+    },
+    {
+      "path": "_next/static/immutable/chunks/068sst7sl2pxv.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/068sst7sl2pxv.js",
+      "bytes": 70400
+    },
+    {
+      "path": "_next/static/immutable/chunks/24s8s-b_jlfxf.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/24s8s-b_jlfxf.js",
+      "bytes": 380408
+    },
+    {
+      "path": "_next/static/immutable/chunks/1jfvtfj0lod0e.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/1jfvtfj0lod0e.js",
+      "bytes": 383378
+    },
+    {
+      "path": "_next/static/immutable/chunks/2909--y2sjnrz.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/2909--y2sjnrz.js",
+      "bytes": 908
+    },
+    {
+      "path": "_next/static/immutable/chunks/0y2xe-ck5_67j.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0y2xe-ck5_67j.js",
+      "bytes": 43325
+    },
+    {
+      "path": "_next/static/immutable/chunks/0exww1q93i36a.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0exww1q93i36a.js",
+      "bytes": 50443
+    },
+    {
+      "path": "_next/static/immutable/chunks/2b_h7z57wtrem.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/2b_h7z57wtrem.js",
+      "bytes": 81261
+    },
+    {
+      "path": "_next/static/immutable/chunks/0ik-_j5mu_0nu.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0ik-_j5mu_0nu.js",
+      "bytes": 274305
+    },
+    {
+      "path": "_next/static/immutable/chunks/44yqupspo5_9y.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/44yqupspo5_9y.js",
+      "bytes": 703701
+    },
+    {
+      "path": "_next/static/immutable/chunks/1m-ngfx64-4-9.css",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/1m-ngfx64-4-9.css",
+      "bytes": 226
+    },
+    {
+      "path": "_next/static/immutable/chunks/2narp1tkytrr3.css",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/2narp1tkytrr3.css",
+      "bytes": 2404
+    },
+    {
+      "path": "_next/static/immutable/chunks/19z99mp74k9h9.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/19z99mp74k9h9.js",
+      "bytes": 24686
+    },
+    {
+      "path": "_next/static/immutable/chunks/3yl5xrs4nqah7.css",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/3yl5xrs4nqah7.css",
+      "bytes": 20600
+    },
+    {
+      "path": "_next/static/immutable/chunks/3r0mg-z704mcm.css",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/3r0mg-z704mcm.css",
+      "bytes": 45575
+    },
+    {
+      "path": "_next/static/immutable/chunks/10jcl7iozmh4t.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/10jcl7iozmh4t.js",
+      "bytes": 316006
+    },
+    {
+      "path": "_next/static/immutable/media/ServerMono_Regular-s.p.3svvteyy0qp2u.woff2",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/media/ServerMono_Regular-s.p.3svvteyy0qp2u.woff2",
+      "bytes": 24812
+    },
+    {
+      "path": "fonts/mono/JetBrainsMono-Medium.ttf",
+      "url": "https://www.aicodingdictionary.com/fonts/mono/JetBrainsMono-Medium.ttf",
+      "bytes": 270316
+    },
+    {
+      "path": "_next/static/immutable/chunks/3d2xutc2vlmrz.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/3d2xutc2vlmrz.js",
+      "bytes": 9251
+    },
+    {
+      "path": "_next/static/immutable/chunks/0c0hxoamwjsbw.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0c0hxoamwjsbw.js",
+      "bytes": 112594
+    },
+    {
+      "path": "_next/static/immutable/chunks/3nslcz99jjo1h.css",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/3nslcz99jjo1h.css",
+      "bytes": 116
+    },
+    {
+      "path": "_next/static/immutable/chunks/3-h24q3oorhys.css",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/3-h24q3oorhys.css",
+      "bytes": 196
+    },
+    {
+      "path": "_next/static/immutable/chunks/2qdb0lh7rte_b.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/2qdb0lh7rte_b.js",
+      "bytes": 9522
+    },
+    {
+      "path": "_next/static/immutable/chunks/2eiwtf7erdj6d.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/2eiwtf7erdj6d.js",
+      "bytes": 989
+    },
+    {
+      "path": "_next/static/immutable/chunks/0ifm3bqsruqt5.css",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0ifm3bqsruqt5.css",
+      "bytes": 247
+    },
+    {
+      "path": "_next/static/immutable/chunks/16i6umwbkozvf.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/16i6umwbkozvf.js",
+      "bytes": 3184
+    },
+    {
+      "path": "_next/static/immutable/chunks/1kz3aqaowsuif.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/1kz3aqaowsuif.js",
+      "bytes": 1387
+    },
+    {
+      "path": "_next/static/immutable/chunks/3j384p66pzgcf.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/3j384p66pzgcf.js",
+      "bytes": 211
+    },
+    {
+      "path": "_next/static/immutable/chunks/2e1cwz3ven53o.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/2e1cwz3ven53o.js",
+      "bytes": 1017
+    },
+    {
+      "path": "_next/static/immutable/chunks/0akq8uf19myy2.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/0akq8uf19myy2.js",
+      "bytes": 767578
+    },
+    {
+      "path": "_next/static/immutable/chunks/1x-ai_51i1_eb.js",
+      "url": "https://www.aicodingdictionary.com/_next/static/immutable/chunks/1x-ai_51i1_eb.js",
+      "bytes": 19913
+    }
+  ]
+}

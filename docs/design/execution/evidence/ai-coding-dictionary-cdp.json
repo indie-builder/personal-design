@@ -1,0 +1,94 @@
+{
+  "result": "passed",
+  "date": "2026-09-25",
+  "browser": "Codex in-app browser",
+  "protocol": "CDP through cua_repl tab capability",
+  "baseUrl": "http://localhost:3102/products/ai-coding-dictionary",
+  "sourceRevision": "ed1ebed3975cba04ed5e74c6ca73659274beb754",
+  "content": {
+    "terms": 71,
+    "edges": 543
+  },
+  "checks": {
+    "originalCanvasLoaded": true,
+    "localRuntimeReady": true,
+    "loadingPageVisible": false,
+    "externalLinks": 0,
+    "remoteResourceRequests": 0,
+    "harnessChineseAndEnglishVisible": true,
+    "chineseDefinitionCopiesPerTerm": 1,
+    "nextTerm": "model-provider-request",
+    "chineseSearch": {
+      "query": "缓存",
+      "matches": [
+        "prefix-cache"
+      ]
+    },
+    "canvasPointerSelection": "prefix-cache",
+    "dragAndWheelFramesChanged": true,
+    "dragDidNotSelectTerm": true,
+    "browserBackRestored": "harness",
+    "repeatedBrowserBackRestored": "harness",
+    "directChineseSearchRestored": true,
+    "mobileViewport": 390,
+    "mobileDocumentWidth": 390,
+    "mobileBilingualTerm": "token",
+    "browserConsoleErrors": [
+      "Codex/Electron injected script 4: MutationObserver.observe target is not a Node during navigation; Debugger.getScriptSource confirmed host wrapper, no project source URL."
+    ],
+    "projectRuntimeErrors": []
+  },
+  "originalAssetIntegrity": [
+    {
+      "file": "10jcl7iozmh4t.js",
+      "sha256": "63d1861940ed5296ffc4f0c72b6e8f7509f0f427e44d3bd36e2b6084f15460c8"
+    },
+    {
+      "file": "3r0mg-z704mcm.css",
+      "sha256": "f91926813f3d3d0294a70503f1da6b3ebe0d8cd02bb7ef7f467c18f62d3c9d90"
+    },
+    {
+      "file": "1m-ngfx64-4-9.css",
+      "sha256": "faadb12e718ce30a2691a2f781751531cc534cc5fb3281c8f79b058e86e99ae0"
+    }
+  ],
+  "integrityNormalization": "Restore /ai-coding-atlas/_next/ to /_next/ and /ai-coding-atlas/fonts/ to /fonts/ before SHA-256 comparison.",
+  "scope": "Original runtime reuse and local integration. No claim that proprietary source project files were recovered.",
+  "selectionRevision": {
+    "checks": {
+      "contextNextSelects": "context-window",
+      "foregroundSafeSelectedDisk": true,
+      "contrastingRingAndLargerLabel": true,
+      "closeClearsSelection": true,
+      "colorControls": 0,
+      "soundControls": 0,
+      "audioRequestsAfterInteraction": 0,
+      "sectionColorOn": false,
+      "consoleErrors": []
+    },
+    "rendererNote": "Original renderer now has explicit selected overlay and label patches; originalAssetIntegrity is the captured baseline, not the current renderer hash."
+  },
+  "radialLayoutRevision": {
+    "term": "turn",
+    "viewportWidth": 815,
+    "originalRadialCompositionPreserved": true,
+    "viewportClamping": false,
+    "backgroundDimmingChanged": false,
+    "selectionPinned": true,
+    "scope": "CDP visual comparison confirms radial composition and separated foreground circles/labels on Turn, Agent and Model. Transitions and drifting positions remain animated.",
+    "canvasClickResult": "agent",
+    "closeClearsSelection": true,
+    "collisionStrategy": "Outward-only movement on the original projected ray; reserve circles and related labels; include background occluders.",
+    "visualChecks": [
+      "turn",
+      "agent",
+      "model"
+    ],
+    "frameTimingSample": {
+      "term": "model",
+      "frames": 60,
+      "medianMs": 8.3,
+      "p95Ms": 9
+    }
+  }
+}

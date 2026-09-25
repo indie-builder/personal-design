@@ -25,7 +25,7 @@
 - 设计工程工具预览为四个带 favicon 的工具格；可见且前台时按顺序短暂切换为外链箭头，离屏、后台或减少动态效果时静止。
 - 首页时间轴可保留像素漫步者：仅在可见、前台且未启用减少动态效果时，沿横线走到日期下方再上跳顶动日期，落回横线后继续到下一日期；一次性完成整条路线后退出，再次进入首页才重播，以两帧步态推进，不作为全站背景装饰扩散。
 - 水平滚动与拖动浏览；超过 6px 后判定拖动并抑制误点，仅溢出时出现翻页按钮；方向键即时移动一列。
-- 进入三个作品时名称衔接到内页页头；返回时原页面先退场，再反向衔接到首页。原生新标签、复制链接与预取行为保留。
+- 进入站内作品时名称衔接到内页页头；返回时原页面先退场，再反向衔接到首页。原生新标签、复制链接与预取行为保留。
 - 页头头像为点击触发的太极彩蛋，支持 Esc 收起；不阻塞作品链接。
 
 实现：[home-view.tsx](../../apps/web/components/home-view.tsx)、[workspace-shell.tsx](../../apps/web/components/workspace-shell.tsx)、[site-receipt-preview.tsx](../../apps/web/components/site-receipt-preview.tsx)、[taichi-avatar.tsx](../../apps/web/components/taichi-avatar.tsx)。
@@ -64,6 +64,15 @@
 - 不搬运目标工具网站内容；同步失败保留上一次成功目录。
 
 实现：`tools-directory.tsx`、`packages/design-engineer-tools/scripts/sync.mjs`。
+
+### AI Coding 词典 `/products/ai-coding-dictionary`
+
+- 从首页作品入口进入后，在全屏 iframe 中加载本地保存的原版词典前端；原版负责知识网渲染、动效、镜头、搜索、选择及详情控件，本站不重建图谱。窄范围补丁跳过原版 loading 开场，直接进入知识网；本站提供返回作品入口。选中圆点采用置顶深色圆点、纸色间隔和粗外圈，名称突出；保留原版放射排布，碰撞圆点沿原来的放射方向向外错开，同时为关联词条名称留出空间；不改变角度、不强制收进可视区；移除配色切换和声音控件，禁止音频初始化。
+- `bridge.js` 在原版词条详情中加入中文释义与中文解读，英文原文同时保留，术语名称保持英文；隐藏并禁用外部平台链接。词典内的词条和搜索状态同步到本站 URL 的 `term`、`q`。
+- `pnpm sync:ai-coding-dictionary` 依据源仓库 Git blob SHA 增量更新，仅变更词条重新翻译；随后 `prepare-runtime.mjs` 将包内 `upstream/` 保存的原版 JS、CSS、字体和音频及更新后的目录生成到 `apps/web/public/ai-coding-atlas/`。
+- 词典已完成内置浏览器 CDP 的原版运行文件一致性、节点点击、搜索、拖拽缩放、双语详情和历史返回检查；重复步骤与实际范围见 [CDP 验收记录](execution/ai-coding-dictionary-cdp.md)。
+
+实现：`dictionary-map.tsx`、`packages/ai-coding-dictionary/scripts/sync.mjs`、`packages/ai-coding-dictionary/scripts/prepare-runtime.mjs`、`packages/ai-coding-dictionary/runtime/bridge.js`。
 
 ### 布局旧地址兼容 `/products/layout-compositions/[id]`
 
