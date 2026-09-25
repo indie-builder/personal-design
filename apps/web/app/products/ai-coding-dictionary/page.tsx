@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { entries, sections } from '@personal-design/ai-coding-dictionary';
-import { graphEdges, graphNodes } from '@personal-design/ai-coding-dictionary/graph';
 import { DictionaryMap } from '@/components/dictionary-map';
 
 export const metadata: Metadata = {
@@ -9,7 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AiCodingDictionaryPage() {
-  return (
-    <DictionaryMap entries={entries} sections={sections} nodes={graphNodes} edges={graphEdges} />
-  );
+  return <DictionaryMap />;
 }

@@ -34,6 +34,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: '/:path*', headers: securityHeaders },
+      {
+        source: '/ai-coding-atlas/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
+        ],
+      },
       ...mediaDirectories.map((directory) => ({
         source: `/${directory}/:path*`,
         has: [{ type: 'query' as const, key: 'v', value: '[a-f0-9]{40}' }],
@@ -42,7 +49,6 @@ const nextConfig: NextConfig = {
     ];
   },
   transpilePackages: [
-    '@personal-design/ai-coding-dictionary',
     '@personal-design/layout-compositions',
     '@personal-design/inspora',
     '@personal-design/design-engineer-tools',

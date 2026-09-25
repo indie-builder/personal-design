@@ -2,10 +2,6 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import type {
-  DictionaryGraphEdge,
-  DictionaryGraphNode,
-} from '@personal-design/ai-coding-dictionary/graph';
 import { ArrowLeft, ArrowRight, ArrowUpRight, ImageOff } from 'lucide-react';
 import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 import { shuffleBooks } from '@/lib/book-shuffle';
@@ -14,7 +10,6 @@ import { buttonClassName } from './button';
 import { MotionVideo } from './motion-video';
 import { BookSpines } from './layout-bookshelf';
 import { SiteReceiptPreview } from './site-receipt-preview';
-import { DictionaryGraph } from './dictionary-graph';
 import { TimelineWalker } from './timeline-walker';
 import { WorkspaceLink } from './workspace-shell';
 import styles from './home-view.module.css';
@@ -106,21 +101,27 @@ function BookPreview({ categories }: { categories: { name: string; count: number
 }
 
 /** Reuse the atlas renderer only while this timeline item is visible and motion is allowed. */
-function DictionaryPreview({
-  nodes,
-  edges,
-}: {
-  nodes: DictionaryGraphNode[];
-  edges: DictionaryGraphEdge[];
-}) {
+function DictionaryPreview() {
   const host = useRef<HTMLDivElement>(null);
-  const [running, setRunning] = useState(false);
   useEffect(() => {
     const element = host.current;
     if (!element) return;
     let visible = false;
+    let frame: HTMLIFrameElement | null = null;
     const update = () => {
-      setRunning(visible && !document.hidden && !instantMotion());
+      if (visible && !document.hidden && !instantMotion()) {
+        if (frame) return;
+        frame = document.createElement('iframe');
+        frame.src = '/ai-coding-atlas/index.html?preview=1&term=agent';
+        frame.title = 'AI Coding 知识图谱预览';
+        frame.tabIndex = -1;
+        frame.setAttribute('aria-hidden', 'true');
+        frame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+        element.append(frame);
+      } else {
+        frame?.remove();
+        frame = null;
+      }
     };
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -134,9 +135,10 @@ function DictionaryPreview({
     return () => {
       observer.disconnect();
       stop();
+      frame?.remove();
     };
   }, []);
-  const fallbackNodes = [
+  const nodes = [
     { name: 'Model', x: 58, y: 55, r: 12, color: '#bdced9' },
     { name: 'Token', x: 147, y: 32, r: 10, color: '#bdced9' },
     { name: 'Agent', x: 162, y: 102, r: 18, color: '#c7d6c1' },
@@ -145,17 +147,17 @@ function DictionaryPreview({
     { name: 'MCP', x: 267, y: 157, r: 10, color: '#e2d3be' },
   ];
   return (
-    <div ref={host} className={styles.dictionaryPreview} data-running={running} aria-hidden="true">
+    <div className={styles.dictionaryPreview} aria-hidden="true">
       <svg viewBox="0 0 320 196">
         <g className={styles.dictionaryEdges}>
-          {fallbackNodes
+          {nodes
             .filter((node) => node.name !== 'Agent')
             .map((node) => (
               <line key={node.name} x1="162" y1="102" x2={node.x} y2={node.y} />
             ))}
           <path d="M58 55 Q106 8 147 32 M147 32 Q211 23 261 64 M68 148 Q161 179 267 157" />
         </g>
-        {fallbackNodes.map((node) => (
+        {nodes.map((node) => (
           <g key={node.name}>
             <circle cx={node.x} cy={node.y} r={node.r} fill={node.color} />
             <text x={node.x} y={node.y - node.r - 6} textAnchor="middle">
@@ -164,11 +166,7 @@ function DictionaryPreview({
           </g>
         ))}
       </svg>
-      {running && (
-        <div className={styles.dictionaryRuntime}>
-          <DictionaryGraph nodes={nodes} edges={edges} selected="agent" preview />
-        </div>
-      )}
+      <div ref={host} className={styles.dictionaryRuntime} />
     </div>
   );
 }
@@ -233,14 +231,12 @@ export function HomeView({
   musePreviews = [],
   toolsPreview = [],
   layoutCategories = [],
-  dictionaryPreview,
 }: {
   products: Product[];
   layoutCategories?: { name: string; count: number }[];
   layoutPreviews?: Preview[];
   musePreviews?: Preview[];
   toolsPreview?: ToolPreviewItem[];
-  dictionaryPreview: { nodes: DictionaryGraphNode[]; edges: DictionaryGraphEdge[] };
 }) {
   const drag = useRef({ start: 0, scroll: 0, down: false, moved: false });
   const viewport = useRef<HTMLDivElement>(null);
@@ -398,7 +394,7 @@ export function HomeView({
                           ) : product.slug === 'design-engineer-tools' ? (
                             <ToolPreview tools={toolsPreview} />
                           ) : product.slug === 'ai-coding-dictionary' ? (
-                            <DictionaryPreview {...dictionaryPreview} />
+                            <DictionaryPreview />
                           ) : product.slug === 'personal-sites' ? (
                             <SiteReceiptPreview />
                           ) : previews[0]?.videoSrc ? (
