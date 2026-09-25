@@ -2,7 +2,7 @@
 
 ## Package Manager
 
-Use **pnpm** (11.x, workspaces): `pnpm install`, `pnpm dev`, `pnpm build`
+Use **pnpm** (12.x, workspaces): `pnpm install`, `pnpm dev`, `pnpm build`
 
 ## Dev Server
 

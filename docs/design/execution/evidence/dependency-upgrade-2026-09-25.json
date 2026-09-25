@@ -1,0 +1,31 @@
+{
+  "node": "24.21.0",
+  "pnpm": "12.6.0",
+  "lockfileSha256": "390cd91d0eb90d19ffdf8af03d2770cac9127b1bbd787f3cb56afa2adc3aa33c",
+  "checks": [
+    "pnpm install --frozen-lockfile",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm format:check",
+    "pnpm build"
+  ],
+  "e2e": {
+    "server": "pnpm --filter @personal-design/web start --port 3001",
+    "command": "DESIGN_BASE_URL=http://localhost:3001 node scripts/design-checks/run-all.mjs",
+    "passed": 11,
+    "failed": 0,
+    "suites": [
+      "verify-design.mjs",
+      "verify-design-routes.mjs",
+      "home.mjs",
+      "layouts-check.mjs",
+      "layouts-states.mjs",
+      "muse-behavior.mjs",
+      "muse-recovery.mjs",
+      "shared-browser.cjs",
+      "shared-autoplay.cjs",
+      "journeys.mjs",
+      "personal-sites.mjs"
+    ]
+  }
+}

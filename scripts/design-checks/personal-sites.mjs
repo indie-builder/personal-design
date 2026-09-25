@@ -32,14 +32,19 @@ try {
   await video.focus();
   await page.keyboard.press('Space');
   await page.waitForFunction(
-    () => document.querySelector('section[aria-label="个人网站动态展示"] video')?.paused,
+    () => {
+      const video = document.querySelector('section[aria-label="个人网站动态展示"] video');
+      return video?.paused && video.getAttribute('aria-label') === '播放个人网站宣传片';
+    },
     undefined,
     { timeout: 5000 },
   );
-  assert.equal(await video.getAttribute('aria-label'), '播放个人网站宣传片');
   await page.keyboard.press('Enter');
   await page.waitForFunction(
-    () => !document.querySelector('section[aria-label="个人网站动态展示"] video')?.paused,
+    () => {
+      const video = document.querySelector('section[aria-label="个人网站动态展示"] video');
+      return !video?.paused && video?.getAttribute('aria-label') === '暂停个人网站宣传片';
+    },
     undefined,
     { timeout: 5000 },
   );
