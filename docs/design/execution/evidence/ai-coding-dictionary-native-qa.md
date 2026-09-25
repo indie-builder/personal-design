@@ -4,6 +4,8 @@
 
 在本分支运行 `pnpm build && pnpm start`，以生产构建访问 `/products/ai-coding-dictionary`。项目现有浏览器回归在 `DESIGN_BASE_URL=http://localhost:3203 node scripts/design-checks/run-all.mjs` 下 **11/11 套通过**；其中路由核对为 358 条。原生词典的专项交互通过 ego-browser 在同一生产构建上检查。
 
+Vercel 预览部署 [9VsqqBmtnyDF2SG6XjXnCHWVGRPo](https://vercel.com/lovemyrmbb-3480s-projects/personal-design/9VsqqBmtnyDF2SG6XjXnCHWVGRPo) 为 **Ready**。打开其 [Agent 直达页](https://personal-design-8d8kwq10p-lovemyrmbb-3480s-projects.vercel.app/products/ai-coding-dictionary?term=agent)，实际检查到 Canvas、双语详情和 iframe 数量 0；旧 `/ai-coding-atlas/index.html` 返回 404。
+
 ## 专项结果
 
 | 操作 | 已核对结果 |
