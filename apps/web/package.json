@@ -1,5 +1,6 @@
 {
   "name": "@personal-design/web",
+  "description": "Deployment baseline comparison",
   "version": "0.1.0",
   "private": true,
   "type": "module",
