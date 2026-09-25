@@ -35,6 +35,13 @@ Co-Authored-By: (the agent model's name and attribution byline)
 | Sync inspora 数据 | `pnpm sync:inspora`（增量；`-- --full` 全量 backfill；需先 `pnpm --filter @personal-design/inspora exec playwright install chromium`） |
 | Sync AI Coding 词典 | `pnpm sync:ai-coding-dictionary`（按上游文件 SHA 增量；变更词条自动中译，失败保留旧目录） |
 
+## Testing Rules
+
+- 绝不在写完代码后再补写单元测试。
+- 高度优先只用 E2E 测试验证复杂功能；E2E 结束时产出可验证、可重复执行的验收产物，并记录复现命令与结果。
+- 必须隔离测试某个系统时，先列出所有可能的失败方式，再写代码。
+- 开发期间只运行相关的定向 E2E；全套 E2E 留到开发结束时执行。
+
 ## Design specification
 
 - 现行规范见 [DESIGN.md](DESIGN.md)，页面契约与文档职责见 [docs/design/README.md](docs/design/README.md)；修改前端遵循 [apps/web/AGENTS.md](apps/web/AGENTS.md)。
