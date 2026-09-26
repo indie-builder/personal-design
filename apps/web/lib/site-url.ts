@@ -4,3 +4,18 @@ const envUrl =
 
 /** 规范站点地址：生产在 Vercel 环境变量里设 NEXT_PUBLIC_SITE_URL 为正式域名。 */
 export const siteUrl = new URL(envUrl ?? 'http://localhost:3000');
+
+/** Set/delete params in place ('' deletes) and return `path` or `path?query`. */
+export function paramsHref(path: string, params: URLSearchParams, updates: Record<string, string>) {
+  for (const [key, value] of Object.entries(updates)) {
+    if (value) params.set(key, value);
+    else params.delete(key);
+  }
+  return `${path}${params.size ? `?${params}` : ''}`;
+}
+
+/** Rewrite the current history entry (or push one) with query updates applied. */
+export function updateParams(updates: Record<string, string>, push = false, state: unknown = null) {
+  const href = paramsHref(window.location.pathname, new URLSearchParams(window.location.search), updates);
+  window.history[push ? 'pushState' : 'replaceState'](state, '', href);
+}

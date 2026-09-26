@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, RotateCcw } from 'lucide-react';
 import { Button, buttonClassName } from './button';
 import styles from './inspora-media-carousel.module.css';
 import { instantMotion } from '@/lib/motion';
+import { useMediaStatus } from '@/lib/use-media-status';
 import { MotionVideo } from './motion-video';
 import { LightboxProvider, useLightbox } from './lifeline/lightbox';
 
@@ -189,13 +190,7 @@ function MediaSlide({
   siblings: CarouselMedia[];
 }) {
   const lightbox = useLightbox();
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    if (!active || status !== 'loading') return;
-    const timer = setTimeout(() => setStatus('error'), 15000);
-    return () => clearTimeout(timer);
-  }, [active, status, attempt]);
+  const { status, attempt, setStatus, retry } = useMediaStatus(active, 15000);
   return (
     <figure
       className={styles.slide}
@@ -276,10 +271,7 @@ function MediaSlide({
               <p>可以重试，或在新窗口打开原媒体。</p>
               <div className={styles.actions}>
                 <Button
-                  onClick={() => {
-                    setStatus('loading');
-                    setAttempt((n) => n + 1);
-                  }}
+                  onClick={retry}
                 >
                   <RotateCcw size={16} />
                   重试

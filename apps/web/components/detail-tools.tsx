@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Button } from './button';
 import styles from './detail-tools.module.css';
 import { usePathname, useRouter } from 'next/navigation';
+import { useMediaStatus } from '@/lib/use-media-status';
 import { LightboxProvider, useLightbox, type LightboxItem } from './lifeline/lightbox';
 
 // 常驻单例翻页监听：page 组件只把翻页目标写进 <html> dataset（useLayoutEffect，
@@ -88,15 +89,8 @@ function MainImageButton({
   index: number;
 }) {
   const lightbox = useLightbox();
-  const [state, setState] = useState<'loading' | 'ready' | 'fallback'>('loading');
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    const timeout = window.setTimeout(
-      () => setState((value) => (value === 'loading' ? 'fallback' : value)),
-      12000,
-    );
-    return () => window.clearTimeout(timeout);
-  }, [src, attempt]);
+  // 'error' 即「回退预览图」状态；载入看门狗 12 秒。
+  const { status: state, attempt, setStatus, retry } = useMediaStatus(true, 12000);
   return (
     <div className={styles.imageWrap}>
       <button
@@ -123,7 +117,7 @@ function MainImageButton({
           sizes="(min-width: 1024px) 60vw, 100vw"
           className="object-contain"
         />
-        {state !== 'fallback' && (
+        {state !== 'error' && (
           <Image
             key={attempt}
             src={src}
@@ -134,8 +128,8 @@ function MainImageButton({
             sizes="(min-width: 1024px) 60vw, 100vw"
             className={styles.fullImage}
             style={{ opacity: state === 'ready' ? 1 : 0 }}
-            onLoad={() => setState('ready')}
-            onError={() => setState('fallback')}
+            onLoad={() => setStatus('ready')}
+            onError={() => setStatus('error')}
           />
         )}
         <span className={styles.zoomHint}>点击放大</span>
@@ -145,14 +139,8 @@ function MainImageButton({
           <span>
             {state === 'loading' ? '正在载入高清图，先显示预览' : '高清图暂不可用，已显示预览'}
           </span>
-          {state === 'fallback' && (
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setState('loading');
-                setAttempt((value) => value + 1);
-              }}
-            >
+          {state === 'error' && (
+            <Button variant="ghost" onClick={retry}>
               重新加载
             </Button>
           )}

@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { instantMotion } from '@/lib/motion';
+import { useMediaStatus } from '@/lib/use-media-status';
 import { buttonClassName } from '../button';
 import styles from './lightbox.module.css';
+import { useLightboxSwipe } from './use-lightbox-swipe';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 import {
@@ -85,10 +87,11 @@ interface Frame {
 export function LightboxProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState<ActiveImage | null>(null);
   const [expanded, setExpanded] = useState(false);
-  const [fullReady, setFullReady] = useState(false);
-  const [loadError, setLoadError] = useState(false);
+  const { status: mediaStatus, attempt, setStatus: setMediaStatus, retry } = useMediaStatus(
+    !!active,
+    12000,
+  );
   const [thumbError, setThumbError] = useState(false);
-  const [attempt, setAttempt] = useState(0);
   const [closeRect, setCloseRect] = useState<Rect | null>(null);
   const [frame, setFrame] = useState<Frame | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -100,18 +103,6 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
   const closeTimerRef = useRef(0);
   const closingRef = useRef(false);
   const swipeRef = useRef<HTMLDivElement>(null);
-  const suppressSwipeClick = useRef(false);
-  const swipeStateRef = useRef<{
-    pointerId: number;
-    startX: number;
-    startY: number;
-    startT: number;
-    lastX: number;
-    lastT: number;
-    velocity: number;
-    dx: number;
-    active: boolean;
-  } | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -124,25 +115,27 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
   // 卸载兜底：关闭动画的兜底定时器不遗留（回调是 setActive(null)，纯洁癖）
   useEffect(() => () => clearTimeout(closeTimerRef.current), []);
 
-  const open = useCallback((item: LightboxItem, options: OpenOptions) => {
-    const immediate = instantMotion();
-    setInstant(immediate);
-    setNaturalRatio(null);
-    clearTimeout(closeTimerRef.current);
-    closingRef.current = false;
-    setActive({
-      item,
-      sourceEl: options.sourceEl ?? null,
-      initialRect: options.rect,
-      siblings: options.siblings ?? [],
-      index: options.index ?? 0,
-    });
-    setCloseRect(null);
-    setFullReady(false);
-    setLoadError(false);
-    setThumbError(false);
-    setExpanded(immediate);
-  }, []);
+  const open = useCallback(
+    (item: LightboxItem, options: OpenOptions) => {
+      const immediate = instantMotion();
+      setInstant(immediate);
+      setNaturalRatio(null);
+      clearTimeout(closeTimerRef.current);
+      closingRef.current = false;
+      setActive({
+        item,
+        sourceEl: options.sourceEl ?? null,
+        initialRect: options.rect,
+        siblings: options.siblings ?? [],
+        index: options.index ?? 0,
+      });
+      setCloseRect(null);
+      setThumbError(false);
+      setMediaStatus('loading');
+      setExpanded(immediate);
+    },
+    [setMediaStatus],
+  );
 
   const activeRef = useRef<ActiveImage | null>(null);
   useEffect(() => {
@@ -169,37 +162,39 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
     closeTimerRef.current = window.setTimeout(() => setActive(null), EXIT_DURATION + 80);
   }, [reducedMotion]);
 
-  const go = useCallback((dir: 1 | -1) => {
-    setInstant(instantMotion());
-    setNaturalRatio(null);
-    // 关闭动画期间按方向键：取消卸载倒计时，灯箱恢复展开（修闪没竞态）
-    const current = activeRef.current;
-    if (!current || current.siblings.length < 2) return;
-    clearTimeout(closeTimerRef.current);
-    closingRef.current = false;
-    setExpanded(true);
-    setActive((cur) => {
-      if (!cur || cur.siblings.length === 0) return cur;
-      const next = (cur.index + dir + cur.siblings.length) % cur.siblings.length;
-      const item = cur.siblings[next];
-      // sourceEl 已不指向当前条目：之后关闭原地淡出，而不是飞回第一张
-      return item ? { ...cur, item, index: next, sourceEl: null } : cur;
-    });
-    setFullReady(false);
-    setLoadError(false);
-    setThumbError(false);
-  }, []);
+  const go = useCallback(
+    (dir: 1 | -1) => {
+      setInstant(instantMotion());
+      setNaturalRatio(null);
+      // 关闭动画期间按方向键：取消卸载倒计时，灯箱恢复展开（修闪没竞态）
+      const current = activeRef.current;
+      if (!current || current.siblings.length < 2) return;
+      clearTimeout(closeTimerRef.current);
+      closingRef.current = false;
+      setExpanded(true);
+      setActive((cur) => {
+        if (!cur || cur.siblings.length === 0) return cur;
+        const next = (cur.index + dir + cur.siblings.length) % cur.siblings.length;
+        const item = cur.siblings[next];
+        // sourceEl 已不指向当前条目：之后关闭原地淡出，而不是飞回第一张
+        return item ? { ...cur, item, index: next, sourceEl: null } : cur;
+      });
+      setThumbError(false);
+      setMediaStatus('loading');
+    },
+    [setMediaStatus],
+  );
 
+  // 每次目标图变化都重新计时载入看门狗
+  const activeSrc = active?.item.src;
   useEffect(() => {
-    if (!active || fullReady || loadError) return;
-    const timer = window.setTimeout(() => {
-      setLoadError(true);
-    }, 12000);
-    return () => clearTimeout(timer);
-  }, [active, attempt, fullReady, loadError]);
+    if (activeSrc) retry();
+  }, [activeSrc, retry]);
 
   const isOpen = active !== null;
   const dialogReady = isOpen && frame !== null;
+  const fullReady = mediaStatus === 'ready';
+  const loadError = mediaStatus === 'error';
 
   useEffect(() => {
     if (active && !previousFocusRef.current)
@@ -353,73 +348,12 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
   const hasOrigin = Boolean(closeRect ?? (active?.sourceEl ? active.initialRect : null));
 
   // 移动端 swipe 翻图（手写 pointer，零依赖；纵向手势不拦截）
-  const onSwipeStart = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (
-      swipeStateRef.current ||
-      event.pointerType === 'mouse' ||
-      !hasSiblings ||
-      !expanded ||
-      (event.target instanceof Element && event.target.closest('button, a'))
-    )
-      return;
-    suppressSwipeClick.current = false;
-    // 清掉上一次回弹残留的 transition（否则后续拖拽全程慢半拍）
-    if (swipeRef.current) swipeRef.current.style.transition = 'none';
-    swipeStateRef.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      startT: event.timeStamp,
-      lastX: event.clientX,
-      lastT: event.timeStamp,
-      velocity: 0,
-      dx: 0,
-      active: false,
-    };
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-  const onSwipeMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    const s = swipeStateRef.current;
-    const el = swipeRef.current;
-    if (!s || !el || event.pointerId !== s.pointerId) return;
-    const dx = event.clientX - s.startX;
-    const dy = event.clientY - s.startY;
-    if (!s.active && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
-      s.active = true;
-    }
-    if (s.active) {
-      s.dx = dx;
-      // 尾部速度（指数平滑），「慢拖后发力甩」也能触发
-      const dt = event.timeStamp - s.lastT;
-      if (dt > 0) {
-        s.velocity = 0.8 * s.velocity + 0.2 * ((event.clientX - s.lastX) / dt);
-        s.lastX = event.clientX;
-        s.lastT = event.timeStamp;
-      }
-      if (!reducedMotion) el.style.transform = `translate3d(${dx * 0.9}px, 0, 0)`;
-    }
-  };
-  const onSwipeEnd = (event: React.PointerEvent<HTMLDivElement>) => {
-    const s = swipeStateRef.current;
-    const el = swipeRef.current;
-    if (!s || !el || event.pointerId !== s.pointerId) return;
-    swipeStateRef.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId))
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    if (s.active) {
-      suppressSwipeClick.current = true;
-      if (Math.abs(s.dx) > 64 || Math.abs(s.velocity) > 0.5) {
-        // 触发翻图：位移直接复位（crossfade 接管视觉连续性）
-        el.style.transition = 'none';
-        el.style.transform = '';
-        go(s.dx < 0 ? 1 : -1);
-        return;
-      }
-      // 未达到阈值：回弹
-      el.style.transition = reducedMotion ? 'none' : `transform 150ms ${EASE}`;
-      el.style.transform = '';
-    }
-  };
+  const { handlers: swipeHandlers, consumeClickSuppression } = useLightboxSwipe({
+    swipeRef,
+    enabled: hasSiblings && expanded,
+    reducedMotion,
+    go,
+  });
 
   // focus trap：Tab/Shift+Tab 在 dialog 内循环，不外溢到背景
   const onDialogKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -476,21 +410,9 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
               <div
                 ref={swipeRef}
                 className="absolute inset-0 touch-pan-y"
-                onPointerDown={onSwipeStart}
-                onPointerMove={onSwipeMove}
-                onPointerUp={onSwipeEnd}
-                onPointerCancel={(event) => {
-                  if (swipeStateRef.current?.pointerId !== event.pointerId) return;
-                  swipeStateRef.current = null;
-                  if (event.currentTarget.hasPointerCapture(event.pointerId))
-                    event.currentTarget.releasePointerCapture(event.pointerId);
-                  if (swipeRef.current) swipeRef.current.style.transform = '';
-                }}
+                {...swipeHandlers}
                 onClick={(event) => {
-                  if (suppressSwipeClick.current) {
-                    suppressSwipeClick.current = false;
-                    return;
-                  }
+                  if (consumeClickSuppression()) return;
                   if (event.target === event.currentTarget) close();
                 }}
               >
@@ -527,14 +449,11 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
                   }}
                   ref={(el) => {
                     // 缓存图可能在监听挂载前就加载完，onLoad 不会触发，挂载时补检
-                    if (el?.complete && el.naturalWidth > 0) setFullReady(true);
+                    if (el?.complete && el.naturalWidth > 0) setMediaStatus('ready');
                   }}
-                  onError={() => {
-                    setLoadError(true);
-                  }}
+                  onError={() => setMediaStatus('error')}
                   onLoad={(event) => {
-                    setFullReady(true);
-                    setLoadError(false);
+                    setMediaStatus('ready');
                     if (event.currentTarget.naturalHeight)
                       setNaturalRatio(
                         event.currentTarget.naturalWidth / event.currentTarget.naturalHeight,
@@ -561,11 +480,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
                       <button
                         type="button"
                         className={buttonClassName({ className: styles.control })}
-                        onClick={() => {
-                          setLoadError(false);
-                          setFullReady(false);
-                          setAttempt((value) => value + 1);
-                        }}
+                        onClick={retry}
                       >
                         重新加载
                       </button>
