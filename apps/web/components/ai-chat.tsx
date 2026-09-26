@@ -155,6 +155,7 @@ export function AiChat() {
     () =>
       observeMotionPolicy(() => {
         page.current?.toggleAttribute('data-motion-paused', document.hidden);
+        if (document.documentElement.dataset.input === 'keyboard') setHeaderHidden(false);
         if (instantMotion() || document.hidden) {
           creationEntry.current?.finish();
           creationExit.current?.finish();
@@ -577,7 +578,9 @@ function ConversationView({
     () => new Set(conversation.messages.map((message) => message.id)),
   );
   const [atBottom, setAtBottom] = useState(true);
+  const composerHidden = !atBottom;
   const scroll = useRef<HTMLDivElement>(null);
+  const composerArea = useRef<HTMLDivElement>(null);
   const scrollGesture = useRef({ top: 0, travel: 0, userUntil: 0 });
   useEffect(() => onHeaderHiddenChange(false), [onHeaderHiddenChange]);
   const textarea = useRef<HTMLTextAreaElement>(null);
@@ -588,8 +591,9 @@ function ConversationView({
   }, [busy]);
   useEffect(() => {
     onBusy(busy);
+    if (busy) onHeaderHiddenChange(false);
     return () => onBusy(false);
-  }, [busy, onBusy]);
+  }, [busy, onBusy, onHeaderHiddenChange]);
   useEffect(() => {
     onMessages(conversation.id, messages);
   }, [conversation.id, messages, onMessages]);
@@ -606,6 +610,24 @@ function ConversationView({
       scrollGesture.current.travel = 0;
     }
   }, [messages, status, atBottom]);
+
+  useEffect(() => {
+    const area = composerArea.current;
+    const viewport = scroll.current;
+    if (!area || !viewport) return;
+    const fit = () => {
+      area.parentElement?.style.setProperty('--composer-height', `${area.offsetHeight}px`);
+      if (atBottom) {
+        viewport.scrollTop = viewport.scrollHeight;
+        scrollGesture.current.top = viewport.scrollTop;
+        scrollGesture.current.travel = 0;
+      }
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(area);
+    return () => observer.disconnect();
+  }, [atBottom]);
 
   const send = useCallback(
     (text: string) => {
@@ -645,7 +667,7 @@ function ConversationView({
           gesture.userUntil = performance.now() + 1200;
           gesture.travel =
             Math.sign(delta) === Math.sign(gesture.travel) ? gesture.travel + delta : delta;
-          if (top < 24) {
+          if (top < 24 || document.activeElement === textarea.current) {
             onHeaderHiddenChange(false);
             gesture.travel = 0;
           } else if (Math.abs(gesture.travel) >= 12) {
@@ -788,7 +810,11 @@ function ConversationView({
           )}
         </div>
       </div>
-      <div className={styles.composerArea}>
+      <div
+        ref={composerArea}
+        className={styles.composerArea}
+        data-hidden={composerHidden || undefined}
+      >
         {!atBottom && (
           <Button
             icon
@@ -802,49 +828,58 @@ function ConversationView({
             <ArrowDown size={20} strokeWidth={1.6} />
           </Button>
         )}
-        <form
-          className={styles.composer}
-          onSubmit={(event) => {
-            event.preventDefault();
-            send(input);
-          }}
+        <div
+          className={styles.composerPanel}
+          data-composer-panel=""
+          data-hidden={composerHidden || undefined}
+          inert={composerHidden}
+          aria-hidden={composerHidden || undefined}
+          onFocusCapture={() => onHeaderHiddenChange(false)}
         >
-          <textarea
-            ref={textarea}
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            aria-label={`发消息给${agent.name}`}
-            placeholder={`发消息给${agent.name}…`}
-            rows={1}
-            maxLength={4000}
-            onKeyDown={(event) => {
-              if (
-                event.key === 'Enter' &&
-                !event.shiftKey &&
-                !event.nativeEvent.isComposing &&
-                !window.matchMedia('(pointer: coarse)').matches
-              ) {
-                event.preventDefault();
-                send(input);
-              }
+          <form
+            className={styles.composer}
+            onSubmit={(event) => {
+              event.preventDefault();
+              send(input);
             }}
-          />
-          {busy ? (
-            <Button icon variant="primary" aria-label="停止生成" onClick={() => void stop()}>
-              <Square size={16} fill="currentColor" />
-            </Button>
-          ) : (
-            <Button
-              type="submit"
-              icon
-              variant="primary"
-              aria-label="发送消息"
-              disabled={!input.trim()}
-            >
-              <ArrowUp size={20} strokeWidth={1.6} />
-            </Button>
-          )}
-        </form>
+          >
+            <textarea
+              ref={textarea}
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              aria-label={`发消息给${agent.name}`}
+              placeholder={`发消息给${agent.name}…`}
+              rows={1}
+              maxLength={4000}
+              onKeyDown={(event) => {
+                if (
+                  event.key === 'Enter' &&
+                  !event.shiftKey &&
+                  !event.nativeEvent.isComposing &&
+                  !window.matchMedia('(pointer: coarse)').matches
+                ) {
+                  event.preventDefault();
+                  send(input);
+                }
+              }}
+            />
+            {busy ? (
+              <Button icon variant="primary" aria-label="停止生成" onClick={() => void stop()}>
+                <Square size={16} fill="currentColor" />
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                icon
+                variant="primary"
+                aria-label="发送消息"
+                disabled={!input.trim()}
+              >
+                <ArrowUp size={20} strokeWidth={1.6} />
+              </Button>
+            )}
+          </form>
+        </div>
       </div>
     </section>
   );
