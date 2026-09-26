@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "checks": [
+    "female selection migrated to male",
+    "existing male avatar retained",
+    "conversation and custom agent preserved",
+    "avatar stable after reload",
+    "new agent uses male pool"
+  ],
+  "malePool": 15
+}

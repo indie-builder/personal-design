@@ -4,13 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node ../../packages/ai-coding-dictionary/scripts/prepare-runtime.mjs && next dev --turbopack",
-    "build": "node ../../packages/ai-coding-dictionary/scripts/prepare-runtime.mjs && next build",
+    "dev": "node scripts/generate-openui-prompt.mjs && node ../../packages/ai-coding-dictionary/scripts/prepare-runtime.mjs && next dev --turbopack",
+    "build": "node scripts/generate-openui-prompt.mjs && node ../../packages/ai-coding-dictionary/scripts/prepare-runtime.mjs && next build",
     "start": "next start",
     "lint": "oxlint --deny-warnings .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@earendil-works/pi-ai": "^0.87.1",
+    "@earendil-works/pi-coding-agent": "0.87.1",
+    "@openuidev/lang-core": "0.3.0",
+    "@openuidev/react-headless": "0.16.3",
+    "@openuidev/react-lang": "^0.3.0",
+    "@openuidev/react-ui": "0.16.3",
+    "@personal-design/ai-chat": "workspace:*",
     "@personal-design/ai-coding-dictionary": "workspace:*",
     "@personal-design/design-engineer-tools": "workspace:*",
     "@personal-design/inspora": "workspace:*",
@@ -22,7 +29,9 @@
     "next": "16.3.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "tailwind-merge": "3.7.0"
+    "tailwind-merge": "3.7.0",
+    "tslib": "^2.8.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",

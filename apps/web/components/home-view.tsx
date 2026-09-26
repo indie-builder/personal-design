@@ -9,6 +9,7 @@ import type { Product } from '@/lib/products';
 import { buttonClassName } from './button';
 import { MotionVideo } from './motion-video';
 import { BookSpines } from './layout-bookshelf';
+import { AiChatPreview } from './ai-chat-preview';
 import { SiteReceiptPreview } from './site-receipt-preview';
 import { TimelineWalker } from './timeline-walker';
 import { WorkspaceLink } from './workspace-shell';
@@ -393,6 +394,8 @@ export function HomeView({
                             <BookPreview categories={layoutCategories} />
                           ) : product.slug === 'design-engineer-tools' ? (
                             <ToolPreview tools={toolsPreview} />
+                          ) : product.slug === 'ai-chat' ? (
+                            <AiChatPreview />
                           ) : product.slug === 'ai-coding-dictionary' ? (
                             <DictionaryPreview />
                           ) : product.slug === 'personal-sites' ? (

@@ -1,0 +1,26 @@
+// Requires fixture provider :3907 and a separate Next server with test-only credentials.
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createParser} from '../../apps/web/node_modules/@openuidev/lang-core/dist/index.mjs';
+const base=process.env.DESIGN_BASE_URL||'http://localhost:3107';
+assert(base==='http://localhost:3107','Use the isolated test server');
+const {schema}=JSON.parse(await readFile(new URL('../../apps/web/lib/openui-system-prompt.json',import.meta.url)));
+const agent={id:'test',name:'测试助手',prompt:'你是一个团队协作顾问。'};
+const message=(text,index=0)=>({id:'m'+index,role:index%2?'assistant':'user',parts:[{type:'text',text}]});
+const post=(messages,extra={})=>fetch(base+'/api/ai-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent,messages,...extra})});
+const output=async response=>{assert.equal(response.status,200);const lines=(await response.text()).trim().split('\n').map(JSON.parse);assert.equal(lines.at(-1).choices[0].finish_reason,'stop');return lines.map(l=>l.choices[0].delta.content||'').join('');};
+const parser=createParser(schema,'Stack');const checks=[];
+await fetch('http://localhost:3907/reset');
+let text=await output(await post([message('团队预算3000元')]));assert(parser.parse(text).root);checks.push('Pi NDJSON renders with the current official schema');
+await output(await post([message('团队预算3000元'),message(text,1),message('请继续',2)]));
+let requests=await(await fetch('http://localhost:3907/requests')).json();assert(requests.at(-1).messages.some(m=>m.content.includes('团队预算3000元')));assert(!requests.at(-1).tools?.length);checks.push('restored context, no host tools');
+const response=await post(Array.from({length:17},(_,i)=>message('第'+i+'轮，预算3000元。',i)));
+const memory=JSON.parse(Buffer.from(response.headers.get('x-ai-memory'),'base64').toString()).memory;
+await output(response);assert(memory.summary.includes('3000'));assert.equal(memory.throughId,'m10');checks.push('summary compression and memory delivery');
+text=await output(await post([message('触发结构修复')]));assert.equal(parser.parse(text).meta.orphaned.length,0);checks.push('one automatic repair reconnects orphaned action');
+await assert.rejects(async()=>output(await post([message('触发服务错误')])));checks.push('provider failure is not reported as success');
+const controller=new AbortController();const slow=await fetch(base+'/api/ai-chat',{method:'POST',signal:controller.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({agent,messages:[message('慢速回答')]})});controller.abort();await slow.body?.cancel().catch(()=>{});await output(await post([message('停止后继续')]));checks.push('abort and next request');
+assert.equal((await fetch(base+'/api/ai-chat',{method:'POST',body:'{}'})).status,400);
+assert.equal((await fetch(base+'/api/ai-chat',{method:'POST',headers:{origin:'https://other.example'},body:'{}'})).status,403);
+assert.equal((await fetch(base+'/api/ai-chat',{method:'POST',body:'x'.repeat(512001)})).status,413);checks.push('body, origin and schema validation');
+const dir=new URL('../../docs/design/execution/evidence/ai-chat/',import.meta.url);await mkdir(dir,{recursive:true});await writeFile(new URL('api-result.json',dir),JSON.stringify({passed:true,checks},null,2)+'\n');console.log(checks);

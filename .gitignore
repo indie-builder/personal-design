@@ -21,3 +21,7 @@ packages/layout-compositions/.upstream/
 
 # Generated from the captured atlas runtime and the synchronized bilingual catalog.
 apps/web/public/ai-coding-atlas/
+
+# Server-only credentials
+.env*
+!.env.example

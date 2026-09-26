@@ -1,0 +1,181 @@
+{
+  "id": "case-fixture",
+  "agentId": "general",
+  "title": "我们准备选择轻舟协作，请从需求梳理开始，带我们走完选方案、试用和效果评估的完整流程。",
+  "messages": [
+    {
+      "id": "ee5b1b0d-3a6f-4644-bd5c-9fc81fe83ed5",
+      "role": "user",
+      "parts": [
+        {
+          "type": "text",
+          "text": "我们准备选择轻舟协作，请从需求梳理开始，带我们走完选方案、试用和效果评估的完整流程。"
+        }
+      ]
+    },
+    {
+      "id": "68e46902-d684-4a01-93e5-2adb24b23e3f",
+      "role": "assistant",
+      "metadata": {
+        "uiState": {
+          "需求梳理": {
+            "团队名称": {
+              "value": "星河设计"
+            },
+            "团队人数": {
+              "value": "3"
+            },
+            "活跃项目数": {
+              "value": "5"
+            },
+            "主要痛点": {
+              "value": "希望客户只读查看进度，减少反复沟通"
+            },
+            "所需能力": {
+              "value": {
+                "kanban": true,
+                "reminder": false,
+                "guest": true,
+                "approval": false,
+                "audit": false
+              }
+            }
+          }
+        }
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "以下基于内置的轻舟协作案例，我们从需求梳理开始，一步步带你走完选型、试用和评估流程。\n\nroot = Stack([pageHeader, intro, reqForm], \"column\", \"l\")\npageHeader = CardHeader(\"第一步：需求梳理\", \"填写团队情况，用于匹配最合适的方案\")\nintro = TextContent(\"先确认人数、项目数和协作方式等关键条件，我们会据此推荐够用的最低档方案，不会过度推荐。\")\nreqForm = Form(\"需求梳理\", reqButtons, [fTeam, fSize, fProjects, fWay, fAbility, fPain])\nfTeam = FormControl(\"团队名称\", Input(\"团队名称\", \"例如：某某设计小组\"))\nfSize = FormControl(\"团队人数\", Input(\"团队人数\", \"例如：3\", \"number\", { required: true, numeric: true }), \"必填，用于判断可选档位\")\nfProjects = FormControl(\"活跃项目数\", Input(\"活跃项目数\", \"例如：5\", \"number\", { required: true, numeric: true }), \"必填，同时进行的项目数量\")\nfWay = FormControl(\"当前协作方式\", TextArea(\"当前协作方式\", \"例如：微信群 + 表格跟任务，常出现遗漏和逾期\", 3))\nfAbility = FormControl(\"所需能力\", CheckBoxGroup(\"所需能力\", [cb1, cb2, cb3, cb4, cb5]), \"选择你们实际需要的能力\")\ncb1 = CheckBoxItem(\"任务看板\", \"按列推进任务状态\", \"kanban\", true)\ncb2 = CheckBoxItem(\"截止提醒\", \"到期自动提醒负责人\", \"reminder\")\ncb3 = CheckBoxItem(\"客户只读查看\", \"客户可查看进度但不能编辑\", \"guest\")\ncb4 = CheckBoxItem(\"审批流程\", \"任务或交付需逐级审批\", \"approval\")\ncb5 = CheckBoxItem(\"操作审计\", \"记录关键操作日志\", \"audit\")\nfPain = FormControl(\"主要痛点\", TextArea(\"主要痛点\", \"例如：任务没人认领、进度不透明、客户反复追问进度\", 3))\nreqButtons = Buttons([Button(\"推荐方案\", Action([@ToAssistant(\"根据我填写的需求推荐方案\")]), \"primary\")])"
+        }
+      ]
+    },
+    {
+      "id": "e88d6fba-8278-49b2-85df-a1bd01cb19a7",
+      "role": "user",
+      "parts": [
+        {
+          "type": "text",
+          "text": "根据我填写的需求推荐方案\n需求梳理：团队名称：星河设计；团队人数：3；活跃项目数：5；主要痛点：希望客户只读查看进度，减少反复沟通；所需能力：kanban：是；reminder：否；guest：是；approval：否；audit：否"
+        }
+      ]
+    },
+    {
+      "id": "3ec3d5da-3f59-4d27-8ea9-48aaec097308",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([pageHeader, cmpTable, recCard, recBody, acc, nextBtns], \"column\", \"l\")\npageHeader = CardHeader(\"第二步：方案对比\", \"星河设计 · 3人 · 5个活跃项目 · 需要客户只读查看\")\ncmpTable = Table([colFeature, colPersonal, colTeam, colPro])\ncolFeature = Col(\"能力\", [\"使用人数\", \"活跃项目上限\", \"任务看板\", \"项目共享与负责人分配\", \"截止提醒\", \"管理员／成员角色\", \"客户只读访客\", \"自定义角色／审批／审计／汇总报表\"])\ncolPersonal = Col(\"个人版\", [\"1人\", \"3个\", \"仅个人清单\", \"不支持\", \"个人提醒\", \"不支持\", \"不支持\", \"不支持\"])\ncolTeam = Col(\"团队版\", [\"2–15人\", \"20个\", \"支持\", \"支持\", \"支持\", \"支持\", \"支持\", \"不支持\"])\ncolPro = Col(\"专业版\", [\"2–50人\", \"不限\", \"支持\", \"支持\", \"支持\", \"支持\", \"支持\", \"支持\"])\nrecCard = Card([recHeader, recText, recTags], \"sunk\")\nrecHeader = CardHeader(\"推荐：团队版\", \"满足硬性要求的最低档方案\")\nrecText = TextContent(\"3人在团队版的2–15人范围内，5个项目远低于20个上限，任务看板和客户只读访客均为团队版标准能力。你们不需要审批、审计或自定义角色，因此不必升级专业版。\")\nrecTags = TagBlock([\"3人 ≤ 15人上限\", \"5项目 ≤ 20项目上限\", \"客户只读查看已覆盖\", \"移动端可用\"], \"sm\")\nrecBody = TextContent(\"个人版仅1人使用且不支持团队共享和客户访客，直接排除；专业版的差异能力你们暂未用到，等出现审批或超20个项目需求时再评估即可。\")\nacc = Accordion([accItem1])\naccItem1 = AccordionItem(\"tradeoff\", \"取舍说明：为什么不建议直接上专业版\", [accText1])\naccText1 = TextContent(\"专业版适合需要逐级审批、操作留痕或复杂角色分工的团队。星河设计当前诉求是任务流转透明和客户只读查看，团队版即可完整覆盖；先从最低满足档试用，能降低迁移和培训成本，后续需求变化再升级也不冲突。\")\nnextBtns = Buttons([Button(\"制定试用计划\", Action([@ToAssistant(\"请为团队版制定两周试用计划\")]), \"primary\")])"
+        }
+      ]
+    },
+    {
+      "id": "8d43282f-08c9-4be2-a47d-ab1f8b6565fa",
+      "role": "user",
+      "parts": [
+        {
+          "type": "text",
+          "text": "请为团队版制定两周试用计划"
+        }
+      ]
+    },
+    {
+      "id": "69121167-9141-457b-8ce8-08d889587e22",
+      "role": "assistant",
+      "metadata": {
+        "uiState": {
+          "试用参数": {
+            "完成率目标": {
+              "value": [
+                85
+              ]
+            }
+          }
+        }
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([pageHeader, planSteps, cfgHeader, cfgForm, taskHeader, taskTable, taskHint, nextBtns], \"column\", \"l\")\npageHeader = CardHeader(\"第三步：两周试用计划\", \"团队版 · 星河设计 · 按三阶段推进\")\nplanSteps = Steps([step1, step2, step3])\nstep1 = StepsItem(\"准备（第1–2天）\", \"建立1个试点项目，整理5个活跃项目中最典型的任务导入；邀请3名成员，并添加1–2位只读客户访客，确认客户能看到进度但无法编辑。\")\nstep2 = Step第Item: 1\nstep2 = StepsItem(\"第一周\", \"所有新任务统一在看板流转：建卡、指派负责人、设截止时间；团队成员每天更新状态，期间不做额外的线下任务表格，保持单一信息源。\")\nstep3 = StepsItem(\"第二周\", \"延续使用习惯，观察客户查看情况是否减少了反复沟通；周末进行首次数据复盘，对照完成率、逾期和交接时长。\")\ncfgHeader = InlineHeader(\"试用参数\", \"选择开始日期并设定目标\")\ncfgForm = Form(\"试用参数\", cfgButtons, [fDate, fGoal])\nfDate = FormControl(\"期望开始日期\", DatePicker(\"期望开始日期\", \"single\", { required: true }), \"建议尽早，保持两周完整周期\")\nfGoal = FormControl(\"完成率目标\", Slider(\"完成率目标\", \"discrete\", 50, 100, 5, [80], \"默认80%，可拖动调整\"))\ncfgButtons = Buttons([Button(\"保存试用参数\", Action([@ToAssistant(\"我已确认试用开始日期与完成率目标\")]), \"primary\")])\ntaskHeader = InlineHeader(\"3个试点任务\", \"可直接点击单元格修改任务和负责人\")\ntaskTable = EditableTable(\"试点任务\", [cTask, cOwner, cStatus], [r1, r2, r3])\ncTask = { type: \"text\", key: \"task\", header: \"任务\", width: 40 }\ncOwner = { type: \"select\", key: \"owner\", header: \"负责人\", options: [o1, o2, o3] }\no1 = { value: \"小林\", label: \"小林\" }\no2 = { value: \"小周\", label: \"小周\" }\no3 = { value: \"小陈\", label: \"小陈\" }\ncStatus = { type: \"select\", key: \"status\", header: \"状态\", options: [s1, s2, s3] }\ns1 = { value: \"todo\", label: \"待开始\" }\ns2 = { value: \"doing\", label: \"进行中\" }\ns3 = { value: \"done\", label: \"已完成\" }\nr1 = { id: \"1\", values: [\"建立试点项目并导入典型任务\", \"小林\", \"todo\"] }\nr2 = { id: \"2\", values: [\"邀请3名成员与只读客户访客\", \"小周\", \"todo\"] }\nr3 = { id: \"3\", values: [\"每周五复盘：进度、逾期与交接时长\", \"小陈\", \"todo\"] }\ntaskHint = TextContent(\"以上只是试用计划，尚未创建任何真实项目；表格内容确认后随下一步一起生效。\")\nnextBtns = Buttons([Button(\"查看试用数据\", Action([@ToAssistant(\"查看内置试用样本的效果数据\")]), \"primary\")])"
+        }
+      ]
+    },
+    {
+      "id": "ac0607a4-8491-4ae8-96a9-1740808e91c9",
+      "role": "user",
+      "parts": [
+        {
+          "type": "text",
+          "text": "查看内置试用样本的效果数据\n试用参数：完成率目标：85"
+        }
+      ]
+    },
+    {
+      "id": "9817be69-3e61-4951-b18f-057a9d183120",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([pageHeader, kpiBlock, tabs, acc, hint, nextBtns], \"column\", \"l\")\npageHeader = CardHeader(\"第四步：效果分析\", \"内置试用样本 · 50项试点任务 · 两周周期\")\nkpiBlock = OverviewCardBlock([k1, k2, k3])\nk1 = OverviewCardItem(\"rate\", IconText(ic1, \"success\", \"m\", \"完成率\", \"45 / 50 项完成\", true, \"vertical\"), MetricIndicatorInline(\"90%\", \"目标 85%，已达成\", { direction: \"up\", value: 30 }))\nic1 = Icon(\"circle-check\", \"chart\")\nk2 = OverviewCardItem(\"overdue\", IconText(ic2, \"warning\", \"m\", \"逾期任务\", \"两周内逾期\", true, \"vertical\"), MetricIndicatorInline(\"4 项\", \"基线逾期 12 项\", { direction: \"down\", value: 67 }))\nic2 = Icon(\"alarm-clock\", \"time\")\nk3 = OverviewCardItem(\"handoff\", IconText(ic3, \"info\", \"m\", \"平均交接时长\", \"从指派到开始处理\", true, \"vertical\"), MetricIndicatorInline(\"7 小时\", \"基线为 18 小时\", { direction: \"down\", value: 61 }))\nic3 = Icon(\"timer\", \"time\")\ntabs = Tabs([tabTrend, tabCompare, tabDist])\ntabTrend = TabItem(\"trend\", \"趋势\", [trendCard])\ntrendCard = Card([trendHeader, LineChart(days, [done, planned], \"natural\", \"天数\", \"累计任务数\", 240)])\ntrendHeader = CardHeader(\"14天累计完成 vs 累计计划\", \"口径：每日累计完成的任务数与当日计划累计任务数\")\ndays = [\"第1天\",\"第2天\",\"第3天\",\"第4天\",\"第5天\",\"第6天\",\"第7天\",\"第8天\",\"第9天\",\"第10天\",\"第11天\",\"第12天\",\"第13天\",\"第14天\"]\ndone = Series(\"累计完成\", [2,4,6,9,12,15,18,22,26,30,34,38,42,45])\nplanned = Series(\"累计计划\", [3,6,9,12,15,18,21,25,29,33,37,41,45,50])\ntabCompare = TabItem(\"compare\", \"前后对比\", [cmpCard])\ncmpCard = Card([cmpHeader, BarChart([\"基线\",\"试用两周\"], [sDone, sOverdue], \"grouped\", \"周期\", \"任务数\", 240)])\ncmpHeader = CardHeader(\"基线 vs 试用：完成与逾期任务数\", \"口径：同一批50项试点任务，基线为使用前的对照数据\")\nsDone = Series(\"完成任务数\", [30, 45])\nsOverdue = Series(\"逾期任务数\", [12, 4])\ntabDist = TabItem(\"dist\", \"任务分布\", [distCard])\ndistCard = Card([distHeader, PieChart([\"已完成\",\"进行中\",\"阻塞\"], [45,4,1], \"donut\", \"circular\")])\ndistHeader = CardHeader(\"两周结束时任务状态分布\", \"口径：50项试点任务按当前状态统计，合计50项\")\nacc = Accordion([accA, accB])\naccA = AccordionItem(\"blocker\", \"阻塞说明\", [accAText])\naccAText = TextContent(\"唯一阻塞任务的原因是客户资料未到齐，需确认责任人和下一步跟进时间；这是协作流程问题，不归咎于工具本身。团队成员样本：小林完成18项／进行中2项，小周完成15项／进行中1项／阻塞1项，小陈完成12项／进行中1项。\")\naccB = AccordionItem(\"detail\", \"数据明细\", [detailTable])\ndetailTable = Table([cMetric, cBaseline, cTrial, cChange])\ncMetric = Col(\"指标\", [\"完成任务\", \"逾期任务\", \"平均交接时长\", \"完成率\"])\ncBaseline = Col(\"基线\", [\"30 项\",\"12 项\",\"18 小时\",\"60%\"], \"string\")\ncTrial = Col(\"试用两周\", [\"45 项\",\"4 项\",\"7 小时\",\"90%\"], \"string\")\ncChange = Col(\"变化\", [\"+15 项\",\"-8 项\",\"-11 小时\",\"+30 个百分点\"], \"string\")\nhint = TextContent(\"以上为内置试用样本数据，仅用于演示评估方式，不代表贵团队的真实成果。\")\nnextBtns = Buttons([Button(\"给出最终建议\", Action([@ToAssistant(\"请基于需求、85%目标和样本结果给出最终建议\")]), \"primary\")])"
+        }
+      ]
+    },
+    {
+      "id": "6da5a58c-cfb4-4e5e-842c-b2bcff12dff8",
+      "role": "user",
+      "parts": [
+        {
+          "type": "text",
+          "text": "请基于需求、85%目标和样本结果给出最终建议"
+        }
+      ]
+    },
+    {
+      "id": "4d09024d-c47b-47c8-b104-0e62fcd92a09",
+      "role": "assistant",
+      "metadata": {
+        "uiState": {
+          "$show": null,
+          "$showRec": null,
+          "下一步": {
+            "下一步": {
+              "value": "extend"
+            }
+          }
+        }
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([pageHeader, recCallout, riskCallout, nextForm, summaryCard], \"column\", \"l\")\npageHeader = CardHeader(\"第五步：决策闭环\", \"星河设计 · 团队版 · 目标完成率 85%\")\nrecCallout = Callout(\"success\", \"建议：正式采用团队版\", \"样本完成率90%达到你们85%的目标，逾期和交接时长明显改善，且团队版完全覆盖3人、5项目和客户只读的需求，无需升级专业版。\", $showRec)\nriskCallout = TextCallout(\"warning\", \"需要注意的风险\", \"样本数据仅代表演示环境，不构成采购依据。建议正式采用后保留每周复盘：若出现审批、审计需求或活跃项目超过20个，再评估专业版；若团队扩张超过15人，需重新确认档位。\")\nnextForm = Form(\"下一步\", nextButtons, [fChoice])\nfChoice = FormControl(\"选择下一步行动\", RadioGroup(\"下一步\", [r1, r2, r3], \"adopt\"))\nr1 = RadioItem(\"确认采用团队版\", \"按当前试点任务清单正式启用\", \"adopt\")\nr2 = RadioItem(\"继续延长试用\", \"再用两周观察客户协作效果\", \"extend\")\nr3 = RadioItem(\"调整后再评估\", \"先解决阻塞问题的责任人确认\", \"adjust\")\nnextButtons = Buttons([Button(\"确认下一步\", Action([@ToAssistant(\"我已确认下一步行动，请给出行动摘要\")]), \"primary\")])\nsummaryCard = Card([sumHeader, sumList], \"sunk\")\nsumHeader = CardHeader(\"行动摘要\", \"选型流程回顾\")\nsumList = ListBlock([li1, li2, li3, li4], \"number\")\nli1 = ListItem(\"需求梳理\", \"3人团队、5个活跃项目、客户只读查看\")\nli2 = ListItem(\"方案确定\", \"团队版满足全部硬性要求，无需专业版\")\nli3 = ListItem(\"两周试用\", \"按准备—第一周—第二周推进，完成率目标85%已由样本达成\")\nli4 = ListItem(\"效果评估\", \"完成率90%、逾期4项、交接7小时（内置试用样本）\")\n$showRec = true"
+        }
+      ]
+    },
+    {
+      "id": "885ce601-e34d-46b4-a935-9bea417d8813",
+      "role": "user",
+      "parts": [
+        {
+          "type": "text",
+          "text": "我已确认下一步行动，请给出行动摘要\n下一步：下一步：extend"
+        }
+      ]
+    },
+    {
+      "id": "37ee5190-6807-4127-b498-6034dbb89f65",
+      "role": "assistant",
+      "metadata": {
+        "uiState": {
+          "$showChoice": null
+        }
+      },
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([pageHeader, choiceCallout, summaryCard, noteCard, tipCallout], \"column\", \"l\")\npageHeader = CardHeader(\"行动摘要\", \"星河设计 · 团队版 · 已确认下一步\")\nchoiceCallout = Callout(\"info\", \"已确认：继续延长试用\", \"再用两周观察客户只读协作是否持续减少反复沟通，重点跟踪阻塞任务的解决情况；期间暂不采购，延长观察不改变当前团队版方案。\", $showChoice)\nsummaryCard = Card([sumHeader, sumList], \"sunk\")\nsumHeader = CardHeader(\"选型全程回顾\", \"从需求到决策的四个阶段\")\nsumList = ListBlock([li1, li2, li3, li4, li5], \"number\")\nli1 = ListItem(\"需求梳理\", \"3人团队、5个活跃项目、需要客户只读查看\")\nli2 = ListItem(\"方案确定\", \"团队版为满足硬性要求的最低档，无需专业版\")\nli3 = ListItem(\"两周试用\", \"准备—第一周—第二周三阶段推进，目标完成率85%\")\nli4 = ListItem(\"效果分析\", \"样本完成率90%、逾期4项、交接7小时（内置试用样本）\")\nli5 = ListItem(\"当前决定\", \"延长试用两周，继续观察客户协作效果与阻塞处理\")\nnoteCard = Card([noteHeader, noteTable], \"clear\")\nnoteHeader = CardHeader(\"延长试用期间的关注点\", \"下一轮复盘建议核对\")\nnoteTable = Table([cItem, cFocus])\ncItem = Col(\"关注项\", [\"客户只读访客使用情况\", \"阻塞任务（客户资料未到齐）\", \"截止提醒效果\", \"活跃项目数变化\"])\ncFocus = Col(\"观察要点\", [\"客户是否主动查看、追问是否减少\", \"责任人与跟进时间是否明确\", \"逾期是否维持在低位\", \"是否接近20个项目上限\"])\ntipCallout = TextCallout(\"neutral\", \"提醒\", \"本次样本数据仅用于演示评估方式，延长试用后请以贵团队真实运行数据作为最终采购依据。\")\n$showChoice = true"
+        }
+      ]
+    }
+  ]
+}

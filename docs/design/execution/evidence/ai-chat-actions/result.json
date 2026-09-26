@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "checks": [
+    "status only during generation",
+    "completed icon actions",
+    "copy rendered text with success/failure feedback",
+    "regenerate and stop clear transient state",
+    "reload and mobile touch targets"
+  ],
+  "provider": "live Coding Plan"
+}

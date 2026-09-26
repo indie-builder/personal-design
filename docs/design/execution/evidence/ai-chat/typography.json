@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "values": {
+    "header": "15px",
+    "message": "14px",
+    "cardTitle": "16px",
+    "table": "13px",
+    "input": "16px",
+    "placeholder": "14px",
+    "menuTarget": 44
+  }
+}

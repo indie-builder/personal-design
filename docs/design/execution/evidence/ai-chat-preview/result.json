@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "checks": [
+    "visible preview animates six coordinated elements",
+    "offscreen animations pause",
+    "background visibility policy pauses playback",
+    "1440px: thinking, card reveal and completed chart/action frames",
+    "390px: thinking, card reveal and completed chart/action frames",
+    "reduced motion shows the completed static preview",
+    "one native project link; no model requests or nested controls",
+    "project opens normally"
+  ]
+}

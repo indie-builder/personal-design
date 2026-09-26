@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "actionPayloadPreserved": true,
+  "checks": [
+    {
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "answerOverflow": [],
+      "errors": 0,
+      "primary": [
+        1,
+        1,
+        1
+      ],
+      "destructivePrimary": 0,
+      "disabled": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "answerOverflow": [],
+      "errors": 0,
+      "primary": [
+        1,
+        1,
+        1
+      ],
+      "destructivePrimary": 0,
+      "disabled": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "answerOverflow": [],
+      "errors": 0,
+      "primary": [
+        1,
+        1,
+        1
+      ],
+      "destructivePrimary": 0,
+      "disabled": true
+    }
+  ]
+}

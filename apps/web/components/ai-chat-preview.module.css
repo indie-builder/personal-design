@@ -1,0 +1,35 @@
+.surface { --preview-play-state:paused; position:relative; width:100%; height:100%; padding:12px 18px; display:flex; flex-direction:column; justify-content:center; gap:10px; background:var(--color-paper); color:var(--color-ink); font:400 12px/1.4 var(--font-sans); pointer-events:none; }
+.surface[data-running] { --preview-play-state:running; }
+.question { align-self:flex-end; padding:6px 12px; border-radius:14px 14px 4px 14px; background:var(--color-subtle); }
+.reply { position:relative; height:110px; flex:none; }
+.answer { position:absolute; inset:0; border:1px solid var(--color-hairline-strong); border-radius:12px; padding:10px 12px; }
+.heading { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.heading strong { font-size:12px; font-weight:550; }
+.heading small { color:var(--color-ink-soft); font-size:10px; }
+.chart { display:grid; gap:5px; margin-top:9px; }
+.chart > div { display:grid; grid-template-columns:28px minmax(0,1fr) 28px; align-items:center; gap:8px; font-size:10px; }
+.chart > div > i { display:block; height:7px; border-radius:3px; background:var(--color-plate); overflow:hidden; }
+.chart b { display:block; height:100%; border-radius:3px; transform-origin:left; }
+.before { width:60%; background:var(--color-control-border); }
+.after { width:90%; background:var(--color-ink); }
+.chart em { font-style:normal; text-align:right; font-variant-numeric:tabular-nums; }
+.followUp { display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:3px 8px; border:1px solid var(--color-hairline-strong); border-radius:999px; font-size:10px; }
+.thinking { position:absolute; top:16px; left:12px; display:flex; gap:5px; opacity:0; }
+.thinking i { width:4px; height:4px; border-radius:50%; background:var(--color-ink-soft); }
+.thinking i:nth-child(2) { opacity:.65; }
+.thinking i:nth-child(3) { opacity:.35; }
+@media(prefers-reduced-motion:no-preference) {
+  .surface[data-motion] .question { animation:question 8s var(--ease-out) infinite both; }
+  .surface[data-motion] .thinking { animation:thinking 8s ease infinite both; }
+  .surface[data-motion] .answer { animation:answer 8s var(--ease-out) infinite both; }
+  .surface[data-motion] .before { animation:beforeBar 8s var(--ease-out) infinite both; }
+  .surface[data-motion] .after { animation:afterBar 8s var(--ease-out) infinite both; }
+  .surface[data-motion] .followUp { animation:followUp 8s var(--ease-out) infinite both; }
+  .surface[data-motion] :is(.question,.thinking,.answer,.before,.after,.followUp) { animation-play-state:var(--preview-play-state); }
+}
+@keyframes question { 0% { opacity:0; transform:translateY(6px); } 6%,88% { opacity:1; transform:translateY(0); } 96%,100% { opacity:0; transform:translateY(-4px); } }
+@keyframes thinking { 0%,8%,26%,100% { opacity:0; } 12%,20% { opacity:1; } }
+@keyframes answer { 0%,22% { opacity:0; transform:translateY(8px); } 30%,88% { opacity:1; transform:translateY(0); } 96%,100% { opacity:0; transform:translateY(-4px); } }
+@keyframes beforeBar { 0%,34% { transform:scaleX(0); } 46%,100% { transform:scaleX(1); } }
+@keyframes afterBar { 0%,40% { transform:scaleX(0); } 54%,100% { transform:scaleX(1); } }
+@keyframes followUp { 0%,54% { opacity:0; transform:translateY(4px); } 62%,88% { opacity:1; transform:translateY(0); } 96%,100% { opacity:0; transform:translateY(-4px); } }

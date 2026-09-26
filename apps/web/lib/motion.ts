@@ -36,7 +36,7 @@ export function playExit(
     { opacity: 1, transform: 'none' },
     { opacity: 0, transform: 'translateX(28px) scale(.98)' },
   ],
-  options: { duration?: number; hold?: boolean } = {},
+  options: { duration?: number; hold?: boolean; easing?: string } = {},
 ) {
   const duration = options.duration ?? 180;
   if (!element || instantMotion() || document.hidden) {
@@ -45,7 +45,7 @@ export function playExit(
   }
   const animation = element.animate(frames, {
     duration,
-    easing: 'cubic-bezier(.4,0,.8,.6)',
+    easing: options.easing ?? 'cubic-bezier(.4,0,.8,.6)',
     fill: 'forwards',
   });
   let settled = false;

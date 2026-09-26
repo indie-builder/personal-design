@@ -74,4 +74,15 @@ export const products: Product[] = [
     stats: [],
     line: 'tools' as const,
   },
+  {
+    slug: 'ai-chat',
+    name: 'AI 问答',
+    tagline: '和智能体一起，把问题想清楚',
+    description: '选择或创建智能体，用文字、表格和交互卡片展开对话。',
+    date: '2026-09-26',
+    href: '/products/ai-chat',
+    cover: '',
+    stats: [],
+    line: 'tools' as const,
+  },
 ].sort((a, b) => a.date.localeCompare(b.date));

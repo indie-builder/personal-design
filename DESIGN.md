@@ -39,6 +39,24 @@ colors:
   book-paper: "#f5f1e7"
   book-ink: "#38362e"
   book-muted: "#625c50"
+  chat-bubble: "#edf3fc"
+  chat-primary: "#31588e"
+  chat-primary-hover: "#dbe9ff"
+  chat-focus: "#6a8cbb"
+  chat-selected: "#e7f0ff"
+  dark-chat-bubble: "#29374b"
+  dark-chat-primary: "#b8d4ff"
+  dark-chat-primary-hover: "#395578"
+  dark-chat-focus: "#9abdef"
+  dark-chat-selected: "#2c4161"
+  answer-chart-slate: "#526c7b"
+  answer-chart-mist: "#8a9ba7"
+  answer-chart-sage: "#788f7e"
+  answer-chart-sand: "#a18b6e"
+  dark-answer-chart-slate: "#b0c5d2"
+  dark-answer-chart-mist: "#788f9f"
+  dark-answer-chart-sage: "#a3b9a5"
+  dark-answer-chart-sand: "#c3ac8e"
 typography:
   workspace-title: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "17px", "fontWeight": 600, "lineHeight": 1.3, "letterSpacing": "0"}
   workspace-title-mobile: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "16px", "fontWeight": 600, "lineHeight": 1.3, "letterSpacing": "0"}
@@ -50,6 +68,14 @@ typography:
   body: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "14px", "fontWeight": 400, "lineHeight": 1.75, "letterSpacing": "0"}
   control: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "14px", "fontWeight": 500, "lineHeight": "22px", "letterSpacing": "0"}
   caption: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "13px", "fontWeight": 400, "lineHeight": 1.75, "letterSpacing": "0"}
+  answer-body: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "13px", "fontWeight": 400, "lineHeight": 1.65, "letterSpacing": "0"}
+  answer-label: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "12px", "fontWeight": 500, "lineHeight": 1.5, "letterSpacing": "0"}
+  answer-caption: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "12px", "fontWeight": 400, "lineHeight": 1.5, "letterSpacing": "0"}
+  answer-heading: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "15px", "fontWeight": 600, "lineHeight": 1.5, "letterSpacing": "0"}
+  answer-metric: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "18px", "fontWeight": 550, "lineHeight": 1.5, "letterSpacing": "0"}
+  answer-input: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "13px", "fontWeight": 400, "lineHeight": "20px", "letterSpacing": "0"}
+  answer-code: {"fontFamily": "SFMono-Regular, Menlo, monospace", "fontSize": "12px", "fontWeight": 400, "lineHeight": 1.6, "letterSpacing": "0"}
+  answer-control: {"fontFamily": "'Albert Sans', -apple-system, system-ui, 'PingFang SC', 'Microsoft YaHei', sans-serif", "fontSize": "13px", "fontWeight": 500, "lineHeight": "20px", "letterSpacing": "0"}
 rounded:
   xs: "2px"
   control: "4px"
@@ -58,10 +84,19 @@ rounded:
   panel: "16px"
   pill: "999px"
   circle: "50%"
+  chat-panel: "20px"
+  chat-composer: "16px"
+  chat-frame: "24px"
+  chat-drawer: "24px 0 0 24px"
+  chat-bubble: "16px 16px 5px 16px"
+  chat-field: "10px"
+  answer-field: "10px"
+  answer-group: "10px"
 spacing:
   page-x: "48px"
   page-x-compact: "24px"
   page-x-mobile: "20px"
+  answer-group: "12px"
 components:
   button-default:
     backgroundColor: "{colors.paper}"
@@ -90,6 +125,18 @@ components:
     rounded: "{rounded.circle}"
     width: "44px"
     height: "44px"
+  answer-action:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.paper}"
+    typography: "{typography.answer-control}"
+    rounded: "{rounded.answer-field}"
+    padding: "10px 12px"
+    width: "100%"
+  chat-composer:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.chat-composer}"
+    padding: "6px 8px 6px 12px"
 ---
 
 # Personal Design · 全站设计标准
@@ -100,7 +147,7 @@ components:
 
 采用 OpenDesign 中性视觉语言、Albert Sans 与中文零字距。页面保持开放、轻量，真实作品承担视觉表达；控件在操作时给出明确反馈。实体书材质仅用于布局参考书架、画册及首页对应预览；灵感集采用作品网格和详情阅读。
 
-**状态：现行标准；更新日期：2026-09-25。** 本文件是全站视觉与交互规范，不是历史变更日志，也不是全站已通过无障碍或视觉验收的认证。
+**状态：现行标准；更新日期：2026-09-26。** 本文件是全站视觉与交互规范，不是历史变更日志，也不是全站已通过无障碍或视觉验收的认证。
 
 **Key Characteristics:**
 
@@ -113,7 +160,7 @@ components:
 
 用户最新明确决定优先；产品与内容边界见 [PRODUCT.md](PRODUCT.md)，页面流程见 [设计文档入口](docs/design/README.md)。本文件规定现行视觉标准，CSS 与组件是实现证据；发现偏差必须记录并处理，不得仅因为代码已存在就将偏差改写为规则。
 
-顶部 tokens 与 `.impeccable/design.json` 是源码核对后的文档快照，不参与运行时主题计算。运行时 token 统一在 [globals.css](apps/web/app/globals.css)，组件状态在相邻 CSS Module。改动时同步对应规范，避免再追加“前条由后条覆盖”的时间线。
+顶部 tokens 与 `.impeccable/design.json` 是源码核对后的文档快照，不参与运行时主题计算。全站运行时 token 统一在 [globals.css](apps/web/app/globals.css)，获准的局部 token 与组件状态在相邻 CSS Module。改动时同步对应规范，避免再追加“前条由后条覆盖”的时间线。
 
 [OpenDesign 迁移说明](docs/design/open-design/rules.md) 解释来源与有意适配；`source/`、历史交付报告与旧截图只作证据，不是当前页面要求。不恢复原项目的运行时、菜单或 Agent 指令。
 
@@ -140,6 +187,8 @@ components:
 ### 局部材质
 
 `book-*` 仅用于实体书表面；书脊的前景／背景配对、尺寸以 [layout-bookshelf.tsx](apps/web/components/layout-bookshelf.tsx) 的 bindings 为准。米白纸面在双主题下保持材质色，外围工具栏仍跟随全站主题。灯箱采用局部恒定暗房与亮色焦点环。
+
+AI 问答的 `chat-*` / `dark-chat-*` 仅作用于聊天页：`bubble` 标识用户消息，`selected` 标识选中项与发送操作底色，`primary` 用于输入光标，`primary-hover` 是其悬停底色，`focus` 用于焦点。所有图标复用中性 `ink` / `ink-soft`，不设独立蓝色图标色；浅蓝仅承载消息角色与选中、焦点等交互状态。页面、输入区、弹窗和回答卡片仍使用全站中性 `workspace` / `paper` / `plate`，不扩展为全站品牌色。
 
 线路色虽仍在源码中保留，但不属于当前可用视觉色板；LED 色不再列入规范。真实媒体自身颜色不受中性色约束。
 
@@ -177,6 +226,7 @@ AI Coding 词典为用户确认的局部例外：保留全屏参考图谱，并�
 | 灵感网格 | 最大1440px；4列，1199px以下3列、759px以下2列、359px以下1列，纵向自动追加 |
 | 灵感详情 | 开放阅读布局，图片保持比例，视频按剩余视口适配 |
 | AI Coding 词典 | 全屏原版图谱、左上角悬浮标题导航；桌面右侧阅读面 clamp(340px,34vw,520px)，800px 及以下为底部 68dvh 非模态阅读面，保留图谱可见区域 |
+| AI 问答 | 所有视口优先沿用移动视觉与交互；桌面居中480px窄框，宽屏时高calc(100dvh - 32px)、上下16px留白，外层返回标题独立悬浮不占据手机框布局；不足800px时页头预留72px避免重叠，639px及以下移除外框；消息区独立滚动，空态和有消息时输入区均常驻底部 |
 | 布局旧作品链接 | 定位同一画册的对应书页；有图时直接放大 |
 | 个人网站介绍 | 外层最大 1296px，桌面左右 48px，正文说明最大 68ch |
 
@@ -199,6 +249,8 @@ AI Coding 词典为用户确认的局部例外：保留全屏参考图谱，并�
 
 通用分类为无外框下划线标签；灵感分类使用同一套标签。灵感媒体沿用8px圆角。两集合使用即时搜索输入，支持清除和斜杠聚焦，不需要提交。书脊、封面和装订允许自己的不对称微圆角。保留的 `card` / `panel` token 不意味着需要为内容新建面板。
 
+AI 问答是已确认的局部圆角适配：输入区统一使用 `chat-composer`，创建智能体页面与桌面窄框使用 `chat-frame`，贴齐其左侧的抽屉使用 `chat-drawer`，手机均取消外框圆角；用户消息使用 `chat-bubble` 非对称圆角，创建页字段使用 `chat-field`，生成回答字段使用 `answer-field`，只读表格容器使用 `answer-group`；头像使用既有 `media`（8px），会话列表使用既有 `card`，智能体下拉列表使用既有 `panel`。生成回答的通用 Card、选择行和编辑条目不设外框或圆角。生成回答文字动作使用同字段的10px圆角；这一局部例外不改变全站共享胶囊按钮、聊天导航／发送图标按钮或媒体规则。
+
 ## Components
 
 ### 按钮与图标
@@ -213,6 +265,20 @@ AI Coding 词典为用户确认的局部例外：保留全屏参考图谱，并�
 - 精细指针悬停改变对应表面；按下缩至 .96。键盘及减少动态效果取消空间反馈。
 
 完整用途与例外见 [控件标准](docs/design/controls/README.md)。
+
+### AI 问答的局部适配
+
+回答使用 OpenUI 官方完整组件库和移动端适配渲染，沿项目中性主题与字体；所有视口都按320–480px手机容器组织，桌面窄框采用相同尺寸。通用 Card 是无外框内容组；单选、多选使用整行点击、细线分隔和中性选中底色。回答、官方portal与编辑确认／撤销操作区占满可用宽度，间距8px：单个按钮满行；内容容器宽于320px时两个短操作等宽并排；容器不宽于320px或操作数达到三个时全部纵向满行。每组最多一个primary，以填充／描边／文字样式区分主次；重复primary及破坏性primary降为secondary，保持动作顺序与payload。编辑确认用primary、撤销用描边default。文字按钮填满所在列或整行，圆角10px与输入框一致，文字13px／20px行盒、内边距10px 12px、最小高44px；不再使用靠边小胶囊或区分可见表面与触控的透明边界；回答图标统一14px、1.6线宽，不加装饰徽章。Select和DatePicker使用原生控件，EditableTable保留逐项展开、确认／撤销，条目以分隔线组织。只读表格保留单一边界和内部横滑；优先突出2–4个核心维度是阅读建议，更多维度通过分组或横滑保留完整数据；指标为紧凑标签／数值行。折线、面积和竖向柱状图默认240px绘图区；其他图表按其adapter核对。多个维度建议使用少量分段标签或分组，保留全部必要数据；所有图表类型共享 `answer-chart-*` 亮暗主题配色，以低饱和灰蓝、灰绿和砂色区分系列。`ai-chat.module.css` 的 `.page --chat-*` 提供外壳与回答共用的语义尺寸，`ai-chat-ui.module.css` 的 `answer-*` 继承对应值，官方 body portal 与图表 tooltip 也显式提供同一尺寸作用域；`ai-chat-ui-theme.ts` 映射官方字号、间距、圆角与各图表 palette，回答组间距为12px；移动适配器维持单列内容，动作组按上述容器宽度和数量规则组织。默认内置“轻舟协作”五阶段业务案例，入口直接描述业务需求，不要求用户指定 OpenUI 或组件。该案例使用明确标识的内置样本，业务流程留在默认智能体。通用生成回答按任务组织，可仅有内容，不强制表单、按钮或逐阶段流程；必要字段和数据不能因视觉建议删除。通用组件职责、边界状态及执行位置见 [OpenUI移动端组件契约](docs/design/controls/openui-mobile.md)。
+
+Tabs／Accordion／Chips控件文字13px；表格数据13px、表头12px，单元格内边距8px 12px。单选／多选行上下内边距6px，OptionCard内边距10px并随内容增高；Switch行上下内边距2px。保留回答组间距12px、表单间距16px、既有240px图表设定，圆图不加220px上限。
+
+辅助说明统一12px，包括 InlineHeader、列表、开关、提示块与指标附属文字。代码使用 `answer-code` 等宽角色，中性底色、8px圆角，复制按钮常显；不继承正文的比例字体。Switch保留44×44px真实按钮，内部绘制28×18px轨道。单选／多选只取消内部指示器的重复焦点环，OptionCard保留自己的可见焦点。禁用主操作、强调边界、highlight及sunk状态统一映射项目中性色。组件源审查与浏览器覆盖范围见 [AI 问答一致性审查](docs/design/execution/ai-chat-consistency-audit.md)。
+
+用户截图与首版移动布局为此页面的构图依据，所有视口优先保留移动端的窄幅、字号、留白与交互：原有 Menu 会话记录按钮在左、智能体头像与名称居中（头像使用用户提供的图片，32px，8px圆角）、Plus 新对话按钮在右。空态欢迎语与三个纵向问题选项位于消息区，每项为自然语言问题及一句结果说明，无图标或快捷键，输入区在空态和有消息时均常驻底部；示例点击后直接发送生成请求，不在输入区下方另放建议或免责声明。智能体选择器打开页头下方居中的原生 auto popover 列表，宽屏距视口顶部100px、手机156px；创建操作进入覆盖整个手机视口／桌面窄框的独立表单页（直接在聊天容器内 absolute/inset:0 定位，不进入浏览器 top layer）：顶部返回按钮与居中标题，正文填写名称和系统提示词，底部常驻单一全宽创建按钮。进入不自动聚焦输入框；名称回车转入提示词；返回或 Esc 回到智能体列表并保留本次草稿，成功创建后清空草稿。正文可独立滚动，手机上按 visualViewport 的可见高度调整，避免键盘遮住提交区。Menu 打开与窄框等高、左边缘对齐、最大340px的导航抽屉：框外共享页头常驻“← AI 问答”返回入口，抽屉顶部为“对话”标题，右侧关闭；下方仅保留新对话与可滚动历史记录，不展示外观入口或保存位置说明。共享页头位于手机展示框外，使用其他作品的字号和对齐；800px及以上独立绝对定位，不挤压手机框，窄屏预留页头行避免导航重叠；手机框内仅有应用的智能体和对话导航。回答等待提示仅生成时显示，结束后显示中性圆形复制／重新生成图标，触控区域44px；复制取渲染后的文字并显示成功或失败反馈。问答页不显示主题切换控件。回到最新消息按钮位于手机框水平中央、输入区上方。内层工具栏为82px覆盖层，消息起始留出相应空间；手动向上滑动阅读时以180ms向上位移并淡出，反向滚动恢复，不改变消息区高度；自动跟随回答不触发隐藏。键盘、减少动态效果即时切换，隐藏栏 inert。
+
+沿用全站字体与中文零字距；聊天外壳所有视口页头与创建页标题15px / 550，欢迎标题15px / 500，消息与列表13px，消息行高1.65，导航标题15px；按钮13px、表单标签12px，外壳及回答图标14px。外壳与生成回答共用语义字号，前述 `answer-*` token 记录其回答映射；全部实际输入值统一13px / 400，`--chat-input-size` 直接引用正文尺寸；包括文本、邮箱、密码、数字、URL、多行、已选下拉、日期、滑块数值、编辑表格、输入区、创建页及portal字段。实际值、占位与空／已选下拉统一13px，聚焦前后同号；仅字段标签、说明、校验提示和组件副说明保留12px。OpenUI及创建页字段采用20px行盒、8px 12px内边距、10px圆角和至少44px触控；生成TextArea最小80px，可随行数自然增高。保留浏览器原生缩放，不添加禁缩放viewport。输入区内边距为6px 8px 6px 12px；同角色组件不另设尺寸。桌面不放大字号或间距。用户消息使用局部 `chat-bubble`。智能体创建仅保留名称与系统提示词。
+
+**输入区单一轮廓规则：** 聚焦时整个输入区呈现2px局部蓝色轮廓、偏移−1px，原边框透明；textarea 无内层边框、轮廓或投影。智能体列表行的2px焦点环内偏2px，避免滚动容器裁切；创建页字段的焦点环内偏1px以合并边框；其他可聚焦控件的局部焦点环外偏3px。发送和停止按钮以 `chat-selected` 底配中性 `ink` 图标；禁用时回归中性底色与辅助文字色。焦点、原生 dialog 的 Esc 与关闭后焦点恢复、减少动态效果路径均保留。
 
 ### 分类与主题
 
@@ -272,6 +338,11 @@ AI Coding 词典为用户确认的局部例外：保留全屏参考图谱，并�
 | 灵感切卷反馈 | 卷盘260ms旋转／透明度反馈；键盘／减少动态效果取消动画 |
 | 灵感专注进入／返回 | 右侧进入220ms位移／透明度，返回160ms退场后恢复全览；键盘／减少动态效果即时，无dialog或FLIP |
 | 灯箱 | 指针进入 200ms、退出 140ms；键盘即时 |
+| AI 问答首页预览 | 8秒一轮，提问→等待→卡片→图表→追问，末段淡出 | 离屏／后台暂停；键盘／减少动态效果为静态完成态 | 仅transform/opacity，不请求模型 |
+| AI 问答下拉 | 从触发点下方展开180ms，收回140ms；原生 display/overlay 离散过渡保留退出层 |
+| AI 问答导航 | 面板在固定裁切区内向右滑入220ms、向左退出180ms；遮罩同步淡变，不越出手机框 |
+| AI 问答创建页 | 框内从右进入240ms，返回从当前位置向右退出180ms，退出后提交状态并恢复焦点 |
+| AI 问答消息反馈 | 新消息首次出现180ms；不重播历史或每个流式片段。发送／停止图标140ms；等待点仅生成中循环 |
 
 这些时长记录已选定的指针效果，不作为所有输入方式必须播放的时长。体验验收以以下状态矩阵为准；是否缩短指针展示时长另作设计决策，不能因“数字符合表格”就认定体验通过。
 

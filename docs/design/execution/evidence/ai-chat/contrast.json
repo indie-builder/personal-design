@@ -1,0 +1,14 @@
+[
+  {
+    "role": "composer-focus-light",
+    "foreground": "#6a8cbb",
+    "background": "#ffffff",
+    "ratio": 3.45
+  },
+  {
+    "role": "composer-focus-dark",
+    "foreground": "#9abdef",
+    "background": "#202020",
+    "ratio": 8.46
+  }
+]

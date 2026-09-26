@@ -1,0 +1,323 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "width": 320,
+      "theme": "light",
+      "groups": [
+        {
+          "width": 280,
+          "columns": 1,
+          "primary": 1,
+          "buttons": [
+            {
+              "label": "Submit",
+              "width": 280,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "Cancel",
+              "width": 280,
+              "height": 44,
+              "left": 0,
+              "top": 52,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        },
+        {
+          "width": 280,
+          "columns": 1,
+          "primary": 0,
+          "buttons": [
+            {
+              "label": "确认修改",
+              "width": 280,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "撤销修改",
+              "width": 280,
+              "height": 44,
+              "left": 0,
+              "top": 52,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        },
+        {
+          "width": 280,
+          "columns": 1,
+          "primary": 1,
+          "buttons": [
+            {
+              "label": "Save",
+              "width": 280,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        },
+        {
+          "width": 280,
+          "columns": 1,
+          "primary": 1,
+          "buttons": [
+            {
+              "label": "主操作",
+              "width": 280,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "次操作",
+              "width": 280,
+              "height": 44,
+              "left": 0,
+              "top": 52,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "文字操作",
+              "width": 280,
+              "height": 44,
+              "left": 0,
+              "top": 104,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "groups": [
+        {
+          "width": 350,
+          "columns": 2,
+          "primary": 1,
+          "buttons": [
+            {
+              "label": "Submit",
+              "width": 171,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "Cancel",
+              "width": 171,
+              "height": 44,
+              "left": 179,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        },
+        {
+          "width": 350,
+          "columns": 2,
+          "primary": 0,
+          "buttons": [
+            {
+              "label": "确认修改",
+              "width": 171,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "撤销修改",
+              "width": 171,
+              "height": 44,
+              "left": 179,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        },
+        {
+          "width": 350,
+          "columns": 2,
+          "primary": 1,
+          "buttons": [
+            {
+              "label": "Save",
+              "width": 350,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        },
+        {
+          "width": 350,
+          "columns": 1,
+          "primary": 1,
+          "buttons": [
+            {
+              "label": "主操作",
+              "width": 350,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "次操作",
+              "width": 350,
+              "height": 44,
+              "left": 0,
+              "top": 52,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "文字操作",
+              "width": 350,
+              "height": 44,
+              "left": 0,
+              "top": 104,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "groups": [
+        {
+          "width": 438,
+          "columns": 2,
+          "primary": 1,
+          "buttons": [
+            {
+              "label": "Submit",
+              "width": 215,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "Cancel",
+              "width": 215,
+              "height": 44,
+              "left": 223,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        },
+        {
+          "width": 438,
+          "columns": 2,
+          "primary": 0,
+          "buttons": [
+            {
+              "label": "确认修改",
+              "width": 215,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "撤销修改",
+              "width": 215,
+              "height": 44,
+              "left": 223,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        },
+        {
+          "width": 438,
+          "columns": 2,
+          "primary": 1,
+          "buttons": [
+            {
+              "label": "Save",
+              "width": 438,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        },
+        {
+          "width": 438,
+          "columns": 1,
+          "primary": 1,
+          "buttons": [
+            {
+              "label": "主操作",
+              "width": 438,
+              "height": 44,
+              "left": 0,
+              "top": 0,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "次操作",
+              "width": 438,
+              "height": 44,
+              "left": 0,
+              "top": 52,
+              "radius": "10px",
+              "font": "13px"
+            },
+            {
+              "label": "文字操作",
+              "width": 438,
+              "height": 44,
+              "left": 0,
+              "top": 104,
+              "radius": "10px",
+              "font": "13px"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

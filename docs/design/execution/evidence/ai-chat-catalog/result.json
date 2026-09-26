@@ -1,0 +1,46 @@
+{
+  "checks": [
+    {
+      "theme": "light",
+      "width": 320,
+      "overflow": false,
+      "errors": [],
+      "fonts": [],
+      "switches": [
+        {
+          "w": 44,
+          "h": 44
+        }
+      ],
+      "buttons": []
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "overflow": false,
+      "errors": [],
+      "fonts": [],
+      "switches": [
+        {
+          "w": 44,
+          "h": 44
+        }
+      ],
+      "buttons": []
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "overflow": false,
+      "errors": [],
+      "fonts": [],
+      "switches": [
+        {
+          "w": 44,
+          "h": 44
+        }
+      ],
+      "buttons": []
+    }
+  ]
+}

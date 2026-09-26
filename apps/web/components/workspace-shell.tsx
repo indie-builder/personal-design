@@ -75,6 +75,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     (product) => pathname === product.href || pathname.startsWith(`${product.href}/`),
   );
   const title = currentProduct?.name ?? '作品时间轴';
+  const isChat = currentProduct?.slug === 'ai-chat';
   const isLanding = isHome || pathname === currentProduct?.href;
 
   function navigate(href: string, scroll?: boolean) {
@@ -241,12 +242,12 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   return (
     <WorkspaceNavigationContext.Provider value={navigate}>
       <WorkspaceBackContext.Provider value={setBack}>
-        <div ref={shell} className={styles.shell}>
+        <div ref={shell} className={`${styles.shell} ${isChat ? styles.chatShell : ''}`}>
           <a href="#workspace-content" className={styles.skip}>
             跳至内容
           </a>
           <header
-            className={`${styles.header} ${isHome ? '' : styles.innerHeader} ${currentProduct?.slug === 'ai-coding-dictionary' ? styles.canvasHeader : ''}`}
+            className={`${styles.header} ${isHome ? '' : styles.innerHeader} ${currentProduct?.slug === 'ai-coding-dictionary' ? styles.canvasHeader : ''} ${isChat ? styles.chatHeader : ''}`}
           >
             <div className={styles.identity}>
               {isHome && <TaichiAvatar />}
@@ -291,7 +292,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                 </WorkspaceLink>
               )}
             </div>
-            <ThemeToggle />
+            <ThemeToggle hidden={isChat} />
           </header>
           <div id="workspace-content" tabIndex={-1} className={styles.content}>
             {children}

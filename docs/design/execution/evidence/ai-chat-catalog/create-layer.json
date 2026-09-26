@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "width": 320,
+      "theme": "light",
+      "titleVisible": true,
+      "backVisible": true,
+      "titleSize": "15px",
+      "inside": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "titleVisible": true,
+      "backVisible": true,
+      "titleSize": "15px",
+      "inside": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "titleVisible": true,
+      "backVisible": true,
+      "titleSize": "15px",
+      "inside": true
+    }
+  ]
+}
