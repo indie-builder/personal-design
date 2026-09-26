@@ -3,10 +3,12 @@
   "checks": [
     "Pi NDJSON renders with the current official schema",
     "restored context, no host tools",
-    "summary compression and memory delivery",
+    "structured submission reaches current and restored Pi context without losing zero, false or arrays",
+    "summary input includes structured form context and memory delivery",
     "one automatic repair reconnects orphaned action",
     "provider failure is not reported as success",
     "abort and next request",
-    "body, origin and schema validation"
+    "body, origin and schema validation",
+    "submission shape and size validation"
   ]
 }

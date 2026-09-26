@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { EventType, openAIReadableStreamAdapter } from '@openuidev/react-headless';
 import {
   metadataSchema,
+  messageSchema,
+  type FormSubmission,
   type Agent,
   type ChatMessage,
   type Conversation,
@@ -49,9 +51,10 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
           signal: requestController.signal,
           body: JSON.stringify({
             agent,
-            messages: history
-              .slice(boundary + 1)
-              .map(({ metadata: _metadata, ...message }) => message),
+            messages: history.slice(boundary + 1).map(({ metadata, ...message }) => ({
+              ...message,
+              ...(metadata?.submission ? { metadata: { submission: metadata.submission } } : {}),
+            })),
             ...(boundary >= 0 ? { memory } : {}),
           }),
         });
@@ -102,11 +105,26 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
     [agent, commit],
   );
   const sendMessage = useCallback(
-    (text: string) =>
-      run([
-        ...current.current,
-        { id: crypto.randomUUID(), role: 'user', parts: [{ type: 'text', text }] },
-      ]),
+    (text: string, submission?: FormSubmission) => {
+      try {
+        // Snapshot ActionEvent state as JSON, matching OpenUI's context serialization.
+        const message = messageSchema.parse(
+          JSON.parse(
+            JSON.stringify({
+              id: crypto.randomUUID(),
+              role: 'user',
+              parts: [{ type: 'text', text }],
+              ...(submission ? { metadata: { submission } } : {}),
+            }),
+          ),
+        );
+        return run([...current.current, message]);
+      } catch {
+        setError(new Error('提交内容过长或格式不正确，请检查后重试。'));
+        setStatus('error');
+        return Promise.resolve();
+      }
+    },
     [run],
   );
   const regenerate = useCallback(() => {

@@ -1,4 +1,4 @@
-import { requestSchema } from '@personal-design/ai-chat';
+import { modelMessageContent, requestSchema } from '@personal-design/ai-chat';
 
 import openuiPrompt from '@/lib/openui-system-prompt.json';
 import { createParser } from '@openuidev/lang-core';
@@ -43,7 +43,12 @@ export async function POST(request: Request) {
   } catch {
     return new Response('请求格式有误，请重新发送。', { status: 400 });
   }
-  const parsed = requestSchema.safeParse(payload);
+  let parsed;
+  try {
+    parsed = requestSchema.safeParse(payload);
+  } catch {
+    return new Response('对话格式有误或过长，请新建对话后重试。', { status: 400 });
+  }
   if (!parsed.success || parsed.data.messages.at(-1)?.role !== 'user') {
     return new Response('对话格式有误或过长，请新建对话后重试。', { status: 400 });
   }
@@ -56,7 +61,7 @@ export async function POST(request: Request) {
     let memory = parsed.data.memory;
     let history = parsed.data.messages;
     const characters = history.reduce(
-      (count, message) => count + message.parts.reduce((size, part) => size + part.text.length, 0),
+      (count, message) => count + modelMessageContent(message).length,
       0,
     );
     if (history.length > 16 || characters > 24000) {
@@ -67,7 +72,7 @@ export async function POST(request: Request) {
         let batch = '';
         for (let index = 0; index < older.length; index++) {
           const message = older[index]!;
-          batch += `\n${message.role}: ${message.parts.map((part) => part.text).join('\n')}`;
+          batch += `\n${message.role}: ${modelMessageContent(message)}`;
           if (batch.length < 18000 && index < older.length - 1) continue;
           const result = await provider.runtime.completeSimple(
             provider.model,
@@ -150,12 +155,7 @@ export async function POST(request: Request) {
           try {
             abortSignal.throwIfAborted();
             emit({ role: 'assistant' });
-            await session.prompt(
-              history
-                .at(-1)!
-                .parts.map((p) => p.text)
-                .join('\n'),
-            );
+            await session.prompt(modelMessageContent(history.at(-1)!));
             abortSignal.throwIfAborted();
             const last = session.messages.at(-1);
             if (

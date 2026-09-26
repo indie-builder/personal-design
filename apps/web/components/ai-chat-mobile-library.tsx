@@ -1,6 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+  type SyntheticEvent,
+  type KeyboardEvent,
+} from 'react';
 import { ChevronDown } from 'lucide-react';
 import {
   createLibrary,
@@ -12,10 +21,43 @@ import {
   useTriggerAction,
 } from '@openuidev/react-lang';
 // Share the entry point with ThemeProvider so chart/portal contexts are identical.
-import { openuiLibrary, type EditableTableColumn } from '@openuidev/react-ui';
+import {
+  openuiLibrary,
+  SliderBlock as OpenUISliderBlock,
+  type EditableTableColumn,
+} from '@openuidev/react-ui';
 import { uniqueOpenUiReferences } from '@/lib/openui-content';
 import { Button } from './button';
 import styles from './ai-chat-ui.module.css';
+
+export const AnswerReadOnlyContext = createContext(false);
+
+// Disable mutations at their component boundary, not the whole answer.
+// Fieldsets handle native controls; capture guards also cover Radix slider spans.
+function EditBoundary({ children }: { children: ReactNode }) {
+  const readOnly = useContext(AnswerReadOnlyContext);
+  const block = (event: SyntheticEvent) => {
+    if (!readOnly) return;
+    if (event.type !== 'pointerdown') event.preventDefault();
+    event.stopPropagation();
+  };
+  return (
+    <fieldset
+      className={styles.editBoundary}
+      disabled={readOnly}
+      aria-disabled={readOnly || undefined}
+      data-edit-boundary=""
+      onPointerDownCapture={block}
+      onClickCapture={block}
+      onChangeCapture={block}
+      onKeyDownCapture={(event: KeyboardEvent) => {
+        if (event.key !== 'Tab') block(event);
+      }}
+    >
+      {children}
+    </fieldset>
+  );
+}
 
 function useMobileField(
   name: string,
@@ -24,6 +66,7 @@ function useMobileField(
   dateRange = false,
 ) {
   const field = useStateField(name, value);
+  const readOnly = useContext(AnswerReadOnlyContext);
   const streaming = useIsStreaming();
   const validation = useFormValidation();
   const rangeValue = field.value;
@@ -45,8 +88,11 @@ function useMobileField(
   return {
     ...field,
     streaming,
+    disabled: streaming || readOnly,
     invalid: !!validation?.errors[field.name],
+    validate: (value: unknown) => validation?.validateField(field.name, value, rules),
     change: (next: unknown) => {
+      if (readOnly || streaming) return;
       field.setValue(next);
       validation?.clearFieldError(field.name);
     },
@@ -65,7 +111,7 @@ const Select = defineComponent({
         name={field.name}
         aria-label={props.name}
         aria-invalid={field.invalid}
-        disabled={field.streaming}
+        disabled={field.disabled}
         value={String(field.value ?? '')}
         onChange={(e) => field.change(e.target.value)}
       >
@@ -105,7 +151,7 @@ const DatePicker = defineComponent({
               className={styles.mobileControl}
               type="date"
               aria-label={`${props.name}开始日期`}
-              disabled={field.streaming}
+              disabled={field.disabled}
               value={from}
               max={to || undefined}
               onChange={(e) => field.change({ from: e.target.value, to })}
@@ -117,7 +163,7 @@ const DatePicker = defineComponent({
               className={styles.mobileControl}
               type="date"
               aria-label={`${props.name}结束日期`}
-              disabled={field.streaming}
+              disabled={field.disabled}
               value={to}
               min={from || undefined}
               onChange={(e) => field.change({ from, to: e.target.value })}
@@ -134,9 +180,34 @@ const DatePicker = defineComponent({
         name={field.name}
         aria-label={props.name}
         aria-invalid={field.invalid}
-        disabled={field.streaming}
+        disabled={field.disabled}
         value={dateValue(field.value)}
         onChange={(e) => field.change(e.target.value)}
+      />
+    );
+  },
+});
+
+const Slider = defineComponent({
+  ...openuiLibrary.components.Slider!,
+  component: function MobileSlider({ props }) {
+    const field = useMobileField(props.name, props.value ?? props.defaultValue, props.rules);
+    return (
+      <OpenUISliderBlock
+        name={field.name}
+        label={props.label || field.name}
+        variant={props.variant}
+        min={props.min}
+        max={props.max}
+        step={props.step}
+        defaultValue={field.value as number[] | undefined}
+        disabled={field.disabled}
+        isStreaming={field.streaming}
+        onValueCommit={(values) => {
+          if (field.disabled) return;
+          field.change(values);
+          field.validate(values[0]);
+        }}
       />
     );
   },
@@ -147,6 +218,7 @@ const EditableTable = defineComponent({
   ...openuiLibrary.components.EditableTable!,
   component: function MobileEditableTable({ props }) {
     const field = useStateField(props.name, props.data);
+    const readOnly = useContext(AnswerReadOnlyContext);
     const streaming = useIsStreaming();
     const trigger = useTriggerAction();
     const columns: EditableTableColumn[] = props.columns || [];
@@ -157,6 +229,7 @@ const EditableTable = defineComponent({
       if (!streaming && baseline === null) setBaseline(snapshot);
     }, [streaming, baseline, snapshot]);
     function change(rowId: string, index: number, value: string | number) {
+      if (readOnly || streaming) return;
       field.setValue(
         rows.map((row) =>
           row.id !== rowId
@@ -167,7 +240,11 @@ const EditableTable = defineComponent({
     }
     const dirty = baseline !== null && baseline !== snapshot;
     return (
-      <div className={styles.mobileEditable} data-mobile-editable>
+      <div
+        className={styles.mobileEditable}
+        data-mobile-editable
+        data-read-only={readOnly || undefined}
+      >
         {rows.map((row, index) => (
           <details key={row.id} className={styles.editableItem} open={index === 0}>
             <summary>
@@ -182,7 +259,7 @@ const EditableTable = defineComponent({
                     <select
                       className={styles.mobileControl}
                       aria-label={column.header}
-                      disabled={streaming}
+                      disabled={streaming || readOnly}
                       value={String(row.values?.[i] ?? '')}
                       onChange={(e) => change(row.id, i, e.target.value)}
                     >
@@ -207,7 +284,7 @@ const EditableTable = defineComponent({
                               : 'text'
                       }
                       inputMode={column.type === 'number' ? 'decimal' : undefined}
-                      disabled={streaming}
+                      disabled={streaming || readOnly}
                       value={row.values?.[i] ?? ''}
                       onChange={(e) =>
                         change(
@@ -229,7 +306,7 @@ const EditableTable = defineComponent({
           <div className={styles.mobileEditActions}>
             <Button
               variant="primary"
-              disabled={streaming}
+              disabled={streaming || readOnly}
               onClick={() => {
                 trigger(`请根据我更新的${props.name || '条目'}继续`);
                 setBaseline(snapshot);
@@ -239,7 +316,7 @@ const EditableTable = defineComponent({
             </Button>
             <Button
               variant="default"
-              disabled={streaming}
+              disabled={streaming || readOnly}
               onClick={() => field.setValue(JSON.parse(baseline!))}
             >
               撤销修改
@@ -263,19 +340,42 @@ function actionHierarchy(buttons: unknown) {
   });
 }
 
-const adaptations = { Select, DatePicker, EditableTable };
+const adaptations = { Select, DatePicker, Slider, EditableTable };
+const editableComponents = new Set([
+  'Input',
+  'TextArea',
+  'Select',
+  'DatePicker',
+  'Slider',
+  'CheckBoxGroup',
+  'RadioGroup',
+  'SwitchGroup',
+  'Chips',
+  'OptionCards',
+  'Button',
+  'IconButton',
+]);
+const actionBlocks = new Set([
+  'SnippetCardBlock',
+  'OverviewCardBlock',
+  'ContextCardBlock',
+  'CompositeCardBlock',
+  'VisualCardBlock',
+]);
 export const mobileOpenuiLibrary = createLibrary({
   root: 'Stack',
-  components: Object.values(openuiLibrary.components).map((component) => {
-    if (component.name in adaptations)
-      return adaptations[component.name as keyof typeof adaptations];
+  components: Object.values(openuiLibrary.components).map((definition) => {
+    const component =
+      definition.name in adaptations
+        ? adaptations[definition.name as keyof typeof adaptations]
+        : definition;
     if (
+      !editableComponents.has(component.name) &&
+      !actionBlocks.has(component.name) &&
       ![
         'Stack',
         'Card',
         'Buttons',
-        'OverviewCardBlock',
-        'OptionCards',
         'IconText',
         'BarChart',
         'LineChart',
@@ -283,46 +383,66 @@ export const mobileOpenuiLibrary = createLibrary({
         'HorizontalBarChart',
         'RadarChart',
         'ScatterChart',
+        'ListBlock',
       ].includes(component.name)
     )
       return component;
     const Original = component.component;
     return defineComponent({
       ...component,
-      component: ({ props, ...rest }) => (
-        <Original
-          {...rest}
-          props={{
-            ...props,
-            ...(['Stack', 'Card'].includes(component.name)
-              ? {
-                  children: uniqueOpenUiReferences(props.children),
-                  direction: 'column',
-                  wrap: false,
-                  gap: 'm',
-                  ...(component.name === 'Card' ? { variant: 'clear' } : {}),
-                }
-              : {}),
-            ...(component.name === 'Buttons'
-              ? { direction: 'row', buttons: actionHierarchy(props.buttons) }
-              : {}),
-            ...(component.name === 'IconText'
-              ? { layout: 'horizontal', iconVariant: 'neutral', iconSize: 's' }
-              : {}),
-            ...(component.name === 'OverviewCardBlock' ? { layout: 'grid', responsive: true } : {}),
-            ...([
-              'BarChart',
-              'LineChart',
-              'AreaChart',
-              'HorizontalBarChart',
-              'RadarChart',
-              'ScatterChart',
-            ].includes(component.name)
-              ? { height: 240 }
-              : {}),
-          }}
-        />
-      ),
+      component: function MobileComponent({ props, ...rest }) {
+        const readOnly = useContext(AnswerReadOnlyContext);
+        const content = (
+          <Original
+            {...rest}
+            props={{
+              ...props,
+              ...(['Stack', 'Card'].includes(component.name)
+                ? {
+                    children: uniqueOpenUiReferences(props.children),
+                    direction: 'column',
+                    wrap: false,
+                    gap: 'm',
+                    ...(component.name === 'Card' ? { variant: 'clear' } : {}),
+                  }
+                : {}),
+              ...(component.name === 'Buttons'
+                ? { direction: 'row', buttons: actionHierarchy(props.buttons) }
+                : {}),
+              ...(component.name === 'IconText'
+                ? { layout: 'horizontal', iconVariant: 'neutral', iconSize: 's' }
+                : {}),
+              ...(component.name === 'OverviewCardBlock'
+                ? { layout: 'grid', responsive: true }
+                : {}),
+              ...([
+                'BarChart',
+                'LineChart',
+                'AreaChart',
+                'HorizontalBarChart',
+                'RadarChart',
+                'ScatterChart',
+              ].includes(component.name)
+                ? { height: 240 }
+                : {}),
+              ...(readOnly && actionBlocks.has(component.name) ? { action: undefined } : {}),
+              ...(readOnly && component.name === 'ListBlock'
+                ? {
+                    items: (props.items || []).map((item: { props?: Record<string, unknown> }) => ({
+                      ...item,
+                      props: { ...item.props, action: undefined },
+                    })),
+                  }
+                : {}),
+            }}
+          />
+        );
+        return editableComponents.has(component.name) ? (
+          <EditBoundary>{content}</EditBoundary>
+        ) : (
+          content
+        );
+      },
     });
   }),
 });

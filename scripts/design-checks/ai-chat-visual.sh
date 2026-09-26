@@ -14,6 +14,7 @@ const fixture=JSON.parse(await fs.readFile(config.root+'/scripts/design-checks/f
 await p.goto(config.base+'/products/ai-chat');await p.evaluate(c=>{const key='personal-design:ai-chat:v1';if(JSON.parse(localStorage.getItem(key)||'{}').conversations?.some(x=>x.id!=='case-fixture'))throw new Error('Contains user records');localStorage.setItem(key,JSON.stringify({agents:[],conversations:[c]}));},fixture);await p.reload();await p.waitForSelector('[data-answer-body]');
 const measurements=[];
 for(const [width,height,theme,index,file] of [[1440,900,'light',0,'desktop.png'],[817,860,'light',0,'user-width-817.png'],[390,844,'light',0,'mobile.png'],[320,844,'light',0,'mobile-320.png'],[390,844,'light',3,'mobile-data.png'],[390,844,'dark',2,'mobile-dark-editor.png']]){
+ if(file==='mobile-dark-editor.png'){await p.evaluate(c=>{const i=c.messages.findLastIndex(m=>m.parts.some(p=>p.type==='text'&&p.text.includes('EditableTable(')));c.messages.push(...c.messages.splice(i,1));localStorage.setItem('personal-design:ai-chat:v1',JSON.stringify({agents:[],conversations:[c]}));},fixture);await p.reload();await p.waitForSelector('[data-mobile-editable]');}
  await p.cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<640});await p.evaluate(t=>document.documentElement.dataset.theme=t,theme);
  await p.evaluate(i=>{const s=document.querySelector('[aria-label="对话"] > div'),t=document.querySelectorAll('[data-answer-body]')[i];s.scrollTop+=t.getBoundingClientRect().top-s.getBoundingClientRect().top-96;},index);
  if(file==='mobile-dark-editor.png'){
@@ -26,6 +27,7 @@ for(const [width,height,theme,index,file] of [[1440,900,'light',0,'desktop.png']
  const hints=await p.evaluate(()=>[...document.querySelectorAll('.ai-openui .openui-hint,.ai-openui .openui-header-bottom,.ai-openui .openui-text-block__secondary')].map(e=>getComputedStyle(e,e.hasAttribute('placeholder')?'::placeholder':null).fontSize));assert(hints.every(size=>size==='12px'));const placeholders=await p.evaluate(()=>[...document.querySelectorAll('.ai-openui input[placeholder],.ai-openui textarea[placeholder]')].map(e=>getComputedStyle(e,'::placeholder').fontSize));assert(placeholders.every(size=>size==='13px'));
  measurements.push({file,...m});await p.screenshot({path:out+'/'+file});
 }
+await p.evaluate(c=>localStorage.setItem('personal-design:ai-chat:v1',JSON.stringify({agents:[],conversations:[c]})),fixture);await p.reload();await p.waitForSelector('[data-answer-body]');
 await p.cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
 const chartChecks=[];
 for(const [theme,tab,file,expected] of [['light','趋势','mobile-chart.png','rgb(138, 155, 167)'],['light','任务分布','mobile-distribution.png','rgb(138, 155, 167)'],['dark','趋势','mobile-chart-dark.png','rgb(120, 143, 159)'],['dark','任务分布','mobile-distribution-dark.png','rgb(120, 143, 159)']]){

@@ -28,8 +28,10 @@ import {
   type Agent,
   type ChatMessage,
   type Conversation,
+  type FormSubmission,
   type SavedChat,
 } from '@personal-design/ai-chat';
+import { SubmittedForm } from './ai-chat-submission';
 import { instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
 import { Button, buttonClassName } from './button';
 import { GeneratedAnswer } from './ai-chat-ui';
@@ -630,13 +632,13 @@ function ConversationView({
   }, [atBottom]);
 
   const send = useCallback(
-    (text: string) => {
+    (text: string, submission?: FormSubmission) => {
       const value = text.trim();
       if (!value || busy || value.length > 4000) return;
       clearError();
       setInput('');
       setAtBottom(true);
-      void sendMessage(value);
+      void sendMessage(value, submission);
     },
     [busy, clearError, sendMessage],
   );
@@ -718,13 +720,19 @@ function ConversationView({
                 aria-label={message.role === 'user' ? '你的问题' : `${agent.name}的回答`}
               >
                 {message.role === 'user' ? (
-                  <p>{text}</p>
+                  <>
+                    <p>{text}</p>
+                    {message.metadata?.submission && (
+                      <SubmittedForm submission={message.metadata.submission} />
+                    )}
+                  </>
                 ) : (
-                  <fieldset className={styles.answerContent} disabled={busy}>
+                  <div className={styles.answerContent}>
                     <div data-answer-body>
                       <GeneratedAnswer
                         text={text}
                         streaming={streaming}
+                        readOnly={busy || index !== messages.length - 1}
                         onReply={send}
                         initialState={message.metadata?.uiState}
                         onStateUpdate={(state) => updateUiState(message.id, state)}
@@ -776,7 +784,7 @@ function ConversationView({
                         )}
                       </div>
                     )}
-                  </fieldset>
+                  </div>
                 )}
               </article>
             );

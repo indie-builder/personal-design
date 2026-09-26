@@ -9,6 +9,7 @@ CONFIG
 cat <<'JS'
 const assert=(await import('node:assert/strict')).default;const fs=await import('node:fs/promises');
 const task=await taskSpace(config.space);const p=task.page('p1');const fixture=JSON.parse(await fs.readFile(config.root+'/scripts/design-checks/fixtures/ai-chat-case.json','utf8'));
+fixture.messages=fixture.messages.slice(0,fixture.messages.findLastIndex(m=>m.parts.some(p=>p.type==='text'&&p.text.includes('EditableTable(')))+1);
 const out=config.root+'/docs/design/execution/evidence/ai-chat-mobile';await fs.mkdir(out,{recursive:true});const checks=[];
 await p.goto(config.base+'/products/ai-chat');
 await p.evaluate(c=>{const key='personal-design:ai-chat:v1';if(JSON.parse(localStorage.getItem(key)||'{}').conversations?.some(x=>!['case-fixture','component-fixture'].includes(x.id)))throw new Error('Contains user records');localStorage.setItem(key,JSON.stringify({agents:[],conversations:[c]}));},fixture);
@@ -36,7 +37,7 @@ for(const [width,theme] of [[320,'light'],[390,'dark'],[1440,'light']]){
 await p.evaluate(()=>{window.__mobileRequest=null;const original=window.fetch;window.fetch=async(...args)=>{if(String(args[0]).includes('/api/ai-chat')){window.__mobileRequest=JSON.parse(args[1].body);return new Response([{role:'assistant'},{content:'root = Stack([TextContent("已收到修改后的试点任务。")]);'},{}].map((delta,i)=>JSON.stringify({choices:[{index:0,delta,finish_reason:i===2?'stop':null}]})).join('\n')+'\n',{headers:{'Content-Type':'application/x-ndjson'}});}return original(...args);};});
 await p.fill('[data-mobile-editable] details[open] input[type="text"]','确认后的移动端项目');await p.click('button:text-is("确认修改")');
 await p.waitForFunction(()=>!!window.__mobileRequest&&!document.querySelector('[data-generation-status]'));
-assert(await p.evaluate(()=>window.__mobileRequest.messages.at(-1).parts[0].text.includes('确认后的移动端项目')));
+assert(await p.evaluate(()=>!window.__mobileRequest.messages.at(-1).parts[0].text.includes('确认后的移动端项目')&&JSON.stringify(window.__mobileRequest.messages.at(-1).metadata.submission.formState).includes('确认后的移动端项目')));
 checks.push('confirm edits sends values through the official action callback');
 await p.reload();await p.cdp('Emulation.clearDeviceMetricsOverride');
 await fs.writeFile(out+'/result.json',JSON.stringify({passed:true,checks},null,2)+'\n');console.log(checks);

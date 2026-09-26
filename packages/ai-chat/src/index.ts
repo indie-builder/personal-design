@@ -81,8 +81,17 @@ export const memorySchema = z.object({
   summary: z.string().min(1).max(12000),
   throughId: z.string().min(1).max(100),
 });
+export const submissionSchema = z.object({
+  formName: z.string().max(200).optional(),
+  formState: z
+    .record(z.string(), z.json())
+    .refine((state) => JSON.stringify(state).length <= 60000, 'Form submission is too large'),
+});
+// Raw ActionEvent input; messageSchema validates it before persistence and transport.
+export type FormSubmission = { formName?: string; formState: Record<string, unknown> };
 export const metadataSchema = z.object({
   memory: memorySchema.optional(),
+  submission: submissionSchema.optional(),
   uiState: z.record(z.string(), z.unknown()).optional(),
 });
 export const messageSchema = z.object({
@@ -95,6 +104,19 @@ export const messageSchema = z.object({
     .max(8),
 });
 export type ChatMessage = z.infer<typeof messageSchema>;
+
+// OpenUI's content/context envelope keeps display text separate from model context.
+export function modelMessageContent(message: ChatMessage): string {
+  const text = message.parts.map((part) => part.text).join('\n');
+  const submission = message.role === 'user' ? message.metadata?.submission : undefined;
+  if (!submission) return text;
+  const context = [
+    `User clicked: ${text}`,
+    submission.formState,
+    ...(submission.formName ? [{ formName: submission.formName }] : []),
+  ];
+  return `]]>openui:content\n${text}\n]]>openui:context\n${JSON.stringify(context)}`;
+}
 export const requestSchema = z.object({
   agent: agentSchema,
   messages: z.array(messageSchema).min(1).max(100),
