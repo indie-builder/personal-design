@@ -2,6 +2,7 @@ import { readFile, writeFile, rename } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { translateEntry } from './translate-claude.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const repo = 'indie-builder/dictionary-of-ai-coding';
@@ -9,16 +10,9 @@ const catalogPath = join(root, 'catalog.json');
 const sourcePath = join(root, 'source.json');
 const source = JSON.parse(await readFile(sourcePath, 'utf8'));
 const previous = JSON.parse(await readFile(catalogPath, 'utf8'));
-const headers = { 'User-Agent': 'personal-design-dictionary-sync' };
 
 function gh(...args) {
   return execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
-}
-
-async function getJson(url) {
-  const response = await fetch(url, { headers });
-  if (!response.ok) throw new Error(`${response.status} ${url}`);
-  return response.json();
 }
 
 function getText(path, revision) {
@@ -76,57 +70,6 @@ function parseEntry(name, section, text, names) {
   };
 }
 
-function chunks(text) {
-  const parts = [];
-  while (text.length > 400) {
-    let cut = Math.max(
-      text.lastIndexOf('. ', 400),
-      text.lastIndexOf('! ', 400),
-      text.lastIndexOf('? ', 400),
-      text.lastIndexOf(' ', 400),
-    );
-    if (cut < 200) cut = 400;
-    parts.push(text.slice(0, cut + 1));
-    text = text.slice(cut + 1);
-  }
-  if (text) parts.push(text);
-  return parts;
-}
-
-async function translate(text, terms) {
-  const pattern = new RegExp(
-    `(?<![A-Za-z])(?:${terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(?![A-Za-z])`,
-    'gi',
-  );
-  const saved = [];
-  const protectedText = text.replace(pattern, (term) => {
-    const key = `ZXQ${String(saved.length).padStart(3, '0')}QXZ`;
-    saved.push([key, term]);
-    return key;
-  });
-  const translated = [];
-  for (const chunk of chunks(protectedText)) {
-    const url = new URL('https://api.mymemory.translated.net/get');
-    url.searchParams.set('q', chunk);
-    url.searchParams.set('langpair', 'en|zh-CN');
-    const result = await getJson(url);
-    if (
-      result.responseStatus !== 200 ||
-      result.quotaFinished ||
-      !result.responseData?.translatedText
-    )
-      throw new Error('Translation service unavailable or quota exhausted; catalog preserved');
-    translated.push(result.responseData.translatedText);
-  }
-  let result = translated.join('');
-  for (const [key, term] of saved) {
-    if (!result.includes(key))
-      throw new Error(`Translation lost protected term ${term}; catalog preserved`);
-    result = result.replaceAll(key, term);
-  }
-  return result;
-}
-
 const revision = gh('api', `repos/${repo}/commits/main`, '--jq', '.sha').trim();
 const tree = JSON.parse(gh('api', `repos/${repo}/git/trees/${revision}?recursive=1`));
 if (tree.truncated) throw new Error('GitHub tree truncated; catalog preserved');
@@ -142,7 +85,10 @@ const files = Object.fromEntries(
 const changed = [...new Set([...Object.keys(files), ...Object.keys(source.files)])].filter(
   (path) => files[path] !== source.files[path],
 );
-if (!changed.length) {
+const needsBackfill = previous.entries.some(
+  (entry) => entry.body.zh.length !== entry.body.en.length,
+);
+if (!changed.length && !needsBackfill) {
   console.log('AI Coding 词典已是最新');
   process.exit(0);
 }
@@ -174,15 +120,28 @@ for (const [section, group] of sectionData.entries()) {
   for (const term of group.terms) {
     const path = `dictionary/${term}.md`;
     if (!files[path]) throw new Error(`Missing source file: ${path}`);
-    let entry = oldEntries.get(term);
-    if (!entry || files[path] !== source.files[path]) {
-      entry = parseEntry(term, section, getText(path, revision), names);
-      entry.description.zh = await translate(entry.description.en, terms);
-      entry.body.zh = [];
-      for (const paragraph of entry.body.en) entry.body.zh.push(await translate(paragraph, terms));
+    const old = oldEntries.get(term);
+    const sourceChanged = !old || files[path] !== source.files[path];
+    let entry = sourceChanged
+      ? {
+          ...parseEntry(term, section, getText(path, revision), names),
+          summary: old?.summary,
+        }
+      : { ...old, section };
+    if (sourceChanged || entry.body.zh.length !== entry.body.en.length) {
+      entry = translateEntry(entry, terms, { translateDescription: sourceChanged });
       translatedCount++;
-      console.log(`已更新 ${term}`);
-    } else entry = { ...entry, section };
+      console.log(`已完整翻译 ${term}`);
+    }
+    if (
+      entry.body.zh.length !== entry.body.en.length ||
+      entry.body.zh.some(
+        (paragraph, index) =>
+          !paragraph.trim() ||
+          (entry.body.en[index]?.length > 80 && !/\p{Script=Han}/u.test(paragraph)),
+      )
+    )
+      throw new Error(`Incomplete bilingual body: ${term}; catalog preserved`);
     entries.push(entry);
   }
 }

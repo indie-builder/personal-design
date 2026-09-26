@@ -33,7 +33,7 @@ Co-Authored-By: (the agent model's name and attribution byline)
 | Browser regression suite | `node scripts/design-checks/run-all.mjs`（先 `pnpm build && pnpm start`，`DESIGN_BASE_URL` 指定地址，默认 3000；汇总全部行为脚本，任一失败非零退出） |
 | Sync layout images | `pnpm sync:layouts`（幂等，已生成的 WebP 会跳过） |
 | Sync inspora 数据 | `pnpm sync:inspora`（增量；`-- --full` 全量 backfill；需先 `pnpm --filter @personal-design/inspora exec playwright install chromium`） |
-| Sync AI Coding 词典 | `pnpm sync:ai-coding-dictionary`（按上游文件 SHA 增量；变更词条自动中译，失败保留旧目录） |
+| Sync AI Coding 词典 | `pnpm sync:ai-coding-dictionary`（按上游文件 SHA 增量；通过本机默认 `claude -p` 逐段完整翻译变更词条，失败保留旧目录） |
 
 ## Testing Rules
 

@@ -6,6 +6,16 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const source = join(root, 'upstream');
 const destination = join(root, '../../apps/web/public/ai-coding-atlas');
 const catalog = JSON.parse(await readFile(join(root, 'catalog.json'), 'utf8'));
+for (const entry of catalog.entries)
+  if (
+    entry.body.zh.length !== entry.body.en.length ||
+    entry.body.zh.some(
+      (paragraph, index) =>
+        !paragraph.trim() ||
+        (entry.body.en[index]?.length > 80 && !/\p{Script=Han}/u.test(paragraph)),
+    )
+  )
+    throw new Error(`词条 ${entry.term} 缺少与英文段落对应的完整中文翻译`);
 const original = JSON.parse(await readFile(join(source, 'atlas.json'), 'utf8'));
 const initialLocation = await readFile(join(root, 'runtime/initial-location.js'), 'utf8');
 const focusSpacing = await readFile(join(root, 'runtime/focus-spacing.js'), 'utf8');
@@ -55,7 +65,7 @@ const nodes = entries
         ...new Set([
           ...(old?.aliases ?? []),
           entry.description.zh,
-          ...chineseSearchTerms([entry.description.zh, ...entry.body.zh].join(' ')),
+          ...chineseSearchTerms([entry.description.zh, entry.summary?.zh ?? ''].join(' ')),
         ]),
       ],
       links: entry.related.filter((term) => names.has(term)).map(slug),
