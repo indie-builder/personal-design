@@ -13,13 +13,3 @@ export function paramsHref(path: string, params: URLSearchParams, updates: Recor
   }
   return `${path}${params.size ? `?${params}` : ''}`;
 }
-
-/** Rewrite the current history entry (or push one) with query updates applied. */
-export function updateParams(updates: Record<string, string>, push = false, state: unknown = null) {
-  const href = paramsHref(
-    window.location.pathname,
-    new URLSearchParams(window.location.search),
-    updates,
-  );
-  window.history[push ? 'pushState' : 'replaceState'](state, '', href);
-}

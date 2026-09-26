@@ -2,6 +2,12 @@
 
 用户要求整体重新设计，并明确首页承担菜单、不要全站菜单。旧全站交付报告只记录历史，不证明本轮结果。
 
+> **状态（2026-09-27）**：本轮属历史交付记录。其验收脚本已由现行套件取代并被移除：
+> `v2-foundation`、`v2-home`、`v2-muse`、`v2-layouts`、`v2-muse-video-viewport`、`v2-capture`
+> 在移除前对当前生产构建逐一运行即失败（断言的是旧版页面结构与命名），不再可复现。
+> 现行行为的回归以 `node scripts/design-checks/run-all.mjs` 为准；
+> 仍可运行的 `v2-muse-spinner.mjs` 保留作诊断。下文对本轮脚本的引用按历史记录阅读。
+
 ## 方案与覆盖
 
 - [完整目标](../../goals/ui-ux-redesign-v2.md)
