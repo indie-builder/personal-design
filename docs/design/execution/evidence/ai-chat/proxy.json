@@ -1,0 +1,10 @@
+{
+  "base": "https://personal-design.localhost",
+  "passed": true,
+  "checks": [
+    "HTTPS proxy same-host request passes origin validation",
+    "cross-host request blocked",
+    "opaque origin blocked",
+    "missing Zhipu key clearly reported over HTTPS proxy"
+  ]
+}

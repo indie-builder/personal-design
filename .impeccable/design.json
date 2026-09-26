@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-12T05:04:51.146073+00:00",
+  "generatedAt": "2026-09-26T09:38:17.375Z",
   "title": "Design System: Personal Design 产品集",
   "extensions": {
     "colorMeta": {
@@ -411,6 +411,78 @@
       "book-muted": {
         "role": "secondary",
         "displayName": "book-muted"
+      },
+      "chat-bubble": {
+        "role": "secondary",
+        "displayName": "AI 问答用户消息底色（亮色，局部）"
+      },
+      "chat-primary": {
+        "role": "secondary",
+        "displayName": "AI 问答输入光标（亮色，局部）"
+      },
+      "chat-primary-hover": {
+        "role": "secondary",
+        "displayName": "AI 问答发送／停止悬停底色（亮色，局部）"
+      },
+      "chat-focus": {
+        "role": "secondary",
+        "displayName": "AI 问答焦点（亮色，局部）"
+      },
+      "chat-selected": {
+        "role": "secondary",
+        "displayName": "AI 问答选中及发送底色（亮色，局部）"
+      },
+      "dark-chat-bubble": {
+        "role": "secondary",
+        "displayName": "AI 问答用户消息底色（暗色，局部）"
+      },
+      "dark-chat-primary": {
+        "role": "secondary",
+        "displayName": "AI 问答输入光标（暗色，局部）"
+      },
+      "dark-chat-primary-hover": {
+        "role": "secondary",
+        "displayName": "AI 问答发送／停止悬停底色（暗色，局部）"
+      },
+      "dark-chat-focus": {
+        "role": "secondary",
+        "displayName": "AI 问答焦点（暗色，局部）"
+      },
+      "dark-chat-selected": {
+        "role": "secondary",
+        "displayName": "AI 问答选中及发送底色（暗色，局部）"
+      },
+      "answer-chart-slate": {
+        "role": "secondary",
+        "displayName": "生成回答图表（亮色）slate"
+      },
+      "answer-chart-mist": {
+        "role": "secondary",
+        "displayName": "生成回答图表（亮色）mist"
+      },
+      "answer-chart-sage": {
+        "role": "secondary",
+        "displayName": "生成回答图表（亮色）sage"
+      },
+      "answer-chart-sand": {
+        "role": "secondary",
+        "displayName": "生成回答图表（亮色）sand"
+      },
+      "dark-answer-chart-slate": {
+        "role": "secondary",
+        "displayName": "生成回答图表（暗色）slate"
+      },
+      "dark-answer-chart-mist": {
+        "role": "secondary",
+        "displayName": "生成回答图表（暗色）mist"
+      },
+      "dark-answer-chart-sage": {
+        "role": "secondary",
+        "displayName": "生成回答图表（暗色）sage"
+      },
+      "dark-answer-chart-sand": {
+        "role": "secondary",
+        "displayName": "生成回答图表（暗色）sand"
       }
     },
     "shadows": [
@@ -478,7 +550,41 @@
         "name": "timeline-wide",
         "value": "1440px"
       }
-    ]
+    ],
+    "typographyMeta": {
+      "answer-body": {
+        "displayName": "生成回答正文",
+        "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+      },
+      "answer-label": {
+        "displayName": "生成回答标签与动作",
+        "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+      },
+      "answer-caption": {
+        "displayName": "生成回答说明",
+        "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+      },
+      "answer-heading": {
+        "displayName": "生成回答标题",
+        "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+      },
+      "answer-metric": {
+        "displayName": "生成回答指标",
+        "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+      },
+      "answer-input": {
+        "displayName": "生成回答原生输入",
+        "purpose": "实际输入、占位与空／已选下拉统一正文13px，包括外壳与portal；字段行盒20px，标签与辅助说明12px。"
+      },
+      "answer-code": {
+        "displayName": "生成回答代码",
+        "purpose": "12px等宽代码角色；中性代码表面，复制按钮常显。"
+      },
+      "answer-control": {
+        "displayName": "生成回答控件",
+        "purpose": "动作、Tabs、Accordion与Chips使用13px；动作20px行盒、44px触控。"
+      }
+    }
   },
   "components": [
     {
@@ -534,6 +640,14 @@
       "description": "页头产品名称承载返回首页入口；不新增产品菜单。",
       "html": "<a class=\"ds-brand\" href=\"/\" aria-label=\"布局参考，返回首页\"><svg class=\"ds-backIcon\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" aria-hidden=\"true\"><path d=\"m12 19-7-7 7-7M5 12h14\"/></svg><span>布局参考</span></a>",
       "css": ".ds-shell { min-height:100dvh; }\n.ds-header { max-width:1440px; margin:0 auto; min-height:88px; padding:20px 48px; display:flex; align-items:center; justify-content:space-between; gap:24px; }\n.ds-brand { padding:0; border:0; background:none; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:10px; min-height:44px; color:var(--color-ink); font-size:17px; font-weight:600; line-height:1.3; text-decoration:none; }\n.ds-innerHeader { min-height:72px; padding-block:12px; }\n.ds-backIcon { flex-shrink:0; color:var(--color-ink-soft); transition:transform 140ms ease-out,color 140ms ease; }\n@media(hover:hover) and (pointer:fine) {\n  .ds-brand:hover .ds-backIcon { color:var(--color-ink); transform:translateX(-2px); }\n}\n.ds-brand:focus-visible .ds-backIcon { color:var(--color-ink); }\n@media(prefers-reduced-motion:reduce) {\n  .ds-backIcon { transition:none; }\n  .ds-brand:hover .ds-backIcon { transform:none; }\n}\n.ds-content { outline:none; min-width:0; }\n.ds-skip { position:fixed; z-index:1000; top:8px; left:20px; transform:translateY(-160%); padding:10px 16px; background:var(--color-ink); color:var(--color-paper); border-radius:4px; }\n.ds-skip:focus { transform:none; }\n@media(max-width:1100px) { .ds-header { padding-inline:24px; } }\n@media(max-width:639px) { .ds-header { min-height:72px; padding:12px 20px; } .ds-brand { font-size:16px; } }\n\n.ds-brand:focus-visible { outline:2px solid var(--color-ink); outline-offset:4px; }\n\n.ds-brand h1 { margin:0; font:inherit; letter-spacing:0; }\n\n.ds-heading { margin:0; font:inherit; }\n\n.ds-identity { display:flex; align-items:center; gap:8px; }\n\n/* A single text layer carries the selected work into its page heading. */\n.ds-travelTitle { position:fixed; z-index:100; margin:0; padding:0; pointer-events:none; transform-origin:0 0; white-space:nowrap; }\n"
+    },
+    {
+      "name": "生成回答动作",
+      "kind": "button",
+      "refersTo": "answer-action",
+      "description": "单操作满宽；内容宽于320px时两项等宽，窄容器或三项以上纵向满宽；每组一个填充主操作，其余降低强调。",
+      "html": "<div class=\"ds-answer-scope\"><div class=\"ds-answer-actions\"><button class=\"ds-answer-action\">确认修改</button><button class=\"ds-answer-action ds-answer-secondary\">撤销修改</button></div></div>",
+      "css": ".ds-answer-scope { container-type:inline-size; width:100%; } .ds-answer-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:8px; } .ds-answer-action { width:100%; min-width:0; min-height:44px; padding:10px 12px; border:1px solid var(--color-ink); box-sizing:border-box; border-radius:10px; background:var(--color-ink); color:var(--color-paper); font:500 13px/20px var(--font-sans); letter-spacing:0; white-space:normal; text-align:center; cursor:pointer; } .ds-answer-action:only-child { grid-column:1 / -1; } .ds-answer-actions:has(> button:nth-child(3)) { grid-template-columns:minmax(0,1fr); } @container(max-width:320px) { .ds-answer-actions { grid-template-columns:minmax(0,1fr); } } .ds-answer-secondary { background:var(--color-paper); color:var(--color-ink); border-color:var(--color-hairline-strong); } .ds-answer-action:hover { background:var(--color-accent); } .ds-answer-secondary:hover { background:var(--color-plate); } .ds-answer-action:focus-visible { outline:2px solid var(--chat-focus, #6a8cbb); outline-offset:3px; }"
     }
   ],
   "narrative": {
@@ -554,6 +668,11 @@
       {
         "name": "回退几何稳定",
         "body": "退出最终帧保留至目标DOM提交；同一导航只由一层驱动位移，目标滚动与焦点在绘制前恢复。",
+        "section": "components"
+      },
+      {
+        "name": "输入区单一轮廓规则",
+        "body": "聚焦时整个输入区呈现2px局部蓝色轮廓、偏移−1px，原边框透明；textarea 无内层边框、轮廓或投影。",
         "section": "components"
       }
     ],

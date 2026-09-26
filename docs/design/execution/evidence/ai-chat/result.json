@@ -1,0 +1,27 @@
+{
+  "base": "http://localhost:3107",
+  "checks": [
+    "legacy rename, preserved custom agents/history and stable random avatars",
+    "original Menu/Plus, neutral background and bottom composer",
+    "disclaimer removed and outer composer focus only",
+    "empty/disabled",
+    "mobile question choices, no shortcut/icon, and generated form continuation",
+    "mobile creation screen, draft back, Escape, short viewport, narrow and landscape",
+    "agent create and persistence",
+    "OpenUI card/table/action and follow-up",
+    "generated form submission, agent system prompt and context",
+    "summary compression, recent turns, reload and summary reuse",
+    "new conversation has isolated context",
+    "agent switch and history restoration",
+    "mobile overflow, history, Escape and focus restoration",
+    "dark theme and reduced motion",
+    "abort and generation lock",
+    "plain-text fallback",
+    "invalid UI recovery",
+    "upstream failure surfaced with retry",
+    "API validation, cross-origin and body limit",
+    "sixth home entry and return navigation"
+  ],
+  "fixture": "OpenAI-compatible local provider, not live Zhipu",
+  "passed": true
+}

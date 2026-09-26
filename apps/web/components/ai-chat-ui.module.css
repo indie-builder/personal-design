@@ -1,0 +1,120 @@
+/* Generated answers inherit the site, while using a quieter mobile reading surface. */
+.generatedUi,:global([class*="openui-theme-portal-"]),:global(.openui-chart-label-tooltip) { --answer-body-size:var(--chat-body-size); --answer-label-size:var(--chat-label-size); --answer-caption-size:var(--chat-caption-size); --answer-heading-size:var(--chat-heading-size); --answer-metric-size:var(--chat-metric-size); --answer-input-size:var(--chat-input-size); --answer-icon-size:var(--chat-icon-size); --answer-control-height:var(--chat-control-height); --answer-field-radius:10px; --answer-group-radius:10px; }
+.generatedUi { width:100%; min-width:0; container-type:inline-size; color:var(--color-body); }
+.generatedUi :where(button,input,textarea,select,p,span,div,th,td,text,tspan) { font-family:var(--font-sans); letter-spacing:0; }
+.generatedUi :global(.openui-card) { padding:0; min-width:0; border:0; border-radius:0; background:transparent; box-shadow:none; }
+.generatedUi :global(.openui-header) { gap:4px; }
+.generatedUi :global(.openui-header-top-left) { font-size:var(--answer-heading-size); font-weight:600; line-height:1.45; color:var(--color-ink); }
+.generatedUi :global(.openui-header-bottom) { margin-top:4px; font-size:var(--answer-caption-size); line-height:1.6; color:var(--color-ink-soft); }
+.generatedUi :global(.openui-buttons),:global([class*="openui-theme-portal-"]) :global(.openui-buttons) { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:8px; margin-top:4px; }
+.generatedUi :global(.openui-button-base),:global([class*="openui-theme-portal-"]) :global(.openui-button-base),.mobileEditActions button { width:100%; min-width:0; min-height:var(--answer-control-height); padding:10px 12px; border-radius:var(--answer-field-radius); font-size:var(--answer-input-size); font-weight:500; line-height:20px; white-space:normal; overflow-wrap:anywhere; justify-content:center; text-align:center; }
+.generatedUi :global(.openui-icon-button) { width:var(--answer-control-height); height:var(--answer-control-height); min-width:var(--answer-control-height); border-radius:50%; }
+.generatedUi :global(.lucide) { width:var(--answer-icon-size); height:var(--answer-icon-size); stroke-width:1.6; flex-shrink:0; }
+.generatedUi :global(.openui-icon-tag) { width:24px; height:24px; border:0; border-radius:0; background:transparent; color:var(--color-ink-soft); }
+.generatedUi :global(.openui-radio-group),.generatedUi :global(.openui-checkbox-group) { gap:0; border-top:1px solid var(--color-hairline); border-bottom:1px solid var(--color-hairline); }
+.generatedUi :global(.openui-radio-item-container),.generatedUi :global(.openui-checkbox-item-container) { min-height:var(--answer-control-height); padding:6px 4px; align-items:center; gap:8px; border:0; border-radius:0; background:transparent; cursor:pointer; }
+.generatedUi :global(.openui-radio-item-container) + :global(.openui-radio-item-container),.generatedUi :global(.openui-checkbox-item-container) + :global(.openui-checkbox-item-container) { border-top:1px solid var(--color-hairline); }
+.generatedUi :global(.openui-radio-item-label),.generatedUi :global(.openui-checkbox-item-label) { font-size:var(--answer-body-size); font-weight:450; line-height:1.5; color:var(--color-ink); }
+.generatedUi :global(.openui-radio-item-description),.generatedUi :global(.openui-checkbox-item-description) { margin-top:2px; font-size:var(--answer-caption-size); line-height:1.5; color:var(--color-ink-soft); }
+.generatedUi :global(.openui-radio-item-container):has([aria-checked="true"]),.generatedUi :global(.openui-checkbox-item-container):has([aria-checked="true"]) { background:var(--color-plate); }
+.generatedUi :global(.openui-radio-item-container):has(:focus-visible),.generatedUi :global(.openui-checkbox-item-container):has(:focus-visible) { outline:2px solid var(--chat-focus); outline-offset:-2px; }
+.generatedUi :global(.openui-radio-item-root):focus-visible,.generatedUi :global(.openui-checkbox-item-root):focus-visible { outline:none; }
+.generatedUi :global(.openui-form-control) { gap:6px; }
+.generatedUi :global(.openui-label) { font-size:var(--answer-label-size); font-weight:500; line-height:1.5; color:var(--color-body); }
+.generatedUi :global(.openui-input),.generatedUi :global(.openui-textarea),.mobileControl,:global([class*="openui-theme-portal-"]) :where(:global(.openui-input),:global(.openui-textarea)) { display:block; box-sizing:border-box; width:100%; min-width:0; min-height:var(--answer-control-height); padding:8px 12px; border:1px solid var(--color-hairline-strong); border-radius:var(--answer-field-radius); background:var(--color-plate); color:var(--color-ink); font:400 var(--answer-input-size)/20px var(--font-sans); }
+.generatedUi :global(.openui-textarea),:global([class*="openui-theme-portal-"]) :global(.openui-textarea) { min-height:80px; }
+.generatedUi .mobileControl:focus-visible,.generatedUi :global(.openui-input):focus-visible,.generatedUi :global(.openui-textarea):focus-visible { border-color:transparent; outline:2px solid var(--chat-focus); outline-offset:-1px; box-shadow:none; }
+.mobileControl:disabled { opacity:.5; }
+.mobileControl[aria-invalid="true"] { border-color:var(--openui-text-danger-primary); }
+.generatedUi :global(.openui-option-cards__grid) { grid-template-columns:minmax(0,1fr); gap:8px; }
+.generatedUi :global(.openui-option-card) { min-height:var(--answer-control-height); padding:10px; border-radius:var(--answer-field-radius); box-shadow:none; }
+.generatedUi :global(.openui-tabs-list) { width:100%; gap:4px; padding:2px; border-radius:var(--answer-field-radius); background:var(--color-plate); }
+.generatedUi :global(.openui-tabs-trigger) { min-height:var(--answer-control-height); flex:1 0 auto; justify-content:center; padding:8px 12px; border-radius:8px; font-size:var(--answer-input-size); line-height:20px; }
+.generatedUi :global(.openui-tabs-trigger)[aria-selected="true"] { background:var(--color-paper); color:var(--color-ink); }
+.generatedUi :global(.openui-tabs-indicator) { display:none; }
+.generatedUi :global(.openui-accordion) { border:0; background:transparent; }
+.generatedUi :global(.openui-accordion-item) { border:0; border-top:1px solid var(--color-hairline); border-radius:0; background:transparent; }
+.generatedUi :global(.openui-accordion-trigger) { min-height:var(--answer-control-height); padding:8px 0; font-size:var(--answer-input-size); font-weight:500; line-height:1.5; }
+.generatedUi :global(.openui-table-container) { max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; border:1px solid var(--color-hairline-strong); border-radius:var(--answer-group-radius); }
+.generatedUi :where(th,td) { padding:8px 12px; font-size:var(--answer-body-size); line-height:1.6; }
+.generatedUi :where(th) { background:var(--color-plate); color:var(--color-ink-soft); font-size:var(--answer-label-size); font-weight:500; }
+.generatedUi :global(.openui-small-card-block__row),.generatedUi :global(.openui-medium-card-block__row) { display:grid; grid-template-columns:minmax(0,1fr); gap:0; }
+.generatedUi :global(.openui-overview-card) { padding:10px 0; border:0; border-bottom:1px solid var(--color-hairline); border-radius:0; background:transparent; box-shadow:none; }
+.generatedUi :global(.openui-overview-card__vertical) { display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:12px; }
+.generatedUi :global(.openui-overview-card__slot--top) { min-width:0; }
+.generatedUi :global(.openui-overview-card__slot--bottom) { flex:none; max-width:52%; text-align:right; }
+.generatedUi :global(.openui-metric-indicator__row) { flex-wrap:wrap; justify-content:flex-end; gap:4px 8px; }
+.generatedUi :global(.openui-metric-indicator__main-value) { color:var(--color-ink); font-size:var(--answer-metric-size); font-weight:550; line-height:1.3; }
+.generatedUi :global(.openui-metric-indicator__subtext) { font-size:var(--answer-caption-size); line-height:1.5; color:var(--color-ink-soft); }
+.generatedUi :global(.openui-step-title) { font-size:var(--answer-body-size); font-weight:550; }
+.generatedUi :global(.openui-step-details) { font-size:var(--answer-label-size); line-height:1.7; }
+.generatedUi :global(.openui-step-number-inner) { background:var(--color-plate); color:var(--color-ink-soft); }
+.generatedUi :global(.openui-slider-thumb) { min-width:var(--answer-control-height); min-height:var(--answer-control-height); display:grid; place-items:center; }
+.generatedUi :global(.openui-slider-wrapper) { min-height:var(--answer-control-height); }
+.mobileRange,.editableFields { display:grid; gap:12px; min-width:0; }
+.mobileRange label,.editableFields label { display:grid; gap:6px; min-width:0; font-size:var(--answer-label-size); }
+.mobileEditable { width:100%; display:grid; gap:0; border-top:1px solid var(--color-hairline); }
+.editableItem { min-width:0; border:0; border-bottom:1px solid var(--color-hairline); border-radius:0; background:transparent; }
+.editableItem summary { list-style:none; display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:var(--answer-control-height); padding:8px 0; cursor:pointer; font-size:var(--answer-body-size); font-weight:500; }
+.editableItem summary::-webkit-details-marker { display:none; }
+.editableItem summary > span { min-width:0; overflow-wrap:anywhere; }
+.editableItem[open] summary svg { transform:rotate(180deg); }
+.editableFields { padding:0 0 18px; }
+.mobileEditActions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:8px; margin-top:12px; }
+.mobileEditActions button { min-height:var(--answer-control-height); }
+.muted { color:var(--color-ink-soft); font-size:var(--answer-label-size); }
+:global(html[data-theme="dark"]) .mobileControl { color-scheme:dark; }
+.generatedUi :where(input,textarea)::placeholder,:global([class*="openui-theme-portal-"]) :where(input,textarea)::placeholder { font-size:inherit; color:var(--color-ink-soft); opacity:1; }
+.mobileControl:has(option[value=""]:checked) { color:var(--color-ink-soft); }
+.generatedUi :where(button:not([role="radio"]):not([role="checkbox"])) { min-height:var(--answer-control-height); min-width:var(--answer-control-height); }
+.generatedUi :global(.openui-select-trigger) { min-height:var(--answer-control-height); padding:8px 12px; border-radius:var(--answer-field-radius); font-size:var(--answer-input-size); line-height:20px; }
+.generatedUi :global(.openui-radio-item-root),.generatedUi :global(.openui-checkbox-item-root) { width:16px; height:16px; min-width:16px; flex:none; }
+
+/* Single actions and the final odd action occupy the complete mobile row. */
+.generatedUi :global(.openui-buttons) > button:last-child:nth-child(odd),:global([class*="openui-theme-portal-"]) :global(.openui-buttons) > button:last-child:nth-child(odd),.mobileEditActions > button:last-child:nth-child(odd) { grid-column:1 / -1; }
+
+/* All supporting copy uses the same caption scale, including native empty states. */
+.generatedUi :global(.openui-hint),.generatedUi :global(.openui-option-card__subtitle),.generatedUi :global(.openui-text-block__secondary),.generatedUi :global(.openui-text-block__tertiary),.generatedUi :global(.openui-slider-block__error-message) { font-size:var(--answer-caption-size); font-weight:400; line-height:1.5; }
+
+/* Auxiliary roles and less frequent catalog components share the same hierarchy. */
+.generatedUi :global(.openui-inline-header-description),.generatedUi :global(.openui-list-item-subtitle),.generatedUi :global(.openui-switch-item-description),.generatedUi :global(.openui-text-callout-content-description),.generatedUi :global(.openui-metric-indicator__previous-value),.generatedUi :global(.openui-metric-indicator__trend) { font-size:var(--answer-caption-size); line-height:1.5; }
+.generatedUi :global(.openui-inline-header-heading) { font-size:var(--answer-heading-size); }
+.generatedUi :global(.openui-option-card__content) { flex-direction:row; align-items:center; gap:8px; }
+.generatedUi :global(.openui-option-card__top--icon) { width:20px; height:20px; background:transparent; }
+.generatedUi :global(.openui-chip-item) { border-radius:999px; padding:6px 12px; font-size:var(--answer-input-size); line-height:20px; }
+.generatedUi :global(.openui-chip-item__text) { white-space:normal; overflow-wrap:anywhere; }
+.generatedUi :global(.openui-switch-group) { padding:0; border:0; border-radius:0; background:transparent; gap:0; }
+.generatedUi :global(.openui-switch-item-container) { min-height:44px; align-items:center; padding:2px 0; border-bottom:1px solid var(--color-hairline); }
+/* Keep a real 44px switch button; draw only the small track and moving thumb. */
+.generatedUi :global(.openui-switch-item-root) { width:44px; height:44px; min-width:44px; flex:none; padding:0; margin:0; border:0; background:transparent; }
+.generatedUi :global(.openui-switch-item-root)::before { content:""; position:absolute; left:8px; top:13px; width:28px; height:18px; border-radius:9px; background:var(--color-control-border); }
+.generatedUi :global(.openui-switch-item-root)[data-state="checked"]::before { background:var(--color-ink); }
+.generatedUi :global(.openui-switch-item-thumb) { width:12px; height:12px; left:11px; top:22px; transform:translateY(-50%); background:var(--color-paper); }
+.generatedUi :global(.openui-switch-item-thumb)[data-state="checked"] { transform:translateY(-50%) translateX(10px); }
+.generatedUi :global(.openui-callout) { border-left-width:1px; }
+.generatedUi :global(.openui-text-callout) { border-left-width:1px; padding:0 12px; }
+.generatedUi :global(.openui-code-block-copy-button) { opacity:1; }
+.generatedUi :global(.openui-code-block-syntax-highlighter) { min-height:60px; padding:16px 64px 16px 12px !important; background:var(--color-plate) !important; border:1px solid var(--color-hairline); border-radius:8px; }
+.generatedUi :global(.openui-code-block-syntax-highlighter),.generatedUi :global(.openui-code-block-syntax-highlighter) * { font-family:var(--openui-font-code) !important; font-size:var(--answer-caption-size) !important; line-height:1.6 !important; color:var(--color-body) !important; text-shadow:none !important; }
+.generatedUi :global(.openui-code-block-syntax-highlighter) :global(.keyword) { font-weight:600; }
+:global([class*="openui-theme-portal-"]) { font-size:var(--answer-body-size); }
+:global(.openui-chart-label-tooltip) { font:400 var(--chat-caption-size)/1.5 var(--font-sans); color:var(--color-ink); background:var(--color-paper); max-width:260px; overflow-wrap:anywhere; }
+:global(.openui-modal-content) { width:min(440px,calc(100vw - 40px)); max-height:calc(100dvh - 160px); box-shadow:none; }
+:global(.openui-modal-close) { width:44px; height:44px; }
+
+.generatedUi :global(.openui-tag) { align-self:flex-start; width:fit-content; max-width:100%; height:auto; min-height:24px; padding:3px 8px; border-radius:6px; font-size:var(--answer-caption-size); }
+.generatedUi :global(.openui-tag-text) { white-space:normal; overflow-wrap:anywhere; }
+.generatedUi :global(.openui-callout-description),.generatedUi :global(.openui-list-item-action-label) { font-size:var(--answer-caption-size); line-height:1.5; }
+.generatedUi :global(.openui-table-container) + div > span { font-size:var(--answer-caption-size) !important; color:var(--color-ink-soft) !important; }
+:global([class*="openui-theme-portal-"]) :where(button) { min-width:44px; min-height:44px; }
+:global([class*="openui-theme-portal-"]) :where(svg):global(.lucide) { width:var(--answer-icon-size); height:var(--answer-icon-size); }
+:global(.openui-modal-title) { font-size:var(--answer-heading-size); }
+
+
+.mobileControl option:not([value=""]) { font-size:var(--answer-input-size); }
+:global([class*="openui-theme-portal-"]) :where(input,textarea,select) { font-size:var(--answer-input-size); }
+
+/* More than two actions form a vertical list; narrow cards never squeeze a pair. */
+.generatedUi :global(.openui-buttons):has(> button:nth-child(3)),:global([class*="openui-theme-portal-"]) :global(.openui-buttons):has(> button:nth-child(3)) { grid-template-columns:minmax(0,1fr); }
+:global(.openui-modal-body) { container-type:inline-size; }
+@container(max-width:320px) { .generatedUi :global(.openui-buttons),:global([class*="openui-theme-portal-"]) :global(.openui-buttons),.mobileEditActions { grid-template-columns:minmax(0,1fr); } }

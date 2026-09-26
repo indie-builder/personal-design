@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "checks": [
+    "AI chat drawer has no appearance/theme/storage footer on desktop or mobile",
+    "existing agent and conversation records unchanged after reload",
+    "Escape restores navigation trigger focus",
+    "homepage theme control preserved"
+  ],
+  "desktop": {
+    "theme": false,
+    "note": false,
+    "appearance": false,
+    "history": true,
+    "back": true
+  },
+  "mobile": {
+    "theme": false,
+    "note": false,
+    "appearance": false,
+    "history": true,
+    "back": true
+  }
+}

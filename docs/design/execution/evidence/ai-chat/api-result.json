@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "checks": [
+    "Pi NDJSON renders with the current official schema",
+    "restored context, no host tools",
+    "summary compression and memory delivery",
+    "one automatic repair reconnects orphaned action",
+    "provider failure is not reported as success",
+    "abort and next request",
+    "body, origin and schema validation"
+  ]
+}

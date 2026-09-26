@@ -1,0 +1,514 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "width": 320,
+      "theme": "light",
+      "fields": [
+        {
+          "type": "text",
+          "name": "text",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "email",
+          "name": "email",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "password",
+          "name": "password",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "number",
+          "name": "number",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "url",
+          "name": "url",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "textarea",
+          "name": "notes",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 80
+        },
+        {
+          "type": "select-one",
+          "name": "selected",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "select-one",
+          "name": "empty",
+          "empty": true,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "date",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "range开始日期",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "range结束日期",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        },
+        {
+          "type": "text",
+          "name": null,
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "button",
+          "name": null,
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "text",
+          "name": "编辑文本",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "number",
+          "name": "编辑数值",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "url",
+          "name": "编辑网址",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "select-one",
+          "name": "编辑选择",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "编辑日期",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "fields": [
+        {
+          "type": "text",
+          "name": "text",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "email",
+          "name": "email",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "password",
+          "name": "password",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "number",
+          "name": "number",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "url",
+          "name": "url",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "textarea",
+          "name": "notes",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 80
+        },
+        {
+          "type": "select-one",
+          "name": "selected",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "select-one",
+          "name": "empty",
+          "empty": true,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "date",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "range开始日期",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "range结束日期",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        },
+        {
+          "type": "text",
+          "name": null,
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "button",
+          "name": null,
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "text",
+          "name": "编辑文本",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "number",
+          "name": "编辑数值",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "url",
+          "name": "编辑网址",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "select-one",
+          "name": "编辑选择",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "编辑日期",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "fields": [
+        {
+          "type": "text",
+          "name": "text",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "email",
+          "name": "email",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "password",
+          "name": "password",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "number",
+          "name": "number",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "url",
+          "name": "url",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "textarea",
+          "name": "notes",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 80
+        },
+        {
+          "type": "select-one",
+          "name": "selected",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "select-one",
+          "name": "empty",
+          "empty": true,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "date",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "range开始日期",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "range结束日期",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        },
+        {
+          "type": "text",
+          "name": null,
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "button",
+          "name": null,
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "text",
+          "name": "编辑文本",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "number",
+          "name": "编辑数值",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "url",
+          "name": "编辑网址",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "select-one",
+          "name": "编辑选择",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": null,
+          "height": 44
+        },
+        {
+          "type": "date",
+          "name": "编辑日期",
+          "empty": false,
+          "normal": "13px",
+          "focused": "13px",
+          "date": "13px",
+          "height": 44
+        }
+      ]
+    }
+  ],
+  "composer": "13px",
+  "agentFields": "13px",
+  "portalValue": "13px",
+  "portalPlaceholder": "13px",
+  "persistence": true
+}

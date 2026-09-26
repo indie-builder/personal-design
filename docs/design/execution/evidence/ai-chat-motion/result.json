@@ -1,0 +1,648 @@
+{
+  "base": "http://localhost:3107",
+  "checks": [
+    "picker enters/exits with native layer retention",
+    "drawer panel stays clipped to mobile frame and keeps exit content",
+    "creation enters inside frame and exits before state changes",
+    "quick reverse continues from current transform",
+    "keyboard open/back/Escape are immediate",
+    "reduced motion settles active exit and skips next entrance",
+    "repeated submit commits exactly once",
+    "new-message arrival does not replay per chunk; waiting stops in simulated background",
+    "mobile paired motion and no horizontal overflow",
+    "home return and native back/forward leave no modal or inert residue"
+  ],
+  "frames": [
+    {
+      "name": "desktop-picker-enter",
+      "animations": [
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(-50%) translateY(-12px) scale(0.98)",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(-50%) translateY(0px) scale(1)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "block",
+      "transform": "matrix(0.995508, 0, 0, 0.995508, -160, -1.34771)",
+      "opacity": "0.775382",
+      "containerScroll": 0,
+      "children": "生成式 UI 助手创建智能体",
+      "clipped": "auto"
+    },
+    {
+      "name": "desktop-picker-exit",
+      "animations": [
+        {
+          "duration": 140,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "display": "block",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "display": "none",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 140,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 140,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "overlay": "auto",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "overlay": "none",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 140,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(-50%) translateY(0px) scale(1)",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(-50%) translateY(-12px) scale(0.98)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "block",
+      "transform": "matrix(0.984492, 0, 0, 0.984492, -160, -4.65229)",
+      "opacity": "0.224618",
+      "containerScroll": 0,
+      "children": "生成式 UI 助手创建智能体",
+      "clipped": "auto"
+    },
+    {
+      "name": "desktop-drawer-enter",
+      "animations": [
+        {
+          "duration": 220,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 220,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": "::backdrop"
+        },
+        {
+          "duration": 220,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(-100%)",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(0px)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "block",
+      "transform": "none",
+      "opacity": "0.775382",
+      "containerScroll": 0,
+      "children": "AI 问答新建对话对话记录还没有对话，发送一个问题开始吧。",
+      "clipped": "hidden"
+    },
+    {
+      "name": "desktop-drawer-exit",
+      "animations": [
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "display": "block",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "display": "none",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "overlay": "auto",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "overlay": "none",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": "::backdrop"
+        },
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(0px)",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(-100%)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "block",
+      "transform": "none",
+      "opacity": "0.224618",
+      "containerScroll": 0,
+      "children": "AI 问答新建对话对话记录还没有对话，发送一个问题开始吧。",
+      "clipped": "hidden"
+    },
+    {
+      "name": "desktop-create-enter",
+      "animations": [
+        {
+          "duration": 240,
+          "frames": [
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translateX(100%)",
+              "computedOffset": 0
+            },
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translateX(0px)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "flex",
+      "transform": "matrix(1, 0, 0, 1, 105.575, 0)",
+      "opacity": "1",
+      "containerScroll": 0,
+      "children": "创建智能体名称系统提示词创建并开始对话",
+      "clipped": "hidden"
+    },
+    {
+      "name": "desktop-create-exit",
+      "animations": [
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "none",
+              "computedOffset": 0
+            },
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translateX(100%)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "flex",
+      "transform": "matrix(1, 0, 0, 1, 372.425, 0)",
+      "opacity": "1",
+      "containerScroll": 0,
+      "children": "创建智能体名称系统提示词创建并开始对话",
+      "clipped": "hidden"
+    },
+    {
+      "name": "mobile-drawer-enter",
+      "animations": [
+        {
+          "duration": 220,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 220,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": "::backdrop"
+        },
+        {
+          "duration": 220,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(-100%)",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(0px)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "block",
+      "transform": "none",
+      "opacity": "0.775382",
+      "containerScroll": 0,
+      "children": "AI 问答新建对话对话记录慢速回答动效检查",
+      "clipped": "hidden"
+    },
+    {
+      "name": "mobile-drawer-exit",
+      "animations": [
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "display": "block",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "display": "none",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "overlay": "auto",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "overlay": "none",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        },
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "1",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": "::backdrop"
+        },
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": 0,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(0px)",
+              "computedOffset": 0
+            },
+            {
+              "offset": 1,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translate(-100%)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "block",
+      "transform": "none",
+      "opacity": "0.224618",
+      "containerScroll": 0,
+      "children": "AI 问答新建对话对话记录慢速回答动效检查",
+      "clipped": "hidden"
+    },
+    {
+      "name": "mobile-create-enter",
+      "animations": [
+        {
+          "duration": 240,
+          "frames": [
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translateX(100%)",
+              "computedOffset": 0
+            },
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translateX(0px)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "flex",
+      "transform": "matrix(1, 0, 0, 1, 86.1388, 0)",
+      "opacity": "1",
+      "containerScroll": 0,
+      "children": "创建智能体名称系统提示词创建并开始对话",
+      "clipped": "hidden"
+    },
+    {
+      "name": "mobile-create-exit",
+      "animations": [
+        {
+          "duration": 180,
+          "frames": [
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "none",
+              "computedOffset": 0
+            },
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "transform": "translateX(100%)",
+              "computedOffset": 1
+            }
+          ],
+          "pseudo": null
+        }
+      ],
+      "display": "flex",
+      "transform": "matrix(1, 0, 0, 1, 303.861, 0)",
+      "opacity": "1",
+      "containerScroll": 0,
+      "children": "创建智能体名称系统提示词创建并开始对话",
+      "clipped": "hidden"
+    }
+  ],
+  "passed": true
+}

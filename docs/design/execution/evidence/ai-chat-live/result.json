@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "provider": "live Pi / GLM-5.3-Flash",
+  "checks": [
+    "business prompts contain no OpenUI instructions",
+    "three chart tabs render actual SVG charts",
+    "decision follow-up retains sample context",
+    "reload preserves current conversation"
+  ]
+}

@@ -5,7 +5,7 @@ import { Moon, Sun } from 'lucide-react';
 import { Button } from './button';
 import styles from './theme-toggle.module.css';
 
-export function ThemeToggle() {
+export function ThemeToggle({ hidden = false }: { hidden?: boolean }) {
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
     const syncSystem = () => {
@@ -43,6 +43,7 @@ export function ThemeToggle() {
     }
   };
 
+  if (hidden) return null;
   return (
     <Button icon variant="ghost" onClick={toggle} title="切换明暗主题">
       <span className={styles.lightLabel}>切换为深色主题</span>

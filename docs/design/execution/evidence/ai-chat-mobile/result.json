@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "checks": [
+    "320px light: touch targets, native pickers, editable row cards, reset and refresh persistence, no overflow",
+    "390px dark: touch targets, native pickers, editable row cards, reset and refresh persistence, no overflow",
+    "1440px light: touch targets, native pickers, editable row cards, reset and refresh persistence, no overflow",
+    "confirm edits sends values through the official action callback"
+  ]
+}

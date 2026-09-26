@@ -21,6 +21,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['@earendil-works/pi-coding-agent', '@earendil-works/pi-ai'],
   cacheComponents: true,
   reactCompiler: true,
   // 预取只拉静态外壳，动态分叉在导航时流式到达（配合 cacheComponents 的官方推荐档）

@@ -1,4 +1,6 @@
+@layer theme, base, openui, components, utilities;
 @import 'tailwindcss';
+@import '@openuidev/react-ui/layered/styles/index.css';
 @custom-variant dark (&:where(html[data-theme='dark'] *));
 
 /* Albert Sans 由 next/font/local 接管（app/layout.tsx），家族名经 --font-albert-sans 注入 */

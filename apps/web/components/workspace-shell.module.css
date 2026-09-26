@@ -31,3 +31,11 @@
 /* Dictionary navigation floats on the canvas instead of reserving a header row. */
 .canvasHeader { position:fixed; z-index:40; top:0; left:0; width:auto; max-width:none; justify-content:flex-start; gap:12px; background:transparent; pointer-events:none; }
 .canvasHeader > * { pointer-events:auto; }
+
+/* Reserve the shared page header above the independent mobile demo. */
+.chatShell { --ai-header-height:72px; display:flow-root; }
+@media(min-width:800px) {
+  .chatShell { --ai-header-height:0px; }
+  .chatHeader { position:absolute; inset:0 0 auto; z-index:10; pointer-events:none; }
+  .chatHeader .identity { pointer-events:auto; }
+}

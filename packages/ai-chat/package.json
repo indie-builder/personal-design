@@ -1,0 +1,18 @@
+{
+  "name": "@personal-design/ai-chat",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.4"
+  },
+  "scripts": {
+    "sync:avatars": "node scripts/sync-avatars.mjs"
+  }
+}

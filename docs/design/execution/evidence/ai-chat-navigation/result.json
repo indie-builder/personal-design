@@ -1,0 +1,11 @@
+{
+  "base": "https://personal-design.localhost",
+  "checks": [
+    "1440x900 dark: external header, bounded drawer/picker/editor, no overflow",
+    "1280x800 light: external header, bounded drawer/picker/editor, no overflow",
+    "390x844 light: external header, bounded drawer/picker/editor, no overflow",
+    "390x600 dark: external header, bounded drawer/picker/editor, no overflow",
+    "shared header matches sibling project; return home and browser back work"
+  ],
+  "passed": true
+}

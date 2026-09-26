@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "checks": [
+    "switch changes state within a 44px target",
+    "option cards retain keyboard focus",
+    "validation hints use 12px",
+    "code copy is visible without hover",
+    "agent picker, creation screen and drawer stay within phone geometry",
+    "gallery portal retains shared font tokens",
+    "official modal inherits answer tokens in both themes and closes with Escape"
+  ]
+}

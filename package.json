@@ -21,7 +21,8 @@
     "sync:ai-coding-dictionary": "pnpm --filter @personal-design/ai-coding-dictionary sync",
     "sync:personal-sites": "pnpm --filter @personal-design/personal-sites sync",
     "sync:inspora": "pnpm --filter @personal-design/inspora sync",
-    "test:portfolio-api": "node --test scripts/portfolio-api.test.mjs"
+    "test:portfolio-api": "node --test scripts/portfolio-api.test.mjs",
+    "sync:ai-chat-avatars": "pnpm --filter @personal-design/ai-chat sync:avatars"
   },
   "devDependencies": {
     "oxfmt": "^0.70.0",

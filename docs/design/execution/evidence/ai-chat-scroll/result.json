@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "checks": [
+    "1440: centered button, directional hide/show, stable viewport, return-to-latest restores bar",
+    "390: centered button, directional hide/show, stable viewport, return-to-latest restores bar",
+    "reduced motion disables toolbar transition"
+  ]
+}

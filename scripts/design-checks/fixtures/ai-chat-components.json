@@ -1,0 +1,107 @@
+{
+  "id": "component-fixture",
+  "agentId": "general",
+  "title": "组件全量检查",
+  "messages": [
+    {
+      "id": "catalog-0",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([title, tbl])\ntitle = TextContent(\"Top Languages\", \"large-heavy\")\ntbl = Table([Col(\"Language\", langs), Col(\"Users (M)\", users), Col(\"Year\", years)])\nlangs = [\"Python\", \"JavaScript\", \"Java\", \"TypeScript\", \"Go\"]\nusers = [15.7, 14.2, 12.1, 8.5, 5.2]\nyears = [1991, 1995, 1995, 2012, 2009]"
+        }
+      ]
+    },
+    {
+      "id": "catalog-1",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([title, chart])\ntitle = TextContent(\"Q4 Revenue\", \"large-heavy\")\nchart = BarChart(labels, [s1, s2], \"grouped\")\nlabels = [\"Oct\", \"Nov\", \"Dec\"]\ns1 = Series(\"Product A\", [120, 150, 180])\ns2 = Series(\"Product B\", [90, 110, 140])"
+        }
+      ]
+    },
+    {
+      "id": "catalog-2",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([title, form])\ntitle = TextContent(\"Contact Us\", \"large-heavy\")\nform = Form(\"contact\", btns, [nameField, emailField, countryField, msgField])\nnameField = FormControl(\"Name\", Input(\"name\", \"Your name\", \"text\", { required: true, minLength: 2 }))\nemailField = FormControl(\"Email\", Input(\"email\", \"you@example.com\", \"email\", { required: true, email: true }))\ncountryField = FormControl(\"Country\", Select(\"country\", countryOpts, \"Select...\", { required: true }))\nmsgField = FormControl(\"Message\", TextArea(\"message\", \"Tell us more...\", 4, { required: true, minLength: 10 }))\ncountryOpts = [SelectItem(\"us\", \"United States\"), SelectItem(\"uk\", \"United Kingdom\"), SelectItem(\"de\", \"Germany\")]\nbtns = Buttons([Button(\"Submit\", Action([@ToAssistant(\"Submit\")]), \"primary\"), Button(\"Cancel\", Action([@ToAssistant(\"Cancel\")]), \"secondary\")])"
+        }
+      ]
+    },
+    {
+      "id": "catalog-3",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([title, tabs])\ntitle = TextContent(\"React vs Vue\", \"large-heavy\")\ntabs = Tabs([tabReact, tabVue])\ntabReact = TabItem(\"react\", \"React\", reactContent)\ntabVue = TabItem(\"vue\", \"Vue\", vueContent)\nreactContent = [TextContent(\"React is a library by Meta for building UIs.\"), Callout(\"info\", \"Note\", \"React uses JSX syntax.\")]\nvueContent = [TextContent(\"Vue is a progressive framework by Evan You.\"), Callout(\"success\", \"Tip\", \"Vue has a gentle learning curve.\")]"
+        }
+      ]
+    },
+    {
+      "id": "catalog-4",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([kpiHeader, kpiBlock, productsHeader, productCards])\nkpiHeader = InlineHeader(\"This Month\", \"Key account metrics\")\nkpiBlock = SnippetCardBlock([kpi1, kpi2, kpi3])\nkpi1 = SnippetCardItem(\"revenue\", kpi1lhs, kpi1rhs)\nkpi1lhs = IconText(kpi1icon, \"neutral\", \"m\", \"Revenue\", \"Month to date\", false, \"horizontal\")\nkpi1icon = Icon(\"circle-dollar-sign\", \"finance\")\nkpi1rhs = BoldText(\"number\", \"$48,200\", \"+8.1%\", \"metric\")\nkpi2 = SnippetCardItem(\"active-users\", kpi2lhs, kpi2rhs)\nkpi2lhs = IconText(kpi2icon, \"neutral\", \"m\", \"Active Users\", \"This month\", false, \"horizontal\")\nkpi2icon = Icon(\"users\", \"people\")\nkpi2rhs = BoldText(\"number\", \"1,204\", \"+3.4%\", \"metric\")\nkpi3 = SnippetCardItem(\"churn\", kpi3lhs, kpi3rhs)\nkpi3lhs = IconText(kpi3icon, \"neutral\", \"m\", \"Churn\", \"This month\", false, \"horizontal\")\nkpi3icon = Icon(\"user-minus\", \"people\")\nkpi3rhs = BoldText(\"number\", \"1.8%\", \"-0.3%\", \"metric\")\nproductsHeader = InlineHeader(\"Top Products\", \"By units sold\")\nproductCards = CompositeCardBlock([p1, p2])\np1 = CompositeCardItem(\"widget-pro\", p1header, [p1body], p1footer)\np1header = IconText(p1icon, \"neutral\", \"m\", \"Widget Pro\", \"Best seller\", true, \"horizontal\")\np1icon = Icon(\"package\", \"shopping\")\np1body = MetricIndicatorInline(\"2,410 units\", \"Sold this month\", { direction: \"up\", value: 12 })\np1footer = { price: BoldText(\"text\", \"$29.00\"), button: p1btn }\np1btn = Button(\"View Details\", Action([@ToAssistant(\"Show details for Widget Pro\")]), \"secondary\")\np2 = CompositeCardItem(\"widget-mini\", p2header, [p2body], p2footer)\np2header = IconText(p2icon, \"neutral\", \"m\", \"Widget Mini\", \"New arrival\", true, \"horizontal\")\np2icon = Icon(\"box\", \"shopping\")\np2body = MetricIndicatorInline(\"980 units\", \"Sold this month\", { direction: \"up\", value: 4 })\np2footer = { price: BoldText(\"text\", \"$14.00\"), button: p2btn }\np2btn = Button(\"View Details\", Action([@ToAssistant(\"Show details for Widget Mini\")]), \"secondary\")"
+        }
+      ]
+    },
+    {
+      "id": "catalog-5",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([tableHeader, editTable, formHeader, prefsForm])\ntableHeader = InlineHeader(\"Team Roster\", \"Click a cell to edit\")\neditTable = EditableTable(\"roster\", [colName, colRole, colStart], [row1, row2])\ncolName = { type: \"text\", key: \"name\", header: \"Name\" }\ncolRole = { type: \"select\", key: \"role\", header: \"Role\", options: [roleEng, roleDesign] }\nroleEng = { value: \"eng\", label: \"Engineering\" }\nroleDesign = { value: \"design\", label: \"Design\" }\ncolStart = { type: \"date-single\", key: \"start\", header: \"Start Date\" }\nrow1 = { id: \"1\", values: [\"Alex Kim\", \"eng\", \"2024-01-15\"] }\nrow2 = { id: \"2\", values: [\"Jamie Lee\", \"design\", \"2024-03-02\"] }\nformHeader = InlineHeader(\"Preferences\", \"Tell us how you like to work\")\nprefsForm = Form(\"prefs\", formButtons, [fc1, fc2])\nfc1 = FormControl(\"Working Style\", styleCards, \"Pick the one that fits best\")\nstyleCards = OptionCards(\"style\", \"single\", [style1, style2])\nstyle1 = OptionCard(\"focused\", \"Deep Focus\", \"Long uninterrupted blocks\", style1icon)\nstyle1icon = Icon(\"target\", \"tools\")\nstyle2 = OptionCard(\"collab\", \"Collaborative\", \"Frequent pairing and syncs\", style2icon)\nstyle2icon = Icon(\"users\", \"people\")\nfc2 = FormControl(\"Tools\", toolChips, \"Select all that apply\")\ntoolChips = Chips(\"tools\", \"multiple\", [tool1, tool2, tool3])\ntool1 = ChipItem(\"figma\", \"Figma\", tool1icon)\ntool1icon = Icon(\"figma\", \"design\")\ntool2 = ChipItem(\"slack\", \"Slack\", tool2icon)\ntool2icon = Icon(\"message-square\", \"communication\")\ntool3 = ChipItem(\"notion\", \"Notion\", tool3icon)\ntool3icon = Icon(\"notebook\", \"text\")\nformButtons = Buttons([Button(\"Save\", Action([@ToAssistant(\"Save preferences\")]), \"primary\")])"
+        }
+      ]
+    },
+    {
+      "id": "catalog-6",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([Card([CardHeader(\"文字与状态\", \"统一的辅助说明\")]), Label(\"字段标签\"), Text(\"text\", \"正文\", \"次级说明\"), MarkDownRenderer(\"## 内容标题\\n正文与 **重点**。\\n\\n- 第一项\\n- 第二项\"), TextCallout(\"info\", \"操作提示\", \"请核对填写信息\"), Callout(\"error\", \"校验失败\", \"请检查必填字段\"), TagBlock([\"普通\",\"标签\"], \"lg\"), Tag(\"成功\", null, \"lg\", \"success\"), Tag(\"注意\", null, \"sm\", \"warning\"), MetricIndicatorWithStrikethrough(\"18\", \"数据说明\", \"22\"), EntityList([{left:\"项目\",right:\"协作平台\"},{left:\"数量\",right:\"18\",rightVariant:\"number\"}]), ListBlock([ListItem(\"条目标题\", \"条目说明\")]), Separator()])"
+        }
+      ]
+    },
+    {
+      "id": "catalog-7",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([CardHeader(\"选择和操作\", \"包含禁用与选中状态\"), Form(\"audit\", actions, [FormControl(\"通知\", SwitchGroup(\"switches\", [SwitchItem(\"开启通知\", \"接收进度提醒\", \"notice\", true)], \"card\")), FormControl(\"单选\", RadioGroup(\"radio\", [RadioItem(\"第一项\", \"单选说明\", \"one\"),RadioItem(\"第二项\", \"长一点的选项说明\", \"two\")], \"one\")), FormControl(\"多选\", CheckBoxGroup(\"check\", [CheckBoxItem(\"勾选项目\", \"多选辅助说明\", \"one\", true)])), FormControl(\"选择标签\", Chips(\"chips\", \"multiple\", [ChipItem(\"one\", \"可选\"),ChipItem(\"two\", \"不可选\", null, true)])), FormControl(\"开始日期\", DatePicker(\"date\", \"range\")), FormControl(\"目标\", Slider(\"target\", \"continuous\", 0,100,1,[50],\"目标比例\"))]), IconButton(\"查看详情\", Icon(\"info\"), Action([@ToAssistant(\"查看详情\")]), \"secondary\", \"large\", \"square\")])\nactions = Buttons([Button(\"主操作\", Action([@ToAssistant(\"继续\")]), \"primary\", \"normal\", \"large\"),Button(\"次操作\", Action([@ToAssistant(\"返回\")]), \"primary\", \"normal\", \"small\"),Button(\"文字操作\", Action([@ToAssistant(\"更多\")]), \"tertiary\")])"
+        }
+      ]
+    },
+    {
+      "id": "catalog-8",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([CardHeader(\"媒体与卡片\", \"本地图片\"), Image(\"示例头像\", src), ImageBlock(src,\"示例头像\"), ImageGallery([{src:src,alt:\"头像预览\",details:\"辅助说明\"}]), ImageText(src,\"头像\",\"图片标题\",\"图片说明\",true,\"vertical\",80), ImageTextLarge(src,\"头像\",\"大图标题\",\"大图说明\"), CodeBlock(\"javascript\", \"const message = 'hello';\"), ContextCardBlock([ContextCardItem(\"a\",\"背景卡片\",\"卡片说明\"),ContextCardItem(\"b\",\"第二张卡片\",\"另一个说明\")],\"carousel\"), VisualCardBlock([VisualCardItem(BoldText(\"text\",\"视觉卡片\",\"辅助说明\"),\"a\",src,Tag(\"示例\"),\"头像\"),VisualCardItem(BoldText(\"text\",\"另一张卡片\",\"辅助说明\"),\"b\",src,null,\"头像\")],\"carousel\"), Carousel([[TextContent(\"第一张\")],[TextContent(\"第二张\")]]), Modal(\"弹出内容\", false, [TextContent(\"弹出说明\")])])\nsrc = \"/ai-chat/avatars/007.webp\""
+        }
+      ]
+    },
+    {
+      "id": "catalog-9",
+      "role": "assistant",
+      "parts": [
+        {
+          "type": "text",
+          "text": "root = Stack([CardHeader(\"其他图表\", \"各类型统一主题\"), OverviewCardBlock([OverviewCardItem(\"kpi\",Text(\"text\",\"完成率\"),MetricIndicatorInline(\"90%\",\"样本数据\"))]), LineChart([\"一\",\"二\",\"三\"],[Series(\"样本\",[10,20,15])]), AreaChart([\"一\",\"二\",\"三\"],[Series(\"样本\",[10,20,15])]), RadarChart([\"一\",\"二\",\"三\"],[Series(\"样本\",[10,20,15])]), HorizontalBarChart([\"一\",\"二\",\"三\"],[Series(\"样本\",[10,20,15])]), RadialChart([\"完成\",\"进行\"],[70,30]), SingleStackedBarChart([\"完成\",\"进行\"],[70,30]), ScatterChart([ScatterSeries(\"样本\",[Point(1,2,3),Point(2,3,4)])]), PieChart([\"完成\",\"进行\"],[70,30]), Steps([StepsItem(\"第一步\",\"操作说明\"),StepsItem(\"第二步\",\"后续说明\")]), Accordion([AccordionItem(\"one\",\"展开详情\",[TextContent(\"详情说明\")])])])\nunusedSlice = Slice(\"完成\",70)"
+        }
+      ]
+    }
+  ]
+}

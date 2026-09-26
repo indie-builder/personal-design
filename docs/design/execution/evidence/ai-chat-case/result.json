@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "source": "Captured live Pi/GLM-5.3-Flash workflow; replayed with official OpenUI library",
+  "checks": [
+    "1440px: six stages, persisted form/slider state, tables, line/bar/pie tabs, decision summary, no overflow",
+    "390px: six stages, persisted form/slider state, tables, line/bar/pie tabs, decision summary, no overflow"
+  ]
+}
