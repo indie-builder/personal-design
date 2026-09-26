@@ -131,7 +131,7 @@
 ## 已知核对项
 
 - 首页进入作品的导航、标题清理、双主题、键盘及减少动态效果已有本会话功能检查；ego 截图接口持续超时，尚未完成视觉帧验收。
-- 开册、首页预览与路由动效已接入统一输入／偏好策略；行为回归使用 `sh scripts/design-checks/workspace-navigation.sh`。回退专项检查为 `sh scripts/design-checks/back-motion.sh`。回退稳定性检查为 `sh scripts/design-checks/back-stability.sh`，覆盖旧画册移除后清理、书脊焦点恢复与整页／子项位移不叠加。这些脚本不能替代视觉关键帧验收。
+- 开册、首页预览与路由动效已接入统一输入／偏好策略；行为回归使用 `sh scripts/design-checks/workspace-navigation.sh`。回退专项检查为 `sh scripts/design-checks/back-motion.sh`。回退稳定性检查为 `sh scripts/design-checks/back-stability.sh`，覆盖旧画册移除后清理、书脊焦点恢复与整页／子项位移不叠加。这些脚本写死 portless 开发域名，需先 `pnpm dev` 再运行，不能替代视觉关键帧验收。
 - 书籍开册仍有局部 width / height 插值；属于现有实现，需实测性能，不能表述为全部动效仅使用 transform / opacity。
 
 
