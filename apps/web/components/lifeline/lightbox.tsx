@@ -87,10 +87,12 @@ interface Frame {
 export function LightboxProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState<ActiveImage | null>(null);
   const [expanded, setExpanded] = useState(false);
-  const { status: mediaStatus, attempt, setStatus: setMediaStatus, retry } = useMediaStatus(
-    !!active,
-    12000,
-  );
+  const {
+    status: mediaStatus,
+    attempt,
+    setStatus: setMediaStatus,
+    retry,
+  } = useMediaStatus(!!active, 12000);
   const [thumbError, setThumbError] = useState(false);
   const [closeRect, setCloseRect] = useState<Rect | null>(null);
   const [frame, setFrame] = useState<Frame | null>(null);

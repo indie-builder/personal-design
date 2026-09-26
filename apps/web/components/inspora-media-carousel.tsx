@@ -270,9 +270,7 @@ function MediaSlide({
             <>
               <p>可以重试，或在新窗口打开原媒体。</p>
               <div className={styles.actions}>
-                <Button
-                  onClick={retry}
-                >
+                <Button onClick={retry}>
                   <RotateCcw size={16} />
                   重试
                 </Button>

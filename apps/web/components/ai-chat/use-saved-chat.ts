@@ -21,7 +21,9 @@ function normalize(initial: SavedChat): SavedChat {
     ...initial,
     agents: agents.map((item) => ({
       ...item,
-      ...(item.id === defaultAgent.id ? { name: defaultAgent.name, prompt: defaultAgent.prompt } : {}),
+      ...(item.id === defaultAgent.id
+        ? { name: defaultAgent.name, prompt: defaultAgent.prompt }
+        : {}),
       avatarId: isMaleAvatar(item.avatarId) ? item.avatarId : randomAvatarId(),
     })),
   };

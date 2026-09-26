@@ -65,7 +65,13 @@ export function PlateWall({
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     const post = params.get('post');
-    if (post) router.replace(browseHref(`${pathname}/${encodeURIComponent(post)}`, paramsHref(pathname, params, { post: '' })));
+    if (post)
+      router.replace(
+        browseHref(
+          `${pathname}/${encodeURIComponent(post)}`,
+          paramsHref(pathname, params, { post: '' }),
+        ),
+      );
   }, [searchParams, pathname, router]);
   const query = searchParams.get('q') ?? '';
   // 输入即时回显在本地，停顿后写入 URL（URL 是筛选的唯一事实源）
