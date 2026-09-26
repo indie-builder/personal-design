@@ -11,6 +11,7 @@
 | [设计工程工具](apps/web/app/products/design-engineer-tools) | 按分类浏览设计工程工具，直接打开工具原站。 |
 | [个人网站](apps/web/app/products/personal-sites) | 观看网站宣传片，再打开独立部署的个人网站。 |
 | [AI Coding 词典](apps/web/app/products/ai-coding-dictionary) | 在可搜索的知识网中探索术语，逐段对照阅读中英文内容。 |
+| [AI 问答](apps/web/app/products/ai-chat) | 选择或创建智能体，用文字、表格和交互卡片展开对话；会话保存在当前浏览器。 |
 
 ## 本地运行
 
