@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  },
   "scripts": {
     "sync": "node scripts/sync.mjs && node scripts/prepare-runtime.mjs",
     "backfill:zh": "node scripts/backfill-zh.mjs",
