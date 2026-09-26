@@ -4,7 +4,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // 全站浏览器回归套件入口：对运行中的生产构建逐个执行 scripts/design-checks
-// 下的行为脚本与根 verify 脚本，汇总 PASS/FAIL，任一失败即非零退出。
+// 下的行为脚本、根 verify 脚本与 /api/portfolio 契约检查，汇总 PASS/FAIL，
+// 任一失败即非零退出。
 // 前置：pnpm build && pnpm start（或等价预览），用 DESIGN_BASE_URL 指定地址。
 // muse-performance / layout-first-paint 需要 MEDIA_VERSION 版本化构建，不纳入
 // 默认套件，按 docs/design/README.md「验收要求」单独运行。
@@ -14,6 +15,7 @@ const base = process.env.DESIGN_BASE_URL ?? 'http://localhost:3000';
 const suites = [
   '../verify-design.mjs',
   '../verify-design-routes.mjs',
+  '../portfolio-api.test.mjs',
   'home.mjs',
   'layouts-check.mjs',
   'layouts-states.mjs',
