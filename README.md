@@ -1,38 +1,47 @@
-# Personal Design · 产品集
+# Personal Design
 
-设计工具与参考产品的合集，pnpm monorepo。
+个人设计作品集。首页按上线日期展示作品时间轴；站点基于 Next.js 16、Tailwind CSS v4 和 pnpm workspace。
 
-## 产品
+## 作品
 
-| 产品 | 路径 | 说明 |
-| --- | --- | --- |
-| 布局参考 | [`apps/web/app/products/layout-compositions`](apps/web/app/products/layout-compositions) | 350 种排版构图图鉴，内容改编自 [nevertoday/350-layout-compositions](https://github.com/nevertoday/350-layout-compositions)（CC BY 4.0） |
+| 作品 | 功能 |
+| --- | --- |
+| [布局参考](apps/web/app/products/layout-compositions) | 按 8 个分类和主题浏览 350 张排版构图图鉴；支持搜索、双页画册和图片放大。 |
+| [灵感集](apps/web/app/products/muse) | 按中文分类或关键词浏览图像与视频；滚动加载作品，查看详情、作者和原作。 |
+| [设计工程工具](apps/web/app/products/design-engineer-tools) | 按分类浏览设计工程工具，直接打开工具原站。 |
+| [个人网站](apps/web/app/products/personal-sites) | 观看网站宣传片，再打开独立部署的个人网站。 |
+| [AI Coding 词典](apps/web/app/products/ai-coding-dictionary) | 在可搜索的知识网中探索术语，逐段对照阅读中英文内容。 |
 
-## 结构
+## 本地运行
 
-```
-apps/web                        # Next.js 产品集站点（App Router + Tailwind v4）
-packages/layout-compositions    # 布局参考内容包：catalog.json + 查询 API + 图片同步脚本
-```
-
-## 命令
+需要 Node.js 24、pnpm 12。`pnpm dev` 使用全局安装的 portless，地址为 <https://personal-design.localhost>；也可以用 `pnpm dev:direct` 在 <http://localhost:3000> 启动。
 
 ```bash
-pnpm install        # 安装依赖
-pnpm dev            # 启动开发服务器
-pnpm build          # 构建
-pnpm lint           # oxlint
-pnpm format         # oxfmt 格式化 TS/TSX/MJS（CSS 不参与）
-pnpm typecheck      # 全部包 TypeScript 检查
-pnpm sync:layouts   # 从上游同步布局图片（下载 tarball → sha256 校验 → 转 WebP）
+pnpm install
+pnpm dev
 ```
 
-## 新增产品
+## 项目结构
 
-1. 在 `packages/<product>/` 建内容包（数据 + 同步脚本）
-2. 在 `apps/web/app/products/<slug>/` 建页面
-3. 在 `apps/web/lib/products.ts` 注册
+- `apps/web`：唯一的 Next.js 站点，包括首页、作品页面和共享组件。
+- `packages/*`：各作品的数据、查询 API 和内容同步脚本。
+- `apps/web/public`：同步或生成的本地媒体；灵感集的大图和视频等媒体由来源站点提供。
 
-## 署名
+## 常用命令
 
-布局参考产品的图片与数据改编自上游项目，依 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 使用，站点内已附署名。
+```bash
+pnpm build                       # 生产构建
+pnpm start                       # 启动生产服务
+pnpm lint                        # 代码检查
+pnpm typecheck                   # 类型检查
+pnpm test                        # 单元测试
+pnpm format:check                # 格式检查
+pnpm sync:layouts                # 同步布局参考缩略图
+pnpm sync:inspora                # 增量同步灵感集
+pnpm sync:design-engineer-tools  # 同步工具目录
+pnpm sync:ai-coding-dictionary   # 增量同步和翻译词典
+```
+
+词典同步依赖已登录的 `gh` 和本机 `claude` CLI。个人网站的本地预览媒体由 `packages/personal-sites` 生成，更新宣传片后运行该包的 `render:promo` 和根目录的 `pnpm sync:personal-sites`。
+
+布局参考内容改编自 [nevertoday/350-layout-compositions](https://github.com/nevertoday/350-layout-compositions)，依 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 使用。页面流程与验收见 [设计文档](docs/design/README.md)。
