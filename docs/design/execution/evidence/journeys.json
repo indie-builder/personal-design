@@ -1,5 +1,5 @@
 {
-  "base": "http://localhost:3001",
+  "base": "http://localhost:3000",
   "results": [
     "home → muse → query → detail with source link → return restores query",
     "home → layouts → open book → album flip → zoom as detail → Esc layering → back to home"
