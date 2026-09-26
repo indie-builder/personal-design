@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "displayText": "提交需求",
+  "structuredValues": true,
+  "collapsedByDefault": true,
+  "viewableReceipt": true,
+  "retryPreservesContext": true,
+  "followupPreservesContext": true,
+  "reloadPreservesContext": true
+}

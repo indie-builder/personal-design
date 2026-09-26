@@ -138,3 +138,14 @@
 
 .page { font-size:var(--chat-body-size); --control-icon-size:var(--chat-icon-size); }
 .page button svg { width:var(--chat-icon-size); height:var(--chat-icon-size); }
+
+/* Submitted values are an immutable, collapsed receipt, not chat prose. */
+.submission { margin-top:8px; border-top:1px solid var(--color-hairline-strong); }
+.submission summary { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:44px; list-style:none; cursor:pointer; font-size:var(--chat-body-size); color:var(--color-ink-soft); }
+.submission summary::-webkit-details-marker { display:none; }
+.submission[open] summary svg { transform:rotate(180deg); }
+.submission dl { margin:0 0 4px; max-height:260px; overflow:auto; overscroll-behavior:contain; }
+.submission dl > div + div { margin-top:12px; }
+.submission dt { color:var(--color-ink-soft); font-size:var(--chat-label-size); }
+.submission dd { margin:2px 0 0; font-size:var(--chat-body-size); white-space:pre-wrap; overflow-wrap:anywhere; }
+.submission summary:focus-visible { outline:2px solid var(--chat-focus); outline-offset:2px; border-radius:4px; }

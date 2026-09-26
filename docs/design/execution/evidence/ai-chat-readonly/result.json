@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "width": 390,
+      "theme": "light",
+      "oldDisabled": true,
+      "latestEnabled": true,
+      "renderErrors": false,
+      "views": true,
+      "latestEditing": true
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "oldDisabled": true,
+      "latestEnabled": true,
+      "renderErrors": false,
+      "views": true,
+      "latestEditing": true
+    }
+  ],
+  "oldActionBlocked": true,
+  "latestSubmissionLocksPrevious": true,
+  "persisted": true
+}

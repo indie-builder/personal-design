@@ -1,5 +1,5 @@
 import 'server-only';
-import type { ChatMessage } from '@personal-design/ai-chat';
+import { modelMessageContent, type ChatMessage } from '@personal-design/ai-chat';
 import type { Message } from '@earendil-works/pi-ai';
 
 export async function createPiRuntime() {
@@ -63,7 +63,7 @@ export async function createChatSession(
   await resourceLoader.reload();
   const sessionManager = SessionManager.inMemory();
   for (const item of history) {
-    const content = item.parts.map((p) => p.text).join('\n');
+    const content = modelMessageContent(item);
     const message: Message =
       item.role === 'user'
         ? { role: 'user', content, timestamp: Date.now() }

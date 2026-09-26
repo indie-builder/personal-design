@@ -115,6 +115,17 @@
 :global([class*="openui-theme-portal-"]) :where(input,textarea,select) { font-size:var(--answer-input-size); }
 
 /* More than two actions form a vertical list; narrow cards never squeeze a pair. */
-.generatedUi :global(.openui-buttons):has(> button:nth-child(3)),:global([class*="openui-theme-portal-"]) :global(.openui-buttons):has(> button:nth-child(3)) { grid-template-columns:minmax(0,1fr); }
+.generatedUi :global(.openui-buttons):has(> :nth-child(3)),:global([class*="openui-theme-portal-"]) :global(.openui-buttons):has(> :nth-child(3)) { grid-template-columns:minmax(0,1fr); }
 :global(.openui-modal-body) { container-type:inline-size; }
 @container(max-width:320px) { .generatedUi :global(.openui-buttons),:global([class*="openui-theme-portal-"]) :global(.openui-buttons),.mobileEditActions { grid-template-columns:minmax(0,1fr); } }
+
+/* Read-only editing boundaries do not disable sibling viewing controls. */
+.editBoundary { display:contents; border:0; margin:0; padding:0; min-width:0; }
+.editBoundary[disabled] :where(input,textarea,select,button,[role="slider"]) { cursor:not-allowed; }
+.editBoundary[disabled] :where([role="slider"]) { opacity:.55; }
+.generatedUi :global(.openui-buttons) > :last-child:nth-child(odd) > :global(.openui-button-base),:global([class*="openui-theme-portal-"]) :global(.openui-buttons) > :last-child:nth-child(odd) > :global(.openui-button-base) { grid-column:1 / -1; }
+
+/* Locked values remain legible; action controls retain their disabled styling. */
+.generatedUi[data-read-only] :where(input,textarea,select),.editBoundary[disabled] :where(input,textarea,select),.mobileEditable[data-read-only] :where(input,textarea,select) { opacity:1; color:var(--color-ink-soft); -webkit-text-fill-color:var(--color-ink-soft); }
+
+.editBoundary[disabled] :where(*) { touch-action:auto; }
