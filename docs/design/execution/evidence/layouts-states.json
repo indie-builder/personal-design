@@ -1,5 +1,5 @@
 {
-  "baseURL": "http://localhost:3001",
+  "baseURL": "http://localhost:3000",
   "checks": {
     "legacyMissing": "063 lands on its page without zoom dialog",
     "unknownId": "true 404 at routing level",

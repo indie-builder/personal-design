@@ -3,23 +3,23 @@
   "checks": {
     "baseline": {
       "scroll": 0,
-      "max": 630,
+      "max": 1470,
       "column": 420
     },
     "nextStep": 420,
     "end": {
-      "scroll": 630,
-      "max": 630,
+      "scroll": 1470,
+      "max": 1470,
       "column": 420
     },
-    "arrowBack": 210,
+    "arrowBack": 1050,
     "drag": {
       "offset": 200,
       "pathname": "/"
     },
     "reduced": {
       "scroll": 420,
-      "max": 630,
+      "max": 1470,
       "column": 420
     },
     "mobile": {

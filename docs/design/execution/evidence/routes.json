@@ -1,5 +1,5 @@
 {
-  "total": 357,
+  "total": 359,
   "failed": [],
   "results": [
     {
@@ -31,21 +31,21 @@
       "isRedirectStub": false
     },
     {
+      "route": "/products/ai-coding-dictionary",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true,
+      "isRedirectStub": false
+    },
+    {
+      "route": "/products/ai-chat",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true,
+      "isRedirectStub": false
+    },
+    {
       "route": "/products/layout-compositions/002",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/005",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/006",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -59,14 +59,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/007",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/008",
+      "route": "/products/layout-compositions/006",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -80,6 +73,27 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/005",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true,
+      "isRedirectStub": false
+    },
+    {
+      "route": "/products/layout-compositions/008",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/009",
       "status": 200,
       "kind": "redirect",
@@ -87,7 +101,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/010",
+      "route": "/products/layout-compositions/007",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -95,6 +109,20 @@
     },
     {
       "route": "/products/layout-compositions/011",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/012",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/010",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -115,32 +143,11 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/012",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/015",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/016",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions",
-      "status": 200,
-      "kind": "page",
-      "hasMain": true,
-      "isRedirectStub": false
     },
     {
       "route": "/products/layout-compositions/017",
@@ -157,21 +164,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/019",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/021",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/022",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -185,14 +178,28 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/023",
+      "route": "/products/layout-compositions/016",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/024",
+      "route": "/products/layout-compositions/022",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/019",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/023",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -206,14 +213,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/026",
+      "route": "/products/layout-compositions/027",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/027",
+      "route": "/products/layout-compositions/024",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -234,14 +241,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/030",
+      "route": "/products/layout-compositions/026",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/031",
+      "route": "/products/layout-compositions/030",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -255,20 +262,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/033",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/035",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/034",
       "status": 200,
       "kind": "redirect",
@@ -276,7 +269,35 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/031",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/033",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/036",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/037",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/035",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -304,48 +325,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/037",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/046",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/047",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/043",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/044",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/045",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/041",
       "status": 200,
       "kind": "redirect",
@@ -360,21 +339,35 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/043",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/045",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/046",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/044",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/048",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/049",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/050",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -388,7 +381,21 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/052",
+      "route": "/products/layout-compositions/050",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/047",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/049",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -402,14 +409,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/054",
+      "route": "/products/layout-compositions/052",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/055",
+      "route": "/products/layout-compositions/054",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -423,14 +430,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/057",
+      "route": "/products/layout-compositions/058",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/058",
+      "route": "/products/layout-compositions/055",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -444,7 +451,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/060",
+      "route": "/products/layout-compositions/057",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/062",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -458,7 +472,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/062",
+      "route": "/products/layout-compositions/060",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/063",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -479,13 +500,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/063",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/066",
       "status": 200,
       "kind": "redirect",
@@ -494,13 +508,6 @@
     },
     {
       "route": "/products/layout-compositions/067",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/068",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -521,7 +528,21 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/068",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/071",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/073",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -542,21 +563,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/075",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/073",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/076",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/075",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -577,21 +591,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/080",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/082",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/079",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/080",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -605,14 +612,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/083",
+      "route": "/products/layout-compositions/082",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/084",
+      "route": "/products/layout-compositions/085",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -626,7 +633,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/085",
+      "route": "/products/layout-compositions/084",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/083",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -647,13 +661,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/091",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/089",
       "status": 200,
       "kind": "redirect",
@@ -661,7 +668,21 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/091",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/090",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/094",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -682,14 +703,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/094",
+      "route": "/products/layout-compositions/095",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/095",
+      "route": "/products/layout-compositions/096",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -710,13 +731,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/096",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/099",
       "status": 200,
       "kind": "redirect",
@@ -725,13 +739,6 @@
     },
     {
       "route": "/products/layout-compositions/100",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/101",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -752,7 +759,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/104",
+      "route": "/products/layout-compositions/101",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -766,7 +773,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/105",
+      "route": "/products/layout-compositions/104",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -774,6 +781,13 @@
     },
     {
       "route": "/products/layout-compositions/107",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/105",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -843,20 +857,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/117",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/123",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/118",
       "status": 200,
       "kind": "redirect",
@@ -871,14 +871,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/120",
+      "route": "/products/layout-compositions/117",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/121",
+      "route": "/products/layout-compositions/120",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -906,6 +906,20 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/123",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/121",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/126",
       "status": 200,
       "kind": "redirect",
@@ -920,21 +934,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/129",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/128",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/130",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -948,7 +948,21 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/129",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/132",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/130",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -962,7 +976,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/136",
+      "route": "/products/layout-compositions/135",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -976,7 +990,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/135",
+      "route": "/products/layout-compositions/136",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/139",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -997,20 +1018,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/139",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/140",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/141",
       "status": 200,
       "kind": "redirect",
@@ -1018,14 +1025,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/146",
+      "route": "/products/layout-compositions/142",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/142",
+      "route": "/products/layout-compositions/140",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1053,13 +1060,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/147",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/148",
       "status": 200,
       "kind": "redirect",
@@ -1074,7 +1074,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/150",
+      "route": "/products/layout-compositions/146",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/147",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1082,6 +1089,13 @@
     },
     {
       "route": "/products/layout-compositions/151",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/150",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1109,14 +1123,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/155",
+      "route": "/products/layout-compositions/158",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/156",
+      "route": "/products/layout-compositions/155",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1130,6 +1144,13 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/156",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/159",
       "status": 200,
       "kind": "redirect",
@@ -1137,7 +1158,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/158",
+      "route": "/products/layout-compositions/160",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1159,13 +1180,6 @@
     },
     {
       "route": "/products/layout-compositions/163",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/160",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1284,13 +1298,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/180",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/181",
       "status": 200,
       "kind": "redirect",
@@ -1298,7 +1305,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/182",
+      "route": "/products/layout-compositions/180",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1306,6 +1313,13 @@
     },
     {
       "route": "/products/layout-compositions/183",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/182",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1320,13 +1334,6 @@
     },
     {
       "route": "/products/layout-compositions/185",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/189",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1354,6 +1361,13 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/191",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/190",
       "status": 200,
       "kind": "redirect",
@@ -1361,7 +1375,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/191",
+      "route": "/products/layout-compositions/189",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1396,7 +1410,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/199",
+      "route": "/products/layout-compositions/197",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1410,14 +1424,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/197",
+      "route": "/products/layout-compositions/198",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/198",
+      "route": "/products/layout-compositions/199",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1445,14 +1459,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/203",
+      "route": "/products/layout-compositions/204",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/204",
+      "route": "/products/layout-compositions/203",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1473,14 +1487,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/206",
+      "route": "/products/layout-compositions/208",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/208",
+      "route": "/products/layout-compositions/206",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1515,6 +1529,27 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/217",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/215",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/218",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/212",
       "status": 200,
       "kind": "redirect",
@@ -1529,42 +1564,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/215",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/216",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/217",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/218",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/219",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/220",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1578,14 +1578,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/224",
+      "route": "/products/layout-compositions/222",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/222",
+      "route": "/products/layout-compositions/220",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1599,7 +1599,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/225",
+      "route": "/products/layout-compositions/224",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1613,7 +1613,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/227",
+      "route": "/products/layout-compositions/219",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/225",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1634,6 +1641,20 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/232",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/227",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/230",
       "status": 200,
       "kind": "redirect",
@@ -1641,14 +1662,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/231",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/232",
+      "route": "/products/layout-compositions/234",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1662,7 +1676,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/234",
+      "route": "/products/layout-compositions/231",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/237",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1683,21 +1704,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/237",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/238",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/240",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1712,6 +1719,13 @@
     },
     {
       "route": "/products/layout-compositions/241",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/240",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1739,6 +1753,13 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/244",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/245",
       "status": 200,
       "kind": "redirect",
@@ -1747,13 +1768,6 @@
     },
     {
       "route": "/products/layout-compositions/246",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/244",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1788,7 +1802,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/252",
+      "route": "/products/layout-compositions/257",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1802,14 +1816,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/253",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/255",
+      "route": "/products/layout-compositions/252",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1823,6 +1830,13 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/255",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/258",
       "status": 200,
       "kind": "redirect",
@@ -1830,7 +1844,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/257",
+      "route": "/products/layout-compositions/253",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1838,6 +1852,20 @@
     },
     {
       "route": "/products/layout-compositions/259",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/262",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/265",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1858,21 +1886,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/262",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/263",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/265",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1907,13 +1921,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/274",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/269",
       "status": 200,
       "kind": "redirect",
@@ -1921,14 +1928,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/270",
+      "route": "/products/layout-compositions/271",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/271",
+      "route": "/products/layout-compositions/270",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1949,28 +1956,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/278",
+      "route": "/products/layout-compositions/274",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/277",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/280",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/279",
+      "route": "/products/layout-compositions/275",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -1984,7 +1977,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/275",
+      "route": "/products/layout-compositions/277",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2005,35 +1998,28 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/279",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/278",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/280",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/283",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/286",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/287",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/288",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/289",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2047,6 +2033,13 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/288",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/285",
       "status": 200,
       "kind": "redirect",
@@ -2054,7 +2047,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/290",
+      "route": "/products/layout-compositions/286",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/289",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2068,14 +2068,21 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/292",
+      "route": "/products/layout-compositions/287",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/293",
+      "route": "/products/layout-compositions/290",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/292",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2096,6 +2103,13 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/297",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/296",
       "status": 200,
       "kind": "redirect",
@@ -2103,7 +2117,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/297",
+      "route": "/products/layout-compositions/293",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2131,13 +2145,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/301",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/302",
       "status": 200,
       "kind": "redirect",
@@ -2152,7 +2159,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/304",
+      "route": "/products/layout-compositions/301",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2160,6 +2167,13 @@
     },
     {
       "route": "/products/layout-compositions/305",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/304",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2194,21 +2208,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/310",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/311",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/312",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2229,7 +2229,21 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/312",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/314",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/310",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2243,13 +2257,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/317",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/318",
       "status": 200,
       "kind": "redirect",
@@ -2257,7 +2264,7 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/319",
+      "route": "/products/layout-compositions/317",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2271,14 +2278,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/321",
+      "route": "/products/layout-compositions/319",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/322",
+      "route": "/products/layout-compositions/321",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2292,35 +2299,14 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/322",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/324",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/326",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/327",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/325",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/329",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2334,7 +2320,35 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/325",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/326",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/329",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/330",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/layout-compositions/327",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2383,14 +2397,14 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/337",
+      "route": "/products/layout-compositions/338",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/338",
+      "route": "/products/layout-compositions/337",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2418,6 +2432,13 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/344",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
       "route": "/products/layout-compositions/342",
       "status": 200,
       "kind": "redirect",
@@ -2426,20 +2447,6 @@
     },
     {
       "route": "/products/layout-compositions/343",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/344",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
-      "route": "/products/layout-compositions/345",
       "status": 200,
       "kind": "redirect",
       "hasMain": false,
@@ -2460,6 +2467,20 @@
       "isRedirectStub": true
     },
     {
+      "route": "/products/layout-compositions/345",
+      "status": 200,
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
+    },
+    {
+      "route": "/products/personal-sites",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true,
+      "isRedirectStub": false
+    },
+    {
       "route": "/robots.txt",
       "status": 200,
       "kind": "asset",
@@ -2474,13 +2495,6 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/layout-compositions/349",
-      "status": 200,
-      "kind": "redirect",
-      "hasMain": false,
-      "isRedirectStub": true
-    },
-    {
       "route": "/products/layout-compositions/350",
       "status": 200,
       "kind": "redirect",
@@ -2488,18 +2502,18 @@
       "isRedirectStub": true
     },
     {
-      "route": "/products/personal-sites",
+      "route": "/products/muse",
       "status": 200,
       "kind": "page",
       "hasMain": true,
       "isRedirectStub": false
     },
     {
-      "route": "/products/muse",
+      "route": "/products/layout-compositions/349",
       "status": 200,
-      "kind": "page",
-      "hasMain": true,
-      "isRedirectStub": false
+      "kind": "redirect",
+      "hasMain": false,
+      "isRedirectStub": true
     }
   ]
 }
