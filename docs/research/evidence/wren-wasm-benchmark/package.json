@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@duckdb/node-api": "^1.5.5-r.5",
+    "@wrenai/wren-core-wasm": "^0.4.1"
+  }
+}

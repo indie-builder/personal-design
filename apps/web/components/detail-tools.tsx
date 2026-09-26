@@ -1,12 +1,7 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useRef } from 'react';
-import Image from 'next/image';
-import { Button } from './button';
-import styles from './detail-tools.module.css';
 import { usePathname, useRouter } from 'next/navigation';
-import { useMediaStatus } from '@/lib/use-media-status';
-import { LightboxProvider, useLightbox, type LightboxItem } from './lifeline/lightbox';
 
 // 常驻单例翻页监听：page 组件只把翻页目标写进 <html> dataset（useLayoutEffect，
 // paint 前就绪），keydown 在模块级只注册一次——详情→详情导航的过渡窗口内监听不卸，
@@ -55,99 +50,6 @@ function ensureNavListener() {
       navRouter?.push(detailNext);
     }
   });
-}
-
-/** 详情主图支持同主题图鉴的灯箱浏览。 */
-export function DetailMainImage(props: {
-  src: string;
-  thumb: string;
-  alt: string;
-  serial: string;
-  siblings: LightboxItem[];
-  index: number;
-}) {
-  return (
-    <LightboxProvider>
-      <MainImageButton {...props} />
-    </LightboxProvider>
-  );
-}
-
-function MainImageButton({
-  src,
-  thumb,
-  alt,
-  serial,
-  siblings,
-  index,
-}: {
-  src: string;
-  thumb: string;
-  alt: string;
-  serial: string;
-  siblings: LightboxItem[];
-  index: number;
-}) {
-  const lightbox = useLightbox();
-  // 'error' 即「回退预览图」状态；载入看门狗 12 秒。
-  const { status: state, attempt, setStatus, retry } = useMediaStatus(true, 12000);
-  return (
-    <div className={styles.imageWrap}>
-      <button
-        type="button"
-        aria-label={`放大查看 ${alt}`}
-        className={styles.imageButton}
-        onClick={(event) =>
-          lightbox?.open(
-            { src, thumb, alt, serial },
-            {
-              rect: event.currentTarget.getBoundingClientRect(),
-              sourceEl: event.currentTarget,
-              siblings,
-              index,
-            },
-          )
-        }
-      >
-        <Image
-          src={thumb}
-          alt={alt}
-          fill
-          priority
-          sizes="(min-width: 1024px) 60vw, 100vw"
-          className="object-contain"
-        />
-        {state !== 'error' && (
-          <Image
-            key={attempt}
-            src={src}
-            alt=""
-            fill
-            priority
-            unoptimized
-            sizes="(min-width: 1024px) 60vw, 100vw"
-            className={styles.fullImage}
-            style={{ opacity: state === 'ready' ? 1 : 0 }}
-            onLoad={() => setStatus('ready')}
-            onError={() => setStatus('error')}
-          />
-        )}
-        <span className={styles.zoomHint}>点击放大</span>
-      </button>
-      {state !== 'ready' && (
-        <div className={styles.status} role="status">
-          <span>
-            {state === 'loading' ? '正在载入高清图，先显示预览' : '高清图暂不可用，已显示预览'}
-          </span>
-          {state === 'error' && (
-            <Button variant="ghost" onClick={retry}>
-              重新加载
-            </Button>
-          )}
-        </div>
-      )}
-    </div>
-  );
 }
 
 /** 详情页键盘 ←/→ 翻页（与灯箱翻图心智一致）；并负责 detail-in 翻页跳过标记 */
