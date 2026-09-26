@@ -1,9 +1,0 @@
-.field { display:flex; align-items:center; gap:10px; min-height:var(--control-height); min-width:0; border:1px solid var(--color-control-border); border-radius:var(--radius-control); padding:0 12px; background:var(--color-paper); color:var(--color-ink); font:400 14px/20px var(--font-sans); transition:border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out); }
-.field:hover { border-color:var(--color-ink); }
-.field:focus-within { border-color:var(--color-ink); outline:2px solid var(--color-ink); outline-offset:3px; }
-.field > svg { flex-shrink:0; width:18px; height:18px; color:var(--color-ink-soft); }
-.field input { width:100%; min-width:0; height:42px; border:0; padding:0; background:transparent; color:inherit; font:inherit; outline:none; caret-color:var(--color-ink); }
-.field input::placeholder { color:var(--color-ink-soft); opacity:1; }
-.field > button { min-height:34px; padding:6px 12px; margin-right:-8px; }
-select.field { padding-right:32px; cursor:pointer; }
-.field:disabled { background:var(--color-subtle); color:var(--color-ink-soft); cursor:not-allowed; }

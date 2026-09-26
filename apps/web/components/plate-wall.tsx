@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { browseHref, browseMemoryKey, matchesSearch } from '@/lib/browse-context';
+import { paramsHref } from '@/lib/site-url';
 import { MotionVideo } from './motion-video';
 import { categoryLabel } from '@/lib/category-label';
 import { CollectionSearch } from './collection-search';
@@ -64,9 +65,13 @@ export function PlateWall({
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     const post = params.get('post');
-    params.delete('post');
-    const listHref = `${pathname}${params.size ? `?${params}` : ''}`;
-    if (post) router.replace(browseHref(`${pathname}/${encodeURIComponent(post)}`, listHref));
+    if (post)
+      router.replace(
+        browseHref(
+          `${pathname}/${encodeURIComponent(post)}`,
+          paramsHref(pathname, params, { post: '' }),
+        ),
+      );
   }, [searchParams, pathname, router]);
   const query = searchParams.get('q') ?? '';
   // 输入即时回显在本地，停顿后写入 URL（URL 是筛选的唯一事实源）
@@ -77,10 +82,11 @@ export function PlateWall({
     setInput(value);
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      const params = new URLSearchParams(window.location.search);
-      if (value) params.set('q', value);
-      else params.delete('q');
-      window.history.replaceState(null, '', `${pathname}${params.size ? `?${params}` : ''}`);
+      window.history.replaceState(
+        null,
+        '',
+        paramsHref(pathname, new URLSearchParams(window.location.search), { q: value }),
+      );
     }, SEARCH_DEBOUNCE);
   };
   const returnHref = `${pathname}${searchParams.size ? `?${searchParams}` : ''}`;

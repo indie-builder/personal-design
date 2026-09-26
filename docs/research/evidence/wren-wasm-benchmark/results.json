@@ -1,0 +1,243 @@
+{
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M2 Max",
+  "ram_gib": 64,
+  "wren": "0.4.1",
+  "duckdb_node": "1.5.5-r.5",
+  "query": "SELECT region, SUM(amount) AS total, COUNT(*) AS cnt FROM Orders WHERE status = 'paid' AND day >= 30 AND day < 300 GROUP BY region ORDER BY region",
+  "warm_repeats": 5,
+  "results": [
+    {
+      "mode": "wren-json",
+      "rows": 100000,
+      "init_ms": 106.6,
+      "load_ms": 289.8,
+      "first_query_ms": 151.7,
+      "warm_median_ms": 6.5,
+      "warm_ms": [
+        6.5,
+        6.1,
+        6.7,
+        6.4,
+        6.5
+      ],
+      "peak_process_rss_mib": 457.1,
+      "file_mib": {
+        "csv": 2.4,
+        "json": 6.7,
+        "parquet": 0.3,
+        "duckdb": 0.8
+      },
+      "correct": true
+    },
+    {
+      "mode": "wren-csv",
+      "rows": 100000,
+      "init_ms": 106,
+      "load_ms": 48.3,
+      "first_query_ms": 162.7,
+      "warm_median_ms": 8,
+      "warm_ms": [
+        8.6,
+        8,
+        7.6,
+        7.7,
+        8.7
+      ],
+      "peak_process_rss_mib": 377.5,
+      "file_mib": {
+        "csv": 2.4,
+        "json": 6.7,
+        "parquet": 0.3,
+        "duckdb": 0.8
+      },
+      "correct": true
+    },
+    {
+      "mode": "wren-parquet",
+      "rows": 100000,
+      "init_ms": 104.2,
+      "load_ms": 30.4,
+      "first_query_ms": 159.9,
+      "warm_median_ms": 8.5,
+      "warm_ms": [
+        8.8,
+        8.1,
+        8,
+        8.5,
+        8.7
+      ],
+      "peak_process_rss_mib": 377.6,
+      "file_mib": {
+        "csv": 2.4,
+        "json": 6.7,
+        "parquet": 0.3,
+        "duckdb": 0.8
+      },
+      "correct": true
+    },
+    {
+      "mode": "duckdb-csv",
+      "rows": 100000,
+      "init_ms": 47.1,
+      "load_ms": 41.8,
+      "first_query_ms": 4.4,
+      "warm_median_ms": 2.2,
+      "warm_ms": [
+        2.4,
+        2.5,
+        2.2,
+        2,
+        1.9
+      ],
+      "peak_process_rss_mib": 97.3,
+      "file_mib": {
+        "csv": 2.4,
+        "json": 6.7,
+        "parquet": 0.3,
+        "duckdb": 0.8
+      },
+      "correct": true
+    },
+    {
+      "mode": "duckdb-file",
+      "rows": 100000,
+      "init_ms": 44.6,
+      "load_ms": 0,
+      "first_query_ms": 3.1,
+      "warm_median_ms": 1.3,
+      "warm_ms": [
+        1.6,
+        1.5,
+        1.3,
+        1.2,
+        1
+      ],
+      "peak_process_rss_mib": 86.1,
+      "file_mib": {
+        "csv": 2.4,
+        "json": 6.7,
+        "parquet": 0.3,
+        "duckdb": 0.8
+      },
+      "correct": true
+    },
+    {
+      "mode": "wren-json",
+      "rows": 1000000,
+      "init_ms": 109.8,
+      "load_ms": 6717.5,
+      "first_query_ms": 182.4,
+      "warm_median_ms": 32.5,
+      "warm_ms": [
+        34.9,
+        33.9,
+        32.5,
+        31.8,
+        32
+      ],
+      "peak_process_rss_mib": 1497.5,
+      "file_mib": {
+        "csv": 24.5,
+        "json": 68.4,
+        "parquet": 2.1,
+        "duckdb": 3.3
+      },
+      "correct": true
+    },
+    {
+      "mode": "wren-csv",
+      "rows": 1000000,
+      "init_ms": 103.5,
+      "load_ms": 188.8,
+      "first_query_ms": 200.9,
+      "warm_median_ms": 37.9,
+      "warm_ms": [
+        46.2,
+        39,
+        37.9,
+        37.6,
+        36.3
+      ],
+      "peak_process_rss_mib": 476.3,
+      "file_mib": {
+        "csv": 24.5,
+        "json": 68.4,
+        "parquet": 2.1,
+        "duckdb": 3.3
+      },
+      "correct": true
+    },
+    {
+      "mode": "wren-parquet",
+      "rows": 1000000,
+      "init_ms": 104,
+      "load_ms": 88,
+      "first_query_ms": 193.3,
+      "warm_median_ms": 38.4,
+      "warm_ms": [
+        48.7,
+        41.4,
+        37.7,
+        38.4,
+        38
+      ],
+      "peak_process_rss_mib": 435.5,
+      "file_mib": {
+        "csv": 24.5,
+        "json": 68.4,
+        "parquet": 2.1,
+        "duckdb": 3.3
+      },
+      "correct": true
+    },
+    {
+      "mode": "duckdb-csv",
+      "rows": 1000000,
+      "init_ms": 45,
+      "load_ms": 222.6,
+      "first_query_ms": 16.7,
+      "warm_median_ms": 15.6,
+      "warm_ms": [
+        15.6,
+        16.2,
+        15.6,
+        15.9,
+        15.6
+      ],
+      "peak_process_rss_mib": 165.5,
+      "file_mib": {
+        "csv": 24.5,
+        "json": 68.4,
+        "parquet": 2.1,
+        "duckdb": 3.3
+      },
+      "correct": true
+    },
+    {
+      "mode": "duckdb-file",
+      "rows": 1000000,
+      "init_ms": 46.3,
+      "load_ms": 0,
+      "first_query_ms": 8.8,
+      "warm_median_ms": 6.6,
+      "warm_ms": [
+        6.9,
+        6.6,
+        6,
+        6.8,
+        6.5
+      ],
+      "peak_process_rss_mib": 89,
+      "file_mib": {
+        "csv": 24.5,
+        "json": 68.4,
+        "parquet": 2.1,
+        "duckdb": 3.3
+      },
+      "correct": true
+    }
+  ]
+}
