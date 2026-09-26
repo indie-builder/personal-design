@@ -68,10 +68,11 @@
 ### AI Coding 词典 `/products/ai-coding-dictionary`
 
 - 从首页作品入口进入后，在全屏 iframe 中加载本地保存的原版图谱，标题回退导航叠放在画布左上角；原版负责知识网渲染、动效、镜头、收起式搜索和选择，本站不重建图谱。跳过 loading 开场，背景与前景跟随主题，字体采用 Albert Sans。节点放大约 15%，七个章节使用固定低饱和浅色；选中圆点、纸色间隔和粗外圈置顶。保留原版放射排布，碰撞节点沿原方向向外错开，为名称留出空间；保留标签渲染修正，不强制节点进入固定可视区。配色切换、声音控件和音频初始化已移除。
-- 详情按用户当前要求采用 Impeccable 阅读面，替代原版详情布局与按钮。`bridge.js` 创建原生 aside，`detail.css` 提供桌面右侧与小屏底部布局；标题、关闭及相邻导航常驻，正文独立滚动。中文与英文释义、中文解读与完整英文正文同屏，原文表格使用语义 table。内容定位只滚动阅读区；关联术语按章节排列为紧凑原生链接目录，相邻词条显示完整名称。旧详情组件不挂载，分享与 Copy Markdown 控件移除。
+- 详情采用 Impeccable 阅读面。`bridge.js` 创建原生 aside，`detail.css` 提供桌面右侧与小屏底部布局；标题、关闭及相邻导航常驻，正文独立滚动。中英释义和逐段对应的完整中英正文同屏，中文概述单独保留但不代替全文翻译；双语表格使用语义 table。内容定位只滚动阅读区；关联术语默认收起为一行，展开后按章节显示紧凑原生链接，相邻词条显示完整名称。旧详情组件不挂载，分享与 Copy Markdown 控件移除。
 - 词条和搜索状态同步到本站 URL 的 `term`、`q`，保留原生链接、修饰键新标签和浏览器历史；关联词条不在当前搜索结果内时清除搜索以显示目标节点。关闭与 Esc 清除选中状态并将焦点返回搜索入口。返回作品统一使用共享页头的标题导航，不另放图谱内返回按钮。
-- `pnpm sync:ai-coding-dictionary` 依据源仓库 Git blob SHA 增量更新，仅变更词条重新翻译；随后 `prepare-runtime.mjs` 将包内 `upstream/` 快照、本站运行适配及更新后的目录生成到 `apps/web/public/ai-coding-atlas/`。
-- 详情范围与评审处置见 [详情阅读区契约](execution/ai-coding-dictionary-detail.md)；可重复的运行检查见 [CDP 验收记录](execution/ai-coding-dictionary-cdp.md)。本轮已完成详情正文、章节目录跳转、关闭／Esc、首末导航、搜索关联跳转与浏览器返回验收；实际范围见 JSON 记录。
+- `pnpm sync:ai-coding-dictionary` 依据源仓库 Git blob SHA 增量更新，使用本机默认 `claude -p` 完整翻译变更词条并检查中英文段落一一对应；随后 `prepare-runtime.mjs` 将包内 `upstream/` 快照、本站运行适配及更新后的目录生成到 `apps/web/public/ai-coding-atlas/`。
+- 旧目录缺少全文译文时可运行 `pnpm --filter @personal-design/ai-coding-dictionary backfill:zh`；脚本逐词条保存，可中断续跑。构建时若有词条缺少与英文对应的译文，则报错而不发布摘要版。
+- 详情范围见 [详情阅读区契约](execution/ai-coding-dictionary-detail.md)；本轮全文翻译与关联区的实际检查及截图见 [验收记录](execution/evidence/dictionary-full-translation-qa.md)。此前的 [CDP 记录](execution/ai-coding-dictionary-cdp.md) 只证明旧版摘要阅读面与原图谱行为。
 
 - 首页缩略预览按可见性复用原版图谱动画与连线，离屏释放资源；普通首页入口每次创建新的图谱实例，重置上次搜索、选中与镜头状态。
 

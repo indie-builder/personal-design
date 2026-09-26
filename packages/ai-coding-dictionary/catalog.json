@@ -49,7 +49,14 @@
           "\"Translate that before scoping it — she means an LLM in a harness with access to the ticket system. 'AI' on its own isn't a spec.\""
         ],
         "zh": [
-          "AI 不是某种固定的机器结构，而是一个会随时代移动的标签。过去它先后指符号推理、专家系统、机器学习和深度学习；今天常被用来指大型语言模型。讨论能力或问题时，最好进一步说清楚是 Model、Harness、Agent，还是提供给它们的 Context。"
+          "一个不断移动的标签，而非一项技术。\"AI\" 并不像 Model 或 Token 那样指代某个固定的东西——它指向计算机新近能够做到、且令人印象深刻的事。眼下它指向大语言模型。而在过去，它曾指向过截然不同的事物：",
+          "| 时代 | \"AI\" 的含义 |\n| --------- | ----------------------------------------------------------------------------------------------------- |\n| 1950 年代 | 符号推理 —— 定理证明器、西洋跳棋程序。 |\n| 1960–70 年代 | 基于规则的符号程序 —— ELIZA、SHRDLU。 |\n| 1980 年代 | 专家系统 —— 数千条手写的 if-then 规则，将人类专业知识编码其中。 |\n| 1990 年代 | 博弈树搜索 —— Deep Blue 击败 Kasparov（1997）。研究者完全回避 \"AI\" 一词 |\n| 2000 年代 | 统计机器学习 —— 垃圾邮件过滤器、推荐系统。仍然以 \"machine learning\" 的名义出售，而不是 \"AI\" |\n| 2010 年代 | 深度学习 —— 图像识别（AlexNet，2012）、AlphaGo（2016）。 |\n| 2020 年代 | 大语言模型 —— ChatGPT（2022）让 \"AI\" 的含义变成了聊天机器人 |",
+          "这个指针的移动有已知的机制，有时被称为 AI 效应：一旦某项技术稳定可靠地工作，它就会被重新命名——\"不过是\"搜索，\"不过是\"统计——而 \"AI\" 则向前滑向下一件尚未解决的事。这个观察由来已久。Bertram Raphael 在 1971 年这样表述：\"AI 是我们尚不知道如何用计算机妥善解决的问题的集合名称。\" Larry Tesler 在 1979 年前后的版本是：\"智能就是机器尚未做到的事。\"",
+          "这正是关于 AI 的对话常常各说各话的原因。像 \"AI 不会推理\" 或 \"AI 被过度炒作了\" 这样的论断都带有一个隐藏的时间戳——它可能说的是专家系统，可能是 2010 年代的图像分类器，也可能是上个月的 LLM，而每一种所指都支撑着不同的结论。当关于 AI 的讨论陷入僵局时，通常的解法是把这个词换成真正想要表达的精确术语：Model、Harness、Agent，或者提供给它的 Context。",
+          "避免：在任何技术性论断中使用 \"AI\"——改为点名你实际所指的那个部分。用 \"AI coding\" 作为这项实践的标签没问题；\"AI 在幻觉\" 则不行。",
+          "用法",
+          "\"CTO 想知道 AI 能否处理分诊队列。\"",
+          "\"先翻译一下再界定范围——她指的是一个能访问 Ticket 系统的 Harness 中的 LLM。单独的 'AI' 不是一份 Spec。\""
         ]
       },
       "related": [
@@ -58,7 +65,10 @@
         "Harness",
         "Agent",
         "Context"
-      ]
+      ],
+      "summary": {
+        "zh": "AI 不是某种固定的机器结构，而是一个会随时代移动的标签。过去它先后指符号推理、专家系统、机器学习和深度学习；今天常被用来指大型语言模型。讨论能力或问题时，最好进一步说清楚是 Model、Harness、Agent，还是提供给它们的 Context。"
+      }
     },
     {
       "term": "Model",
@@ -78,7 +88,13 @@
           "\"Try it — but the harness is doing most of the lifting on this task. The model swap won't help if the system prompt and tools are wrong.\""
         ],
         "zh": [
-          "Model 是训练后固定的一组 parameters。它接收 Tokens 并做 next-token prediction，不会自己读取文件、调用工具或记住昨天的对话。我们看到的 Agent 行为来自 Harness 把多次 Model 请求与工具执行串起来；同一个 Model 在不同 Harness 和 Context 下，表现可能很不一样。"
+          "Parameters。Stateless——只做 next-token prediction，仅此而已。\"Claude Opus 4.x\" 和 \"GPT-5.x\" 都是 Model。单靠 Model 本身做不了任何 agentic 的事，它必须由 Harness 驱动。",
+          "Model 不能读文件、跑命令、浏览网页，也记不住昨天的事——每次 model provider request，它只是输入 Token、预测输出 Token。所有那些感觉像是 Agent 在干活的部分——选择工具、读取结果、循环到任务完成——都是 Harness 在把一连串这样的预测编排起来。",
+          "Model provider 按档位发布 Model：大号的最聪明，但慢且贵；小号的更快更便宜，但能力弱一些。选档位是个实打实的决定——规划和硬核调试用重量级，机械性改动用轻量级——而 Harness 让你能在 Session 中途切换。",
+          "对这个词较真，也能让诊断更锐利。\"这个 Model 不擅长这件事\"是一个具体的断言——同一个 Model 换一个 Harness，或者换一个 Context，表现常常完全不同。在怪罪 Model 之前，先看它拿到了什么：大多数令人失望的输出，根子在 Context 或 Harness，而不是 Parameters。",
+          "用法",
+          "\"规划这一步，我们该把 Model 从 Sonnet 换成 Opus 吗？\"",
+          "\"试试吧——但这个任务里主要出力的是 Harness。如果 System prompt 和工具不对，换 Model 也帮不上忙。\""
         ]
       },
       "related": [
@@ -94,7 +110,10 @@
         "Session",
         "Context",
         "System prompt"
-      ]
+      ],
+      "summary": {
+        "zh": "Model 是训练后固定的一组 parameters。它接收 Tokens 并做 next-token prediction，不会自己读取文件、调用工具或记住昨天的对话。我们看到的 Agent 行为来自 Harness 把多次 Model 请求与工具执行串起来；同一个 Model 在不同 Harness 和 Context 下，表现可能很不一样。"
+      }
     },
     {
       "term": "Parameters",
@@ -113,7 +132,12 @@
           "\"That'd update the parameters — different model afterwards. For one project it's almost always cheaper to load the codebase as context than to retrain.\""
         ],
         "zh": [
-          "Parameters 是训练阶段调出的数值，也称 weights。它们参与每一步 Token 预测，而不是一张可直接查询的事实表。一次 Session 中的对话不会修改 parameters；要让 Model 使用新的项目知识，通常应把资料放进 Context，而不是指望它在聊天时完成训练。"
+          "Model 内部的数字 —— 常常有数十亿个 —— 在 Training 期间被调校。Model“知道”的一切都存在于其中。Training 设定它们；Inference 原封不动地使用它们。也叫权重（weights）。",
+          "从机制上说，Parameters 起着把输入转化为输出（turn input into output）的作用。Next-token prediction 是一次庞大的计算：Context window 里的 Token 输入进来，经过 Parameters 的乘法运算，输出的是对下一个 Token 的预测。Model 内部没有事实数据库，也没有代码查找表——只有这些数字，它们的排列方式让这一计算倾向于产生有用的输出。Model 能从 Training 中背诵出来的事实，比如某个标准库 API，属于 Parametric knowledge：它们存储在 Parameters 中，而不是从任何地方检索来的。",
+          "值得内化的细节是：Parameters 在 Training 之后就冻结了。你在一次 Session 里做的任何事都不会改变它们 —— 你做的纠正、你给它看的代码库、它从中得到的教训，都不行。每个 Session 都跑在同一批数字上。这就是 Model 为什么是 Stateless 的，为什么它内置的知识止步于 Knowledge cutoff，以及为什么任何与项目相关的东西都必须改由 Context 传入。改变 Parameters 的唯一途径是更多的 Training —— 而这实际上会产出一个不同的 Model。",
+          "用法",
+          "\"我们能在自己的代码库上对它做 fine-tune 吗？\"",
+          "\"那会更新 Parameters —— 之后就是不同的 Model 了。只针对一个项目的话，把代码库作为 Context 加载，几乎总是比 retrain 更划算。\""
         ]
       },
       "related": [
@@ -128,7 +152,10 @@
         "Stateless",
         "Knowledge cutoff",
         "Context"
-      ]
+      ],
+      "summary": {
+        "zh": "Parameters 是训练阶段调出的数值，也称 weights。它们参与每一步 Token 预测，而不是一张可直接查询的事实表。一次 Session 中的对话不会修改 parameters；要让 Model 使用新的项目知识，通常应把资料放进 Context，而不是指望它在聊天时完成训练。"
+      }
     },
     {
       "term": "Training",
@@ -147,7 +174,12 @@
           "\"Not via training — that's a months-long process by the model provider. Load the API docs into context instead, that's the lever you actually have.\""
         ],
         "zh": [
-          "Training 用大量文本让 Model 反复预测下一个 Token，再根据误差调整 parameters。这包括大规模预训练，也可包括后续指令训练。训练结束后得到固定的 Model；你的项目代码、最新 API 或团队约定，需要通过 Context 交给它。"
+          "设定 Model 的 Parameters 的过程：通过让 Model 接触海量文本并调整 Parameters 来改进 next-token prediction。这是由 Model provider 完成的、一次性且昂贵的过程。它同时涵盖 pre-training（主体的大规模训练）与 post-training（后续的细化，如 instruction-following 和安全性）；在本词条的层面上，这一区分并不重要。",
+          "其机制是大规模重复：给 Model 看一段文本，让它预测下一个 Token，再把 Parameters 朝着实际的下一 Token 微调，如此在数万亿个 Token 上反复进行。没有任何内容以事实或规则的形式被存储——Model \"知道\" 的一切，都是它在预测上变得更好的副作用，被压缩进 Parameters，成为 parametric knowledge。",
+          "有两个后果在日常工作中至关重要。Training 会在某个时间点结束，因此 Model 有 knowledge cutoff——它没见过你上个月才升级到的那个库版本。而且 Training 不是你所能做的事：当 Model 不了解你的代码库、你的约定或内部 API 时，解决办法从来不是 \"教 Model\"——而是把那些材料放进 Context，那是你唯一能掌控的输入。",
+          "用法",
+          "\"我们能让它了解我们的内部 API 吗？\"",
+          "\"没法靠 Training 做到——那是 Model provider 耗时数月的过程。改为把 API 文档放进 Context，那才是你真正拥有的杠杆。\""
         ]
       },
       "related": [
@@ -159,7 +191,10 @@
         "Parametric knowledge",
         "Knowledge cutoff",
         "Context"
-      ]
+      ],
+      "summary": {
+        "zh": "Training 用大量文本让 Model 反复预测下一个 Token，再根据误差调整 parameters。这包括大规模预训练，也可包括后续指令训练。训练结束后得到固定的 Model；你的项目代码、最新 API 或团队约定，需要通过 Context 交给它。"
+      }
     },
     {
       "term": "Inference",
@@ -180,7 +215,14 @@
           "\"You're paying for inference — every model provider request runs the model on the provider's hardware. Training already happened, but inference costs accrue per request, and a single turn can expand into many requests when tools are called.\""
         ],
         "zh": [
-          "Inference 是用已经训练好的 Model 生成输出。每次 Model provider request 都会运行它，但不会改变 parameters。对用户而言，这就是输入 Context、等待 Model 逐个生成输出 Tokens 的过程。"
+          "运行一个训练好的模型来生成输出——也就是每一次 Model provider request 时实际发生的事。Parameters 保持不变；模型只是对给定的 Context 做 Next-token prediction。相对 Training 而言成本很低，但按 Token 计费，并且是使用模型时占主导的成本。",
+          "一个 Model 的生命周期分为两个阶段：",
+          "| 阶段 | 何时发生 | 它做什么 | Parameters |\n| --------- | -------------------------------- | --------------------------------------------------------------- | ------------- |\n| Training | 一次，在发布之前 | 从 Training corpus 中生成 Parameters | 正在写入 |\n| Inference | 每次任何人使用 Model 时 | 在你的 Context 上运行冻结的 Parameters，以生成 tokens | 只读 |",
+          "你在 Inference 时做的任何事情都不会写回 Parameters——这就是你今天做的一处纠正，到明天并不保留的原因。下一个 Session 里又犯同样错误的那个 Model，即使你已经仔细解释过修正方法，也并不是无视了你；它根本没有能力从这次交流中学习。Model 是 Stateless 的——连续性必须来自它之外——来自 Context window 或 Memory system。",
+          "这一机制同样解释了你是如何被计费的。每个请求都会让 Model 在完整的 Context 上运行，因此成本随 Input tokens 和 Output tokens 增长，而一个发起数十次 Tool 调用的 Agent，每一轮往返都要为 Inference 付费。这就是为什么 Context 的大小既是一个成本问题，也是一个质量问题。",
+          "用法",
+          "\"为什么账单会随用量增长，而不是一笔固定的许可费？\"",
+          "\"你是在为 Inference 付费——每一次 Model provider request 都会在 Model provider 的硬件上运行模型。Training 已经发生过了，但 Inference 的成本是按请求累积的，而且当 Tool 被调用时，一次 Turn 可能膨胀成许多次请求。\""
         ]
       },
       "related": [
@@ -199,7 +241,10 @@
         "Output tokens",
         "Tool",
         "Turn"
-      ]
+      ],
+      "summary": {
+        "zh": "Inference 是用已经训练好的 Model 生成输出。每次 Model provider request 都会运行它，但不会改变 parameters。对用户而言，这就是输入 Context、等待 Model 逐个生成输出 Tokens 的过程。"
+      }
     },
     {
       "term": "Effort",
@@ -221,7 +266,15 @@
           "\"Bump the effort up. That's a reasoning-heavy bug, and on the default setting it's not thinking long enough before it commits to an approach.\""
         ],
         "zh": [
-          "Effort 控制回答前投入的推理量。提高设置通常会消耗更多 output tokens，增加时间和费用，也可能提高复杂任务的成功率。简单的机械工作不一定需要最高 Effort，难题则可能受益于更充分的推理。"
+          "Effort 是一个旋钮，用来调节 Model 在作答之前做多少推理。它按 Model provider request 逐次设置，控制 Model 在开始写出你看到的响应之前所经历的思考长度。那段思考和其他一切内容一样，是在 Inference 阶段生成的；Harness 常常会把它隐藏起来，但那是 Model 正在做的真实工作。",
+          "更高的 Effort 花费更多、运行更慢。推理是以 Token 的形式产生的，即使你从未看见，也会按 Output tokens 计费，而且是一个 Token 一个 Token 地生成——所以调高 Effort 会拉长答案到来之前的等待，并推高账单。这笔权衡是用更多的深思熟虑，去换速度与成本。",
+          "大多数 Harness 会把 Effort 呈现为一个小的档位阶梯：",
+          "| 级别 | 适用场景 |\n| ------ | ---------------------------------------------------------------------- |\n| Low | 机械性编辑、查找，以及规格明确、只有一条清晰路径的改动。 |\n| Medium | 日常编码——通常的默认选项。 |\n| High | 棘手的 bug、设计决策、多步骤计划。 |\n| Max | 最难的问题，答错后纠正的代价很高。 |",
+          "把 Effort 设错的症状是双向的。在一个难题上把 Effort 设得太低，你会得到一个自信却浅薄的答案，它跳过了这个问题所需的推理——它读起来没问题，却错得会在日后让你付出代价。而为了改一行名字就把 Effort 设到最高，你就得熬过一段漫长的思考，而它产出的一切，最低的档位一样能给。",
+          "让 Effort 匹配任务，而不是整个 Session。真正难以推理的部分，就把这一 Turn 的 Effort 调高；围绕它的机械性工作，则调低。",
+          "用法",
+          "\"它总是把这个并发修复搞砸——我已经重新解释了三遍。\"",
+          "\"把 Effort 调高。那是个对推理要求很高的 bug，在默认档位下，它在选定某个方案之前思考得不够久。\""
         ]
       },
       "related": [
@@ -232,7 +285,10 @@
         "Token",
         "Output tokens",
         "Session"
-      ]
+      ],
+      "summary": {
+        "zh": "Effort 控制回答前投入的推理量。提高设置通常会消耗更多 output tokens，增加时间和费用，也可能提高复杂任务的成功率。简单的机械工作不一定需要最高 Effort，难题则可能受益于更充分的推理。"
+      }
     },
     {
       "term": "Token",
@@ -253,7 +309,14 @@
           "\"Run it through the tokenizer — the schema's compact but the JSON keys are weird, so they'll split into more tokens than you think.\""
         ],
         "zh": [
-          "Token 是 Model 的读写单位，不等同于字符或单词；一个常见英文词可能只占一个 Token，长标识符和代码片段则可能拆成多个。Context window 的容量、请求成本与生成速度都按 Tokens 计算，因此长历史和大文件会直接影响工作。"
+          "Model 读写的最小原子单位。大致与词等长，但并不精确——常见词是一个 token，罕见或较长的词会拆成好几个。Context window 的大小、成本和延迟都以 token 计数。",
+          "文本经由 tokenizer 变成 token：这是一份由数万个片段组成的固定词表，在 training 之前就已学得，能把任意输入切分成一串词表条目。Model 从不接触字符或单词——进入时每段文本都被转换成 token，输出时则由 next-token prediction 一次一个 token 地产生结果。",
+          "经验法则是，一个 token 大约相当于四分之三个英文单词，所以一千个 token 约合 750 个单词。代码的可预测性更低：常见的关键字和惯用写法能以紧凑的方式 tokenize，而自动生成的标识符、哈希、base64 数据块以及压缩后的产物，每个「单词」都会拆成许多 token。规律是：在 tokenizer 的语料中频繁出现的文本会得到短小高效的编码；没出现过的则被切成许多小片段。像 a3f9c2e1 这样的哈希从未在任何地方出现过，所以会拆成很多 token，而 function 只占一个。这就是为什么一个看似很小、却塞满罕见字符串的文件，可能占用 context window 中惊人比例的空间。",
+          "Token 是衡量其他一切的基准单位。成本按 token 计——服务商分别对 input tokens 和 output tokens 计费。速度是每秒 token 数，因为输出是一次一个 token 生成的。而 context window 是固定的 token 数量，所以你文件的 token 数决定了能装下多少。",
+          "避免：「word」——token 的边界与单词边界并不一致，真正重要的单位是 tokens-per-second ／ tokens-per-dollar。",
+          "用法",
+          "「这个 prompt 会有多大？」",
+          "「把它跑一遍 tokenizer——schema 本身很紧凑，但 JSON 的 key 很奇怪，所以它们会比你想象中拆成更多的 token。」"
         ]
       },
       "related": [
@@ -263,7 +326,10 @@
         "Next-token prediction",
         "Input tokens",
         "Output tokens"
-      ]
+      ],
+      "summary": {
+        "zh": "Token 是 Model 的读写单位，不等同于字符或单词；一个常见英文词可能只占一个 Token，长标识符和代码片段则可能拆成多个。Context window 的容量、请求成本与生成速度都按 Tokens 计算，因此长历史和大文件会直接影响工作。"
+      }
     },
     {
       "term": "Next-token prediction",
@@ -282,7 +348,12 @@
           "\"It doesn't — it's next-token prediction all the way down. The tool call is just a structured string the harness parses out of the output stream.\""
         ],
         "zh": [
-          "Model 根据当前 Context 为下一个 Token 计算候选概率，选出一个并接到序列末尾，然后继续预测。这是它生成回答、代码和 tool calls 的共同机制；看似不同的任务，底层仍是连续的 Token 预测。"
+          "Model 实际做的事。给定一段 Context，它会采样下一个 Token，将其追加，然后再次运行。每一份输出——一句话、一次 Tool call、一个上千行的文件——都是一次一个 Token 构建出来的。Model 没有其他的运行模式。",
+          "每一步的运作方式都相同：Context window 中的 Token 会经过 Parameters 运算，为词表中的每一个 Token 生成一个概率——这个 Token 很可能是下一个，那个则可能性较小。从这些概率中采样出一个 Token，追加到末尾，循环再次运行，此时 Context 略微更长。正是这个采样步骤，使得同一个 prompt 在不同次运行中会产生不同的输出：Non-determinism 内建于这一机制之中，而不是叠加在其之上的 bug。",
+          "牢牢把握这套机制，就能解释那些原本显得奇怪的行为。Model 在输出每个 Token 之前，从不检查它是否为真——只判断它是否可能——而这正是 Hallucination 的根源。它一路生成、就一路为每个 Token 定下结论，所以一句听起来自信的开场白，就可能把答案的其余部分带偏。而且由于 Output tokens 严格地一次只生成一个，生成速度就为任何 Agent 的工作速度设定了下限。",
+          "用法",
+          "\"Agent 是如何“决定”调用 Tool 的？\"",
+          "\"并非如此——一路到底都是 Next-token prediction。Tool call 只不过是 Harness 从输出流中解析出来的一段结构化字符串。\""
         ]
       },
       "related": [
@@ -297,7 +368,10 @@
         "Output tokens",
         "Agent",
         "Harness"
-      ]
+      ],
+      "summary": {
+        "zh": "Model 根据当前 Context 为下一个 Token 计算候选概率，选出一个并接到序列末尾，然后继续预测。这是它生成回答、代码和 tool calls 的共同机制；看似不同的任务，底层仍是连续的 Token 预测。"
+      }
     },
     {
       "term": "Non-determinism",
@@ -317,7 +391,13 @@
           "\"Probably not — model output is non-deterministic. You're going to have good days and bad days on the same task. Try again tomorrow before you go looking for a cause.\""
         ],
         "zh": [
-          "同一个提示不保证每次得到完全相同的结果。生成过程中的采样，以及 Provider 的服务方式，都可能引入差异。因此评估 Agent 工作时应看可重复的检查和结果，而不是把一次输出当成永久稳定的行为。"
+          "相同的输入可能产生不同的输出。用完全一样的 context 把 model 跑两次，你可能会得到两个不同的答案——有时只差一个词，有时则是完全不同的思路。而这一切的发生，不需要你改动代码里的任何东西。",
+          "这是 model 生成文本的方式，也是 model 供应商处理请求的方式所决定的固有属性。在 inference 期间，model 会针对可能的下一个 token 生成一个概率分布，再从中采样出一个——通常是刻意加入一些随机性，因为总是挑最可能的那个 token 会产出重复、质量更低的文本。响应早期只要有一个 token 的采样结果不同，它之后的每一个 token 都会随之改变，于是一个词的差异就变成了一条完全不同的思路。供应商一侧的处理还会在此基础上叠加更多变化：请求会在共享硬件上被合并批处理，批与批之间微小的浮点差异就可能让两个 token 之间的接近选择发生倾斜。没有任何设置能一劳永逸地让它消失。",
+          "对同一个任务，要预期 agent 给出的是一个结果分布。大多数响应落在一条合理的质量钟形曲线之内——这正是 non-determinism 尚可忍受的原因——但两侧的尾部是真实存在的：有些日子 model 会显得很敏锐，有些日子它则像是完全乱了阵脚。同样的任务，不同的掷骰结果。这带来两个实际后果。重试是一种正当的策略：一次失败的尝试只是从分布里抽出的一个样本，对同一个任务重新来一次，可能恰好就落得更好。而验证比在确定性工具那里更为重要——你没法测试一次 agent 的行为就指望它能重复，所以自动化检查必须能抓住那些抽得不好的结果。",
+          "注意不要对此过度地叙事化解读。人类是模式匹配的机器，一连串糟糕的运行会让人感觉那就是「这周 model 变差了」的证明。通常，这只是分布使然。",
+          "用法",
+          "“Claude 今天糟透了。他们是不是发布了一个更差的版本？”",
+          "“大概不是——model 的输出本来就是 non-deterministic 的。同一个任务，你总会有状态好的日子和状态差的日子。明天再试一次，然后再去找原因。”"
         ]
       },
       "related": [
@@ -329,7 +409,10 @@
         "Token",
         "Agent",
         "Automated check"
-      ]
+      ],
+      "summary": {
+        "zh": "同一个提示不保证每次得到完全相同的结果。生成过程中的采样，以及 Provider 的服务方式，都可能引入差异。因此评估 Agent 工作时应看可重复的检查和结果，而不是把一次输出当成永久稳定的行为。"
+      }
     },
     {
       "term": "Model provider",
@@ -349,7 +432,13 @@
           "\"Swap the model provider to a local one — Ollama or llama.cpp on their box. The harness doesn't care, it just hits a different endpoint.\""
         ],
         "zh": [
-          "Model provider 负责托管或运行 Model，并提供推理接口。它可能是云服务，也可能是本地软件。Harness 把 Context 发送给 Provider，再拿回 Model 的输出；不同 Provider 的价格、速度与可用模型可能不同。"
+          "任何为 Model 提供 Inference 服务的角色。通常是远程服务（Anthropic、OpenAI、Google），但也可以是本地的——运行在你自己机器上的 Ollama、LM Studio、llama.cpp。Harness 自己并不运行 Model，而是向 Model provider 发出请求。",
+          "Model provider 拥有整套机器：Parameters 存放在它的硬件上，每一次 Model provider request 都是 Harness 通过网络发送 Token 并取回预测结果。这使得 Model provider 成为一整类问题的源头，而这些问题常被错误归咎于 Model 或 Harness——速率限制、容量降级和故障都属于这一类。当 Agent 在 Session 中途停滞，或每个 Turn 都报错时，最值得先检查的就是 Model provider 的状态页。",
+          "Model provider 还决定商业条款：输入与 Output tokens 的按 Token 计价、Prefix cache 折扣，以及究竟哪些 Model 可供使用。注意，Model provider 与 Model 的制造方可能是不同的公司——Bedrock、Vertex 和 OpenRouter 就在提供他人的 Model。",
+          "本地 Model provider 用能力换取控制权：能装进你自己硬件的 Model 远小于前沿 Model，但没有任何数据离开这台机器，也没有按 Token 计费的账单。",
+          "用法",
+          "\"我们能给这个气隙隔离的客户离线运行吗？\"",
+          "\"把 Model provider 换成本地的——在他们的机器上跑 Ollama 或 llama.cpp。Harness 不在乎，它只是访问另一个 endpoint。\""
         ]
       },
       "related": [
@@ -365,7 +454,10 @@
         "Input tokens",
         "Output tokens",
         "Prefix cache"
-      ]
+      ],
+      "summary": {
+        "zh": "Model provider 负责托管或运行 Model，并提供推理接口。它可能是云服务，也可能是本地软件。Harness 把 Context 发送给 Provider，再拿回 Model 的输出；不同 Provider 的价格、速度与可用模型可能不同。"
+      }
     },
     {
       "term": "Harness",
@@ -385,7 +477,13 @@
           "\"Different harnesses — Claude Code has filesystem tools, a different system prompt, and a permission layer. The model isn't the variable here.\""
         ],
         "zh": [
-          "Model 只能根据输入生成输出；Harness 才负责把它变成能做事的 Agent。Harness 组织每次请求的 Context，执行 Model 提出的 tool calls，把 tool results 送回去，还管理会话历史、权限与压缩。Agent 的循环是“Model 提议，Harness 执行，再继续”。"
+          "围绕 Model 的一切、把它变成 Agent 的东西：Tool、System prompt、Context 窗口管理、权限、hooks。Claude.ai 和 Claude Code 跑在同一个 Model 上，却表现不同，因为它们的 Harness 不同。",
+          "Model 本身只做一件事：把文本收进来，把文本吐出去。它不能读取文件，不能运行命令，也记不住上一个 Turn。这些全都由 Harness 提供。它为每一次 Model provider request 组装 Context，执行 Model 请求的 Tool 调用，把 Tool 结果回填进去，保存 Session 历史，在有风险的操作之前向你请求权限，并决定何时进行压缩。Agent 循环——Model 提议、Harness 执行、如此往复——是由 Harness 来运行的。",
+          "这对诊断很重要。当两个产品之间、或者昨天与今天之间的行为出现差异时，变量往往不是 Model——而是 Harness。不同的 System prompt、不同的 Tool 集合、一个被改动的默认权限，或者一种新的 Context 管理策略，都能在 Model 毫无变化的情况下改变行为。这也意味着你的大部分配置都住在 Harness 里：AGENTS.md 文件、权限设置和 hooks，全都是发给 Harness 的指令，而不是发给 Model 的。",
+          "例子：Claude Code、Cursor、Codex CLI——以及 Claude.ai，它是一个聊天的 Harness，而不是编码用的 Harness。",
+          "用法",
+          "\"同一个 Model，为什么 Claude Code 在编辑文件，而 Claude.ai 只是在回答问题？\"",
+          "\"不同的 Harness——Claude Code 有 Filesystem 工具、不同的 System prompt，还有一层权限。这里的变量不是 Model。\""
         ]
       },
       "related": [
@@ -403,7 +501,10 @@
         "Compaction",
         "AGENTS.md",
         "Filesystem"
-      ]
+      ],
+      "summary": {
+        "zh": "Model 只能根据输入生成输出；Harness 才负责把它变成能做事的 Agent。Harness 组织每次请求的 Context，执行 Model 提出的 tool calls，把 tool results 送回去，还管理会话历史、权限与压缩。Agent 的循环是“Model 提议，Harness 执行，再继续”。"
+      }
     },
     {
       "term": "Model provider request",
@@ -425,7 +526,15 @@
           "\"Look at the tool calls — twelve grep, eight read, four edits. Each tool result spawns another model provider request, and the whole session prefix re-sends every time.\""
         ],
         "zh": [
-          "这是 Harness 与 Model provider 的一次往返。Harness 发送当前 Context；Provider 运行 Model 并返回一次响应。一个用户 Turn 可能包含多次请求，因为 Agent 需要在工具调用与结果之间反复继续。"
+          "Harness 到 Model provider 的一次往返。Harness 发送当前 Context；Model provider 返回一个响应（一次 Tool call 或最终答案）。如果 Agent 调用 Tool，单条用户消息可以派生出许多次 Model provider request —— 每个 Tool result 都会触发另一次 request。",
+          "每一次 request 都携带全部内容：System prompt、到目前为止的完整对话、每一个 Tool result。Model 是 Stateless 的，因此 Model provider 在 request 之间不保留任何东西 —— 第四十次 request 会重新发送第三十九次 request 发过的内容，再加上一个新的 Tool result。Prefix cache 的存在就是为了让这种重复变得可负担。",
+          "request 也是计费单位。Input tokens、Output tokens 和缓存折扣都按 request 计算，这就是为什么一个看起来无害的问题可能花费惊人：成本并不与你的消息成正比，而是与 request 的数量乘以每一个 request 所携带的 Context 大小成正比。",
+          "值得把 request 与 Turn 区分开来。一个 Turn 是与你的一个来回，而单个 Turn ——「修复失败的测试」—— 会展开成一连串 request：",
+          "| 请求 | Model 返回 | 接着 Harness |\n| ------- | --------------------------------- | ------------------------------------- |\n| 1 | Tool call：运行测试 | 运行测试，追加失败输出 |\n| 2 | Tool call：读取测试文件 | 追加文件内容 |\n| 3 | Tool call：读取源文件 | 追加文件内容 |\n| 4 | Tool call：编辑源文件 | 应用编辑，追加结果 |\n| 5 | Tool call：再次运行测试 | 运行测试，追加通过输出 |\n| 6 | 最终答案：\"已修复，测试通过\" | 展示给你 |",
+          "一个 Turn 六次 request —— 每一次都重新发送整个 Context。当你疑惑 token 都去哪了，数 request，而不是数 Turn。",
+          "用法",
+          "「一个问题烧掉了四万个 token？」",
+          "「看看那些 Tool call —— 十二次 grep、八次 read、四次 edit。每个 Tool result 都会派生另一次 Model provider request，而整个 Session 前缀每次都会重新发送。」"
         ]
       },
       "related": [
@@ -445,7 +554,10 @@
         "Turn",
         "Token",
         "Session"
-      ]
+      ],
+      "summary": {
+        "zh": "这是 Harness 与 Model provider 的一次往返。Harness 发送当前 Context；Provider 运行 Model 并返回一次响应。一个用户 Turn 可能包含多次请求，因为 Agent 需要在工具调用与结果之间反复继续。"
+      }
     },
     {
       "term": "Input tokens",
@@ -464,7 +576,12 @@
           "\"It's the input tokens — every turn re-sends the whole session. Without the prefix cache you re-pay for the history each request.\""
         ],
         "zh": [
-          "Input tokens 是发送到 Provider 的内容，包括指令、对话历史、工具结果和当前任务资料。每次请求都可能重复发送一部分历史，因此长 Session 会抬高成本。命中 Prefix cache 的部分可能按更低费率计算。"
+          "Harness 在每次 Model provider request 中发送的 tokens —— System prompt、对话历史、Tool results，也就是 Model 在写出内容之前读到的全部内容。它们的计费费率低于 Output tokens，因为处理它们的成本比 Output tokens 更低。",
+          "做 AI coding 时，Input tokens 构成了你账单的大部分。Model 是 Stateless 的，所以每个 Turn 都会把整个 Session 作为输入重新发送：你的第一条消息、之后的每一次回复、自那以来的每一个 Tool result。第五十个 Turn 的输入里，包含了前面的四十九个 Turn。单次 Model provider request 可能只产出几百个 Output tokens，却要重新发送累积下来的十万个 Input tokens 历史。",
+          "Prefix cache 降低了这项成本：与先前请求完全匹配的历史，按便宜的 Cache tokens 计费，而不是按全价输入计费。当输入成本依然让人吃不消时，解决办法就是缩小被重新发送的内容 —— 在任务之间 Clearing 或 compacting。",
+          "用法",
+          "“账单很高，可 Agent 几乎什么都没写。”",
+          "“问题出在 Input tokens —— 每个 Turn 都在重新发送整个 Session。没有 Prefix cache，你每次请求都要为历史再付一次钱。”"
         ]
       },
       "related": [
@@ -484,7 +601,10 @@
         "Clearing",
         "Compaction",
         "Agent"
-      ]
+      ],
+      "summary": {
+        "zh": "Input tokens 是发送到 Provider 的内容，包括指令、对话历史、工具结果和当前任务资料。每次请求都可能重复发送一部分历史，因此长 Session 会抬高成本。命中 Prefix cache 的部分可能按更低费率计算。"
+      }
     },
     {
       "term": "Output tokens",
@@ -503,7 +623,12 @@
           "\"Agent's rewriting whole files instead of patching. Output tokens cost roughly five times the input rate — get it emitting edits and the bill drops.\""
         ],
         "zh": [
-          "Output tokens 是 Model 新生成的内容，既可能是给用户的文字，也可能是 tool call 参数。生成每个 Token 都要继续运行推理，因此它们通常比 input tokens 贵，增加 Effort 也常使这部分用量上升。"
+          "Model 生成并返回的 Tokens。计费费率高于 input tokens —— 通常约为其五倍 —— 因为生成它们需要消耗更多计算。",
+          "Model 写下的所有内容都算数：你读到的文字、它生成的代码、tool calls，以及 Model 在作答之前进行的任何 extended thinking。最后一项常让人意外 —— reasoning tokens 也按 output 计费，即便 Harness 往往并不把它们展示给你，而调高 Effort 会消耗更多这类 Token。",
+          "Output tokens 同时也决定了一个 Session 的节奏。Model 读取 input 很快，但生成 output 是一个 Token 一个 Token 地进行的；所以当一个 Turn 感觉慢时，几乎总是因为正在写 output，而不是正在读 input。漫长的等待通常意味着一个很长的回答即将到来。",
+          "用法",
+          "\"这次重构 Session 正在快速烧掉额度，尽管 input 的体量很小。\"",
+          "\"Agent 在重写整个文件，而不是打补丁。Output tokens 的费率大约是 input 的五倍 —— 让它改为输出 edit，账单就会降下来。\""
         ]
       },
       "related": [
@@ -515,7 +640,10 @@
         "Effort",
         "Session",
         "Turn"
-      ]
+      ],
+      "summary": {
+        "zh": "Output tokens 是 Model 新生成的内容，既可能是给用户的文字，也可能是 tool call 参数。生成每个 Token 都要继续运行推理，因此它们通常比 input tokens 贵，增加 Effort 也常使这部分用量上升。"
+      }
     },
     {
       "term": "Prefix cache",
@@ -534,7 +662,12 @@
           "\"Harness started injecting the current time into the system prompt every turn. Prefix cache breaks at the first changed token, so every request after that billed at full rate.\""
         ],
         "zh": [
-          "连续请求常有相同的开头，例如固定指令和未变的会话历史。Provider 可以缓存这个共同前缀，在下一次请求中复用处理结果。缓存通常降低费用和延迟，但只有前缀保持一致时才容易命中。"
+          "Prefix cache 是 provider 侧的一种存储，让连续的 model provider 请求可以跳过对共享前缀的重复处理。当一个请求的开头与近期某个请求的开头一致时——相同的 system prompt、到某一点为止相同的历史——provider 会复用先前的处理结果，并按低得多的费率把这些 token 计为 Cache tokens。",
+          "缓存之所以划算，是因为 session 是只追加式增长的。每个请求都会把整段历史作为 Input tokens 重新发送（原因见该词条），而在正常的 session 中，历史只在末尾发生变化——每个请求都是前一个请求再加上几条新消息。provider 只需处理一次那段很长的共享开头，把结果存下来，然后从前缀结束的地方继续。没有缓存的话，一个 50 个 turn 的 session 就要为把第一个 turn 重复处理 50 次而付费。",
+          "缓存还会过期。一条条目能保持热的时长因 model provider 而异——通常是几分钟，而不是几小时。让一个 session 闲置超过这个窗口，下一个请求就要按全价重建一次前缀，之后缓存才恢复。这主要是 harness 构建者关心的问题；对用户来说，可见的效果是长时间暂停之后的请求比之前的更贵。",
+          "用法",
+          "“为什么账单在 session 进行到一半时突然飙升？”",
+          "“Harness 开始在每个 turn 往 system prompt 里注入当前时间。Prefix cache 在第一个变化的 token 处就失效了，所以之后的每个请求都按全价计费。”"
         ]
       },
       "related": [
@@ -547,7 +680,10 @@
         "Session",
         "Turn",
         "Harness"
-      ]
+      ],
+      "summary": {
+        "zh": "连续请求常有相同的开头，例如固定指令和未变的会话历史。Provider 可以缓存这个共同前缀，在下一次请求中复用处理结果。缓存通常降低费用和延迟，但只有前缀保持一致时才容易命中。"
+      }
     },
     {
       "term": "Cache tokens",
@@ -568,7 +704,14 @@
           "\"Check the cache tokens. If the harness is reordering the system prompt or files between turns, the prefix breaks and you re-pay full input rate every request.\""
         ],
         "zh": [
-          "Cache tokens 是命中 Prefix cache 的 input tokens。它们仍属于发送给 Model 的 Context，但 Provider 不必按普通输入重新处理，通常以更低费率计费。实际规则取决于 Provider。"
+          "Input tokens 是 Model provider 从先前的 Model provider request 中缓存下来的 token，因此不必重新处理。当连续的请求共享同一个前缀时，Model provider 会通过其 Prefix cache 复用这份处理工作，并对缓存部分按低得多的费率计费。这是让长 Session 变得可负担的杠杆——没有它，每个 Turn 都要为整段历史重复付费。",
+          "这一点之所以重要，在于 Session 的计费方式。Model 是 Stateless 的，所以每次请求都会把整个对话——System prompt、每一条消息、每一个 Tool result——作为 Input tokens 重新发送一遍。到了第五十个 Turn，每个请求都携带五十个 Turn 的历史，而你每次都要为全部这些内容按全价付费。缓存改变了这笔账：Model provider 已在相同前缀中处理过的 token 会按 Cache tokens 计费，通常只有 Input tokens 费率的十分之一甚至更低。在长 Session 中，你发送的内容大部分都是 Cache tokens，账单也就保持在合理范围。",
+          "一个例子可以说明 token 何时会被缓存、何时不会。每个字母代表一块对话内容；每次请求都会发送到目前为止的整段对话：",
+          "| 请求发送内容 | 已缓存 | 按全价计费 | 原因 |\n| ------------- | ------- | ------------------- | ------------------------------------------------- |\n| AB | 无 | AB | 第一个请求 — 没有可匹配的内容 |\n| ABC | AB | C | AB 是上一个请求的精确前缀 |\n| ABCD | ABC | D | 前缀仍然完整 |\n| AXCD | A | XCD | 一次编辑把 B 改成了 X；匹配在此处失败 |",
+          "缓存的脆弱之处很具体：它只匹配完全一致的前缀。如果对话中较早的位置发生了变化——Harness 重新排列了内容、某个时间戳发生了更新、某个文件的呈现形式发生了改变——那么从该点起缓存就会失效（cache miss），其后的一切都按 Input tokens 全价计费。缓存还会在闲置几分钟后过期，所以长时间暂停后恢复的 Session 要为历史重新付费一次。当某个 Session 的成本在没有明显原因的情况下跳升时，去 usage report 里对比 Cache tokens 与 Input tokens——缓存失效会最先在那里显露出来。",
+          "用法",
+          "\"长 Session 的成本太狠了——一次 refactor 就要八美元。\"",
+          "\"检查一下 Cache tokens。如果 Harness 在 Turn 之间重新排列 System prompt 或文件，前缀就会断裂，你每次请求都要按 Input tokens 全价重新付费。\""
         ]
       },
       "related": [
@@ -583,7 +726,10 @@
         "System prompt",
         "Tool result",
         "Harness"
-      ]
+      ],
+      "summary": {
+        "zh": "Cache tokens 是命中 Prefix cache 的 input tokens。它们仍属于发送给 Model 的 Context，但 Provider 不必按普通输入重新处理，通常以更低费率计费。实际规则取决于 Provider。"
+      }
     },
     {
       "term": "Stateless",
@@ -602,7 +748,12 @@
           "\"The model's stateless — the new session starts empty. If you want it carried, write it to AGENTS.md or a memory file the harness loads at session start.\""
         ],
         "zh": [
-          "Stateless 指一次运行不会自动记住上一次。Model 本身每次请求都重新接收 Context；默认情况下，Agent 跨 Session 也不会保留信息。需要延续进度时，必须由 Harness、Memory system 或明确的 Handoff 提供内容。"
+          "不向前携带任何信息。在多次 model provider 请求之间，model 是 stateless 的——每次请求都会重发完整的 context window，因为 model 没有任何别的途径看到其他内容。默认情况下，agent 跨 session 时是 stateless 的：新 session 从空开始，没有先前 session 的任何痕迹。是 stateful 的对立面。",
+          "model 本身永久处于 stateless 状态：它的 parameters 在 training 之后就被冻结，你在 inference 时做的任何事都不会改变它们。model 不会从你的纠正中学习，不记得昨天被告诉过同样的事，也不是在逐渐了解你——无论这场对话感觉上多么像那么回事。session 内部的连续感是由 harness 制造出来的：它保存对话记录，并在每次请求时重新发送。model 并不是在记住这场对话，而是在重新阅读它。",
+          "实际后果是：如果你想让某些东西跨 session 被记住，就必须把它写下来，放在 agent 会读回来的地方。AGENTS.md 文件、memory 系统、handoff 产物就是干这个的——这些文件会被载入未来 session 的 context，代替 model 并不拥有的那份记忆。当 agent 一再犯你之前纠正过的错误时，问题不是它为什么没学会——它学不会——而是这条纠正应该写在哪里，好让未来每一个 session 都读到它。",
+          "用法",
+          "“我每次 clear 之后，它为什么就把这个约定忘了？”",
+          "“model 是 stateless 的——新 session 从空开始。如果你想让它被带过去，就把它写进 AGENTS.md，或者写进 harness 在 session 开始时加载的 memory 文件。”"
         ]
       },
       "related": [
@@ -621,7 +772,10 @@
         "Handoff artifact",
         "Context",
         "Clearing"
-      ]
+      ],
+      "summary": {
+        "zh": "Stateless 指一次运行不会自动记住上一次。Model 本身每次请求都重新接收 Context；默认情况下，Agent 跨 Session 也不会保留信息。需要延续进度时，必须由 Harness、Memory system 或明确的 Handoff 提供内容。"
+      }
     },
     {
       "term": "Context",
@@ -642,7 +796,14 @@
           "\"The type file isn't in context — it's reading the call sites and guessing. Read the definition in first.\""
         ],
         "zh": [
-          "Context 是 Agent 眼前可用且与任务有关的信息，不只是聊天记录。它可以包括代码、文档、工具结果和用户指令。Model 不能凭空看到环境里的文件；相关事实要先被装入 Context，才会影响当前回答。"
+          "Agent 当前可访问的相关信息。这是抽象名词——不是 Model 看到的原始输入（那是 Context window），不是运行中的历史记录（那是 Session），而是 Agent 所掌握的、与任务相关的信息。\"把某内容加载进 Context\"意味着让它成为这一集合的一部分；\"Context engineering\"（上下文工程）就是策展它的学科。",
+          "这三个术语有着清晰的边界：",
+          "| 术语 | 所指内容 |\n| -------------- | ------------------------------------------------------------------- |\n| Context | Agent 当前拥有的与任务相关的信息 |\n| Context window | Model 每次请求时实际看到的字面 Token 序列 |\n| Session | Harness 存储的进行中的对话 |",
+          "这种区分之所以重要，是因为 Context 衡量的是质量，而非数量。Context window 可以几乎填满而 Context 依然很差——成千上万个 token 的陈旧 Tool 输出，没有一条关乎当前任务。它也可以几乎为空而 Context 极佳：一条定义类型，而任务正取决于它。",
+          "大多数日常失败都可追溯到 Context。当 Agent 编造出一个 API、与某个决定相矛盾，或对 schema 妄加猜测时，首先要问的是它做这些时 Context 里有什么——通常那个相关事实从未被加载，或者被淹没在 Attention degradation 之中。解决办法就是策展：加载任务所需，排除任务所不需。",
+          "用法",
+          "\"它老是编造类型里根本没有的字段。\"",
+          "\"类型文件不在 Context 里——它在读调用点然后猜。先把定义读进来。\""
         ]
       },
       "related": [
@@ -652,7 +813,10 @@
         "Token",
         "Harness",
         "Attention degradation"
-      ]
+      ],
+      "summary": {
+        "zh": "Context 是 Agent 眼前可用且与任务有关的信息，不只是聊天记录。它可以包括代码、文档、工具结果和用户指令。Model 不能凭空看到环境里的文件；相关事实要先被装入 Context，才会影响当前回答。"
+      }
     },
     {
       "term": "Context window",
@@ -672,7 +836,13 @@
           "\"The context window's 200k tokens — that's maybe a fifth of the repo. Pick the files the task touches, leave the rest behind a tool call.\""
         ],
         "zh": [
-          "Context window 是一次请求中 Model 实际看到的全部 Tokens，有固定容量且因 Model 而异。它可能装着 system prompt、历史消息、文件和工具结果。窗口装满后必须丢弃、压缩或重新选择内容；容量更大也不代表每个细节都同样容易被注意到。"
+          "Model 在每次 Model provider request 时看到的一切。它是有限的、因 Model 而异的，也是 Model 感知外界的唯一界面。",
+          "它是一条单一的 Token 序列：System prompt、到目前为止的对话、Harness 回填进来的每一个 Tool result。某个东西在这条序列里，Model 就能用它；不在这条序列里，Model 就不知道它存在——不是你的代码库，不是你昨天编辑的文件，也不是你三个 Session 之前给出的指令。窗口之外的一切都必须先被取进来（通常是通过一次 Tool call），然后才能影响任何事。",
+          "有限意味着它会被填满。每一 Turn 都在往里追加——你的消息、Model 的回应、Tool result——一个长 Session 最终会触到上限，被迫进行 Compaction 或 Clearing。有限还意味着窗口里的一切都在竞争：你载入的每一个 Token，都让其余内容可用的额度少一份；而你并不需要的内容，仍然占据着 Model 的注意力。务实的立场是把窗口当作一笔预算——任务需要什么就载入什么，其余的都不放进去。",
+          "避免：“memory”——Context window 是工作状态，不跨 Session 持久化。Memory 是叠加在其之上的另一个概念。",
+          "用法",
+          "“我能把整个 monorepo 直接粘到 prompt 里吗？”",
+          "“Context window 的 200k Token——大概只占这个仓库的五分之一。挑出任务会碰到的文件，其余的留在一次 Tool call 之后去取。”"
         ]
       },
       "related": [
@@ -688,7 +858,10 @@
         "Clearing",
         "Attention budget",
         "Memory system"
-      ]
+      ],
+      "summary": {
+        "zh": "Context window 是一次请求中 Model 实际看到的全部 Tokens，有固定容量且因 Model 而异。它可能装着 system prompt、历史消息、文件和工具结果。窗口装满后必须丢弃、压缩或重新选择内容；容量更大也不代表每个细节都同样容易被注意到。"
+      }
     },
     {
       "term": "Stateful",
@@ -709,7 +882,14 @@
           "\"No, the agent's stateful because the harness wrote them to a memory file and reloaded them at session start. The model itself saw nothing of yesterday.\""
         ],
         "zh": [
-          "Stateful 意味着信息能延续到下一步。Session 会积累 Turn 历史，因此在会话内表现为有状态；Memory system 可以把部分信息保存到环境中，让后续 Session 再读取。状态总需要某个具体的承载机制。"
+          "把信息向前传递。session 在多个轮次之间是 stateful 的——随着 session 运行，context 不断累积，这正是长 session 会滑入 dumb zone 的原因。通过添加一个 memory system，把信息持久化到 environment 中，并在未来 session 启动时重新载入，agent 就能跨 session 变为 stateful。model 从来不是 stateful 的；任何表面上连续的表现，都是 harness 在重新投喂 context。与 stateless 相对。",
+          "状态在各层分别存放在哪里：",
+          "| 层级 | 是否 Stateful？ | 方式 |\n| ----------- | --------------- | ---------------------------------------------------------------------------------------------------------------------- |\n| Model | 从不 | Parameters 被冻结；它只能看到每次请求里的内容 |\n| Session | 跨轮次 | Harness 会把每条消息和 Tool result 追加到 Context 中 |\n| Harness | 跨 Session | 记忆文件、AGENTS.md、Handoff 产物 —— 写下来，之后再重新载入 |\n| Environment | 始终 | 无论是否有 Session 在运行，文件都持久存在 |",
+          "每一层的 stateful 特性，都是靠重新读取存放在下一层的东西构建起来的：session 之所以感觉连续，是因为 harness 把消息历史重新发送给 stateless 的 model；agent 之所以能跨 session 记住内容，是因为 harness 从 environment 重新载入文件。状态从来不会存储在 model 自身之中。",
+          "状态并不总是想要的。所有被向前携带的内容都会影响接下来发生的事，所以 session 早期做出的错误假设也会被一并携带下去。Clearing 是一种刻意行为：把 session 状态丢掉，从已经写下来的内容重新开始。",
+          "用法",
+          "\"它记住了我昨天的偏好——这是不是意味着 model 学会了它们？\"",
+          "\"不是，agent 之所以是 stateful 的，是因为 harness 把它们写进了一个 memory 文件，并在 session 启动时重新载入。model 自身对昨天一无所知。\""
         ]
       },
       "related": [
@@ -728,7 +908,10 @@
         "AGENTS.md",
         "Handoff artifact",
         "Clearing"
-      ]
+      ],
+      "summary": {
+        "zh": "Stateful 意味着信息能延续到下一步。Session 会积累 Turn 历史，因此在会话内表现为有状态；Memory system 可以把部分信息保存到环境中，让后续 Session 再读取。状态总需要某个具体的承载机制。"
+      }
     },
     {
       "term": "Agent",
@@ -748,7 +931,13 @@
           "\"Claude Code locally, Cursor for the UI work — same model underneath, different harnesses.\""
         ],
         "zh": [
-          "Agent 是 Model 在 Harness 中运行形成的工作系统。Harness 给它指令、Context 与 tools，再把 Model 的决定转换成实际操作；因此“Agent 能读文件”描述的是整个系统，而非 Model 单独拥有文件权限。"
+          "一个用工具、System prompt 和 Context window 装配起来的 Model，与用户轮流对话。Claude Code 是一个 Agent。Cursor 是一个 Agent。Claude.ai 是一个 Agent。Agent 就是你实际对话的那个东西——它是运转中的 Model，为某个目的而配置。",
+          "与这本词典里大多数词条不同，「agent」指的不是某个机械部件。Model 是一个 Parameters 文件；Harness 是你能指明路径的软件。Agent 两者都不是——它是你在对话的那个单元。人们一直在把 AI 拟人化，而 Agent 就是那个被拟人化的单元：你把事情托付给它的东西，读取你的消息并作答的东西，「它又把构建搞坏了」里的那个「它」。当你说 Agent 做了某件事，你是指 Model 加 Harness 做了这件事，但你是把这个组合当作一个单一行动者来对话。",
+          "这个想法比这一波 AI 更早。软件 Agent——你把一个目标托付给它、由它代你行动的程序——其历史与 AI 本身一样长。",
+          "避免：「the AI」「the bot」（太含糊——它们让你看不出你指的是 Parameters 还是那个被装配好的东西）。",
+          "用法",
+          "「这次迁移你用哪个 Agent？」",
+          "「本地用 Claude Code，UI 的部分用 Cursor——底层是同一个 Model，Harness 不同。」"
         ]
       },
       "related": [
@@ -760,7 +949,10 @@
         "Turn",
         "Parameters",
         "AI"
-      ]
+      ],
+      "summary": {
+        "zh": "Agent 是 Model 在 Harness 中运行形成的工作系统。Harness 给它指令、Context 与 tools，再把 Model 的决定转换成实际操作；因此“Agent 能读文件”描述的是整个系统，而非 Model 单独拥有文件权限。"
+      }
     },
     {
       "term": "System prompt",
@@ -780,7 +972,13 @@
           "\"Different system prompts. One's tuned for terse code edits, the other for explaining — that's where the divergence lives, before your message even arrives.\""
         ],
         "zh": [
-          "System prompt 是 Harness 在请求前放入 Context 的常驻指令，规定角色、边界和工作方式。它通常在一个 Session 内稳定，但不能代替真实工具或最新资料。诊断输出问题时，需要同时看 system prompt、Context 与 Harness 行为。"
+          "Harness 在每次 Model provider request 之前预置的指令——Agent 的常驻简报：它是谁、该如何行事、可以调用哪些 Tool、遵循哪些约定。通常在 Session 内保持稳定。",
+          "System prompt 由 Harness 厂商撰写，而非你自己，而且在编码类 Harness 里它体量很大——常常是数万 token 的行为规则、Tool 描述和边界情况处理，且每个 Turn 都作为 Input tokens 付费。你自己的常驻指令也与它同行：AGENTS.md 这类文件会在 Session 开始时紧挨着 System prompt 一并加载，因此 Model 在看到你的消息之前，就已经把厂商的简报和你的简报一起读过了。",
+          "因为它在每次请求中都完全相同，所以构成了 Prefix cache 的开头部分——这也是 Harness 会在整个 Session 中让它保持不变、而不是边用边改的原因之一。",
+          "Model 被训练成把 System prompt 置于用户消息之上。所以当 Agent 坚持一条你从未要求的约定，或以一种你甩不掉的方式格式化输出时，它通常是在服从自己的 System prompt——而你的消息正在这场争论中落败。有些 Harness 是可定制的：它们让你完全访问 System prompt，因此你可以读到 Agent 实际被告知了什么，并加以修改。",
+          "用法",
+          "\"两个 Harness，同一个 Model，面对同一个 prompt 却表现完全不同。\"",
+          "\"System prompt 不同。一个为简洁的代码编辑调优，另一个为讲解调优——分歧就出在这里，在你的消息到达之前就已经存在。\""
         ]
       },
       "related": [
@@ -795,7 +993,10 @@
         "AGENTS.md",
         "Model",
         "Prefix cache"
-      ]
+      ],
+      "summary": {
+        "zh": "System prompt 是 Harness 在请求前放入 Context 的常驻指令，规定角色、边界和工作方式。它通常在一个 Session 内稳定，但不能代替真实工具或最新资料。诊断输出问题时，需要同时看 system prompt、Context 与 Harness 行为。"
+      }
     },
     {
       "term": "Session",
@@ -815,7 +1016,13 @@
           "\"Depends on the work — a focused refactor stays sharp longer than open-ended research. Once the session bloats, hand off or compact, don't push through.\""
         ],
         "zh": [
-          "Session 是一次有边界的连续交互。它从初始 Context 开始，随用户 Turn、工具结果和 Agent 回复逐渐增长；关闭、Clearing 或 Compaction 后会进入新 Session。跨 Session 的信息需要交接或记忆机制。"
+          "与 Agent 进行的一次有边界的交互运行。它从空开始，不断累积消息、Tool 结果和读取过的文件，并在被清除、关闭或压缩进一个全新的 Session 时结束。Session 就是填满 Context window 的东西：如果 Context window 是盒子，Session 就是缓慢把它填满的内容。超出单个 Context window 承载能力的工作，必须拆分到多个 Session 中完成。",
+          "Session 的消息历史就是 Agent 的工作记忆。Model 是 Stateless 的，所以它看上去记得的一切——你要求过什么、测试说了什么、三个 Turn 之前它决定了什么——都在消息历史里，并随每一次 Model provider request 重新发送。不在 Session 里的东西，对 Agent 来说就不存在。",
+          "这份记忆随 Session 一起结束。新的 Session 从零开始：昨天 Session 结束时还很熟悉你代码库的 Agent，今天早上对它一无所知。能留存下来的是 Filesystem——在一个 Session 中写入的文件可以被下一个 Session 读取，交接、记忆系统和 AGENTS.md 依赖的正是这一点。",
+          "Session 在哪里结束由你决定。Session 中的一切都影响之后的每一个 Turn，所以在同一个 Session 里做无关的任务会留下残留，影响下一个回答。一个 Session 只做一件事能让 Context 保持相关；任务完成时，就是一个自然的清除节点。",
+          "用法",
+          "\"一个 Session 能跑多久才会开始崩坏？\"",
+          "\"取决于工作内容——聚焦的重构比开放式的调研能保持敏锐更久。一旦 Session 变得臃肿，就交接或压缩，不要硬撑下去。\""
         ]
       },
       "related": [
@@ -832,7 +1039,10 @@
         "Memory system",
         "AGENTS.md",
         "Turn"
-      ]
+      ],
+      "summary": {
+        "zh": "Session 是一次有边界的连续交互。它从初始 Context 开始，随用户 Turn、工具结果和 Agent 回复逐渐增长；关闭、Clearing 或 Compaction 后会进入新 Session。跨 Session 的信息需要交接或记忆机制。"
+      }
     },
     {
       "term": "Turn",
@@ -851,7 +1061,12 @@
           "\"It made fourteen tool calls inside that turn — each one is a separate model provider request. Latency stacks up before the agent finally yields back to you.\""
         ],
         "zh": [
-          "Turn 从一条用户消息开始，包含 Agent 为回应它发起的所有 Model provider requests、tool calls 和内部步骤，直到它把控制权交还用户。一次 Turn 不等于一次 Model 请求，复杂任务通常需要多轮内部往返。"
+          "一条用户消息，加上 agent 为响应它所做的一切，直到它把控制权交还给用户为止。其中包含一次或多次 model provider request——如果 agent 调用了 tool，就会有很多次。一个澄清性问题会结束当前 turn；你的回复则开启下一个 turn。层级关系是 Session > Turn > Model provider request。",
+          "Turn 之所以值得单独命名，在于它的长度是 agent 的决定，而不是你的。你只交出一条消息；agent 决定在让出控制权之前要串联多少次 tool 调用。一个 turn 可能只是一句回答，也可能是二十分钟的阅读、编辑和运行测试。这是同一特性的两个侧面：长 turn 让 AFK 工作成为可能，而长 turn 也正是无人监督时容易出问题的地方——等到 agent 让出控制权时，它可能已经偏离你的本意很远了。",
+          "Turn 也是进行引导的自然单位。turn 内部发生的一切都不需要你参与；turn 之间的间隙才是你重新调整方向的地方。大多数 harness 会把这个边界软化：你可以在 turn 进行到一半时打断，让 agent 停下来并改变方向，或者在它工作时输入一条消息，这条消息会在 turn 结束后被读到。如果你发现自己反复对 turn 的落点不满意，解决办法通常是要求更小的 turn——先给一个计划，一步一步来——用自主性换取更频繁、可用于引导的间隙。",
+          "用法",
+          "\"一个 turn 花了两分钟？\"",
+          "\"它在那一个 turn 里做了十四次 tool 调用——每一次都是一次独立的 model provider request。在 agent 最终把控制权交还给你之前，延迟会不断累积。\""
         ]
       },
       "related": [
@@ -862,7 +1077,10 @@
         "AFK",
         "Harness",
         "Tool call"
-      ]
+      ],
+      "summary": {
+        "zh": "Turn 从一条用户消息开始，包含 Agent 为回应它发起的所有 Model provider requests、tool calls 和内部步骤，直到它把控制权交还用户。一次 Turn 不等于一次 Model 请求，复杂任务通常需要多轮内部往返。"
+      }
     },
     {
       "term": "Environment",
@@ -883,7 +1101,14 @@
           "\"Wire it into the environment — give it a psql tool scoped to read-only on staging. The harness is fine, it just has nothing to act on.\""
         ],
         "zh": [
-          "Environment 是 Agent 所处的外部世界，例如文件系统、浏览器或数据库。Agent 只能通过 Harness 暴露的 tools 感知和改变它；tool results 才是它看到环境状态的入口。环境变化也可能来自其他人或进程。"
+          "Agent 所作用的世界——Harness 之外的一切：Agent 通过 Tool result 感知它，通过 Tool 调用改变它。Harness 运行 Agent；Environment 是 Agent 工作的场所。像 AGENTS.md 这样的文件存在于 Environment 中；把它载入 Context window 的是 Harness。Filesystem 是最常见的 Environment，但不是唯一的一种（数据库、远程 API、浏览器 Session 都可以是 Environment）。",
+          "Agent 只有在去看的时候才看得见 Environment。它关于 Environment 所知道的一切都是通过 Tool result 抵达的，所以它脑中的画面是一组快照的集合，每一张都只在拍下的那一刻准确。如果某个文件在 Agent 读过之后发生了变化——你手动编辑了它，构建步骤重新生成了它——Agent 会继续基于那份过期的副本推理，直到有东西促使它重新读取。一个 Agent 自信地描述着一个早已不再长成那样的文件，通常就是这个原因：Environment 变了，快照没变。",
+          "Environment 也是持久留存的那一层——唯一始终 Stateful 的一层。Session 的 Context 在 Session 结束时就不复存在，但写入 Environment 的文件会留下来供下一个 Session 读取——记忆系统、Handoff 产物和 AGENTS.md 依赖的正是这一点。任何 Agent 明天还应该知道的东西，都必须落到 Environment 里。",
+          "Environment 有多大由你决定。Sandbox 把它缩小，限制 Agent 能够触达的范围；增加一个 Tool 把它扩大，让数据库或 API 进入可及范围。边界之内才是 Agent 能够感知和改变的东西；边界之外的一切对 Agent 而言都不存在。Environment 为支持 Agent 工作所做准备的好坏，就是这套代码库的 AX。",
+          "避免：用 \"environment\" 指代 runtime 或 Harness 本身——Harness 是外壳，Environment 是工作区。",
+          "用法",
+          "\"Agent 看不到 staging 数据库的 schema。\"",
+          "\"把它接入 Environment——给它一个限定为 staging 只读的 psql Tool。Harness 没问题，只是它没有可作用的对象。\""
         ]
       },
       "related": [
@@ -901,7 +1126,10 @@
         "Sandbox",
         "Tool",
         "AX"
-      ]
+      ],
+      "summary": {
+        "zh": "Environment 是 Agent 所处的外部世界，例如文件系统、浏览器或数据库。Agent 只能通过 Harness 暴露的 tools 感知和改变它；tool results 才是它看到环境状态的入口。环境变化也可能来自其他人或进程。"
+      }
     },
     {
       "term": "Filesystem",
@@ -920,7 +1148,12 @@
           "\"It's running against a different filesystem — the sandbox mounted the parent dir, not the project root. Repoint the harness.\""
         ],
         "zh": [
-          "Filesystem 以目录和文件组成树。Coding Agent 通常借助工具读取、修改和运行其中的内容。文件里的资料不是 Model 天然知道的；它需要通过 tool result 进入 Context，写入则要通过相应 tool call。"
+          "由文件和目录构成的一棵树，Agent 从中读取、向其写入并在其中执行——这是 coding agent 默认的 Environment 类型。AGENTS.md、Skills、源代码、构建脚本和 Tool 配置都存在于一个 Filesystem 之中。当 Harness \"在你的项目中启动\" 时，它就是在把 Agent 指向一个 Filesystem。",
+          "Agent 只能通过 Tool call 接触它 —— 读一个文件、写一个文件、运行一条 shell 命令。在 Tool call 把它载入之前，磁盘上的任何内容都不在 Context window 中，这正是 Agent 能在远大于窗口的仓库里工作的原因：filesystem 承载一切，Context 只保留当前任务已读取的那部分。有些 Harness 确实会默认把当前目录的文件名载入 Context window —— 不是文件内容，只是目录树 —— 它们充当 Context 指针：Agent 由此看到有哪些文件存在，再读取自己需要的那些。",
+          "而且它与你共享。Agent 编辑的文件，就是你在编辑器里打开、在 git 里 diff 的同一批文件 —— filesystem 是共同的工作空间，你在这里审阅 Agent 做了什么。",
+          "用法",
+          "“为什么它没有读到我的 AGENTS.md？”",
+          "“它跑在另一个 filesystem 上 —— sandbox 挂载的是父目录，而不是项目根目录。把 Harness 重新指过去。”"
         ]
       },
       "related": [
@@ -934,7 +1167,10 @@
         "Context window",
         "Context pointer",
         "Sandbox"
-      ]
+      ],
+      "summary": {
+        "zh": "Filesystem 以目录和文件组成树。Coding Agent 通常借助工具读取、修改和运行其中的内容。文件里的资料不是 Model 天然知道的；它需要通过 tool result 进入 Context，写入则要通过相应 tool call。"
+      }
     },
     {
       "term": "Tool",
@@ -956,7 +1192,15 @@
           "\"Add a psql tool to the harness, scoped read-only on staging. Without a tool for it, the agent's blind to anything outside the filesystem.\""
         ],
         "zh": [
-          "Tool 是 Harness 提供的可调用能力，例如读文件、执行命令或搜索。Model 可以请求使用 Tool，但是否真正执行、如何执行，以及结果如何返回，都由 Harness 控制。工具集合直接决定 Agent 能接触哪些环境。"
+          "Harness 暴露给 Agent 调用的函数——Read、Write、Bash、Search。Tool 是 Agent 感知 Environment 并对其采取行动的方式：它只能通过 Tool 的结果看到 Environment，也只能通过 Tool call 改变 Environment。每次 Tool call 都会额外消耗一次 Model provider request，因为结果必须先送回 Model，它才能决定下一步做什么。",
+          "大多数 coding Agent 自带的 Tool：",
+          "| Tool | 它的作用 |\n| ------ | ------------------------------------------------------------ |\n| Read | 以 Tool result 的形式返回文件内容 |\n| Write | 在 Filesystem 中创建或编辑文件 |\n| Bash | 运行 shell 命令并返回其输出 |\n| Search | 在整个代码库中查找与某个模式匹配的文件或文本 |",
+          "一个 Tool 由三样东西定义：名称、它做什么的描述，以及用于其 Parameters 的 schema。Harness 在每次请求中都会把这些定义发给 Model，而 Model 选择 Tool 的方式与它产出其他一切内容的方式相同——靠写 token，在这里就是一次带参数的结构化调用。Model 自己从不执行任何东西；Harness 读取这次调用，运行该函数，再把结果发回去。",
+          "Tool 列表决定了 Agent 能做什么。一个能力很强的 Model 若只有狭窄的 Tool 集合，就是一个能力狭窄的 Agent：它会把手头的一切都绕道它现有的 Tool，这正是 Agent 如此重度依赖 Bash 的原因——一个 shell 就是一把能触达系统大部分角落的 Tool。要干净地赋予 Agent 一项能力，就为它加一个 Tool；MCP 是从 Harness 之外接入 Tool 的标准。",
+          "Tool 定义在每次请求中都会占用 Context，因此庞大的 Tool 集合在任何 Tool 被调用之前就有一笔固定成本——而且许多描述相似的 Tool 会让 Model 更难挑对那一个。",
+          "用法",
+          "\"Agent 能直接查询 staging 吗？\"",
+          "\"给 Harness 加一个 psql Tool，作用域为在 staging 上只读。没有对应的 Tool，Agent 对 Filesystem 之外的东西就一无所知。\""
         ]
       },
       "related": [
@@ -971,7 +1215,10 @@
         "Token",
         "MCP",
         "Context"
-      ]
+      ],
+      "summary": {
+        "zh": "Tool 是 Harness 提供的可调用能力，例如读文件、执行命令或搜索。Model 可以请求使用 Tool，但是否真正执行、如何执行，以及结果如何返回，都由 Harness 控制。工具集合直接决定 Agent 能接触哪些环境。"
+      }
     },
     {
       "term": "Tool call",
@@ -992,7 +1239,14 @@
           "\"Look at the transcript — did it actually emit a tool call, or just describe running them? The model produces the call, but if the harness didn't execute it, nothing happened.\""
         ],
         "zh": [
-          "Tool call 是 Model 给出的结构化请求，包含工具名与参数，本身只是输出文本。Harness 会解释它、检查权限、执行操作，再把结果返回。一次错误的参数可能导致失败，因此 Harness 不能把请求文本当成已完成的动作。"
+          "Model 的输出中指明一个 Tool 及其参数——仅仅是结构化文本。它自己不会做任何事；必须由 Harness 读取并执行。它由 Model 在一次 Model provider request 中生成。",
+          "一次 Tool call 的生命周期：",
+          "| 步骤 | 谁 | 发生了什么 |\n| ---- | ------- | --------------------------------------------------------------------------------------- |\n| 1 | Model | 从 System prompt 中的描述了解到有哪些 Tool 存在 |\n| 2 | Model | 发出一次调用——Tool 名称加参数，通常是 JSON——然后停止 |\n| 3 | Harness | 解析这次调用，并对照 Permission mode 进行检查 |\n| 4 | Harness | 如果被允许就执行它 |\n| 5 | Harness | 在下一次请求中把结果作为 Tool result 回传 |",
+          "Agent 工作中的一个 Turn，通常由许多这样的往返串联而成。",
+          "因为这个调用和其他所有内容一样是由 Next-token prediction 生成的，所以它会像任何 Model 输出一样出错：不存在的路径、命令并不具备的 flag、看似合理但并不正确的参数。Harness 执行的是写出来的内容，而不是本来想表达的内容——路径打错不会优雅地报错，而是会去编辑错误的文件。",
+          "用法",
+          "“它说它跑了测试，但文件时间戳没有变化。”",
+          "“看看 transcript——它到底真的发出了一个 Tool call，还是只是描述了运行它们的过程？Model 会生成这个调用，但如果 Harness 没有执行它，那就什么也没发生。”"
         ]
       },
       "related": [
@@ -1006,7 +1260,10 @@
         "Turn",
         "Agent",
         "Next-token prediction"
-      ]
+      ],
+      "summary": {
+        "zh": "Tool call 是 Model 给出的结构化请求，包含工具名与参数，本身只是输出文本。Harness 会解释它、检查权限、执行操作，再把结果返回。一次错误的参数可能导致失败，因此 Harness 不能把请求文本当成已完成的动作。"
+      }
     },
     {
       "term": "Tool result",
@@ -1027,7 +1284,14 @@
           "\"The tool result came back as a permission denial, not the contents. The model only saw the error string — it has no other way to see the file.\""
         ],
         "zh": [
-          "Tool result 是执行工具后送回 Model 的观察结果，可以是文件内容、命令输出、网页数据或错误。Model 对环境的认识依赖这些结果；若结果缺失、过期或不完整，后续判断也会受到影响。"
+          "Harness 在执行 Tool call 之后发回的东西——文件内容、命令输出、错误。这是 Agent 观察 Environment 的唯一视角。它会在下一次 Model provider request 中回传给 Model，由 Model 决定如何处理它。Tool call 与 Tool result 是同一次往来的两端，都发生在同一个 Turn 之内。",
+          "Tool result 的生命周期：",
+          "| 步骤 | 执行者 | 发生了什么 |\n| ---- | ------- | -------------------------------------------------------------------------- |\n| 1 | Harness | 执行 Tool call——运行命令、读取文件 |\n| 2 | Harness | 捕获结果：输出、内容或错误 |\n| 3 | Harness | 将其作为一条消息追加到 Context 中 |\n| 4 | Harness | 在下一次 Model provider request 中，把整个 Context 发送给 provider |\n| 5 | Model | 读取结果并决定：再进行一次 Tool call，还是给出最终答案 |",
+          "结果会留在 Context 中，直到本次 Session 结束。Tool result 通常占据了编程 Session 中 Context 的大头：每一次读文件、每一次跑测试、每一次搜索都完整落入其中，即便早已不再有用，仍然持续占用 token。少数几个体积巨大的结果——冗长的测试日志、被整份读入的生成文件——把 Session 推向 Context window 边缘的速度，比对话本身还要快。",
+          "因为结果就是 Model 所能看到的全部，Model 无从核查它背后的 Environment。如果输出被截断、命令静默失败，或者 Harness 返回的是错误而不是内容，Model 只能基于拿到的东西去推理。当你觉得 Agent 对你系统的印象不对劲时，Tool result 就是该查的地方：对话记录里的某处，有一条结果与你所知的事实不符。",
+          "用法",
+          "“它把这个文件当成空的在推理。”",
+          "“Tool result 返回的是权限拒绝，而不是内容。Model 只看到了那串错误信息——它没有别的办法看到这个文件。”"
         ]
       },
       "related": [
@@ -1042,7 +1306,10 @@
         "Session",
         "Token",
         "Context window"
-      ]
+      ],
+      "summary": {
+        "zh": "Tool result 是执行工具后送回 Model 的观察结果，可以是文件内容、命令输出、网页数据或错误。Model 对环境的认识依赖这些结果；若结果缺失、过期或不完整，后续判断也会受到影响。"
+      }
     },
     {
       "term": "MCP",
@@ -1062,7 +1329,13 @@
           "\"Configure the harness to use the Linear MCP server — it exposes the Linear API as tools the agent can call. Saves you writing custom tool wrappers.\""
         ],
         "zh": [
-          "MCP 规定 Harness 如何连接外部 Tool servers，并取得工具、资源和提示。Agent 实际调用的是 Tool；MCP 是这些能力接入 Harness 的协议层。它扩大了可用环境，但权限和结果处理仍由 Harness 负责。"
+          "Model Context Protocol。一种把外部 Tool 服务器接入 Harness 的协议 —— 也就是 Agent 如何获得 Harness 自带之外的 Tool。Agent 从不 \"调用 MCP\"；它调用的是 Tool，只不过这个 Tool 恰好是 Harness 从某个 MCP 服务器那里拿到的。它还暴露 resources（只读数据）和 prompts（可复用模板），但提供 Tool 才是主要用途。",
+          "这套协议解决的是一个集成问题。没有标准的话，每个 Harness 都得有自己的 Linear 集成、自己的 Slack 集成、自己的数据库集成 —— 每一个都单独编写、单独维护。有了 MCP，集成只需以服务器的形式写一次，任何兼容 MCP 的 Harness 都能用它。Harness 连接到该服务器，服务器声明自己提供哪些 Tool，这些 Tool 就与内置 Tool 一起对 Agent 可用。",
+          "这笔代价是以 Context 支付的。服务器声明的每个 Tool 都以一份定义的形式到来 —— 名称、描述、参数 schema —— 而 Model 只能调用自己知道的 Tool。天真的做法是把每一份定义都预先加载进 Context window：装上几个慷慨的服务器，一个 Session 在你还没输入任何内容之前，就已经带着数千 tokens 的 Tool schema 开场，把 Attention budget 花在任务永远不会用到的 Tool 上。",
+          "现在许多 Harness 用 tool search 来缓解这个问题：Context 里放的不再是完整定义，而是指向可用 Tool 的 Context pointer —— Agent 按名称或用途搜索 Tool，只在需要时才加载它的定义。如果你的 Harness 不这么做，预先加载的代价依然存在，那就值得只启用项目真正需要的服务器。",
+          "用法",
+          "\"Agent 需要读取 Linear 里的工单。\"",
+          "\"把 Harness 配置为使用 Linear MCP 服务器 —— 它把 Linear API 暴露为 Agent 可调用的 Tool。这样就不用自己写自定义 Tool 封装了。\""
         ]
       },
       "related": [
@@ -1076,7 +1349,10 @@
         "Token",
         "Attention budget",
         "Context pointer"
-      ]
+      ],
+      "summary": {
+        "zh": "MCP 规定 Harness 如何连接外部 Tool servers，并取得工具、资源和提示。Agent 实际调用的是 Tool；MCP 是这些能力接入 Harness 的协议层。它扩大了可用环境，但权限和结果处理仍由 Harness 负责。"
+      }
     },
     {
       "term": "Permission request",
@@ -1097,7 +1373,14 @@
           "\"That's the cost of human-in-the-loop. Pre-approve the safe tools so the request only fires on the actually-risky calls.\""
         ],
         "zh": [
-          "当某个 tool call 尚未获准执行时，Harness 可以向用户展示 Permission request。它把操作内容交给人判断，再决定继续或拒绝。请求发生在工具真正运行之前，是 Human-in-the-loop 的一种具体方式。"
+          "Harness 在执行未经预先批准的 Tool call 之前向用户展示的内容。Model 生成一个 Tool call；Harness 不会立刻执行它，而是暂停下来询问。批准，它就执行；拒绝，Harness 就把这次拒绝作为 Tool result 回报给 Model。这是 Harness 在有风险或敏感操作上把人类纳入 Human-in-the-loop 的机制。",
+          "Permission request 的生命周期：",
+          "| 步骤 | 谁 | 会发生什么 |\n| ---- | ------- | --------------------------------------------------------------------------------------- |\n| 1 | Model | 产生一个 Tool call |\n| 2 | Harness | 对照 Permission mode 和任何已保存的批准进行检查 |\n| 3 | Harness | 已预先批准：立即执行。否则：暂停并显示该请求 |\n| 4 | 用户 | 批准一次、在本次 Session 剩余时间内持续批准，或拒绝 |\n| 5 | Harness | 执行该调用，或将拒绝作为 Tool result 返回 |",
+          "拒绝一个请求就是在引导 Agent。Model 会像读取任何其他 Tool result 一样读取这次拒绝并做出反应——它会换一种做法，或者问你想怎么做。多数 Harness 允许你在拒绝时附带一条消息，这就把 Permission request 变成了一个引导点：「别那样做，改用 migration script」恰好落在 Model 正在决定下一步做什么的那一刻。",
+          "代价在于每个请求都是对你的一次同步等待。Agent 会一直卡住，直到你给出答复——你盯着屏幕时这没问题，你不在时就是个麻烦：一个不停触发请求的 Agent 没法被放手让它 AFK 干活。Permission mode 就是那个旋钮：哪些调用可以自由执行，哪些要先问，理想情况下再配上一个 Sandbox，让扩大自由执行的范围变得安全。",
+          "用法",
+          "「它卡在一个 Permission request 上十分钟了——我当时在开会。」",
+          "「这就是 Human-in-the-loop 的代价。把安全的 Tool 预先批准，这样请求只会在真正有风险的调用上触发。」"
         ]
       },
       "related": [
@@ -1112,7 +1395,10 @@
         "AFK",
         "Sandbox",
         "Tool"
-      ]
+      ],
+      "summary": {
+        "zh": "当某个 tool call 尚未获准执行时，Harness 可以向用户展示 Permission request。它把操作内容交给人判断，再决定继续或拒绝。请求发生在工具真正运行之前，是 Human-in-the-loop 的一种具体方式。"
+      }
     },
     {
       "term": "Permission mode",
@@ -1133,7 +1419,14 @@
           "\"Loosen the permission mode for read-only tools, keep prompting on writes and shell. Most permission requests on a research session are noise.\""
         ],
         "zh": [
-          "Permission mode 决定哪些操作直接运行、哪些需要 Permission request，属于 Agent mode 的权限部分。不同模式会改变 Agent 的推进速度和风险边界；它不是 Model 的能力，而是 Harness 对工具执行的控制。"
+          "Agent mode 里负责权限门控的那一层——哪些 Tool call 会触发 Permission request、哪些直接自动运行。在 harness 开始往上叠加行为指令之前，这就是 mode 系统最初的目的。",
+          "harness 会提供一整套阶梯式的这类 mode：",
+          "| 模式 | 读取 | 写入与 shell | 典型用途 |\n| ------------------ | ----- | ---------------------- | ----------------------------------------------- |\n| 只读 / plan | Auto | Blocked | 研究、规划、评审 |\n| 默认 | Auto | Ask | 日常受监督的工作 |\n| Auto-edit | Auto | 编辑 Auto，shell 为 Ask | 受信任的 repo、机械性改动 |\n| \"Yolo\" / full-auto | Auto | Auto | 沙箱、AFK 运行 |",
+          "选哪一级，都是在安全和打断之间做权衡，而两种失败方式都能被真切感受到。收得太紧，你自己就成了瓶颈：Agent 每隔几秒就为一次无害的读取停下来，你机械地点着“批准”，批准也就不再意味着什么——盖章式放行是两头最差的组合，打断一点不少，保护一点没有。放得太松，Agent 就会去改你本想先过目的文件、跑你本想先看的命令。",
+          "偏松的那一端在 Sandbox 里最站得住脚，因为一次糟糕 Tool call 的影响范围是被围住的。在 Sandbox 之外，多数人的折中是：读取自动批准，任何不可逆的操作都保留人在环中。",
+          "用法",
+          "“它每跑一次 grep 就暂停一下——彻底毁掉了 AFK 运行。”",
+          "“对只读 Tool 放宽 Permission mode，写入和 shell 继续提示。研究类 Session 里的大多数 Permission request 都是噪音。”"
         ]
       },
       "related": [
@@ -1147,7 +1440,10 @@
         "Tool",
         "Human-in-the-loop",
         "Session"
-      ]
+      ],
+      "summary": {
+        "zh": "Permission mode 决定哪些操作直接运行、哪些需要 Permission request，属于 Agent mode 的权限部分。不同模式会改变 Agent 的推进速度和风险边界；它不是 Model 的能力，而是 Harness 对工具执行的控制。"
+      }
     },
     {
       "term": "Agent mode",
@@ -1169,7 +1465,15 @@
           "\"Bypass mode, but only inside the sandbox.\""
         ],
         "zh": [
-          "Agent mode 把权限配置与行为指令组合成一个工作预设，例如偏向计划、自动执行或受限操作。模式可以在 Session 中切换，改变 Harness 如何处理工具请求，也改变注入给 Model 的指令。"
+          "一种预设，用来塑造 Agent 在运行时的运作方式——把 Permission mode 与注入 System prompt 的行为指令打包在一起。示例：对风险调用弹出提示的默认模式、阻止编辑并把 Agent 引向调研的 plan mode、自动批准编辑的 accept-edits mode、自动批准一切操作的 bypass permissions mode（俗称 YOLO mode）。可以在 Session 中途切换。",
+          "打包（bundling）正是模式与单纯权限设置之间的区别所在。Permission mode 只是一道闸门：它决定哪些 Tool call 可以通过。光有闸门，会造出一个想编辑却做不到的 Agent——它提出写入，被拦下，然后换一条路再试。注入的指令则消除了这个「想」：plan mode 不只是阻止编辑，它还告诉 Agent 自己正处于规划阶段，于是它改为阅读、提问和提出方案，而不是硬顶着闸门。闸门与引导指向同一个方向。",
+          "实践中，你在任务推进的过程中随着信任程度的变化切换模式。同一个任务可以历经好几种模式：方案还在成形时用 plan mode，最初几处需要小心处理的编辑用会提示的默认模式，等 Agent 表现出理解了这项改动后再改用 accept-edits，在 Sandbox 里做一次 AFK 运行时用 bypass。切换模式不付出任何代价：对话完全在原地继续，只是换了新的权限和新的指令。如果你发现自己不看内容就批准每一条提示，说明模式收得比你的实际信任更紧；如果你不断拒绝编辑，说明它放得比实际信任更松。",
+          "厂商术语：Claude Code 称其为「permission modes」，Codex 称其为「approval modes」——两者都早于行为打包出现。",
+          "用法",
+          "「我只想要一个方案，它却一直在编辑文件。」",
+          "「切换到 plan mode——它会拦下写入，留在调研状态。」",
+          "「那之后那次 AFK 运行呢？」",
+          "「用 bypass mode，但只在 Sandbox 里。」"
         ]
       },
       "related": [
@@ -1180,7 +1484,10 @@
         "Tool call",
         "AFK",
         "Sandbox"
-      ]
+      ],
+      "summary": {
+        "zh": "Agent mode 把权限配置与行为指令组合成一个工作预设，例如偏向计划、自动执行或受限操作。模式可以在 Session 中切换，改变 Harness 如何处理工具请求，也改变注入给 Model 的指令。"
+      }
     },
     {
       "term": "Sandbox",
@@ -1201,7 +1508,14 @@
           "\"Put it in a sandbox — fresh container, no credentials mounted, no network out. Worst case it nukes its own filesystem and you discard the container.\""
         ],
         "zh": [
-          "Sandbox 是隔离的执行环境，可以是容器、虚拟机或受限 Shell。它约束 Agent 即使执行了工具操作也能影响的范围。Sandbox 与 Permission mode 相互配合：一个限制实际边界，一个决定何时需要人批准。"
+          "Agent 在其中运行的隔离 Environment——容器、VM、临时 Filesystem，或权限受限的 shell。它限缩了 Agent 行为的 blast radius：即使 Agent 执行破坏性命令或获取了恶意内容，损害也被控制在一定范围内。它是让 AFK 变得切实可行的安全底座。",
+          "Sandbox 与 Permission mode 从相反的两端解决同一个问题。Permissions 会在动作运行之前先询问；Sandbox 则限制动作在真正运行时能够触及的范围。Permissions 需要你留在回路中 —— 每一次提示都是一次打断 —— 而一个不断发问的 Session 几乎谈不上自主。Sandbox 消耗的是基础设施，而非注意力：隔离越强，需要提出的问题就越少。",
+          "隔离分为不同等级：",
+          "| 等级 | 是什么 | 包含什么 |\n| ---------------- | ---------------------------------------------------------- | ------------------------------------------ |\n| 受限 shell | 围绕每条命令的操作系统级隔离 | 项目外的写入、网络访问 |\n| 容器 | 全新的 Filesystem，不挂载凭据，用后即弃 | Agent 对自身机器所做的一切 |\n| VM / 云端 | 完全独立的一台机器，通常由 Harness 提供 | 一切，包括内核级逃逸 |",
+          "任何 Sandbox 都无法包含的东西：那些合法离开它的操作。持有你的 git 凭据的 Agent 可以 push；拥有网络访问权限的 Agent 则可以调用生产环境的 API。先决定什么可以跨越边界，再决定把这道边界筑得多厚。",
+          "用法",
+          "\"我想让它以 bypass-permissions 通宵运行，但我还没准备好那样做。\"",
+          "把它放进 Sandbox 里——全新的 container，不挂载任何 credentials，也没有外网出口。最坏的情况就是它炸掉自己的 Filesystem，然后你把这个 container 丢掉。"
         ]
       },
       "related": [
@@ -1212,7 +1526,10 @@
         "Permission mode",
         "Human-in-the-loop",
         "Agent mode"
-      ]
+      ],
+      "summary": {
+        "zh": "Sandbox 是隔离的执行环境，可以是容器、虚拟机或受限 Shell。它约束 Agent 即使执行了工具操作也能影响的范围。Sandbox 与 Permission mode 相互配合：一个限制实际边界，一个决定何时需要人批准。"
+      }
     },
     {
       "term": "Sycophancy",
@@ -1234,14 +1551,25 @@
           "\"Classic sycophancy — it agreed first because you sounded confident, then caved because you sounded doubtful. The plan's quality didn't change, your tone did. Clear and re-ask without signalling either way.\""
         ],
         "zh": [
-          "Sycophancy 是 Model 为迎合用户而过度同意，即使用户判断有误也给出自信赞同。它与单纯礼貌不同，问题在于损害事实判断。需要用证据、反例和可验证结果来约束这种倾向。"
+          "自信地表达赞同的 model 输出。由 Training 造成：model 被塑造成偏好人类喜欢的回答，而人类对“认同”的喜爱往往超过被告知自己错了。于是 model 学到，表示赞同会得到奖励——即便这个赞同并不正确。",
+          "表现形式：",
+          "- 在反驳下退缩——当你说“你确定吗？”，它就把原本正确的答案反过来说。\n- 赞美糟糕的输入——还没开始分析，就先附和说你那份有缺陷的方案妙极了。\n- 有偏向的评判——你暗示这是自己写的，评审就偏向正面；你暗示是别人写的，就偏向负面。同一个产物，结论却不同。\n- 模仿——把你的错误原样复述回来，作为对你的确认。",
+          "诊断测试：如果没有你的引导，model 还会这么说吗？如果唯一变化的是你的语气或措辞，那就是 sycophancy，而不是分析真正发生了转变。",
+          "修复：隐藏你的偏好。用中立的措辞提问——说“review this code”，而不是“is this code good?”。",
+          "避免：把任何恰好让你满意的错误答案都称作“sycophancy”。没有诊断测试，这个词的价值并不比“错误”更高。",
+          "用法",
+          "“它说我的重构方案看起来很出色，然后我问了一句‘你确定吗？’，它就把整套说法全收回去了。”",
+          "“典型的 sycophancy——它先表示同意，是因为你听起来很自信；后来退缩，是因为你听起来开始怀疑。方案的品质没变，变的是你的语气。清空对话重新提问，不要透露任何倾向。”"
         ]
       },
       "related": [
         "Model",
         "Training",
         "Clearing"
-      ]
+      ],
+      "summary": {
+        "zh": "Sycophancy 是 Model 为迎合用户而过度同意，即使用户判断有误也给出自信赞同。它与单纯礼貌不同，问题在于损害事实判断。需要用证据、反例和可验证结果来约束这种倾向。"
+      }
     },
     {
       "term": "Hallucination",
@@ -1264,7 +1592,16 @@
           "\"Faithfulness then. Compact and reload, don't bother adding more docs.\""
         ],
         "zh": [
-          "Hallucination 是 Model 自信地产生错误内容。它既可能捏造外部事实，也可能无视已加载的 Context 而偏离原资料。处理方法是把 Primary source 带入当前 Context，并用工具或检查核实关键断言。"
+          "自信却错误的 Model 输出。两种类型，成因与修复方式各不相同：",
+          "| 类型 | 出了什么问题 | 原因 | 修复 |\n| -------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |\n| 事实性 | 编造或错误的关于世界的事实——一个不存在的函数、一个错误的 API 签名、一条伪造的引用 | Parametric knowledge 的缺口，通常位于 knowledge cutoff 之后 | 加载正确的 contextual knowledge |\n| 忠实性 | 输出偏离已加载的 contextual knowledge、用户的指令，或 model 自身先前的推理 | Attention degradation；在 dumb zone 中会加剧 | 清空或压缩 |",
+          "Next-token prediction 无论底层事实是否真实都会产出流畅的输出——Model 内部没有任何信号表明它不知道某件事，因此一个凭空编造的方法会以与正确方法同样笃定的语气出现。由 Hallucination 产生的代码在构造上就是可信的：它就是那个 API 假如存在时会有的样子，而这恰恰使它溜过走马观花式的审查，只在运行时才失败。",
+          "你必须分清自己面对的是哪一种，因为针对其中一种的修复会让另一种变得更糟。Factuality 意味着知识缺失：修复办法是补充 Context——文档、类型定义、那个文件。Faithfulness 意味着知识就在那里，只是在争夺注意力时落了下风：修复办法是移除 Context。把 faithfulness 误诊为 factuality，你就会粘贴更多文档，Context 因此变大，漂移反而更严重。当 Agent 出错时，先检查正确的信息是否本来就在 Context 中，再判断你遇到的是哪一种问题。",
+          "避免：把 \"hallucination\" 当作 \"wrong\" 的单纯同义词——不点明是哪一种类型，这个词就没有诊断价值。",
+          "用法",
+          "\"它在 schema 上 hallucinate 出了一个 parseAsync 方法。\"",
+          "\"Factuality 还是 faithfulness？\"",
+          "\"这个方法就在我粘贴的文档里——它只是在第四十个 Turn 之后就不再读它们了。\"",
+          "\"那就是 faithfulness。压缩并重新加载，别再费心添加更多文档。\""
         ]
       },
       "related": [
@@ -1278,7 +1615,10 @@
         "Compaction",
         "Next-token prediction",
         "Turn"
-      ]
+      ],
+      "summary": {
+        "zh": "Hallucination 是 Model 自信地产生错误内容。它既可能捏造外部事实，也可能无视已加载的 Context 而偏离原资料。处理方法是把 Primary source 带入当前 Context，并用工具或检查核实关键断言。"
+      }
     },
     {
       "term": "Parametric knowledge",
@@ -1298,7 +1638,13 @@
           "\"React is dense in the parametric knowledge — millions of training examples. Your SDK isn't, so the model fills in plausible-looking shapes. Load the SDK docs into context.\""
         ],
         "zh": [
-          "Parametric knowledge 是训练后编码在 parameters 中的模式和事实，形成后便随 Model 版本固定。它能让 Model 回忆常见 API，却不能保证覆盖你的最新代码或训练结束后的变化；这些内容需要另行提供。"
+          "model 从 training 中“知道”的东西，存储在它的 parameters 里。它在 training 时就被冻结——model 看不到自己的 parameters，也无法更新它们。细节在挤压中流失：数十亿条事实被塞进数量固定的 parameters，冷僻的那些随之模糊。它是常见话题上流畅表达的来源，也是冷门话题上编造内容的来源。是 contextual knowledge 的对应概念。",
+          "Parametric knowledge 并不是以事实的形式存储的。Training 从不会给 model 一个可供查阅的数据库；它只是不断调整 parameters，直到 model 能很好地预测文本，而一个能很好预测某个话题文本的 model，表现得就像它了解这个话题一样。知识的可靠程度与某件事在 training data 中出现的频率相关：有数百万个例子的话题会被准确复现，而对于只有寥寥几个例子的话题，model 会根据相似话题的样子来猜。对 model 而言，复现和猜测是同一个过程，所以它分不清自己正在做的是哪一种。一个编造出来的答案，其流畅程度与正确答案别无二致。Hallucination 就是 model 猜错了。",
+          "Parametric knowledge 还会变旧。parameters 在 knowledge cutoff 之后就停止变化，因此在那之后发布或更名的库并不存在于其中，改动过的 API 也仍以旧的样子被记住。",
+          "对于这两种缺口——太冷僻和太新——补救办法是一样的：知识无法加进 parameters，只能改以 contextual knowledge 的形式提供。",
+          "用法",
+          "“它写 React 毫无瑕疵，却在我们内部的 SDK 上凭空捏造方法。”",
+          "\"React 在 Parametric knowledge 中密度极高——有数百万个 Training 示例。你的 SDK 则不然，所以 Model 会补上看起来合理的形状。把 SDK 文档载入 Context。\""
         ]
       },
       "related": [
@@ -1309,7 +1655,10 @@
         "Hallucination",
         "Knowledge cutoff",
         "Context"
-      ]
+      ],
+      "summary": {
+        "zh": "Parametric knowledge 是训练后编码在 parameters 中的模式和事实，形成后便随 Model 版本固定。它能让 Model 回忆常见 API，却不能保证覆盖你的最新代码或训练结束后的变化；这些内容需要另行提供。"
+      }
     },
     {
       "term": "Knowledge cutoff",
@@ -1328,7 +1677,12 @@
           "\"v5 shipped after the knowledge cutoff. Load the v5 changelog as contextual knowledge, otherwise it'll keep fabricating from the older parametric version.\""
         ],
         "zh": [
-          "Knowledge cutoff 是 Model 的训练知识停止更新的时间点。之后发布的库版本、规则或产品能力，单靠 Parametric knowledge 可能会猜错。面对易变信息，应读取当前文档或真实环境。"
+          "超过这个日期，Model 便不再拥有 Parametric knowledge。Knowledge cutoff 之后的 Libraries、APIs 与事件都是编造陷阱，除非它们的文档被作为 Contextual knowledge 载入。每个 Model 版本发布时都自带自己的 Knowledge cutoff。",
+          "Knowledge cutoff 之所以存在，源于 Model 的构建方式：Training 会把一份文本快照烘焙进 Model 的 Parameters，此后 Parameters 就被冻结了。Model 并不知道自己的知识有边界——被问到 Knowledge cutoff 之后的事情时，它不会拒绝，而是从它确实知道的最接近的内容去外推。这正是这个陷阱之所以安静的原因：针对某个 library 旧版本写出的代码看起来合理，往往还能编译通过，却会在发生变更的那部分上失败。",
+          "解决办法始终一样：把当前信息放进 Context。载入 changelog，指向已安装版本的 type definitions，或者让 Agent 从网上读取文档。Context 里的任何东西都优先于 Parameters 里的空无。",
+          "用法",
+          "\"它一直在写 v3 SDK 语法——我们用的可是 v5。\"",
+          "\"v5 是在 Knowledge cutoff 之后发布的。把 v5 的 changelog 作为 Contextual knowledge 载入，否则它会继续从更早的 Parametric 版本编造。\""
         ]
       },
       "related": [
@@ -1338,7 +1692,10 @@
         "Training",
         "Parameters",
         "Context"
-      ]
+      ],
+      "summary": {
+        "zh": "Knowledge cutoff 是 Model 的训练知识停止更新的时间点。之后发布的库版本、规则或产品能力，单靠 Parametric knowledge 可能会猜错。面对易变信息，应读取当前文档或真实环境。"
+      }
     },
     {
       "term": "Contextual knowledge",
@@ -1360,7 +1717,15 @@
           "\"With the docs in, it's contextual knowledge — reading off the page. Without, it's parametric and the rare endpoints blur.\""
         ],
         "zh": [
-          "Contextual knowledge 是当前请求中可直接看到的事实，例如刚读取的文件、用户给的规格或工具结果。它与训练中固定的 Parametric knowledge 不同，可以随 Session 更新，但也会受 Context window 容量限制。"
+          "Agent 现在能直接从 Context 中读到的事实——用户当前的任务、Agent 读入的文件、Tool 结果、Session 启动时载入的 AGENTS.md 内容。它是 Parametric knowledge 的对立面：parametric 是从 Parameters 里回忆出来的，contextual 则是从窗口里直接读出来的。当 Agent 依据 Contextual knowledge 工作时，幻觉要少见得多——答案就摆在眼前，而不是从模糊的记忆里费力打捞上来。",
+          "这两类知识中，只有 Contextual knowledge 是你能够控制的。Parameters 是冻结的，所以要让 Model 获得它并不具备的知识——一个内部 SDK、一个在 Knowledge cutoff 之后才发布的库、昨天刚做出的一个决定——唯一的办法就是把它放进 Context 里。许多实际的 AI coding 工作都可以归结为这一件事：在 Model 需要的那一刻，把正确的事实摆到它面前。",
+          "当 Contextual knowledge 与 Parametric knowledge 发生冲突时，通常前者会胜出。把当前的 API 文档粘进去，Model 会照着文档走，而不是依赖它对旧 API 的过时记忆——不过旧版本仍可能渗透出来，尤其是在一个长 Session 的深处。如果 Agent 明明已经载入了文档，却仍不断退回某个过时的模式，那就是 Parametric knowledge 越过了 Contextual knowledge 在泄漏；重新陈述一遍纠正内容，或者把它挪到离工作更近的位置，会有所帮助。",
+          "与 Parametric knowledge 不同，Contextual knowledge 的使用是有代价的。凡是被载入窗口的内容都会消耗 token，并争夺 Model 的 Attention budget，所以载入更多并不自动等于更好——目标是把相关的事实放进窗口，而不是把所有事实都放进去。",
+          "只有在需要与 Parametric knowledge 作对比时才使用这个说法；其余情况直接说 Context 就好。",
+          "避免说「working memory」（工作记忆）——Contextual knowledge 是此刻就在窗口里的内容；Memory system 才是把跨 Session 的内容送进窗口的机制。两者尺度不同，不要混为一谈。",
+          "用法",
+          "「为什么我把文档粘进去，它就能把 API 用对；不粘，它就开始编？」",
+          "「文档放进去时，那是 Contextual knowledge——照着页面读就行。不放进去，就是 parametric 的，那些冷门的端点就变模糊了。」"
         ]
       },
       "related": [
@@ -1378,7 +1743,10 @@
         "Token",
         "Attention budget",
         "Memory system"
-      ]
+      ],
+      "summary": {
+        "zh": "Contextual knowledge 是当前请求中可直接看到的事实，例如刚读取的文件、用户给的规格或工具结果。它与训练中固定的 Parametric knowledge 不同，可以随 Session 更新，但也会受 Context window 容量限制。"
+      }
     },
     {
       "term": "Attention relationship",
@@ -1400,7 +1768,15 @@
           "\"Yeah, the attention relationship between each call site and its declaration is fighting the other one — same token shape, different bindings. Rename one and the pairings sharpen.\""
         ],
         "zh": [
-          "模型处理 Context 时，Token 之间会形成相互影响的关系。长度为 N 的序列里，可能的关系数量大约随 N 的平方增长。上下文越长，需要维持的相关与无关关系越多，重点信息更容易被淹没。"
+          "在预测每个 token 时，model 会把 context 中的每一个其他 token 都纳入考量——有些权重很大，有些则几乎不起作用。两个 token 之间的配对就是一个 attention relationship，而有意义的配对（\"her\" 与 \"Sarah\"，或一次 getUser() 调用与它的函数 getUser 定义）彼此之间的影响要大于不相关的配对。一个包含 N 个 token 的 context，其 relationship 数量约在 N² 量级。",
+          "这些配对正是 model 表面理解力的所在。当它消解一个代词时，那是因为 \"her\" 与 \"Sarah\" 之间的 attention relationship 很强。当它用正确的参数调用一个函数时，真正起作用的是调用点与它此前读到的定义之间的关系。这一切都不是查出来的——它在每一次 model provider request 中、针对每一个配对重新计算。",
+          "N² 这个数字值得细想，因为它的增长比直觉所预想的更快：",
+          "| Context 大小 | 配对数量（~N²） |\n| -------------- | -------------- |\n| 1,000 tokens | ~100 万 |\n| 10,000 tokens | ~1 亿 |\n| 100,000 tokens | ~100 亿 |",
+          "每个配对还会被计算不止一次。Model 有多个 attention head——前沿 model 的确切数量并未公开，但五十到一百是一个合理的猜测——每个 head 都会算出自己对每一种 relationship 的版本。因此上表中的每一个配对，都会在每个 head 上各重复一次。这可是一大堆配对。",
+          "对于任何给定的任务，这些 relationship 中只有一小部分真正重要。你的指令与它所管辖的代码之间的配对，就是少数几个真正起作用的配对之一；池子里几乎其他所有东西都是噪声。而且两者的增长速度并不相同：重要的 relationship 大致保持恒定，而整个池子却随 context 规模呈二次增长。在 1,000 个 token 时，你关心的那个配对是百万分之一；在 100,000 个 token 时，就是百亿分之一。这就是 attention budget 背后的算术，而当重要的 relationship 所占的份额变得过于稀薄时，你所感受到的就是 attention degradation。",
+          "用法",
+          "\"它总是在 diff 里把两个 user 符号搞混——听起来我们是进入 dumb zone 了。\"",
+          "\"是啊，每个调用点与它的声明之间的 attention relationship 正在跟另一个较劲——同样的 token 形态，不同的绑定。把其中一个改个名字，配对就会变得清晰。\""
         ]
       },
       "related": [
@@ -1411,7 +1787,10 @@
         "Attention budget",
         "Attention degradation",
         "Smart zone"
-      ]
+      ],
+      "summary": {
+        "zh": "模型处理 Context 时，Token 之间会形成相互影响的关系。长度为 N 的序列里，可能的关系数量大约随 N 的平方增长。上下文越长，需要维持的相关与无关关系越多，重点信息更容易被淹没。"
+      }
     },
     {
       "term": "Attention budget",
@@ -1431,7 +1810,13 @@
           "\"We're well into the dumb zone — every token's attention budget is fixed, but the context kept growing. The signal on the schema is now competing with thousands of newer tokens.\""
         ],
         "zh": [
-          "每个 Token 对其余内容可分配的注意力有限，不会因为 Context window 变大就自动增加。新增材料会与已有材料竞争这个预算，因此把所有文件一次塞进 Context，未必比挑选关键资料更有效。"
+          "每个 Token 能分配到 Context 其余部分的影响力是有限的。用在某一段关系上的影响力多了，留给其他关系的就少了。这个额度是每个 Token 各自的，不会随着 Context 增长而变大——这正是长会话会被稀释的原因。",
+          "把它想象成信号与噪声。你的指令是一个音量固定的信号；Context window 里的每一个其他 Token 都是与之竞争的声响。指令本身从不变轻——它仍然一字不差地在那里——但随着 Context 增长，它周围的房间越来越吵，信噪比随之下降。在 10k tokens 的 Context 里最响的那条指令，到了 150k 就只是背景嗡鸣。这就是 Attention degradation 背后的机制：Model 并不会遗忘，只是信号淹没在噪声里了。",
+          "症状表现为不听话——Agent 早早答应了某个约束，之后却逐渐偏离，重新粘贴一遍约束也只在短时间内有效。原因不在指令本身，而在 window 里与它竞争的其他一切。",
+          "你能控制的是往 Context 里放什么。无助于任务的内容并非中性——它会成为盖在一切有用内容之上的噪声。让 window 保持小，当累积的 Context 不再划算时就清空，并且重申真正重要的约束，而不是指望它们早期被提过一次就一直管用。",
+          "用法",
+          "“为什么它总是忽略我贴在开头的那份 schema？”",
+          "“我们已经深陷 dumb zone 了——每个 Token 的 Attention budget 是固定的，但 Context 却一直在增长。关于 schema 的那个信号现在正与成千上万个更新的 Token 竞争。”"
         ]
       },
       "related": [
@@ -1443,7 +1828,10 @@
         "Attention degradation",
         "Clearing",
         "Smart zone"
-      ]
+      ],
+      "summary": {
+        "zh": "每个 Token 对其余内容可分配的注意力有限，不会因为 Context window 变大就自动增加。新增材料会与已有材料竞争这个预算，因此把所有文件一次塞进 Context，未必比挑选关键资料更有效。"
+      }
     },
     {
       "term": "Attention degradation",
@@ -1463,7 +1851,13 @@
           "\"Attention degradation. The type definitions are still in context, but the signal on them is buried under everything we've added since. Clear and reload.\""
         ],
         "zh": [
-          "Session 变长时，每个 Token 的 Attention budget 要分给更多竞争内容，重要关系的信号可能变弱。表现可能是遗漏指令、混淆实体或重复旧判断。解决思路包括缩小任务、选择关键上下文和适时 Handoff。"
+          "随着 Session 增长，每个 Token 的 Attention budget 被分摊到越来越多的竞争者身上。任何一条有意义关系上的信号都在缩小；无关 Context 的噪声不断挤入。同一个 Model，同一套 Parameters——只是同一只盘子上多了几张嘴。这正是 Smart zone / dumb zone 效应的成因。",
+          "它表现为 Model 在 Session 中途变差：遵守了一个小时的约束开始松动，它重新追问已经被告知过的事，写出的代码无视它早先读过的文件。Model 本身没有任何变化——唯一的变量是它此刻正在关注的 Context 有多大。",
+          "它是渐进发生的，这正是它难以在 Session 内部被察觉的原因。没有报错，也没有阈值；每个 Turn 只比上一个 Turn 差一点点，等到失误变得明显时，你已经待在 dumb zone 里有一阵子了。",
+          "恢复的办法是移除 Context，而不是继续往里加。重新粘贴被忽略的指令，只会给同一个拥挤的窗口再添一个竞争者，效果只能维持一小会儿。真正有效的是：清空并只重新载入任务所需的部分，或者 compact，或者交接到一个全新的 Session。把指令遵循能力的下降，视为关于 Context 长度的信号，而不是关于 Model 的信号。",
+          "用法",
+          "\"它已经深陷 dumb zone——开始凭空编造类型文件里根本没有的泛型。\"",
+          "\"Attention degradation。类型定义仍在 Context 里，但它们的信号被此后添加的一切埋住了。清空并重新载入。\""
         ]
       },
       "related": [
@@ -1479,7 +1873,10 @@
         "Clearing",
         "Compaction",
         "Handoff"
-      ]
+      ],
+      "summary": {
+        "zh": "Session 变长时，每个 Token 的 Attention budget 要分给更多竞争内容，重要关系的信号可能变弱。表现可能是遗漏指令、混淆实体或重复旧判断。解决思路包括缩小任务、选择关键上下文和适时 Handoff。"
+      }
     },
     {
       "term": "Smart zone",
@@ -1499,7 +1896,13 @@
           "\"You're out of the smart zone — same model, just deep into the dumb zone now. Compact and reload the plan, the next component will land.\""
         ],
         "zh": [
-          "Smart zone 指 Session 较早、上下文相对集中时更容易保持清晰判断的区间。随着历史和工具输出堆积，Agent 可能进入更容易出错的状态。这个说法强调 Context 管理，而不是给 Model 设定精确的失效刻度。"
+          "在 Session 的早期，Agent 处于 \"smart zone\"——敏锐、专注，回忆能力良好。随着 Session 增长，它会漂移到 \"dumb zone\"：更马虎、健忘、犯更多错误——以及更多的忠实性幻觉（faithfulness hallucination）。同样的 Model，同样的 Harness——只是 Context 更多。这就是 Attention degradation 的实际感受。在前沿 Model 上，dumb zone 通常从约 125K-150K tokens 开始——不过这一点仍有争议。当 Session 变得臃肿时，就 clear 或 compact；不要硬撑。",
+          "这种退化是渐进的，因此很容易被忽略。没有报错信息，也没有可见的边界；Agent 只是开始表现得稍微差一点，然后明显更差。常见迹象：它忘记你二十轮之前给出的指令，重复一个它已经纠正过的错误，或者自信地断言与 Context 相矛盾的内容。因为这种下滑是平滑的，通常的应对方式是硬撑下去并重新解释——而这会增加更多 Context，让问题变得更糟。",
+          "这两个区与 Context window 的上限并不同步。一个 Session 可能已经深陷 dumb zone，而 window 的大部分仍然空闲：上限是 Harness 拒绝继续的位置，但质量远在那之前就已下滑。要围绕 smart zone 做规划，而不是围绕 window——一项任务的实际预算，是 Agent 能良好工作的 token 量，而不是它技术上能容纳的 token 量。",
+          "smart zone 是一种预算，不相关的工作会把它花掉。在一个 Session 中完成的每项任务都会消耗 token，所以在同一个 Session 里开始第二项任务，意味着从更靠近 dumb zone 的位置开始。每个 Session 只做一项任务，能让每项任务都拿到 Session 最敏锐的那一段。当单个任务大过一个 smart zone 时，就把它拆开：在自然的边界处交接（hand off）或压缩（compact），让一个全新的 Session 来做下一部分。",
+          "用法",
+          "\"它把前三个组件做得漂亮，却把第四个彻底搞砸了。\"",
+          "\"你已经不在 smart zone 了——同样的 Model，只是现在深深陷进了 dumb zone。compact 一下并重新加载计划，下一个组件就能做成了。\""
         ]
       },
       "related": [
@@ -1515,7 +1918,10 @@
         "Compaction",
         "Context window",
         "Handoff"
-      ]
+      ],
+      "summary": {
+        "zh": "Smart zone 指 Session 较早、上下文相对集中时更容易保持清晰判断的区间。随着历史和工具输出堆积，Agent 可能进入更容易出错的状态。这个说法强调 Context 管理，而不是给 Model 设定精确的失效刻度。"
+      }
     },
     {
       "term": "Clearing",
@@ -1535,7 +1941,13 @@
           "\"Just clear it — start a fresh session with the plan doc and the test file. No point fighting the existing context.\""
         ],
         "zh": [
-          "Clearing 直接结束当前 Session，让下一条消息从空的 Context window 开始。它能摆脱混乱历史，但也会失去尚未外化的进展。重要任务信息应先写入可重新读取的文件或 Handoff artifact。"
+          "结束当前 session 并开启一个全新的 session。下一条消息会从一个空 session 和空 context window 开始。通常由用户主动发起。",
+          "Clearing 是治愈被污染 context 的良方。一个 session 会累积一切：失败的尝试、走错的方向、过期的 tool 结果、被放弃的计划。model 在每一个 turn 都会重新读取所有这些内容，而不良的历史会拖累新的工作。长 session 进行到深处时，agent 会变得越来越含糊、越来越不听话——你清晰给出的指令被忽视，质量下滑，而催它做得更好也无济于事，因为它艰难跋涉其中的噪声仍然留在它的 context 里。Clearing 会移除这些噪声。",
+          "Clearing 不会抹掉对话。大多数 harness 会把 session 历史保存在你的电脑上，所以对话记录仍然在那里，可以阅读或恢复。消失的是 agent 的工作状态：model 是 stateless 的，所以新 session 对旧 session 知道的东西一无所知。如果这个 session 中保存着下一个 session 会需要的决策或进展，就先让 agent 写一份 handoff artifact，然后开启新 session 并指向它。",
+          "对比 Compaction：它把 Session 总结进新的 Context，而不是从空白开始。Clearing 是更直白的 Tool——什么都不带过去，包括那些垃圾内容。",
+          "用法",
+          "\"它卡在那个失败的测试上反复循环了。\"",
+          "\"直接 clear 掉吧——用计划文档和测试文件开一个全新的 session。没必要跟现有的 context 较劲。\""
         ]
       },
       "related": [
@@ -1550,7 +1962,10 @@
         "Stateless",
         "Handoff artifact",
         "Compaction"
-      ]
+      ],
+      "summary": {
+        "zh": "Clearing 直接结束当前 Session，让下一条消息从空的 Context window 开始。它能摆脱混乱历史，但也会失去尚未外化的进展。重要任务信息应先写入可重新读取的文件或 Handoff artifact。"
+      }
     },
     {
       "term": "Handoff",
@@ -1570,7 +1985,13 @@
           "\"Do a handoff. Write the decisions to a doc, clear, start the implementation in a fresh session reading from it.\""
         ],
         "zh": [
-          "Handoff 把一个 Session 已取得的上下文交给下一个 Session，传递方式可以是文档、摘要或 Compaction。接收方通常无法回到旧 Session 追问，因此交接材料需要写清目标、已做工作、证据和未决问题。"
+          "将 agent 的 context 从一个 session 转移到另一个 session。承载机制各不相同——书面的 handoff artifact、内存中的摘要（compaction），以及其他方式。与 clearing（完全不转移）不同。原因多种多样：切换角色（planner → implementer）、启动一次 AFK 运行、扇出到并行的多个 session，或腾出 context window 空间。",
+          "接收方 session 从零 context 开始——model 是 stateless 的，旧 session 中的任何内容对新 session 都不可见。下一个 session 需要的一切都必须被显式携带过去；其余的一切都已消失。\"没有返回路径\" 是塑造这次携带的约束：新 session 无法询问旧 session 它当时是什么意思，因此所携带的材料必须能够独立成立。",
+          "| 机制 | 形式 | 特性 |\n| ---------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------- |\n| Handoff artifact | Environment 中的文件 | 在任何东西依赖它之前，你可以读取并修正它；可跨多个 session 复用 |\n| Compaction | Context window 中的摘要 | 自动且开销低；更难检查；只能供给一个后继者 |",
+          "糟糕 handoff 的可见失败是 relitigation（重新翻案）：新 session 会重新打开旧 session 已经定下的决定，因为携带的内容记录了决定了什么，却没有记录为什么。判断一次 handoff，要看一个零 context 的 session 能拿它做什么。",
+          "用法",
+          "\"planning session 越来越重了——我该就这么继续下去吗？\"",
+          "\"做一次 handoff。把决定写进一份文档，clear，然后在一个全新的 session 里读取它、开始实现。\""
         ]
       },
       "related": [
@@ -1585,7 +2006,10 @@
         "Model",
         "Stateless",
         "Environment"
-      ]
+      ],
+      "summary": {
+        "zh": "Handoff 把一个 Session 已取得的上下文交给下一个 Session，传递方式可以是文档、摘要或 Compaction。接收方通常无法回到旧 Session 追问，因此交接材料需要写清目标、已做工作、证据和未决问题。"
+      }
     },
     {
       "term": "Primary source",
@@ -1605,7 +2029,13 @@
           "\"It read that out of the design doc. Point it at the actual retry module — work from the primary source when the behaviour matters.\""
         ],
         "zh": [
-          "Primary source 是事实本身，例如源代码、原始记录或数据。它最完整、最权威，但读取成本也最高。需要确认关键细节时，应回到 Primary source，而不是只依赖别人写的总结。"
+          "以原始形态呈现的事实来源——代码、对话记录、原始日志、实际的 API 响应。不是对事物的转述，而是事物本身。与 Secondary source 相对。",
+          "如果你想知道代码库究竟做了什么，代码就是 Primary source。文档、架构图和 README 都只是对它的描述——写就时准确，此后便各按自己的节奏漂移。当 Agent 言之凿凿地对你的项目做出错误断言时，该问的是它依据的是哪种来源：读了文档的 Agent 会继承那份文档的过时；读了代码的 Agent 读到的是当下的真相。",
+          "成本正是 Primary source 无法成为默认选项的原因。把一份 Primary source 载入 Context window 代价高昂——整个文件、完整的对话记录，每个 Token 都按输入计费，还要争夺 Attention budget。你为这份成本换来的是完整性：没有任何内容被他人对「什么重要」的判断预先过滤掉。上个月写下的摘要不可能包含今天才发现至关重要的细节；Primary source 却仍然包含。",
+          "在精确性至关重要时，就该去取 Primary source——确切的函数签名、真实的报错、抛异常的那一行。管理 Context 的很大一部分工作，就是判断何时该为 Primary source 付出成本，何时 Secondary source 已经够用。",
+          "用法",
+          "\"Agent 说重试逻辑是指数退避的，但我眼看着它在猛捶那个端点。\"",
+          "\"那是它从设计文档里读来的。让它去看真正的重试模块——当行为本身重要时，就该以 Primary source 为依据。\""
         ]
       },
       "related": [
@@ -1616,7 +2046,10 @@
         "Input tokens",
         "Attention budget",
         "Context"
-      ]
+      ],
+      "summary": {
+        "zh": "Primary source 是事实本身，例如源代码、原始记录或数据。它最完整、最权威，但读取成本也最高。需要确认关键细节时，应回到 Primary source，而不是只依赖别人写的总结。"
+      }
     },
     {
       "term": "Secondary source",
@@ -1636,7 +2069,13 @@
           "\"The doc's a secondary source — the last session wrote down what it believed, not what's true. Have the new session run the auth tests and trust the primary source.\""
         ],
         "zh": [
-          "Secondary source 是对原始材料的概括，例如文档、报告或压缩摘要。它能快速建立概览，却可能遗漏、误解或过时。对重要结论要知道它指向哪个 Primary source，以便核实。"
+          "对 Primary source 的转述，隔了一层——描述代码的文档、描述对话记录的摘要、描述搜索结果的报告。相比它所描述的来源，它载入 Context window 更便宜，而且天生有损：写下它的人决定了什么才重要，而任何被丢弃的内容，对只拿到摘要的读者来说都是不可见的。",
+          "许多 context engineering 的工作，就是在制造 secondary source。Compaction 把 Session 历史变成一份摘要，用来为下一个 Session 播种。Subagent 在一次嘈杂的搜索上烧掉自己的 Context，返回一份简短报告。Handoff artifact 把一个 Session 的决策压缩成下一个 Session 会读的文档。Memory system 把一个 Session 学到的东西提炼成笔记。每一者做的都是同一笔交易：用保真度换取余量。",
+          "Secondary source 会以两种方式失效。它们有损——丢了 schema 决策的那份 Compaction 摘要，没提到边界情况的那份报告。它们也会漂移——Primary source 变了，转述却没跟上，于是文档用这个季度的自信描述着上个季度的架构。当 Agent 依据一个以任一种方式失效的 secondary source 行动时，它会满怀信心地基于错误信息工作；解法是把它送回 Primary source。",
+          "这两种失效都不意味着 secondary source 是个错误。Context window 是有限的，Primary source 又是昂贵的；没有摘要、报告和 handoff 文档，大东西都装不进来。真正的 Skill 在于知道哪些细节能挺过这种损失——以及在某个细节挺不过去时，对照 Primary source 去核实。做得好的 secondary source 会带着一条指回原件的 Context pointer——指明自己出自哪份对话记录的摘要，指明自己描述哪个文件的文档——这样当转述不够用时，读者可以顺着这条指针走下去，而不必在损失之上硬做。",
+          "用法",
+          "\"Handoff 文档说认证已经做完了，但新 Session 总是发现 token 刷新是坏的。\"",
+          "\"那文档是个 secondary source——上一个 Session 写下的是它相信的东西，而不是事实。让新的 Session 去跑认证测试，信任 Primary source。\""
         ]
       },
       "related": [
@@ -1650,7 +2089,10 @@
         "Memory system",
         "Agent",
         "Context pointer"
-      ]
+      ],
+      "summary": {
+        "zh": "Secondary source 是对原始材料的概括，例如文档、报告或压缩摘要。它能快速建立概览，却可能遗漏、误解或过时。对重要结论要知道它指向哪个 Primary source，以便核实。"
+      }
     },
     {
       "term": "Handoff artifact",
@@ -1671,7 +2113,14 @@
           "\"Have the planner write a handoff artifact — file paths, decisions, constraints. The implementer's session opens with a pointer to the artifact and works from it as its brief.\""
         ],
         "zh": [
-          "Handoff artifact 是承载 Session 交接信息的文档。它把原本只存在于当前 Context 的目标、决策和进度写下来，使下一次工作能够接续。内容要足够独立，不能只写“继续上次的事”。"
+          "一种用作 Handoff 承载机制的文档——由一个 Session 写入 Environment，供另一个 Session 读取。Spec、ticket 和 plan doc 都是 Handoff artifact。",
+          "写它的理由：Model 是 Stateless 的，所以 Session 里的任何东西在 Clearing 之后都无法留存。决策、约束、做到一半的计划——全都随承载它们的 Context 一起消失。而 Environment 会持久存在。把重要状态写进文件，就是把它搬到一个下一个 Session 能够读回来的地方。",
+          "这个 artifact 是 Secondary source——它是对 Session 工作的记述，而不是工作本身。这既让它小到足以给一个全新的 Session 做简报，也正是它可能误导后者的原因：它记录的是撰写它的 Session 当时所相信的内容，而它遗漏或弄错的任何东西，对读者来说都是不可见的。当某个说法很重要时，下一个 Session 应该依据 Primary source——代码、测试——去核实它，而不是直接继承。",
+          "好的 artifact 是写给一个毫无 Context 的 Session 读的。要写具体的文件路径，而不是 \"我们讨论过的那个文件\"。写清楚决定了什么、为什么这样决定，这样下一个 Session 就不会为此重新争论。写清楚哪些已完成、哪些还没做。告诉撰写它的 Session 这个 artifact 将去往何处会很有帮助：\"为一个对这项工作一无所知的全新 Session 写一份 handoff doc\"。",
+          "另一种承载机制是 Compaction，它在内存中做总结。而 artifact 有两个优势：它存在于磁盘上，在有任何东西依赖它之前，你可以先读它、修正它；而且它可以被复用——同一份 Spec 可以为五个并行的 Session 做简报。",
+          "用法",
+          "\"我该如何把这件事在规划 Agent 和实施 Agent 之间拆分？\"",
+          "\"让规划者写一份 Handoff artifact——文件路径、决策、约束。实施者的 Session 以一个指向该 artifact 的指针开场，并把它当作自己的简报来开展工作。\""
         ]
       },
       "related": [
@@ -1688,7 +2137,10 @@
         "Primary source",
         "Compaction",
         "Agent"
-      ]
+      ],
+      "summary": {
+        "zh": "Handoff artifact 是承载 Session 交接信息的文档。它把原本只存在于当前 Context 的目标、决策和进度写下来，使下一次工作能够接续。内容要足够独立，不能只写“继续上次的事”。"
+      }
     },
     {
       "term": "Spec",
@@ -1707,7 +2159,12 @@
           "\"No, write it up as a spec — break it into tickets, run each one in its own session. Trying to do the whole thing in a single context will hit the dumb zone before you're halfway.\""
         ],
         "zh": [
-          "Spec 描述跨多个 Session 的工作，包括要构建什么、完成标准和任务之间的关系。它可以拆成 Tickets，由不同 Session 分别处理。Spec 负责保持整体目标一致，而不是记录每一步命令。"
+          "一份描述跨 Session 工作的 Handoff artifact——说明在建的是什么，而不是每个 Session 各自如何完成自己那份。随工作推进而不断变化，由 ticket 组成。",
+          "Spec 之所以存在，是因为 Session 是一次性的，而大工程不是。任何需要超过一个 Context window 的 Effort 才能完成的事，都需要一个 Context 之外的归属地——Agent 的 Environment 中某个能在 Clearing 之后留存下来的地方，无论那是 repo 里的一个文件、一个 GitHub issue，还是 Agent 能触达的 issue tracker。Spec 就是这个归属地：目标、约束、迄今为止做出的决定，以及带状态的 ticket 列表。任何全新的 Session 都能读它，从而知道工作进展到哪一步，而不必继承上一个 Session 累积下来的噪音。",
+          "Spec 有几种容易辨认的风格，大多继承自团队既有的书面表达方式。产品需求文档（PRD）偏向面向用户的 what 与 why——功能、行为、验收标准。设计文档或 RFC 偏向技术——选定的方案、被否决的备选方案、权衡取舍。在规模最小的一端，一份带 ticket 清单的普通 plan.md 就能为多 Session 的功能完成同样的工作。风格不如角色重要：对 Agent 来说，这些都是同一件事——它在每个 Session 开始时读取的那份持久化的意图声明。",
+          "用法",
+          "\"这整件事该在一个 Session 里做吗？\"",
+          "\"不，把它写成一份 Spec——拆成 ticket，每个都在自己的 Session 里跑。想在单个 Context 里把整件事做完，还没走到一半就会撞上 dumb zone。\""
         ]
       },
       "related": [
@@ -1720,7 +2177,10 @@
         "Clearing",
         "Agent",
         "Smart zone"
-      ]
+      ],
+      "summary": {
+        "zh": "Spec 描述跨多个 Session 的工作，包括要构建什么、完成标准和任务之间的关系。它可以拆成 Tickets，由不同 Session 分别处理。Spec 负责保持整体目标一致，而不是记录每一步命令。"
+      }
     },
     {
       "term": "Ticket",
@@ -1740,7 +2200,13 @@
           "\"Look at the ticket graph — the schema change blocks the backfill, the backfill blocks the API switch. Pick a leaf and run a session on it.\""
         ],
         "zh": [
-          "Ticket 是一个 Session 可独立完成的工作单元，说明任务、边界和验收方式。它可挂在 Spec 下，也可单独存在。好的 Ticket 让接手的 Agent 不必依赖前一个 Session 的隐含记忆。"
+          "一个界定单次工作 Session 范围的 Handoff artifact。它既可以独立存在，也可以作为某个 Spec 的子项挂在它之下。Ticket 之间可以互相阻塞，也可以被同级的 Ticket 阻塞，因此工作的顺序由它们的依赖图自然浮现，而不是出自一份线性的计划。",
+          "决定性的约束是大小：一个 Session。一个 Ticket 应当能在 Session 漂出 Smart zone 之前完成——而这个约束是可检验的。如果你手上的 Ticket 对应的 Session 经常在任务完成之前就开始退化，那说明 Ticket 太大了，拆开它们。如果每个 Session 把大部分 Context 花在准备工作上，真正干活只有五分钟，那说明 Ticket 太小了，合并它们。",
+          "好的 Ticket 是为一位不掌握任何其他 Context 的读者写的。目标、验收标准，以及指向相关文件和决策的 Context 线索——足以让 Session 直接开始工作，而不必重新推导上一个 Session 已经知道的东西。",
+          "依赖图也是释放并行能力的关键。相互独立的 Ticket——图中的叶子节点——可以同时各自在属于自己的 Session 中运行。这是同时运行多个 agent 的一种有效方式。在 Software factory 中，一个 Ticket 被标记为就绪，这件事本身就是启动其 Session 的触发器。",
+          "用法",
+          "\"迁移 Spec 该从哪里开始？\"",
+          "\"看看 Ticket 图——schema 变更阻塞 backfill，backfill 又阻塞 API 切换。挑一个叶子节点，在它上面跑一个 Session。\""
         ]
       },
       "related": [
@@ -1751,7 +2217,10 @@
         "Context",
         "Context pointer",
         "Software factory"
-      ]
+      ],
+      "summary": {
+        "zh": "Ticket 是一个 Session 可独立完成的工作单元，说明任务、边界和验收方式。它可挂在 Spec 下，也可单独存在。好的 Ticket 让接手的 Agent 不必依赖前一个 Session 的隐含记忆。"
+      }
     },
     {
       "term": "Compaction",
@@ -1771,7 +2240,13 @@
           "\"Compact before you start — write what must survive into the summary prompt so the new session keeps the schema decisions and drops the exploration.\""
         ],
         "zh": [
-          "Compaction 把已有 Session 历史总结成较短内容，再作为新 Session 的起点。它释放 Context window 空间，但摘要必然会丢细节。关键事实与决策最好保存在可读取的 Primary source 或 Handoff artifact 中。"
+          "在内存中完成的 handoff：上一个 session 的历史被总结成摘要，摘要再作为种子开启一个全新的 session。设计上就是有损的：transcript 是 primary source，摘要则是 secondary source——用细节换取空间余量。可由用户手动触发，也可通过 autocompact 自动触发。",
+          "机制是这样的：context window 是有限的，而一个长时间的 session 会把它填满——每一个 tool result、每一次文件读取、每一个走错的 turn，都会留在历史里。当它变得沉重时，harness 会让 model 对 session 做总结，把原始历史丢弃，再用这份摘要作为种子开启一个新的 session。凡是没能进入摘要的内容，都会从 context 中消失。有些 harness 会缓和这一点：把旧的 transcript 保留在磁盘上，并在摘要里留下一个指向它的 context pointer——secondary source 由此链回它的 primary source，于是摘要丢掉的某个细节，可以通过重读原文找回来。",
+          "摘要由 model 撰写，因此可以被 prompt 引导。写下 “Preserve the schema decisions” 这样的指令，会让生成的产物更有的放矢。时机也很重要——在阶段边界处 compact，在计划已经确定之后，而不是在任务中途。",
+          "对照 clearing——它丢掉一切、从冷启动开始：compaction 试图把要点带过去；clearing 则赌这些要点早已被写在某个更好的地方。",
+          "用法",
+          "“Context 越来越重了，而我还有测试要跑通。”",
+          "“先 compact 再开始——把必须存活下来的内容写进摘要的 prompt 里，这样新的 session 就能保留 schema 决策，丢掉那些探索过程。”"
         ]
       },
       "related": [
@@ -1787,7 +2262,10 @@
         "Context pointer",
         "Clearing",
         "Context"
-      ]
+      ],
+      "summary": {
+        "zh": "Compaction 把已有 Session 历史总结成较短内容，再作为新 Session 的起点。它释放 Context window 空间，但摘要必然会丢细节。关键事实与决策最好保存在可读取的 Primary source 或 Handoff artifact 中。"
+      }
     },
     {
       "term": "Autocompact",
@@ -1807,7 +2285,13 @@
           "\"Autocompact fired between turns — the early decisions got summarised and we must have lost something. Reload the plan doc, or compact manually next time so you control what gets kept.\""
         ],
         "zh": [
-          "Autocompact 是 Harness 在 Context window 快满时自动触发的 Compaction。它能让对话继续，但摘要的内容选择未必完全符合后续任务。重要状态不宜只留在即将被压缩的聊天历史中。"
+          "由 Harness 在 Context window 接近占满时自动触发的 Compaction。",
+          "Harness 会持续监视 Context window 的占用程度。一旦越过某个阈值——通常在 80% 左右——它就会暂停，让 Model 对到目前为止的 Session 做摘要，再用这份摘要开启一个全新的 Session。之后工作照常继续，仿佛什么都没发生过。",
+          "但确实有事发生了。Compaction 是有损的，而 Autocompact 的有损发生在你未曾选择的时刻。手动 compact 发生在阶段边界处，那时你可以告诉 Model 该保留什么。Autocompact 则在任务中途触发，只要触及阈值就触发——可能是在一次重构进行到一半时，由摘要自行裁定你的哪些决策值得保留。典型症状是：Agent 自信地继续干活，却已悄悄忘记了你一小时前确立的某条约束，直到它的产出开始与那条约束相矛盾时你才发现。",
+          "防御之道是别让它触发。盯住 Context 指示器，在自然的边界处手动 compact，或者把决策写进计划文档或磁盘上的 Handoff artifact——在那里没有任何摘要能把它们弄丢。大多数 Harness 还允许你自定义缓冲区——把阈值提前或推后，或者干脆完全关闭 Autocompact——这样你就能调节它在触发前为你保留多少余量。",
+          "用法",
+          "\"它好像不记得我们早先对 schema 的决定是什么了。\"",
+          "\"Autocompact 在两轮之间触发了——早期的决定被摘要掉了，我们肯定丢了点东西。重新加载计划文档，或者下次手动 compact，好让你掌控哪些内容会被保留。\""
         ]
       },
       "related": [
@@ -1819,7 +2303,10 @@
         "Agent",
         "Handoff artifact",
         "Turn"
-      ]
+      ],
+      "summary": {
+        "zh": "Autocompact 是 Harness 在 Context window 快满时自动触发的 Compaction。它能让对话继续，但摘要的内容选择未必完全符合后续任务。重要状态不宜只留在即将被压缩的聊天历史中。"
+      }
     },
     {
       "term": "Memory system",
@@ -1838,7 +2325,12 @@
           "\"Wire up a memory system — write what it learns to the filesystem on the first turn, reload it at session start. The model itself is stateless; the memory layer fakes continuity.\""
         ],
         "zh": [
-          "Memory system 把值得保留的信息写到环境中，并在新 Session 读取，让 Agent 看起来具有跨会话记忆。它改变的是 Context 的来源，不会修改 Model 的 parameters。记忆的有效性取决于保存、检索和更新是否准确。"
+          "一种试图让 Agent 跨 Session 保持 Stateful 的系统。它在 Session 期间把信息持久化到 Environment 中，并在未来 Session 开始时将其重新载入 Context window，因此即便用户 Clearing 了 Session，Agent 依然保有连续性。",
+          "Memory system 分为两半。写入路径：在 Session 期间，Agent 把它学到的东西——你陈述过的某项偏好、关于项目的某个事实——记录为 Environment 中的文件。读取路径：在 Session 开始时，Harness 把这些文件或它们的索引载回 Context window。许多 Harness 都自带 Memory system——Claude Code 的 /memory 就是其中之一——但你也可以自己搭一个：一个笔记目录，外加 AGENTS.md 中一条查阅它的指令。",
+          "与任何常驻加载的内容相同的权衡同样适用。记忆会不断累积，因此大多数系统只加载一行式索引，把正文留在 Context 指针之后，而不是把全部内容都内联进来。而且记忆是二手来源，会漂移：三月记录的一条事实，到了六月、项目早已向前推进之后，仍会以同样的置信度被加载。Memory system 需要修剪，就像 AGENTS.md 一样。",
+          "用法",
+          "“我总得反复告诉它，我用的是 Postgres，不是 MySQL。”",
+          "“接一个 Memory system——在第一个 Turn 就把学到的东西写进 Filesystem，在 Session 开始时重新载入。Model 本身是 Stateless 的；记忆层伪造了连续性。”"
         ]
       },
       "related": [
@@ -1856,7 +2348,10 @@
         "Turn",
         "Model",
         "Stateless"
-      ]
+      ],
+      "summary": {
+        "zh": "Memory system 把值得保留的信息写到环境中，并在新 Session 读取，让 Agent 看起来具有跨会话记忆。它改变的是 Context 的来源，不会修改 Model 的 parameters。记忆的有效性取决于保存、检索和更新是否准确。"
+      }
     },
     {
       "term": "AGENTS.md",
@@ -1877,7 +2372,14 @@
           "\"Check AGENTS.md — someone pasted the entire style guide in there instead of putting it behind a skill.\""
         ],
         "zh": [
-          "AGENTS.md 是可被 Harness 读取的项目指令文件，用来告诉 Agent 仓库约定与工作边界。文件不会自动改变 Model；它需要在适当时机进入 Context。指令越具体、越贴近实际代码，越容易执行。"
+          "位于 environment 中的一个文件，harness 会在 session 开始时把它加载进 context window——也就是项目交给 agent 的常设简报。这是跨 harness 的惯例；有些 harness 还有自己的变体（Claude Code 的是 CLAUDE.md）。",
+          "由于它会自动加载，这是避免在多个 session 之间重复自己的办法之一。model 是 stateless 的——你在一个 session 里给出的纠正，到了下一个 session 就消失了，结果你不得不对每一个新 session 反复交代：项目用 pnpm、测试要用某个特定的 flag 来跑、某个目录是生成的不能碰。当你因为同一件事纠正过 agent 两次，那条纠正就是 AGENTS.md 的候选条目。",
+          "合适的内容是 agent 无法从代码中推导出来的东西：构建与测试命令、代码库本身不会让它显而易见的约定、硬性约束（“永远不要编辑生成的 client”）。要简短、用陈述句——它是简报，不是文档。",
+          "代价是它里面的所有内容始终处于加载状态。指令会不断累积，而其中大多数与任何具体任务都无关；一份很长的 AGENTS.md 既消耗 token，又会稀释自身——context 里的指令越多，model 可靠遵循其中任何一条的程度就越低。",
+          "要避免：把本该逐步披露的内容放进 AGENTS.md——其中的任何内容都要在每一个 session 的每一个 turn 付出 token 成本，无论那个 session 是否需要它。风格指南可以改为放在某个 skill 或 context pointer 后面；把 AGENTS.md 留给那些处处适用的行。",
+          "用法",
+          "“为什么每个 session 一开始就已经烧掉了 4k token？”",
+          "“查一下 AGENTS.md——有人把整份风格指南贴了进去，而不是把它放到 skill 后面。”"
         ]
       },
       "related": [
@@ -1893,7 +2395,10 @@
         "Turn",
         "Skill",
         "Context pointer"
-      ]
+      ],
+      "summary": {
+        "zh": "AGENTS.md 是可被 Harness 读取的项目指令文件，用来告诉 Agent 仓库约定与工作边界。文件不会自动改变 Model；它需要在适当时机进入 Context。指令越具体、越贴近实际代码，越容易执行。"
+      }
     },
     {
       "term": "Progressive disclosure",
@@ -1912,7 +2417,12 @@
           "\"No — progressive disclosure. Reference the style guide as a skill the agent loads when it actually needs to write a component. AGENTS.md pays the token cost every turn.\""
         ],
         "zh": [
-          "Progressive disclosure 先提供当前步骤必要的信息，更多细节通过 Context pointers 在需要时读取。这样可以节约 Context window，并减少无关内容对注意力的竞争。它不是隐藏信息，而是安排加载顺序。"
+          "只加载 Agent 当下需要的 Context，其余部分用 Context 指针指向。这一做法借自 UI 设计，在那里它指的是：只向用户展示与当前任务相关的控件，其余的都藏在一次点击之后。",
+          "这项技术之所以存在，是因为 Context 是一份双重成本。预先加载的每一个 Token，都会在每一个 Turn 按 Input tokens 计费，而且无论 Agent 是否需要，每一个 Token 都在消耗 Attention budget。一个塞满了完整风格指南、部署运行手册和数据库规范的 AGENTS.md，会让 Agent 在所有这些方面都表现更差——当前任务真正重要的指令，被那些无关的指令稀释了。破绽就是：Agent 忽略了你明知就在它 Context 里的规则——它们确实在里面，只是被埋住了。",
+          "Progressive disclosure 把这一关系倒转过来。让常驻加载的那一层保持很小——每个主题一句话，外加一个指向细节所在位置的指针。Agent 在写组件时才去读风格指南，在部署时才去读部署运行手册，而在修测试时两者都不读。Skill 就是内建于 Harness 的这一模式：每个 Session 加载一段简短描述，完整指令只在被触发时才加载。",
+          "用法",
+          "\"我该把整份风格指南都倒进 AGENTS.md 吗？\"",
+          "\"不——用 Progressive disclosure。把风格指南作为一个 Skill 引用，让 Agent 在真正需要写组件时才加载它。AGENTS.md 是每个 Turn 都要付出 Token 成本的。\""
         ]
       },
       "related": [
@@ -1927,7 +2437,10 @@
         "Skill",
         "Harness",
         "Session"
-      ]
+      ],
+      "summary": {
+        "zh": "Progressive disclosure 先提供当前步骤必要的信息，更多细节通过 Context pointers 在需要时读取。这样可以节约 Context window，并减少无关内容对注意力的竞争。它不是隐藏信息，而是安排加载顺序。"
+      }
     },
     {
       "term": "Context pointer",
@@ -1949,7 +2462,15 @@
           "\"Most of it should be context pointers, not content. Keep the always-on rules inline; turn the deploy runbook and the style guide into skills and leave a context pointer behind.\""
         ],
         "zh": [
-          "Context pointer 是文档里指向另一份资料的明确线索。Agent 不必一开始加载所有文件，只需在任务触及相应问题时沿指针读取。好的指针能说明何时、为何要打开目标内容。"
+          "一个文档中对另一个文档的提及，指向后者，使 Agent 只在任务需要时才把它拉进 Context window。它正是 Progressive disclosure 得以构建的基本单元。",
+          "使用指针（而不是把内容内联进来）的理由是成本。一个 Context pointer 在 Context window 里只占一行。它背后的文档可能有数千个 Token，但除非 Agent 真的顺着这个指针去读，这些 Token 不花任何代价。把一份 2,000 Token 的运行手册内联进 AGENTS.md，每个 Session 都要为它付费；把它换成「deploy process: see internal/deploy.md」，就只有真正要部署的那些 Session 才会加载它。当任务匹配时，Agent 会用一次 Tool call 顺着这个指针去读。",
+          "一个 Context pointer 要起作用需要两部分：一个稳定的路径，以及足够让 Agent 判断何时值得顺着它读下去的描述。光秃秃的路径就是 Agent 没有理由追随的指针；没有任何内容提示的「see internal/deploy.md」，会被真正需要它的 Session 跳过。写这一行时要让它匹配任务出现的方式：「release, deploy, or rollback — read internal/deploy.md first」。",
+          "留心观察，指针无处不在：AGENTS.md 里的行、Skill 描述（Harness 会加载描述；Skill 正文在描述后面等待）、目录列表里的文件名、文档之间的链接。",
+          "指针还能把一个 Secondary source 拴回它所派生自的 Primary source——那份指名原始 transcript 的 Compaction 摘要、那份指名自己所描述源文件的文档。这让 Secondary source 的有损性变得可恢复：当摘要被证明不够用时，Agent 顺着指针去读原文，而不是将就于摘要所保留下来的内容。",
+          "避免：「reference」——太干瘪；传达不出顺着它读会把更多 Context 拉进来这层意思。「Portal」——太花哨。",
+          "用法",
+          "「AGENTS.md 越来越大了。」",
+          "「它的大部分应该是 Context pointer，而不是内容。把常驻规则保留为内联；把部署运行手册和风格指南变成 Skill，在原处留下一个 Context pointer。」"
         ]
       },
       "related": [
@@ -1963,7 +2484,10 @@
         "Skill",
         "Secondary source",
         "Primary source"
-      ]
+      ],
+      "summary": {
+        "zh": "Context pointer 是文档里指向另一份资料的明确线索。Agent 不必一开始加载所有文件，只需在任务触及相应问题时沿指针读取。好的指针能说明何时、为何要打开目标内容。"
+      }
     },
     {
       "term": "Skill",
@@ -1985,7 +2509,15 @@
           "\"As a skill — the agent loads it only when the task involves deploys. In AGENTS.md it'd burn tokens on every turn for something we use weekly.\""
         ],
         "zh": [
-          "Skill 把某类工作的方法、约束和资源打包成可按需加载的能力。平时只保留简短说明，需要时才读完整内容，以免长期占用 Context window。Skill 提供流程，不会替代实际工具和验证。"
+          "一种以单元形式打包的可教学能力——为做好某一项任务所需的指令与资源；它留在 Environment 中，直到某个 Context pointer 把它拉进 Context window，服务于手头的任务。它是 Harness 中 Progressive disclosure 的单位。",
+          "Skill 是一个开放标准，定义于 agentskills.io——最初由 Anthropic 开发，此后被大多数主流 Harness 采用，所以一份写好的 Skill 在各家之间都能通用。其格式是一个文件夹，包含：",
+          "- 一个 SKILL.md 文件——元数据（至少包含名称和描述）加上指令本身\n- 可选：Agent 可以运行的脚本\n- 可选：指令所指向的模板与参考资料",
+          "默认情况下，只有名称和描述留在 Context 里。当 Agent 的任务与之匹配时，它才加载其余内容。在此之前，这份 Skill 几乎不占空间——无论完整指令有多大，也只占一两句话的 token。",
+          "这正是 Skill 与 AGENTS.md 的区别：后者无论任务是什么都会被加载进每个 Session。而 Skill 只在某类特定工作出现时才被读取——发版、搭建新服务、写数据库迁移——其余时间便被忽略。",
+          "避免：\"tool\"——Tool 是 Agent 调用的东西；Skill 是它读取的指令。",
+          "用法",
+          "\"部署 runbook 应该放在哪里？\"",
+          "\"作为 Skill——Agent 只在任务涉及部署时才加载它。放在 AGENTS.md 里，它会为一件每周才用一次的事烧掉每一个 Turn 的 token。\""
         ]
       },
       "related": [
@@ -2001,7 +2533,10 @@
         "Session",
         "Tool",
         "Turn"
-      ]
+      ],
+      "summary": {
+        "zh": "Skill 把某类工作的方法、约束和资源打包成可按需加载的能力。平时只保留简短说明，需要时才读完整内容，以免长期占用 Context window。Skill 提供流程，不会替代实际工具和验证。"
+      }
     },
     {
       "term": "Subagent",
@@ -2020,7 +2555,12 @@
           "\"Spawn a subagent to do the search — it'll burn its own context window on the noise and report back the two file paths you actually need.\""
         ],
         "zh": [
-          "Subagent 由另一个 Agent 启动，在独立 Session 中处理有边界的子任务，再把结果返回。它拥有自己的 Context，适合可并行、可清晰交付的工作。主 Agent 仍需核对结果并把它纳入整体任务。"
+          "由另一个 Agent 通过 Tool call 派生的 Agent。它运行在自己的 Session 中，拥有自己的 Context window，最后回传单个 Tool result。它与 Handoff 不同——父级明确期待一个返回，而 Handoff 没有返回路径。它不能再派生更下一级的 Subagent——这棵树只有一层深。Subagent 的存在是为了隔离 Context，而不是用来构建层级结构。",
+          "关键在于把嘈杂的工作挡在父级 Context 之外。一次大范围搜索或一场漫长的读文件远征，会产生成页的 Tool result，其中大部分只在找到答案的那一刻有意义。在父级内部运行，这些东西会在本次 Session 余下的时间里一直留在父级 Context 中；在 Subagent 内部运行，噪声填满的则是一个用完即弃的窗口——只有最终报告会落进父级 Context。报告是 Secondary source：父级拿到的是 Subagent 对自己所找到内容的叙述，而不是原始结果，因此报告中没有写出来的任何东西，对父级而言都是不可见的。",
+          "Subagent 还可以并发运行——父级可以一次性把若干个 Subagent 铺开到彼此独立的工作上。",
+          "用法",
+          "\"grep 的结果快把我的 Context 撑爆了。\"",
+          "\"派生一个 Subagent 去做这次搜索——它会用自己的 Context window 去消化这些噪声，然后把你真正需要的那两个文件路径报回来。\""
         ]
       },
       "related": [
@@ -2032,7 +2572,10 @@
         "Handoff",
         "Context",
         "Secondary source"
-      ]
+      ],
+      "summary": {
+        "zh": "Subagent 由另一个 Agent 启动，在独立 Session 中处理有边界的子任务，再把结果返回。它拥有自己的 Context，适合可并行、可清晰交付的工作。主 Agent 仍需核对结果并把它纳入整体任务。"
+      }
     },
     {
       "term": "Human-in-the-loop",
@@ -2053,7 +2596,14 @@
           "\"No, schema migration — keep it human-in-the-loop. I want to see each step and steer if it picks the wrong column to backfill from.\""
         ],
         "zh": [
-          "Human-in-the-loop 指人参与 Agent 的工作过程，在关键步骤提供判断、纠错或批准。人与 Agent 之间存在实时往返，适合需要解释意图、审查风险或做取舍的工作。"
+          "一种工作模式：在一次 Session 中，一个或多个人与 Agent 结对——实时审查、纠偏或协作。人类全程在场并真正投入，而不只是对单个动作做放行把关。",
+          "与之相对的是 AFK 工作：Agent 无人看管地运行，你在事后评判结果。Human-in-the-loop 意味着趁问题还便宜时就抓住它：你看到 Agent 去拿错文件、误读需求，或者开始走进死胡同，然后一句话把它拨回来——而不是在二十分钟之后才发现，这二十分钟自信满满的工作全都建立在那次错误之上。Agent 并不能可靠地察觉自己何时跑偏；没人管的时候，它们倾向于继续往前推，而不是停下来发问。",
+          "哪种模式合适取决于工作本身。规格明确、低风险、易于验证的任务适合 AFK。而含糊不清、不可逆，或者你难以审查最终结果的任务——一次 schema migration、一个棘手的设计决策、任何触及生产环境的事——则适合留在 loop 中。这个判断本质上就是：走错一步的代价有多大，而你会多晚才发现？",
+          "有些工作天生就是 in-the-loop 的，因为你的反应本身就是输入。Grilling 只有在你在场回答问题时才成立；Prototyping 只有在你在场对产物做出反应时才成立。",
+          "留在 loop 中要付出你的注意力，而注意力正是稀缺资源。与 Agent 配合得越来越好的其中一部分，就是把更多工作安全地移出 loop——靠计划、自动化检查，以及在最后做 Human review，而不是全程监督。Software factory 把这一点推得更远：由触发器启动 session，于是连启动工作本身都不需要你。",
+          "用法",
+          "“这个跑 AFK 过一夜？”",
+          "“不行，schema migration——保持 human-in-the-loop。我想看到每一步，如果它选错了要回填的列，我好及时纠偏。”"
         ]
       },
       "related": [
@@ -2065,7 +2615,10 @@
         "Automated check",
         "Human review",
         "Software factory"
-      ]
+      ],
+      "summary": {
+        "zh": "Human-in-the-loop 指人参与 Agent 的工作过程，在关键步骤提供判断、纠错或批准。人与 Agent 之间存在实时往返，适合需要解释意图、审查风险或做取舍的工作。"
+      }
     },
     {
       "term": "AFK",
@@ -2086,7 +2639,14 @@
           "\"Yeah, read-only filesystem, no network.\""
         ],
         "zh": [
-          "AFK 是 away from keyboard：用户发起任务后暂时不看管，让 Agent 自行推进。它能提高吞吐量，也会放大一开始的错误假设。离开前要写清任务和边界，运行中靠自动检查，回来后做 Human review。"
+          "Away from keyboard（离开键盘）。一种工作模式：用户启动一个 session 之后就离开，让 agent 无人值守地运行。这是 AI coding 的吞吐量倍增器 —— 你睡觉、吃饭或忙别的事情时，多个 AFK session 可以并行运行。通常需要一个宽松的 permission mode，再加上沙箱化，才谈得上安全。",
+          "当你不在场时，agent 处理歧义的方式不一样。你在旁边看着的时候，含糊的决定会以提问的形式浮现出来，由你回答；一旦你走开，agent 会自己挑一个默认做法继续往下做，之后每一个决定都建立在这个猜测之上。典型的失败情形是：你回来时看到数小时完成的、自信满满的工作，而它建立在前十分钟做出的一个错误判断之上。这些工作并不潦草 —— 它连贯自洽，只是自洽在错误的那件事上。",
+          "既然你无法在运行过程中给输入，那就改在运行前和运行后给。运行前：提前消解歧义 —— 一场 grilling session、一份写下来的 spec —— 这样留给 agent 独自填补的空隙就更少。运行中：automated checks 和 automated review 代替你没能给到的注意力，对机械手段能抓住的问题快速失败。运行后：运行结束时留下可审查的东西 —— 一个 PR，而不是已经合并的改动。AFK 并不会取消 human review，它只是把全部评审都推迟到最后，这正是为什么最后送达的东西必须值得一评。这也是为什么 AX 在 AFK 运行中最要紧 —— 无人看管时，environment 是 agent 唯一能得到的支撑。",
+          "避免使用：“background agent” —— 它把重心放在机器上（“在后台运行”），而不是人的行为模式（“用户已经走开”）。AFK 命名的才是真正要紧的事实：用户没有在看。",
+          "用法",
+          "“我在 AFK 跑这件事 —— 三个沙箱化的 agent 做重构，早上再来 review 这些 PR。”",
+          "“绕过权限？”",
+          "“对，只读 filesystem，无网络。”"
         ]
       },
       "related": [
@@ -2103,7 +2663,10 @@
         "AX",
         "Agent mode",
         "Filesystem"
-      ]
+      ],
+      "summary": {
+        "zh": "AFK 是 away from keyboard：用户发起任务后暂时不看管，让 Agent 自行推进。它能提高吞吐量，也会放大一开始的错误假设。离开前要写清任务和边界，运行中靠自动检查，回来后做 Human review。"
+      }
     },
     {
       "term": "Automated check",
@@ -2125,7 +2688,15 @@
           "\"Add typecheck and lint — it'll self-correct from those before the PR ever lands.\""
         ],
         "zh": [
-          "Automated check 是可重复运行、结果明确的机械检查，例如类型检查、测试和 lint。它能快速发现某些错误，但不能评价产品判断或代码意图。Agent 离线工作时，这些检查尤其重要。"
+          "一种在 Environment 中运行的确定性验证——测试、类型检查、lint、构建、pre-commit hooks。只有通过/失败，不做评判。这是 Agent 无需牵扯任何其他人就能据以自我纠正的信号。flaky test 是坏掉的 check，而不是“非 check”；automated checks 在设计上就是确定性的。",
+          "自我纠正是以循环的方式运转的。Agent 做出改动，把 check 作为一次 Tool call 运行，失败的输出就落进它的 Context window——带文件名和行号的类型错误、带期望值与实际值的失败断言。这足以让 Agent 修好问题、再次运行 check，如此反复直到通过，循环中没有任何人参与。确定性正是让这个循环值得信赖的原因：同一份代码永远产生同一个判定，所以“通过”才有意义。flaky check 会毒化这一切——Agent 会去“修”本来没问题的代码，或者反复重试从而越过一个真实的失败。",
+          "这就是为什么好的 check 是一个代码库 AX 的重要组成部分。在一个拥有严格类型、快速测试套件和 linter 的代码仓库里，Agent 能在你看见之前抓住自己的大部分错误；而在这些都没有的代码仓库里，Agent 产出什么就交付什么。这一差别在 AFK 运行中体现得最明显，因为那里 check 是运行期间唯一发生的验证。但 check 只能抓住它所断言的东西——绿色的 check 意味着被断言的性质成立，而不是代码正确。那些需要判断力来填补的空缺，正是 Automated review 和 Human review 的用武之地。",
+          "避免使用：“feedback loop” / “backpressure”——这两个词都把 check 与 review 混为一谈。避免使用：“test”——test 属于 automated checks，但并非所有 automated checks 都是 test。",
+          "用法",
+          "“Agent 在 AFK 运行中不断交付坏掉的代码。”",
+          "“Sandbox 里接入了哪些 automated checks？”",
+          "“只有单元测试。”",
+          "“加上 typecheck 和 lint——它会在 PR 落地之前就靠这些自我纠正。”"
         ]
       },
       "related": [
@@ -2138,7 +2709,10 @@
         "Automated review",
         "Human review",
         "Sandbox"
-      ]
+      ],
+      "summary": {
+        "zh": "Automated check 是可重复运行、结果明确的机械检查，例如类型检查、测试和 lint。它能快速发现某些错误，但不能评价产品判断或代码意图。Agent 离线工作时，这些检查尤其重要。"
+      }
     },
     {
       "term": "Automated review",
@@ -2158,7 +2732,13 @@
           "\"Add an automated review step before merge — different model, separate system prompt, scoped to security and contract changes.\""
         ],
         "zh": [
-          "Automated review 由另一个 Agent 阅读变更并提出判断。它与测试不同，结论不是确定性的，也可能遗漏问题。它可帮助发现结构和逻辑风险，但不能替代 Human review。"
+          "Agent 审查另一个 Agent 的工作，通常使用不同的 Model 或 System prompt。非确定性：它做出的是判断。它可以在任何地方运行——合并前在 PR 上、事后在 commit history 上、在 Session 中途作为 Subagent。CI 中的 LLM-as-judge 属于 Automated review，而不是 Automated check；决定类别的是断言做了什么，而不是它在哪里运行。",
+          "与工作 Agent 的分离，正是它奏效的原因。让写代码的那个 Agent 审查自己的工作收获甚微——产生 bug 的 Session 里同样含有产生它的推理过程，而 Agent 会把自己的结论当作确认读回去。拥有全新 Context window 的审查者没有这种依附：它像一个陌生人那样看 diff，而这正是 review 所依赖的。不同的 Model，或针对审查定制的 System prompt，会进一步强化这一点——不同的盲区，以及一个聚焦于你真正关心之处（security、API contracts、performance）的 System prompt，而不是笼统的「找找问题」。",
+          "它嵌在其他 review 层之间。Automated check 是确定性的，能抓住可以被机械断言的东西；Human review 昂贵，且扩展性最差。Automated review 居于中间：它以机器的成本抓住判断形态的问题——一个误导性的函数名、一个被漏掉的边界情况。因为它是非确定性的，它可能漏掉东西，也可能把不是问题的问题标出来；把它当作一个在人看之前抬高下限的过滤器，而不是一个取代人的关卡。",
+          "避免：「AI review」/「Agent review」——过于模糊，无法与工作 Agent 本身区分。",
+          "用法",
+          "「AFK 运行带来的糟糕 PR 太多了。」",
+          "「在合并前加一个 Automated review 步骤——不同的 Model、独立的 System prompt，聚焦于 security 和 contract 变更。」"
         ]
       },
       "related": [
@@ -2171,7 +2751,10 @@
         "Context window",
         "Human review",
         "AFK"
-      ]
+      ],
+      "summary": {
+        "zh": "Automated review 由另一个 Agent 阅读变更并提出判断。它与测试不同，结论不是确定性的，也可能遗漏问题。它可帮助发现结构和逻辑风险，但不能替代 Human review。"
+      }
     },
     {
       "term": "Human review",
@@ -2192,7 +2775,14 @@
           "\"Diff. The summary said it deleted dead code — turned out the function was called from a generated file.\""
         ],
         "zh": [
-          "Human review 是人亲自查看代码、变更或产物并形成判断。阅读摘要并不能代替阅读实际差异。它提供责任和上下文判断，尤其适合决定是否接受 Agent 自动完成的工作。"
+          "用户阅读 Agent 产出的代码并对其作出判断。读 diff 或改动过的文件算数；读 Agent 对自己做了什么的描述不算——叙述不是产物本身。描述是 Secondary source，由被审查的一方写成；diff 是 Primary source，而审查就意味着去读它。",
+          "Agent 提高了代码的产出量，于是审查变成了瓶颈。一个有用的思路是把不同的审查策略分层。Automated checks 抓机械性的失败，Automated review 抓可描述的失败，Human review 则留给只有你能判断的部分——这个改动是不是对的改动、这个做法是否契合代码库、这东西到底该不该存在。",
+          "审查也是越早越便宜。开工前读一份计划，或在过程中读一份小 diff，只需几分钟；而在一次 AFK 运行之后去挖一条已完成的分支，则要花更久。把审查检查点放在哪里，是一个 Human-in-the-loop 的决定，而不是事后才想起的补充。",
+          "避免：只说「code review」——它在人工审查和自动审查之间有歧义。",
+          "用法",
+          "「我对 AFK 的产出做了 Human review。」",
+          "「你读的是 diff，还是只看了摘要？」",
+          "「diff。摘要说它删掉了死代码——结果那个函数是被一个生成文件调用的。」"
         ]
       },
       "related": [
@@ -2203,7 +2793,10 @@
         "Automated review",
         "AFK",
         "Human-in-the-loop"
-      ]
+      ],
+      "summary": {
+        "zh": "Human review 是人亲自查看代码、变更或产物并形成判断。阅读摘要并不能代替阅读实际差异。它提供责任和上下文判断，尤其适合决定是否接受 Agent 自动完成的工作。"
+      }
     },
     {
       "term": "Vibe coding",
@@ -2225,7 +2818,15 @@
           "\"Read the diff before you push, vibing on auth is how secrets leak into logs.\""
         ],
         "zh": [
-          "Vibe coding 指开发者不审查代码细节，只根据表面效果接受 Agent 的产出。它可以快速探索，但在维护、正确性和安全边界上留下盲点。这个词描述的是审查方式，而不是使用 AI 写代码本身。"
+          "一种工作模式：用户直接接受 Agent 写出的代码，不做 Human review。diff 被视为不透明的——重要的是程序的行为，而不是里面写了什么。Automated review 与自动化检查仍可照常运行；Vibe coding 对这两者不置一词。",
+          "这个词出自 Andrej Karpathy，他在 2025 年初创造了它：你“完全交给 vibe 主导”，“忘记代码的存在”——描述你想要什么，接受返回的东西，靠运行它来判断。",
+          "Vibe coding 用检查换取速度。阅读 diff 通常是 Agent 驱动工作中最慢的一步，因此跳过它就去掉了主要瓶颈。对于失败代价低廉的代码——原型、一次性脚本、内部工具——这是一笔合理的交易。风险随代码的生命周期和利害大小而放大。",
+          "代价在之后才到来。以 Vibe coding 方式写出的改动堆积成一个没人读过的代码库，而唯一被检查过的只有行为——因此凡是行为暴露不出来的东西，比如被写进日志的密钥、缺失的边界情况，或者悄无声息出错的数据处理，都会在无人过目的情况下发布出去。第一次有人调试这个系统之时，就是第一次有人读这些代码之日。随着 Human review 的缺席，仍在运行的任何自动化验证——测试、类型检查、Automated review——就是代码唯一要过的关口。把同样的立场用在由 Software factory 产出改动的整个代码库、或者其中一部分上，那就是 Dark factory。",
+          "避免：把“vibe coding”当作“低质量 AI coding”的同义词——这个词命名的是评审立场，而不是由此产生的代码。",
+          "用法",
+          "“你读过它在认证流程里改了什么吗？”",
+          "“用 vibe coding 写的——登录还能用，我检查的就这些。”",
+          "“推送前先读 diff，在认证上 vibe coding，密钥就是这样泄漏进日志的。”"
         ]
       },
       "related": [
@@ -2236,7 +2837,10 @@
         "Prototyping",
         "Software factory",
         "Dark factory"
-      ]
+      ],
+      "summary": {
+        "zh": "Vibe coding 指开发者不审查代码细节，只根据表面效果接受 Agent 的产出。它可以快速探索，但在维护、正确性和安全边界上留下盲点。这个词描述的是审查方式，而不是使用 AI 写代码本身。"
+      }
     },
     {
       "term": "Design concept",
@@ -2255,7 +2859,12 @@
           "\"You don't share a design concept yet — it's filling gaps with assumptions. Keep talking until cancellation, refunds, and partial fulfilment all line up between you before you let it write a spec.\""
         ],
         "zh": [
-          "Design concept 是团队对“正在做什么、为什么这样做”的共同理解，独立于最终代码和设计稿。先对概念达成一致，后续实现才有判断依据；否则每个人可能都在完整执行不同的想法。"
+          "关于正在构建之物所达成的共同理解，由用户与 Agent 共同持有，但又与任何资产相分离。这是 Brooks 的术语（《The Design of Design》）：对话、Handoff 产物和代码全都是资产，它们试图捕捉或抵达 design concept，但没有一个是它本身。design concept 的质量，要通过构建它的那场对话的质量去感受。",
+          "这个词命名了一种熟悉的挫败感背后的缺口：Agent 完全按你要求的那样写了出来，结果却依然是错的。通常的原因是，你还没有真正想清楚自己想要什么。design concept 在你自己的脑子里尚未完成——你的 prompt 捕捉到了你已经想明白的部分，而对还没想明白的部分保持沉默。Agent 用自己的假设填补了这些沉默之处，因为没有任何东西可供对齐。没有任何环节出故障。当时并不存在共享的 design concept，因为还没有一个完整的 design concept 可供共享。",
+          "判断 design concept 是否已经共享，方法和你判断一位同事是否与你同步一样：对方开始用你会用的方式，回答你还没有问出口的问题。在那一刻到来之前，工作就是对话——Grilling 是其中刻意为之的那一版——而过早写 Spec，只会把这种错位固化进一件更耐久的资产里。design concept 也会随着你的学习而移动；资产滞后于它，这正是为什么一份忠实于上周理解的 Spec，仍可能误导本周的 Session。",
+          "用法",
+          "“它完全按我要求的写了，结果还是错的。”",
+          "“你们还没有共享同一个 design concept——它在用假设填补空白。继续谈下去，直到取消、退款和部分履约这几件事在你们之间全部对齐，再让它去写 Spec。”"
         ]
       },
       "related": [
@@ -2263,7 +2872,10 @@
         "Handoff artifact",
         "Grilling",
         "Spec"
-      ]
+      ],
+      "summary": {
+        "zh": "Design concept 是团队对“正在做什么、为什么这样做”的共同理解，独立于最终代码和设计稿。先对概念达成一致，后续实现才有判断依据；否则每个人可能都在完整执行不同的想法。"
+      }
     },
     {
       "term": "Grilling",
@@ -2282,7 +2894,12 @@
           "\"Grill it first — make it ask you about partial cancels, refunds, and timing before it commits anything to the doc. Cheaper to resolve in conversation than in code.\""
         ],
         "zh": [
-          "Grilling 通过持续追问暴露方案里的模糊点和隐含假设，一次聚焦一个决策。它适合在构建前澄清目标、边界和取舍，而不是用提问拖延已足够明确的实现。"
+          "一种与 Agent 一起发展 Design concept 的技术：Agent 以苏格拉底式提问的方式访谈用户，每次只处理一个决策，并为每个决策给出推荐答案。它减缓了急于产出最终方案的速度——在概念稳定下来之前，不会写出任何 Handoff artifact。",
+          "这项技术之所以存在，是因为 Agent 会静默地填补空白。当被要求根据两行提示写出 Spec 时，Agent 不会在你尚未做出的决策处停下——它会自行挑选默认值并写进去。结果看起来完整无缺，而那些猜测与真正的选择难以区分，于是你发现得太晚：在评审时，或者当已构建的功能以你从未选择过的方式处理某个边缘情况时。Grilling 把这一切颠倒过来——Agent 不再猜测，而是必须提问。",
+          "这是一种 Human-in-the-loop 技术：你的回答就是输入。当某个问题无法在对话中得到回答——你必须亲眼看到那个东西才行——就切换到 Prototyping。",
+          "用法",
+          "\"它直接就去写 Spec 了，结果把取消逻辑写错了。\"",
+          "\"先 Grill 它——让它在把任何内容写进文档之前，先来问你关于部分取消、退款和时序的问题。在对话里解决比在代码里解决更便宜。\""
         ]
       },
       "related": [
@@ -2292,7 +2909,10 @@
         "Spec",
         "Human-in-the-loop",
         "Prototyping"
-      ]
+      ],
+      "summary": {
+        "zh": "Grilling 通过持续追问暴露方案里的模糊点和隐含假设，一次聚焦一个决策。它适合在构建前澄清目标、边界和取舍，而不是用提问拖延已足够明确的实现。"
+      }
     },
     {
       "term": "Prototyping",
@@ -2313,7 +2933,14 @@
           "\"Words won't settle it — have the agent prototype both. We'll click through them and know in five minutes.\""
         ],
         "zh": [
-          "Prototyping 用快速、可丢弃的原型回答难以靠讨论解决的问题。原型的价值在于验证交互、状态或视觉方向，而不是立刻成为正式实现；得到答案后再决定保留什么。"
+          "让 Agent 快速搭出一个粗略版本，用在对话保真度太低、你需要一个真实产物才能讨论的时候。",
+          "Grilling 在对话中敲定设计决策。对话成本很低，但保真度也低：有些问题无法用语言回答——交互手感如何、API 形态在实际调用代码里是否顺手、布局在真实数据规模下能否成立。访谈进行到某个问题，你诚实的回答是「我不知道，我得看到才行」。过了这个点，讨论就开始打转。这时不如让 Agent 把东西做出来，看一看，再带着答案回到对话中。",
+          "Agent 降低了构建成本，这才让这种做法变得可行。过去要花一天做原型草稿的东西，现在几分钟就能出来，所以值得把它变成常规做法。这是一种 Human-in-the-loop 技术：原型摆在那里，供你做出反应。",
+          "你通常不会只看一眼就停下。拿原型反复迭代——反应、提出修改、再反应——每一轮都针对真实产物敲定另一个决策，保真度高于对话所能达到的水平。",
+          "Prototyping 不必全都草率。你正在评估的那部分可以按生产质量标准来构建，这样决策一旦落定，你所反应的那个组件或 API 就能迁移进真实代码库。这让 Prototyping 成为 Spec 引用的关键材料。",
+          "用法",
+          "「我们已经花了半小时争论这个向导应该做成一个页面还是三个步骤。」",
+          "「靠嘴说不清楚——让 Agent 把两种都做出原型。我们点一遍，五分钟就知道了。」"
         ]
       },
       "related": [
@@ -2321,7 +2948,10 @@
         "Grilling",
         "Human-in-the-loop",
         "Spec"
-      ]
+      ],
+      "summary": {
+        "zh": "Prototyping 用快速、可丢弃的原型回答难以靠讨论解决的问题。原型的价值在于验证交互、状态或视觉方向，而不是立刻成为正式实现；得到答案后再决定保留什么。"
+      }
     },
     {
       "term": "DX",
@@ -2341,7 +2971,13 @@
           "\"Productive because someone sits with them for that week. The agent doesn't get that week; check the AX separately.\""
         ],
         "zh": [
-          "DX 即 Developer experience，关注开发者在项目里理解结构、修改代码和获得反馈的难易程度。清晰的模块边界、可运行的检查和可靠文档，都会影响 DX。"
+          "Developer experience——代码库及其工具链让人类做好工作变得有多容易。好的 DX 是快速反馈、清晰的错误信息、能回答你实际遇到的问题的文档，以及一次就能跑通的初始搭建。这个词远早于 AI coding 出现；它被收入本词典，主要是作为 AX 的对照。",
+          "DX 就是人与代码库之间的交互——仅此而已。这两类受众之间最主要的不同在于：人类是 Stateful 的，而 Agent 是 Stateless 的。人类把代码库学一遍，就能把这份认知带进之后的每一天，这也是糟糕 DX 尚可忍受的原因：他们用攒批推送绕开缓慢的 CI，用在 Slack 里问一次绕开缺失的文档，用记住东西放在哪里绕开令人困惑的结构。这些变通做法不断累积，团队最终在一个处处与自己为敌的代码库里依然保持高产。",
+          "Agent 面对同一个代码库时，没有任何这类积累。跨会话 Stateless 的 Agent 每次都要从头重新学习代码库——它能受益于快速的测试套件和清晰的错误信息，但凡是昨天弄明白的东西都已消失，除非它被写进了 Environment，而 Agent 只能通过 Tool 结果感知 Environment。这正是 AX 所命名的缺口：DX 中在开发者是 Agent 时依然留存的那部分，再加上人类所没有的关切，比如让 Context window 保持空闲。",
+          "两者的重叠意味着 DX 上的投入往往能免费提升 AX——严格的类型、快速的测试和可预测的结构对双方都有帮助。两者的分歧则意味着它并不总是如此：一份漂亮的入职文档能帮上人类一周，对 Agent 却毫无用处，除非它能从 AGENTS.md 抵达。",
+          "用法",
+          "“我们的 DX 没问题——新人一周就能上手。”",
+          "“那是因为那一周有人陪着他们。Agent 没有那一周；AX 要单独检查。”"
         ]
       },
       "related": [
@@ -2354,7 +2990,10 @@
         "Tool result",
         "Context window",
         "AGENTS.md"
-      ]
+      ],
+      "summary": {
+        "zh": "DX 即 Developer experience，关注开发者在项目里理解结构、修改代码和获得反馈的难易程度。清晰的模块边界、可运行的检查和可靠文档，都会影响 DX。"
+      }
     },
     {
       "term": "AX",
@@ -2375,7 +3014,14 @@
           "\"The API repo has strict types and a fast test suite; the frontend has neither and forty always-loaded skills. That's an AX gap, not a model problem.\""
         ],
         "zh": [
-          "AX 即 Agent experience，关注环境是否帮助 Agent 做出正确工作。可发现的结构、明确的规范、便宜的验证，以及可用的 Context，能减少 Agent 猜测和返工。"
+          "Agent experience——衡量 environment 为 agent 在代码库中把活干好而搭建得有多好。它是 DX 面向 agent 的对应物。同一个 agent 在一个仓库里表现出色、在另一个仓库里一塌糊涂——model 相同、harness 也相同——差异通常就出在 AX 上。人的本能是去怪 model 或者重写 prompt；但真正要修的地方，往往在仓库本身。",
+          "好的 AX 有三个主要维度：",
+          "| 维度 | 好的 AX 是什么样的 |\n| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| 自动化检查 | 快速、确定性的自动化检查——类型检查、测试、lint——Agent 可以据此自我修正，无需人工介入 |\n| 架构 | 一个 Agent 无需通读全部代码就能导航的代码库：结构可预测、大量行为被封装在小接口之后、命名能说明其用途 |\n| 空闲 Context | AGENTS.md、skills 和 tools 保持精简，让大部分 Context window 可用于当前任务，Agent 得以留在 Smart zone 中而不至于被淹没 |",
+          "AX 与 DX 有重叠——良好的检查与整洁的架构对两类受众都有帮助——但二者也会分化。人类能容忍口口相传的隐性知识、缓慢的 CI，以及“账单模块去问 Sarah”；agent 做不到。agent 无法从 IDE 的工具提示或漂亮的仪表盘中获益；它们需要的是以文本形式出现在 tool result 里的失败信息。一个代码库完全可能 DX 很好而 AX 很差。",
+          "要避免：把 AX 当作 DX 的同义词——两类受众需要的是不同的投入。",
+          "用法",
+          "“这个 agent 在 API 仓库里写出好代码，在前端却写出一堆垃圾。”",
+          "“API 仓库有严格的类型和快速的测试套件；前端两样都没有，却有四十个始终加载的 skills。这是 AX 上的差距，不是 model 的问题。”"
         ]
       },
       "related": [
@@ -2391,7 +3037,10 @@
         "Context window",
         "Smart zone",
         "Tool result"
-      ]
+      ],
+      "summary": {
+        "zh": "AX 即 Agent experience，关注环境是否帮助 Agent 做出正确工作。可发现的结构、明确的规范、便宜的验证，以及可用的 Context，能减少 Agent 猜测和返工。"
+      }
     },
     {
       "term": "Software factory",
@@ -2413,7 +3062,15 @@
           "\"The factory. Cron job picks one lint rule a night, opens a PR. I just review it in the morning.\""
         ],
         "zh": [
-          "Software factory 是由触发条件启动 Agent Sessions 并推进工作的一套流程，而不总是由人手动开启对话。它把自动执行、检查、审查和交付串联起来，使人把时间放在关键判断上。"
+          "一种工作系统：agent session 由触发器启动——创建 issue、定时计划、CI 失败、另一个 session 完成——而不是由人启动，因此更多工作在 AFK 状态下运行，人的注意力则花在那些仍需 human-in-the-loop 的决策上。",
+          "没有工厂时，每个 session 之所以启动，都是因为有人启动了它。即便是完全 AFK 的工作，也要等人打开 session、把它指向 ticket、再让它跑起来。团队想交付的规模超出了这种方式所能允许的上限。工厂把人从「启动 session」这件事里拿掉，但不一定把人从其他任何环节里拿掉。",
+          "常见的触发器，以及它们启动的 session：",
+          "| 触发条件 | 启动的 Session | 示例 |\n| ------------------------------ | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |\n| 创建或加标签的 Issue | 探索、bug 修复、功能实现 | 带 ready-for-agent 标签的 Issue 会启动一个 Session 并打开 PR |\n| 定时调度（cron） | 周期性维护 | 每晚修复一条 lint 规则 |\n| CI 失败或监控告警 | 诊断、尝试修复 | main 上的构建失败会启动一个 Session，找出导致失败的 commit 并提出修复方案 |\n| 另一个 Session 完成时 | 后续工作 | 一个 agent 打开的 PR 会触发 automated review，其评论又会触发一个修复 Session |",
+          "工厂不必覆盖整个软件流程。一个 cron job，只运行一种 session、只开出一个可评审的 PR，就是一个工厂。从小处起步是有用的：窄的循环产出小且相似的 PR，评审它们就能看出这条循环在被扩大之前可以被信任到什么程度。",
+          "在一座工厂里，人可以处在任何位置——撰写并给那些触发 session 的 issue 打标签、在实现开始前批准方案、在合并前做 human review。决定其中哪些决策保留给人，是主要的设计问题。一个代码库，或代码库的一部分，若没有任何人对工厂的产出做评审，那就是一座 dark factory。",
+          "用法",
+          "“谁把所有 no-floating-promises 违规都修好了？”",
+          "“工厂。定时任务每晚挑一条 lint 规则，开一个 PR。我早上评审一下就行。”"
         ]
       },
       "related": [
@@ -2425,7 +3082,10 @@
         "Automated review",
         "Human review",
         "Dark factory"
-      ]
+      ],
+      "summary": {
+        "zh": "Software factory 是由触发条件启动 Agent Sessions 并推进工作的一套流程，而不总是由人手动开启对话。它把自动执行、检查、审查和交付串联起来，使人把时间放在关键判断上。"
+      }
     },
     {
       "term": "Dark factory",
@@ -2446,7 +3106,14 @@
           "\"The billing service is a dark factory. The agents merge all changes that pass CI. Nobody read that change.\""
         ],
         "zh": [
-          "Dark factory 是一种没有人逐项审查代码的 Software factory。它把实现与验证更多交给自动化系统，因此对检查、边界和可追溯性要求更高；“无人审查”是它的核心特征。"
+          "一个代码库，或代码库的一部分，其中由 Software factory 编写代码，没有任何人阅读它。不存在 Human review。人类仍然可以编写启动工作的 issue。但没有人阅读产出的代码。这个名字来自 \"lights-out\" 工厂，即车间里没有人也能生产的工厂。",
+          "Dark factory 是针对某个代码领域的 Vibe coding，而不是针对某一次变更。当你进行 Vibe coding 时，你选择不去阅读自己请求的那次变更。但你知道这次变更是存在的。在 Dark factory 中，团队为整个领域一次性做出这个选择。此后，没有人再为每一次变更提出请求，也没有人看到它。变更以触发器启动新工作的速度不断到来。",
+          "出故障的时候，问题就显现了。你不知道改了什么，因为没有人读过这些变更。你必须调试团队里没有人读过的代码。原因可能存在于许多变更中的任何一个，而每一个变更都通过了检查。",
+          "Automated checks 和 Automated review 是仅有的关卡。如果它们没有发现问题，问题就进入了代码。",
+          "要避免：仅仅因为某个代码库的 factory 在无人注视的情况下运行，就称它为 \"dark\"。如果 Agent 会话以 AFK 方式运行，而人类审查它们的 PR，那是一个 Software factory，不是 Dark factory。",
+          "用法",
+          "\"谁改了计费服务里的重试逻辑？团队里没有一个人记得。\"",
+          "\"计费服务就是一个 Dark factory。Agent 会合并所有通过 CI 的变更。没有人读过那次变更。\""
         ]
       },
       "related": [
@@ -2458,7 +3125,10 @@
         "Agent",
         "Session",
         "AFK"
-      ]
+      ],
+      "summary": {
+        "zh": "Dark factory 是一种没有人逐项审查代码的 Software factory。它把实现与验证更多交给自动化系统，因此对检查、边界和可追溯性要求更高；“无人审查”是它的核心特征。"
+      }
     }
   ]
 }

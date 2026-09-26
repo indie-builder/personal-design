@@ -84,7 +84,7 @@
     node.append(heading);
     return node;
   }
-  function appendParagraph(container, text) {
+  function appendParagraph(container, text, language) {
     const lines = text.trim().split('\n');
     if (lines.length > 2 && lines[0].startsWith('|') && /^\|[\s:|\-]+\|$/.test(lines[1])) {
       const wrap = element('div', 'dictionary-table');
@@ -111,8 +111,8 @@
       table.append(head, body);
       wrap.append(table);
       container.append(wrap);
-    } else if (/^Usage:?$/.test(text.trim()))
-      container.append(element('h4', 'dictionary-usage', 'Usage'));
+    } else if (/^Usage:?$/.test(text.trim()) || /^用法[:：]?$/.test(text.trim()))
+      container.append(element('h4', 'dictionary-usage', language === 'zh-CN' ? '用法' : 'Usage'));
     else container.append(element('p', '', text));
   }
   function render(state) {
@@ -168,14 +168,14 @@
     const jump = element('nav', 'dictionary-jump');
     jump.setAttribute('aria-label', '词条内容导航');
     for (const [id, text] of [
-      ['dictionary-explanation', '中文解读'],
-      ['dictionary-original', '英文原文'],
-      ['dictionary-related', '关联目录'],
+      ['dictionary-full', '中英全文'],
+      ['dictionary-related', '关联术语'],
     ]) {
       const link = element('a', '', text);
       link.href = '#' + id;
       link.addEventListener('click', (event) => {
         event.preventDefault();
+        if (id === 'dictionary-related') panel.querySelector('#dictionary-related').open = true;
         panel.querySelector('#' + id)?.scrollIntoView({
           behavior: window.__atlasInstant ? 'instant' : 'smooth',
           block: 'start',
@@ -183,12 +183,28 @@
       });
       jump.append(link);
     }
-    const explanation = section('dictionary-explanation', '中文解读', 'zh-CN');
-    for (const paragraph of entry.body.zh) appendParagraph(explanation, paragraph);
-    const original = section('dictionary-original', '英文原文', 'en');
-    for (const paragraph of entry.body.en) appendParagraph(original, paragraph);
-    const related = section('dictionary-related', '关联术语');
+    const full = section('dictionary-full', '中英全文');
+    for (const [index, paragraph] of entry.body.en.entries()) {
+      const pair = element('div', 'dictionary-pair');
+      const chinese = element('div', 'dictionary-pair-zh');
+      chinese.lang = 'zh-CN';
+      appendParagraph(chinese, entry.body.zh[index] ?? '这段中文译文暂不可用。', 'zh-CN');
+      const english = element('div', 'dictionary-pair-en');
+      english.lang = 'en';
+      appendParagraph(english, paragraph, 'en');
+      pair.append(chinese, english);
+      full.append(pair);
+    }
+    const related = element('details', 'dictionary-related');
+    related.id = 'dictionary-related';
     const relatedEntries = entry.related.map((term) => byTitle.get(term)).filter(Boolean);
+    const relatedSummary = element('summary', 'dictionary-related-summary');
+    relatedSummary.append(
+      element('span', '', '关联术语'),
+      element('span', 'dictionary-related-count', String(relatedEntries.length)),
+    );
+    related.append(relatedSummary);
+    const relatedContent = element('div', 'dictionary-related-content');
     for (const [index, category] of catalog.sections.entries()) {
       const group = relatedEntries.filter((item) => item.section === index);
       if (!group.length) continue;
@@ -204,11 +220,12 @@
         list.append(row);
       }
       directory.append(heading, list);
-      related.append(directory);
+      relatedContent.append(directory);
     }
     if (!relatedEntries.length)
-      related.append(element('p', 'dictionary-muted', '这个词条暂无关联术语。'));
-    content.append(category, introduction, jump, explanation, original, related);
+      relatedContent.append(element('p', 'dictionary-muted', '这个词条暂无关联术语。'));
+    related.append(relatedContent);
+    content.append(category, introduction, jump, full, related);
     const footer = element('nav', 'dictionary-pagination');
     footer.setAttribute('aria-label', '相邻词条');
     const sequence =

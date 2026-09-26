@@ -8,15 +8,15 @@
 
 1. 在内置浏览器打开 `/products/ai-coding-dictionary?term=harness`，读取该 tab 的 CDP 文档并取得 capability。
 2. 使用 `Runtime.evaluate` 读取 `document.querySelector('iframe').contentWindow`；确认其 `__atlasJourney` 已就绪、`canvas` 存在、loading 元素不可见、外部 `a[href^="http"]` 数量为 0。
-3. 确认 `.dictionary-detail` 标题是 Harness，`.dictionary-definition` 与 `.dictionary-definition-en` 各一份，中文解读与完整英文正文同时存在。点击详情“下一词条”链接，确认词条及父页面 URL 都变为 `model-provider-request`；浏览器后退应回到 Harness。再做一次下一词条 → 浏览器后退，动画完成后仍应是 Harness 且仅一份阅读面。
+3. 确认 `.dictionary-detail` 标题是 Harness，`.dictionary-definition` 与 `.dictionary-definition-en` 各一份，`.dictionary-pair` 数量等于该词条英文正文段落数，每对含完整中文译文与英文原文。点击详情“下一词条”链接，确认词条及父页面 URL 都变为 `model-provider-request`；浏览器后退应回到 Harness。再做一次下一词条 → 浏览器后退，动画完成后仍应是 Harness 且仅一份阅读面。
 4. 读取 `.dictionary-close` 按钮的 `getBoundingClientRect()`，用 `Input.dispatchMouseEvent` 执行按下／松开。随后点击原始 Search 按钮，用 `Input.insertText` 输入「缓存」。确认 `__atlasJourney.getState().matchSlugs` 为 `['prefix-cache']`，父页面 `q` 同步。
 5. 从 `Page.captureScreenshot` 定位 Prefix cache 的圆点，使用 CDP 鼠标事件点击。确认镜头聚焦、阅读面打开且中英文各一份。
 6. 清除搜索后，以 CDP 鼠标按下、移动超过 6px、松开执行拖拽，再发出 `mouseWheel`。检查前后画面发生变化，同时未误选词条。
 7. 将视口设为 390×844，打开 `?term=token`。确认文档宽度为 390，底部阅读面高 68dvh，中英文完整可读，共享标题回退导航始终可见，标题与关闭不随正文滚动。最后清除临时视口覆盖和禁用缓存设置。
 8. 查看控制台错误与 iframe 内 `performance.getEntriesByType('resource')`；确认运行资源均来自本机。
 9. 直接打开 `?q=缓存`，确认输入内容、匹配词条与父页面 URL 均保留。
-10. 在 Session 详情检查关联术语按章节分组为紧凑目录；点击关联链接确认标题、双语内容与 URL 同步，正文回到顶部。检查修饰键新标签；从筛选结果外的关联词条跳转时，搜索清除且目标节点可见。
-11. 在 Context 详情检查英文正文的语义 table，点击内容定位只改变阅读面滚动位置；检查首末词条边界禁用，相邻名称完整换行。关闭与 Esc 均应清除选择并恢复搜索焦点，键盘与 reduced-motion 退出即时。
+10. 在 Session 详情确认关联术语默认收起为一行；展开后按章节分组为紧凑目录。点击关联链接确认标题、完整双语内容与 URL 同步，正文回到顶部。检查修饰键新标签；从筛选结果外的关联词条跳转时，搜索清除且目标节点可见。
+11. 在 Context 详情检查中英两份语义 table 的行列对应；点击内容定位只改变阅读面滚动位置；检查首末词条边界禁用，相邻名称完整换行。关闭与 Esc 均应清除选择并恢复搜索焦点，键盘与 reduced-motion 退出即时。
 12. 在 1280px、815px 与 390px 宽度留存截图，确认原版详情、Share 和 Copy Markdown 控件 DOM 数量均为 0。截图及实际检查结果单独记录，不能由代码存在推定验收通过。
 
 ## 原始文件一致性
@@ -37,7 +37,7 @@
 
 ## 视觉适配范围
 
-用户当前要求使用 Impeccable 重做详情，移除分享和 Copy Markdown，关联术语使用章节分组的紧凑文字目录；此前保留原版详情比例和按钮的约束不再适用于阅读面。全屏知识网、原版收起式搜索、节点放大 15%、章节浅色、径向避让和标签渲染继续保留。桌面阅读面宽 clamp(340px,34vw,520px)，800px 及以下为底部 68dvh 非模态阅读面；标题和关闭常驻，正文独立滚动，相邻导航显示完整名称。背景、前景和 Albert Sans 继续接入本站；无配色开关和音效。
+用户当前要求完整中英逐段对照，原有中文概述不代替全文译文；移除分享和 Copy Markdown，关联术语默认收起，展开后保留章节分组的紧凑文字目录。全屏知识网、原版收起式搜索、节点放大 15%、章节浅色、径向避让和标签渲染继续保留。桌面阅读面宽 clamp(340px,34vw,520px)，800px 及以下为底部 68dvh 非模态阅读面；标题和关闭常驻，正文独立滚动，相邻导航显示完整名称。背景、前景和 Albert Sans 继续接入本站；无配色开关和音效。
 
 字体由本站 Albert Sans WOFF2 生成到 public；图谱用的 `runtime/AlbertSans-Medium.ttf` 是同一变量字体在 weight=500 的静态版本（FontTools instantiateVariableFont，再将 flavor 设为 None 保存），无需线上字体请求。
 
