@@ -7,7 +7,9 @@ createServer(async(req,res)=>{
  if(req.url==='/requests'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(requests));return;}
  if(req.url==='/reset'){requests.length=0;res.end('ok');return;}
  let body='';for await(const chunk of req)body+=chunk;
- const data=JSON.parse(body);
+ // 非模型请求（如探活）只回错误码，不让夹具进程崩溃退出
+ let data;try{data=JSON.parse(body)}catch{res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'invalid JSON body'}}));return;}
+ if(!Array.isArray(data?.messages)){res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'messages array required'}}));return;}
  data.messages=data.messages.map(m=>({...m,content:Array.isArray(m.content)?m.content.filter(p=>p.type==='text').map(p=>p.text).join('\n'):m.content}));
  requests.push(data);
  const last=data.messages.at(-1).content;
