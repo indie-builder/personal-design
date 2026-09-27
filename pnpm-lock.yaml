@@ -196,9 +196,6 @@ importers:
       '@personal-design/ai-chat':
         specifier: workspace:*
         version: link:../../packages/ai-chat
-      '@personal-design/ai-coding-dictionary':
-        specifier: workspace:*
-        version: link:../../packages/ai-coding-dictionary
       '@personal-design/design-engineer-tools':
         specifier: workspace:*
         version: link:../../packages/design-engineer-tools
