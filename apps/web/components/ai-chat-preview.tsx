@@ -1,41 +1,26 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
-import { instantMotion, observeMotionPolicy } from '@/lib/motion';
+import { instantMotion, useVisiblePlay } from '@/lib/motion';
 import styles from './ai-chat-preview.module.css';
 
 export function AiChatPreview() {
   const ref = useRef<HTMLDivElement>(null);
-  const [motion, setMotion] = useState({ enabled: false, running: false });
-  useEffect(() => {
-    let visible = false;
-    const update = () =>
-      setMotion({
-        enabled: !instantMotion(),
-        running: visible && !document.hidden && !instantMotion(),
-      });
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        visible = !!entry?.isIntersecting && entry.intersectionRatio >= 0.35;
-        update();
-      },
-      { threshold: 0.35 },
-    );
-    if (ref.current) observer.observe(ref.current);
-    const cleanup = observeMotionPolicy(update);
-    return () => {
-      observer.disconnect();
-      cleanup();
-    };
+  const [enabled, setEnabled] = useState(false);
+  const [running, setRunning] = useState(false);
+  const onPlay = useCallback((playing: boolean) => {
+    setEnabled(!instantMotion());
+    setRunning(playing);
   }, []);
+  useVisiblePlay(ref, onPlay, 0.35);
   return (
     <div
       ref={ref}
       className={styles.surface}
       data-chat-preview
-      data-motion={motion.enabled || undefined}
-      data-running={motion.running || undefined}
+      data-motion={enabled || undefined}
+      data-running={running || undefined}
       aria-hidden="true"
     >
       <span className={styles.question}>看看两周试用的效果</span>

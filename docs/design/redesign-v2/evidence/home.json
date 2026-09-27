@@ -1,48 +1,7 @@
 {
-  "baseURL": "http://localhost:3001",
-  "checks": {
-    "desktopChoices": {
-      "layoutBox": {
-        "x": 128,
-        "y": 304.796875,
-        "width": 572,
-        "height": 530.09375
-      },
-      "museBox": {
-        "x": 740,
-        "y": 304.796875,
-        "width": 572,
-        "height": 554.59375
-      }
-    },
-    "loadedImages": 4,
-    "keyboardLayout": "/products/layout-compositions",
-    "mouseMuse": "/products/muse",
-    "viewports": [
-      {
-        "width": 1440,
-        "scrollWidth": 1440,
-        "stacked": false
-      },
-      {
-        "width": 1024,
-        "scrollWidth": 1024,
-        "stacked": false
-      },
-      {
-        "width": 390,
-        "scrollWidth": 390,
-        "stacked": true
-      },
-      {
-        "width": 320,
-        "scrollWidth": 320,
-        "stacked": true
-      }
-    ],
-    "darkReducedMotion": true,
-    "failedImages": 4
-  },
+  "baseURL": "http://localhost:3000",
+  "checks": {},
   "errors": [],
-  "passed": true
+  "passed": false,
+  "failure": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n  - waiting for getByRole('heading', { name: '设计，随手可查。', level: 1 }) to be visible\n\n    at /Users/xbjt/Documents/myself/personal-design/scripts/design-checks/v2-home.mjs:13:67"
 }

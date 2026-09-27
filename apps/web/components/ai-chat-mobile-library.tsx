@@ -362,6 +362,29 @@ const actionBlocks = new Set([
   'CompositeCardBlock',
   'VisualCardBlock',
 ]);
+const chartBlocks = [
+  'BarChart',
+  'LineChart',
+  'AreaChart',
+  'HorizontalBarChart',
+  'RadarChart',
+  'ScatterChart',
+];
+// 移动尺度适配：按组件名套用静态覆盖，特殊取值（children/buttons/items）单独处理。
+const staticProps: Record<string, Record<string, unknown>> = {
+  Stack: { direction: 'column', wrap: false, gap: 'm' },
+  Card: { direction: 'column', wrap: false, gap: 'm', variant: 'clear' },
+  Buttons: { direction: 'row' },
+  IconText: { layout: 'horizontal', iconVariant: 'neutral', iconSize: 's' },
+  OverviewCardBlock: { layout: 'grid', responsive: true },
+  ...Object.fromEntries(chartBlocks.map((name) => [name, { height: 240 }])),
+};
+const wrappedComponents = new Set([
+  ...Object.keys(staticProps),
+  'ListBlock',
+  ...actionBlocks,
+  ...editableComponents,
+]);
 export const mobileOpenuiLibrary = createLibrary({
   root: 'Stack',
   components: Object.values(openuiLibrary.components).map((definition) => {
@@ -369,79 +392,25 @@ export const mobileOpenuiLibrary = createLibrary({
       definition.name in adaptations
         ? adaptations[definition.name as keyof typeof adaptations]
         : definition;
-    if (
-      !editableComponents.has(component.name) &&
-      !actionBlocks.has(component.name) &&
-      ![
-        'Stack',
-        'Card',
-        'Buttons',
-        'IconText',
-        'BarChart',
-        'LineChart',
-        'AreaChart',
-        'HorizontalBarChart',
-        'RadarChart',
-        'ScatterChart',
-        'ListBlock',
-      ].includes(component.name)
-    )
-      return component;
+    if (!wrappedComponents.has(component.name)) return component;
     const Original = component.component;
+    const name = component.name;
     return defineComponent({
       ...component,
       component: function MobileComponent({ props, ...rest }) {
         const readOnly = useContext(AnswerReadOnlyContext);
-        const content = (
-          <Original
-            {...rest}
-            props={{
-              ...props,
-              ...(['Stack', 'Card'].includes(component.name)
-                ? {
-                    children: uniqueOpenUiReferences(props.children),
-                    direction: 'column',
-                    wrap: false,
-                    gap: 'm',
-                    ...(component.name === 'Card' ? { variant: 'clear' } : {}),
-                  }
-                : {}),
-              ...(component.name === 'Buttons'
-                ? { direction: 'row', buttons: actionHierarchy(props.buttons) }
-                : {}),
-              ...(component.name === 'IconText'
-                ? { layout: 'horizontal', iconVariant: 'neutral', iconSize: 's' }
-                : {}),
-              ...(component.name === 'OverviewCardBlock'
-                ? { layout: 'grid', responsive: true }
-                : {}),
-              ...([
-                'BarChart',
-                'LineChart',
-                'AreaChart',
-                'HorizontalBarChart',
-                'RadarChart',
-                'ScatterChart',
-              ].includes(component.name)
-                ? { height: 240 }
-                : {}),
-              ...(readOnly && actionBlocks.has(component.name) ? { action: undefined } : {}),
-              ...(readOnly && component.name === 'ListBlock'
-                ? {
-                    items: (props.items || []).map((item: { props?: Record<string, unknown> }) => ({
-                      ...item,
-                      props: { ...item.props, action: undefined },
-                    })),
-                  }
-                : {}),
-            }}
-          />
-        );
-        return editableComponents.has(component.name) ? (
-          <EditBoundary>{content}</EditBoundary>
-        ) : (
-          content
-        );
+        const override: Record<string, unknown> = { ...staticProps[name] };
+        if (name === 'Stack' || name === 'Card')
+          override.children = uniqueOpenUiReferences(props.children);
+        if (name === 'Buttons') override.buttons = actionHierarchy(props.buttons);
+        if (readOnly && actionBlocks.has(name)) override.action = undefined;
+        if (readOnly && name === 'ListBlock')
+          override.items = (props.items || []).map((item: { props?: Record<string, unknown> }) => ({
+            ...item,
+            props: { ...item.props, action: undefined },
+          }));
+        const content = <Original {...rest} props={{ ...props, ...override }} />;
+        return editableComponents.has(name) ? <EditBoundary>{content}</EditBoundary> : content;
       },
     });
   }),

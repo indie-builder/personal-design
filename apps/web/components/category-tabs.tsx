@@ -3,6 +3,7 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { categoryLabel } from '@/lib/category-label';
+import { paramsHref } from '@/lib/site-url';
 import styles from './category-tabs.module.css';
 import { cn } from '@/lib/utils';
 
@@ -17,19 +18,14 @@ export function useCatParam(
     requested === '全部' || !allowed || allowed.includes(requested) ? requested : '全部';
   useEffect(() => {
     if (requested === active) return;
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('cat');
-    window.history.replaceState(null, '', `${pathname}${params.size ? `?${params}` : ''}`);
+    const href = paramsHref(pathname, new URLSearchParams(searchParams.toString()), { cat: '' });
+    window.history.replaceState(null, '', href);
   }, [requested, active, searchParams, pathname]);
   const select = (name: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (name === '全部') {
-      params.delete('cat');
-    } else {
-      params.set('cat', name);
-    }
-    const next = params.toString();
-    window.history.replaceState(null, '', `${pathname}${next ? `?${next}` : ''}`);
+    const href = paramsHref(pathname, new URLSearchParams(searchParams.toString()), {
+      cat: name === '全部' ? '' : name,
+    });
+    window.history.replaceState(null, '', href);
   };
   return [active, select];
 }
