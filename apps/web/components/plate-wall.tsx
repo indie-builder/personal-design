@@ -1,17 +1,15 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { browseHref, browseMemoryKey, matchesSearch } from '@/lib/browse-context';
 import { paramsHref } from '@/lib/site-url';
-import { MotionVideo } from './motion-video';
 import { categoryLabel } from '@/lib/category-label';
 import { CollectionSearch } from './collection-search';
 import { CollectionToolbar } from './collection-toolbar';
 import { Button } from './button';
 import styles from './plate-wall.module.css';
+import { PlateCell } from './plate-cell';
 import { CategoryTabs, useCatParam } from './category-tabs';
 
 export interface PlateWallItem {
@@ -50,6 +48,15 @@ interface PlateWallProps {
 
 const DEFAULT_BATCH = 48;
 const SEARCH_DEBOUNCE = 200;
+
+function loadPosts(query: string, category: string, offset: number, limit: number) {
+  const params = new URLSearchParams({ offset: String(offset), limit: String(limit) });
+  if (query) params.set('q', query);
+  if (category !== '全部') params.set('cat', category);
+  return fetch(`/products/muse/api/posts?${params}`).then((response) =>
+    response.ok ? (response.json() as Promise<{ items?: PlateWallItem[]; total?: number }>) : null,
+  );
+}
 
 /** Stable gallery: one native link per work, visible motion previews, scroll-triggered batching. */
 export function PlateWall({
@@ -140,16 +147,9 @@ export function PlateWall({
     const fetchId = ++fetchIdRef.current;
     const timer = setTimeout(() => {
       void (async () => {
-        const params = new URLSearchParams();
-        if (query) params.set('q', query);
-        if (active !== '全部') params.set('cat', active);
-        params.set('offset', '0');
-        params.set('limit', String(Math.max(batchSize, shown)));
         try {
-          const res = await fetch(`/products/muse/api/posts?${params}`);
-          if (!res.ok) return;
-          const data = (await res.json()) as { items?: PlateWallItem[]; total?: number };
-          if (fetchIdRef.current !== fetchId || !Array.isArray(data.items)) return;
+          const data = await loadPosts(query, active, 0, Math.max(batchSize, shown));
+          if (fetchIdRef.current !== fetchId || !Array.isArray(data?.items)) return;
           setSynced({
             key: `${active}|${query}`,
             items: data.items,
@@ -192,13 +192,7 @@ export function PlateWall({
           return () => cancelAnimationFrame(frame);
         }
         // 保存的分批超出首窗：先补齐窗口再恢复位置，保证恢复的滚动高度有效
-        const params = new URLSearchParams(window.location.search);
-        if (query) params.set('q', query);
-        if (active !== '全部') params.set('cat', active);
-        params.set('offset', String(items.length));
-        params.set('limit', String(target - items.length));
-        fetch(`/products/muse/api/posts?${params}`)
-          .then((res) => (res.ok ? res.json() : null))
+        loadPosts(query, active, items.length, target - items.length)
           .then((data: { items?: PlateWallItem[]; total?: number } | null) => {
             const slice = Array.isArray(data?.items) ? data.items : [];
             if (slice.length) {
@@ -235,23 +229,16 @@ export function PlateWall({
           const offset = synced.items.length;
           const key = `${active}|${query}`;
           void (async () => {
-            const params = new URLSearchParams();
-            if (query) params.set('q', query);
-            if (active !== '全部') params.set('cat', active);
-            params.set('offset', String(offset));
-            params.set('limit', String(batchSize));
             try {
-              const res = await fetch(`/products/muse/api/posts?${params}`);
-              if (!res.ok) return;
-              const data = (await res.json()) as { items?: PlateWallItem[]; total?: number };
-              const slice = data.items;
+              const data = await loadPosts(query, active, offset, batchSize);
+              const slice = data?.items;
               if (!Array.isArray(slice) || !slice.length) return;
               setSynced((prev) => {
                 if (prev.key !== key || prev.items.length !== offset) return prev;
                 return {
                   key: prev.key,
                   items: [...prev.items, ...slice],
-                  total: Number(data.total) || prev.total,
+                  total: Number(data?.total) || prev.total,
                 };
               });
             } catch {}
@@ -314,112 +301,5 @@ export function PlateWall({
         <div ref={moreRef} className={styles.more} aria-hidden="true" />
       ) : null}
     </section>
-  );
-}
-
-function PlateCell({
-  item,
-  href,
-  onNavigate,
-  priority,
-}: {
-  item: PlateWallItem;
-  href: string;
-  onNavigate: (key: string) => void;
-  priority: boolean;
-}) {
-  const router = useRouter();
-  const prefetch = () => router.prefetch(href);
-  const preview = item.kind === 'video' ? item.poster : item.src;
-  const [failed, setFailed] = useState(!preview);
-  const [ready, setReady] = useState(false);
-  const cellRef = useRef<HTMLAnchorElement>(null);
-  useEffect(() => {
-    if (item.kind !== 'video' || !preview) return;
-    const poster = new window.Image();
-    poster.onload = () => {
-      setReady(true);
-      setFailed(false);
-    };
-    poster.src = preview;
-    return () => {
-      poster.onload = null;
-    };
-  }, [item.kind, preview]);
-  useEffect(() => {
-    const cell = cellRef.current;
-    if (!cell || ready || failed) return;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry?.isIntersecting && !timer) timer = setTimeout(() => setFailed(true), 15000);
-      else if (!entry?.isIntersecting && timer) {
-        clearTimeout(timer);
-        timer = undefined;
-      }
-    });
-    observer.observe(cell);
-    return () => {
-      observer.disconnect();
-      clearTimeout(timer);
-    };
-  }, [ready, failed]);
-  return (
-    <Link
-      ref={cellRef}
-      id={`muse-${item.key}`}
-      href={href}
-      prefetch={false}
-      onPointerEnter={prefetch}
-      onFocus={prefetch}
-      className={styles.cell}
-      onClick={() => onNavigate(item.key)}
-    >
-      <figure>
-        <div className={styles.media}>
-          {item.kind === 'video' && item.src ? (
-            <MotionVideo
-              src={item.src}
-              poster={preview ?? undefined}
-              aria-label={item.name}
-              onLoadedMetadata={() => {
-                setReady(true);
-                setFailed(false);
-              }}
-              onLoadedData={() => {
-                setReady(true);
-                setFailed(false);
-              }}
-              onError={() => setFailed(true)}
-            />
-          ) : preview ? (
-            <Image
-              src={preview}
-              alt=""
-              fill
-              loading={priority ? 'eager' : 'lazy'}
-              fetchPriority={priority ? 'high' : undefined}
-              sizes="(min-width: 1200px) 25vw, (min-width: 760px) 33vw, (min-width: 360px) 50vw, 100vw"
-              onLoad={() => {
-                setReady(true);
-                setFailed(false);
-              }}
-              onError={() => setFailed(true)}
-            />
-          ) : null}
-          {failed ? (
-            <span className={styles.failure}>
-              预览暂不可用<span>查看作品与出处</span>
-            </span>
-          ) : null}
-          {(item.mediaCount ?? 0) > 1 ? (
-            <span className={styles.badge}>{item.mediaCount} 项</span>
-          ) : null}
-        </div>
-        <figcaption className={styles.caption}>
-          <h2 className={styles.title}>{item.name || '未命名灵感'}</h2>
-          {item.lead ? <span className={styles.meta}>{item.lead}</span> : null}
-        </figcaption>
-      </figure>
-    </Link>
   );
 }

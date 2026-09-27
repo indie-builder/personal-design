@@ -25,8 +25,10 @@ pnpm dev
 ## 项目结构
 
 - `apps/web`：唯一的 Next.js 站点，包括首页、作品页面和共享组件。
-- `packages/*`：各作品的数据、查询 API 和内容同步脚本。
+- `apps/web/app/products/*`：作品路由；`apps/web/components`：共享界面；`apps/web/lib/products.ts`：首页作品注册。
+- `packages/*/src/index.ts`：各作品内容和媒体地址的查询入口；对应 `scripts/` 负责同步。
 - `apps/web/public`：同步或生成的本地媒体；灵感集的大图和视频等媒体由来源站点提供。
+- `.agents/skills/video-shotcraft/demos`：镜头卡源码；工作台的 `demosrc` 是指向它的相对符号链接。
 
 ## 常用命令
 
@@ -40,9 +42,8 @@ pnpm format:check                # 格式检查
 pnpm sync:layouts                # 同步布局参考缩略图
 pnpm sync:inspora                # 增量同步灵感集
 pnpm sync:design-engineer-tools  # 同步工具目录
-pnpm sync:ai-coding-dictionary   # 增量同步和翻译词典
 ```
 
-词典同步依赖已登录的 `gh` 和本机 `claude` CLI。个人网站的本地预览媒体由 `packages/personal-sites` 生成，更新宣传片后运行该包的 `render:promo` 和根目录的 `pnpm sync:personal-sites`。
+词典使用本地运行快照，更新上游需重新捕获并重建资源。个人网站的本地预览媒体由 `packages/personal-sites` 生成，更新宣传片后运行该包的 `render:promo` 和根目录的 `pnpm sync:personal-sites`。
 
 布局参考内容改编自 [nevertoday/350-layout-compositions](https://github.com/nevertoday/350-layout-compositions)，依 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 使用。页面流程与验收见 [设计文档](docs/design/README.md)。

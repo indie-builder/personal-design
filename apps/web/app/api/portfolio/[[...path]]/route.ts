@@ -79,113 +79,120 @@ export async function GET(request: Request, context: { params: Promise<{ path?: 
         cover: absolute(product.cover),
       })),
     });
-  if (path[0] === 'layouts') {
-    if (path.length === 2) {
-      const item = getLayoutById(path[1] ?? '');
-      return item ? ok({ item: layout(item) }) : missing();
-    }
-    if (path.length !== 1) return missing();
-    const filtered = catalog.filter(
-      (item) =>
-        (!cat || item.category_slug === cat) &&
-        (!theme || item.subcategory_slug === theme) &&
-        matchesSearch(q, [item.name, item.category, item.subcategory]),
-    );
-    return ok({
-      ...page(filtered.map(layout)),
-      categories: categories.map((c) => ({
-        id: c.slug,
-        name: categoryLabel(c.name),
-        count: c.count,
-      })),
-      topics: categories
-        .filter((c) => !cat || c.slug === cat)
-        .flatMap((c) => c.subcategories.map((t) => ({ id: t.slug, name: t.name, count: t.count }))),
-      attribution: '图鉴改编自 nevertoday/350-layout-compositions · CC BY 4.0',
-    });
-  }
-  if (path[0] === 'muse') {
-    if (path.length === 2) {
-      const post = getPostBySlug(path[1] ?? '');
-      if (!post) return missing();
+  switch (path[0]) {
+    case 'layouts': {
+      if (path.length === 2) {
+        const item = getLayoutById(path[1] ?? '');
+        return item ? ok({ item: layout(item) }) : missing();
+      }
+      if (path.length !== 1) return missing();
+      const filtered = catalog.filter(
+        (item) =>
+          (!cat || item.category_slug === cat) &&
+          (!theme || item.subcategory_slug === theme) &&
+          matchesSearch(q, [item.name, item.category, item.subcategory]),
+      );
       return ok({
-        item: {
-          id: post.slug,
-          title: post.title,
-          category: categoryLabel(post.category ?? '未分类'),
-          topic: '',
-          author: post.creatorName ?? '',
-          text: post.description ?? '',
-          sourceURL: post.sourceUrl ?? '',
-          thumbnail: absolute(post.media[0]?.poster ?? post.media[0]?.thumb),
-          media: post.media
-            .filter((media) => media.src)
-            .map((media) => ({
-              id: media.id,
-              kind: media.type,
-              url: absolute(media.src),
-              poster: absolute(media.poster ?? media.thumb),
-              width: media.width ?? 4,
-              height: media.height ?? 3,
-            })),
-        },
+        ...page(filtered.map(layout)),
+        categories: categories.map((c) => ({
+          id: c.slug,
+          name: categoryLabel(c.name),
+          count: c.count,
+        })),
+        topics: categories
+          .filter((c) => !cat || c.slug === cat)
+          .flatMap((c) =>
+            c.subcategories.map((t) => ({ id: t.slug, name: t.name, count: t.count })),
+          ),
+        attribution: '图鉴改编自 nevertoday/350-layout-compositions · CC BY 4.0',
       });
     }
-    if (path.length !== 1) return missing();
-    const filtered = filterMuseItems({ q, category: cat || '全部' });
-    return ok({
-      total: filtered.length,
-      hasMore: offset + limit < filtered.length,
-      items: filtered.slice(offset, offset + limit).map((item) => ({
-        id: item.key,
-        title: item.name,
-        category: categoryLabel(item.category),
-        topic: '',
-        author: item.lead ?? '',
-        text: '',
-        sourceURL: '',
-        thumbnail: absolute(item.poster || item.src),
-        media: item.src
-          ? [
-              {
-                id: item.key,
-                kind: item.kind,
-                url: absolute(item.kind === 'image' ? item.fullSrc || item.src : item.src),
-                poster: absolute(item.poster),
-                width: item.width,
-                height: item.height,
-              },
-            ]
-          : [],
-      })),
-      categories: museTabs.map((c) => ({
-        id: c.name,
-        name: categoryLabel(c.name),
-        count: c.count,
-      })),
-      topics: [],
-      attribution: '',
-    });
-  }
-  if (path.length === 1 && path[0] === 'tools')
-    return ok({
-      categories: toolCategories.map((category) => ({
-        id: category.id,
-        name: categoryLabel(category.id),
-        tools: category.tools.map((tool) => ({
-          name: tool.name,
-          url: tool.url,
-          icon: absolute(tool.icon),
+    case 'muse': {
+      if (path.length === 2) {
+        const post = getPostBySlug(path[1] ?? '');
+        if (!post) return missing();
+        return ok({
+          item: {
+            id: post.slug,
+            title: post.title,
+            category: categoryLabel(post.category ?? '未分类'),
+            topic: '',
+            author: post.creatorName ?? '',
+            text: post.description ?? '',
+            sourceURL: post.sourceUrl ?? '',
+            thumbnail: absolute(post.media[0]?.poster ?? post.media[0]?.thumb),
+            media: post.media
+              .filter((media) => media.src)
+              .map((media) => ({
+                id: media.id,
+                kind: media.type,
+                url: absolute(media.src),
+                poster: absolute(media.poster ?? media.thumb),
+                width: media.width ?? 4,
+                height: media.height ?? 3,
+              })),
+          },
+        });
+      }
+      if (path.length !== 1) return missing();
+      const filtered = filterMuseItems({ q, category: cat || '全部' });
+      return ok({
+        total: filtered.length,
+        hasMore: offset + limit < filtered.length,
+        items: filtered.slice(offset, offset + limit).map((item) => ({
+          id: item.key,
+          title: item.name,
+          category: categoryLabel(item.category),
+          topic: '',
+          author: item.lead ?? '',
+          text: '',
+          sourceURL: '',
+          thumbnail: absolute(item.poster || item.src),
+          media: item.src
+            ? [
+                {
+                  id: item.key,
+                  kind: item.kind,
+                  url: absolute(item.kind === 'image' ? item.fullSrc || item.src : item.src),
+                  poster: absolute(item.poster),
+                  width: item.width,
+                  height: item.height,
+                },
+              ]
+            : [],
         })),
-      })),
-    });
-  if (path.length === 1 && path[0] === 'site')
-    return ok({
-      video: absolute(promoUrl),
-      poster: absolute(promoPosterUrl),
-      website: websiteUrl,
-      description:
-        '在这里记录工程经历，也整理每天读到的动态、值得回看的内容和持续关注的开源项目。从一条摘要进入完整阅读，再回到原始来源。',
-    });
-  return missing();
+        categories: museTabs.map((c) => ({
+          id: c.name,
+          name: categoryLabel(c.name),
+          count: c.count,
+        })),
+        topics: [],
+        attribution: '',
+      });
+    }
+    case 'tools':
+      if (path.length !== 1) return missing();
+      return ok({
+        categories: toolCategories.map((category) => ({
+          id: category.id,
+          name: categoryLabel(category.id),
+          tools: category.tools.map((tool) => ({
+            name: tool.name,
+            url: tool.url,
+            icon: absolute(tool.icon),
+          })),
+        })),
+      });
+    case 'site':
+      if (path.length !== 1) return missing();
+      return ok({
+        video: absolute(promoUrl),
+        poster: absolute(promoPosterUrl),
+        website: websiteUrl,
+        description:
+          '在这里记录工程经历，也整理每天读到的动态、值得回看的内容和持续关注的开源项目。从一条摘要进入完整阅读，再回到原始来源。',
+      });
+    default:
+      return missing();
+  }
 }

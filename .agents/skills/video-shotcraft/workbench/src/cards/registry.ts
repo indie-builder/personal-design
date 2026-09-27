@@ -13,7 +13,7 @@ import { PROJECT_CARDS } from "./projectCards";
  *  - 媒体卡：音频 / 视频 / 图片（成片工程 public/ 与仓库音效库都走它们）
  *  - 背景卡
  *  - 成片单元卡：已链接成片工程 workbench.ts 清单里的镜头 / 转场 / 字幕 / 叠加层
- *  - 动效库：demos/ 158 张镜头卡的 demo 组件（gen-index 静态索引） */
+ *  - 动效库：demos/ 镜头卡的 demo 组件（gen-index 静态索引） */
 const ALL: CardDef[] = [
   textBasicCard,
   titleCardCard,
