@@ -135,12 +135,24 @@ async function convertOne(root, item) {
 
   const jobs = [];
   if (!imageDone) {
-    jobs.push(sharp(srcImage).webp({ lossless: true }).toFile(imageOut));
+    // 先写 .part 再改名：中断不会留下被「存在且非空」判成已完成的截断图
+    jobs.push(
+      sharp(srcImage)
+        .webp({ lossless: true })
+        .toFile(`${imageOut}.part`)
+        .then(() => rename(`${imageOut}.part`, imageOut)),
+    );
   }
   if (!thumbDone) {
     // 缩略图也从 PNG 原图缩放（上游 JPG 缩略图本身已压缩，再压会糊）；
     // 720 宽覆盖灵感墙卡片 3x DPR（208px CSS ≈ 624px）
-    jobs.push(sharp(srcImage).resize({ width: 720 }).webp({ quality: 82 }).toFile(thumbOut));
+    jobs.push(
+      sharp(srcImage)
+        .resize({ width: 720 })
+        .webp({ quality: 82 })
+        .toFile(`${thumbOut}.part`)
+        .then(() => rename(`${thumbOut}.part`, thumbOut)),
+    );
   }
   await Promise.all(jobs);
   return 'converted';
