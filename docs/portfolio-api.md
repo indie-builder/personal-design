@@ -16,6 +16,6 @@
 
 本地启动：`pnpm --filter @personal-design/web exec next dev --hostname 127.0.0.1 --port 7200`。
 
-接口回归：服务启动后 `pnpm test:portfolio-api`；用 `PORTFOLIO_API_BASE` 覆盖测试地址。常规 `pnpm test` 不依赖运行中的 HTTP 服务。
+接口回归：对运行中的服务执行 `pnpm test:portfolio-api`；测试默认连 `DESIGN_BASE_URL`（默认 `http://localhost:3000`，与 design-checks 一致），连本机 7200 开发服务时用 `PORTFOLIO_API_BASE=http://127.0.0.1:7200` 覆盖。该检查已纳入 `scripts/design-checks/run-all.mjs` 全站回归。常规 `pnpm test` 不依赖运行中的 HTTP 服务。
 
 上线需部署本项目的新版本；iOS Release 默认连接 `https://portfolio.default-coder.lovemyrmb.cn/`。本地 Debug 可用 `PORTFOLIO_BASE_URL=http://127.0.0.1:7200/` 联调，生产包不会读取该覆盖值。

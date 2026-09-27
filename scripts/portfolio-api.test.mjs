@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-const base = process.env.PORTFOLIO_API_BASE ?? 'http://127.0.0.1:7200';
+
+// 对 /api/portfolio 的集成契约检查：需对运行中的生产服务执行，
+// 基址与 design-checks 一致（DESIGN_BASE_URL，默认 http://localhost:3000），
+// 已纳入 run-all.mjs 全套回归；单独运行用 pnpm test:portfolio-api，
+// 连本机 7200 开发服务时用 PORTFOLIO_API_BASE 覆盖。
+// 注意：layouts 的 350/8 是数据快照钉，同步增删图鉴后需同步更新。
+const base =
+  process.env.PORTFOLIO_API_BASE ?? process.env.DESIGN_BASE_URL ?? 'http://localhost:3000';
 async function get(path = '') {
   const response = await fetch(`${base}/api/portfolio${path}`);
   assert.equal(response.status, 200);
@@ -16,7 +23,14 @@ function publicOnly(value) {
 }
 test('portfolio is complete and public', async () => {
   const result = await get();
-  assert.deepEqual(result.items.map(x => x.id), ['layout-compositions', 'muse', 'design-engineer-tools', 'personal-sites']);
+  assert.deepEqual(result.items.map(x => x.id), [
+    'layout-compositions',
+    'muse',
+    'design-engineer-tools',
+    'personal-sites',
+    'ai-coding-dictionary',
+    'ai-chat',
+  ]);
   publicOnly(result);
 });
 test('layouts paginate, filter, search and resolve corrected media', async () => {
@@ -55,7 +69,7 @@ test('tools and site use their public package data', async () => {
   assert.ok(tools.categories.length >= 10);
   assert.ok(tools.categories.flatMap(x => x.tools).length >= 100);
   const site = await get('/site');
-  assert.ok(site.video.endsWith('/personal-sites/promo.mp4'));
+  assert.equal(new URL(site.video).pathname, '/personal-sites/promo.mp4');
   publicOnly(tools); publicOnly(site);
 });
 test('invalid pagination and missing resources return explicit errors', async () => {
