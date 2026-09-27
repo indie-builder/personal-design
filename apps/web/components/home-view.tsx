@@ -4,10 +4,11 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { instantMotion } from '@/lib/motion';
 import type { Product } from '@/lib/products';
-import { buttonClassName } from './button';
+import { Button } from './button';
 import { MotionVideo } from './motion-video';
 import { AiChatPreview } from './ai-chat-preview';
 import { SiteReceiptPreview } from './site-receipt-preview';
+import { HomeDigitalRain } from './home-digital-rain';
 import { TimelineWalker } from './timeline-walker';
 import { WorkspaceLink } from './workspace-shell';
 import { BookPreview, DictionaryPreview, PreviewImage, ToolPreview } from './home-previews';
@@ -29,7 +30,7 @@ export function HomeView({
 }) {
   const drag = useRef({ start: 0, scroll: 0, down: false, moved: false });
   const viewport = useRef<HTMLDivElement>(null);
-  const [edges, setEdges] = useState({ start: true, end: true });
+  const [position, setPosition] = useState({ value: 0, max: 0 });
   const [hitDate, setHitDate] = useState<number | null>(null);
   const ordered = [...products].sort((a, b) => a.date.localeCompare(b.date));
 
@@ -37,9 +38,9 @@ export function HomeView({
     const element = viewport.current;
     if (!element) return;
     const update = () =>
-      setEdges({
-        start: element.scrollLeft < 2,
-        end: element.scrollLeft + element.clientWidth >= element.scrollWidth - 2,
+      setPosition({
+        value: element.scrollLeft,
+        max: Math.max(0, element.scrollWidth - element.clientWidth),
       });
     update();
     const observer = new ResizeObserver(update);
@@ -64,28 +65,19 @@ export function HomeView({
 
   return (
     <main className={styles.home}>
-      <header className={styles.intro}>
-        <span className={styles.period}>
-          {ordered[0]?.date.slice(0, 4) ?? new Date().getFullYear()}
-          <span aria-hidden="true">—</span>持续更新
-        </span>
-      </header>
-
+      <HomeDigitalRain />
       {ordered.length > 0 ? (
         <>
           <div className={styles.timeline}>
             <div
+              id="home-timeline"
               ref={viewport}
               className={styles.viewport}
               role="region"
               aria-label="作品时间轴，左右方向键浏览"
               tabIndex={0}
               onPointerDown={(event) => {
-                if (
-                  event.pointerType !== 'mouse' ||
-                  event.button !== 0 ||
-                  (edges.start && edges.end)
-                )
+                if (event.pointerType !== 'mouse' || event.button !== 0 || position.max === 0)
                   return;
                 drag.current = {
                   start: event.clientX,
@@ -150,6 +142,7 @@ export function HomeView({
                   return (
                     <li
                       key={product.slug}
+                      data-timeline-stop
                       className={styles.entry}
                       data-hit={hitDate === index || undefined}
                       style={{ '--order': index } as CSSProperties}
@@ -211,7 +204,7 @@ export function HomeView({
                     </li>
                   );
                 })}
-                <li className={`${styles.entry} ${styles.future}`}>
+                <li data-timeline-end className={`${styles.entry} ${styles.future}`}>
                   <span className={styles.date}>未完待续</span>
                   <div className={styles.rule} aria-hidden="true">
                     <span className={styles.node} />
@@ -220,28 +213,31 @@ export function HomeView({
               </ol>
             </div>
           </div>
-          {(!edges.start || !edges.end) && (
+          {position.max > 0 && (
             <footer className={styles.footer}>
               <div className={styles.controls}>
-                <span className={styles.hint}>拖动或沿时间浏览</span>
-                <button
-                  className={buttonClassName({ icon: true })}
+                <Button
+                  variant="ghost"
+                  icon
                   data-direction="previous"
-                  onClick={() => move(-1)}
-                  disabled={edges.start}
                   aria-label="向前浏览作品"
+                  aria-controls="home-timeline"
+                  disabled={position.value < 2}
+                  onClick={() => move(-1)}
                 >
-                  <ArrowLeft size={18} strokeWidth={1.5} />
-                </button>
-                <button
-                  className={buttonClassName({ icon: true })}
+                  <ArrowLeft aria-hidden="true" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  icon
                   data-direction="next"
-                  onClick={() => move(1)}
-                  disabled={edges.end}
                   aria-label="向后浏览作品"
+                  aria-controls="home-timeline"
+                  disabled={position.value >= position.max - 2}
+                  onClick={() => move(1)}
                 >
-                  <ArrowRight size={18} strokeWidth={1.5} />
-                </button>
+                  <ArrowRight aria-hidden="true" />
+                </Button>
               </div>
             </footer>
           )}

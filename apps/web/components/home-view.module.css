@@ -1,9 +1,6 @@
-.home { --column:380px; --gutter:48px; min-height:calc(100dvh - 88px); display:flex; flex-direction:column; padding-top:56px; color:var(--color-ink); }
-.intro { margin:0 var(--gutter); display:flex; align-items:center; justify-content:flex-end; gap:24px; }
-.intro h1 { margin:0; font-size:28px; font-weight:500; line-height:1.35; letter-spacing:0; }
-.period { display:flex; align-items:center; gap:16px; color:var(--color-ink-soft); font-size:12px; font-variant-numeric:tabular-nums; }
+.home { isolation:isolate; --column:380px; --gutter:48px; min-height:calc(100dvh - 88px); display:flex; flex-direction:column; padding-top:77px; color:var(--color-ink); }
 .timeline { position:relative; margin-top:94px; }
-.viewport { overflow-x:auto; overscroll-behavior-x:contain; padding:30px var(--gutter) 24px 152px; scroll-padding-left:152px; scrollbar-width:thin; scrollbar-color:var(--color-hairline-strong) transparent; }
+.viewport { --timeline-start:max(54px,calc((100vw - 1440px)/2 + 54px)); overflow-x:auto; overscroll-behavior-x:contain; padding:30px var(--gutter) 24px var(--timeline-start); scroll-padding-left:var(--timeline-start); scrollbar-width:none; }
 .viewport:focus-visible { outline:2px solid var(--color-ink); outline-offset:-2px; }
 .entries { position:relative; display:flex; width:max-content; min-width:100%; list-style:none; padding:0; margin:0; }
 .entry { width:var(--column); flex:none; }
@@ -32,14 +29,13 @@
 .future .rule { background:none; border-top:1px dashed var(--color-hairline-strong); }
 .future .node { width:7px; height:7px; background:var(--color-paper); border:1px solid var(--color-ink-soft); }
 .future .rule::after { display:none; }
-.footer { margin-top:auto; padding:32px var(--gutter) 24px; display:flex; align-items:center; justify-content:flex-end; gap:24px; }
-.controls { display:flex; align-items:center; gap:8px; }
-.hint { color:var(--color-ink-soft); font-size:12px; margin-right:16px; }
+.footer { margin-top:auto; padding:32px var(--gutter) 24px; display:flex; justify-content:flex-end; }
+.controls { display:flex; align-items:center; gap:4px; }
 .mediaError { height:100%; display:flex; align-items:center; justify-content:center; gap:8px; flex-direction:column; font-size:12px; color:var(--color-ink-soft); }
 .empty { margin:94px var(--gutter); color:var(--color-ink-soft); }
-@media(min-width:1440px) { .home { --column:420px; } .viewport { padding-left:max(152px,calc((100vw - 1136px)/2)); scroll-padding-left:max(152px,calc((100vw - 1136px)/2)); } .preview { height:220px; } }
-@media(max-width:1100px) { .home { --gutter:24px; --column:340px; } .viewport { padding-left:120px; scroll-padding-left:120px; } .project { margin-right:40px; } }
-@media(max-width:640px) { .home { --gutter:20px; --column:290px; min-height:calc(100dvh - 72px); padding-top:34px; } .intro { align-items:flex-start; } .intro h1 { font-size:22px; } .period { gap:8px; padding-top:5px; } .timeline { margin-top:68px; } .viewport { padding-left:20px; scroll-padding-left:20px; } .project { margin-right:36px; } .title h2 { font-size:22px; } .preview { height:174px; } .tagline { font-size:13px; margin-bottom:24px; } .future { width:170px; } .footer { padding-top:32px; gap:12px; } .hint { display:none; } .controls { gap:4px; } }
+@media(min-width:1440px) { .home { --column:420px; } .preview { height:220px; } }
+@media(max-width:1100px) { .home { --gutter:24px; --column:340px; } .viewport { --timeline-start:30px; } .project { margin-right:40px; } }
+@media(max-width:640px) { .home { --gutter:20px; --column:290px; min-height:calc(100dvh - 72px); padding-top:60px; } .timeline { margin-top:68px; } .project { margin-right:36px; } .title h2 { font-size:22px; } .preview { height:174px; } .tagline { font-size:13px; margin-bottom:24px; } .future { width:170px; } .footer { padding-top:32px; gap:12px; } }
 @media(prefers-reduced-motion:reduce) { .home *, .home *::before, .home *::after { transition:none !important; animation:none !important; scroll-behavior:auto !important; } .project:is(:hover,:focus-visible) .title svg { transform:none; } }
 
 @media(hover:hover) and (pointer:fine) {
@@ -114,3 +110,6 @@
   .project:hover .title svg { transform:translateX(6px); }
 }
 @media(prefers-reduced-motion:reduce) { .project:active { transform:none; } }
+
+/* Align to the visible avatar, including its 6px inset inside the 44px button. */
+@media(max-width:639px) { .viewport { --timeline-start:26px; } }
