@@ -136,7 +136,7 @@ export function thumbnailUrl(item: LayoutItem): string {
 }
 
 /** 上游图片缺失的条目 id（v2 丢失且 v1 无等价图）。 */
-export const missingImageIds: ReadonlySet<string> = new Set(
+const missingImageIds: ReadonlySet<string> = new Set(
   Object.entries(corrections)
     .filter(([, correction]) => correction.missing)
     .map(([id]) => id),
@@ -148,16 +148,4 @@ export function hasImage(item: LayoutItem): boolean {
 }
 
 /** 按一级分类取条目，保持 id 顺序。 */
-export function itemsByCategory(categorySlug: string): LayoutItem[] {
-  return catalog.filter((item) => item.category_slug === categorySlug);
-}
-
-/** 按二级分类取条目，保持 id 顺序。 */
-export function itemsBySubcategory(categorySlug: string, subcategorySlug: string): LayoutItem[] {
-  return catalog.filter(
-    (item) => item.category_slug === categorySlug && item.subcategory_slug === subcategorySlug,
-  );
-}
-
-/** 上游项目信息（CC BY 4.0 署名用），实现见 upstream.ts（客户端安全模块）。 */
 export { upstream } from './upstream';

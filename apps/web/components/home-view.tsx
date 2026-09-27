@@ -1,230 +1,19 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { ArrowLeft, ArrowRight, ArrowUpRight, ImageOff } from 'lucide-react';
-import { instantMotion, observeMotionPolicy } from '@/lib/motion';
-import { shuffleBooks } from '@/lib/book-shuffle';
+import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { instantMotion } from '@/lib/motion';
 import type { Product } from '@/lib/products';
-import { buttonClassName } from './button';
+import { Button } from './button';
 import { MotionVideo } from './motion-video';
-import { BookSpines } from './layout-bookshelf';
 import { AiChatPreview } from './ai-chat-preview';
 import { SiteReceiptPreview } from './site-receipt-preview';
+import { HomeDigitalRain } from './home-digital-rain';
 import { TimelineWalker } from './timeline-walker';
 import { WorkspaceLink } from './workspace-shell';
+import { BookPreview, DictionaryPreview, PreviewImage, ToolPreview } from './home-previews';
+import type { Preview, ToolPreviewItem } from './home-previews';
 import styles from './home-view.module.css';
-
-type Preview = { src: string; alt: string; videoSrc?: string };
-type ToolPreviewItem = { name: string; category: string; icon: string | null };
-
-function PreviewImage({ src, alt, priority = false }: Preview & { priority?: boolean }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <div className={styles.imageFrame}>
-      {failed || !src ? (
-        <div className={styles.mediaError}>
-          <ImageOff size={20} strokeWidth={1.5} />
-          <span>预览暂不可用</span>
-        </div>
-      ) : (
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          priority={priority}
-          sizes="(max-width: 640px) 250px, 320px"
-          className={styles.image}
-          onError={() => setFailed(true)}
-        />
-      )}
-    </div>
-  );
-}
-
-/** The homepage preview moves only while it is visible; the actual shelf stays unchanged. */
-function BookPreview({ categories }: { categories: { name: string; count: number }[] }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [running, setRunning] = useState(false);
-  const [quiet, setQuiet] = useState(false);
-  const [active, setActive] = useState(-1);
-  const bag = useRef<number[]>([]);
-  const current = useRef(-1);
-  function nextBook() {
-    if (!running || instantMotion() || document.hidden) return;
-    if (!bag.current.length) bag.current = shuffleBooks(categories.length, current.current);
-    current.current = bag.current.shift() ?? -1;
-    setActive(current.current);
-  }
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    let visible = false;
-    const update = () => {
-      const quiet = instantMotion();
-      const playing = visible && !document.hidden && !quiet;
-      setQuiet(quiet);
-      setRunning(playing);
-      if (playing && current.current === -1) {
-        bag.current = shuffleBooks(categories.length);
-        current.current = bag.current.shift() ?? -1;
-        setActive(current.current);
-      }
-    };
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        visible = !!entry?.isIntersecting && entry.intersectionRatio >= 0.3;
-        update();
-      },
-      { threshold: 0.3 },
-    );
-    observer.observe(element);
-    const stop = observeMotionPolicy(update);
-    return () => {
-      observer.disconnect();
-      stop();
-    };
-  }, [categories.length]);
-  return (
-    <div
-      ref={ref}
-      className={styles.bookMotion}
-      data-running={running}
-      aria-hidden="true"
-      onAnimationEnd={(event) => {
-        if (event.target instanceof HTMLElement && event.target.dataset.bookActive === 'true')
-          nextBook();
-      }}
-    >
-      <BookSpines categories={categories} previewActive={quiet ? -1 : active} />
-    </div>
-  );
-}
-
-/** Reuse the atlas renderer only while this timeline item is visible and motion is allowed. */
-function DictionaryPreview() {
-  const host = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const element = host.current;
-    if (!element) return;
-    let visible = false;
-    let frame: HTMLIFrameElement | null = null;
-    const update = () => {
-      if (visible && !document.hidden && !instantMotion()) {
-        if (frame) return;
-        frame = document.createElement('iframe');
-        frame.src = '/ai-coding-atlas/index.html?preview=1&term=agent';
-        frame.title = 'AI Coding 知识图谱预览';
-        frame.tabIndex = -1;
-        frame.setAttribute('aria-hidden', 'true');
-        frame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-        element.append(frame);
-      } else {
-        frame?.remove();
-        frame = null;
-      }
-    };
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        visible = !!entry?.isIntersecting && entry.intersectionRatio >= 0.3;
-        update();
-      },
-      { threshold: 0.3 },
-    );
-    observer.observe(element);
-    const stop = observeMotionPolicy(update);
-    return () => {
-      observer.disconnect();
-      stop();
-      frame?.remove();
-    };
-  }, []);
-  const nodes = [
-    { name: 'Model', x: 58, y: 55, r: 12, color: '#bdced9' },
-    { name: 'Token', x: 147, y: 32, r: 10, color: '#bdced9' },
-    { name: 'Agent', x: 162, y: 102, r: 18, color: '#c7d6c1' },
-    { name: 'Harness', x: 68, y: 148, r: 11, color: '#bdced9' },
-    { name: 'Context', x: 261, y: 64, r: 14, color: '#c7d6c1' },
-    { name: 'MCP', x: 267, y: 157, r: 10, color: '#e2d3be' },
-  ];
-  return (
-    <div className={styles.dictionaryPreview} aria-hidden="true">
-      <svg viewBox="0 0 320 196">
-        <g className={styles.dictionaryEdges}>
-          {nodes
-            .filter((node) => node.name !== 'Agent')
-            .map((node) => (
-              <line key={node.name} x1="162" y1="102" x2={node.x} y2={node.y} />
-            ))}
-          <path d="M58 55 Q106 8 147 32 M147 32 Q211 23 261 64 M68 148 Q161 179 267 157" />
-        </g>
-        {nodes.map((node) => (
-          <g key={node.name}>
-            <circle cx={node.x} cy={node.y} r={node.r} fill={node.color} />
-            <text x={node.x} y={node.y - node.r - 6} textAnchor="middle">
-              {node.name}
-            </text>
-          </g>
-        ))}
-      </svg>
-      <div ref={host} className={styles.dictionaryRuntime} />
-    </div>
-  );
-}
-
-function ToolPreview({ tools }: { tools: ToolPreviewItem[] }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(-1);
-  useEffect(() => {
-    const element = ref.current;
-    if (!element || !tools.length) return;
-    let visible = false;
-    let timer = 0;
-    const stop = () => {
-      window.clearTimeout(timer);
-      setActive(-1);
-    };
-    const advance = () => {
-      if (!visible || instantMotion() || document.hidden) return stop();
-      setActive((current) => (current + 1) % tools.length);
-      timer = window.setTimeout(advance, 1800);
-    };
-    const update = () => {
-      window.clearTimeout(timer);
-      if (visible && !instantMotion() && !document.hidden) advance();
-      else stop();
-    };
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        visible = !!entry?.isIntersecting && entry.intersectionRatio >= 0.3;
-        update();
-      },
-      { threshold: 0.3 },
-    );
-    observer.observe(element);
-    const removePolicyListener = observeMotionPolicy(update);
-    document.addEventListener('visibilitychange', update);
-    return () => {
-      window.clearTimeout(timer);
-      observer.disconnect();
-      removePolicyListener();
-      document.removeEventListener('visibilitychange', update);
-    };
-  }, [tools.length]);
-  return (
-    <div ref={ref} className={styles.toolPreview} aria-hidden="true">
-      {tools.map((tool, index) => (
-        <span key={tool.name} data-active={index === active || undefined}>
-          <i>
-            {tool.icon && <Image src={tool.icon} alt="" width={16} height={16} />}
-            <ArrowUpRight size={16} strokeWidth={1.6} />
-          </i>
-          <b>{tool.name}</b>
-        </span>
-      ))}
-    </div>
-  );
-}
 
 export function HomeView({
   products,
@@ -241,7 +30,7 @@ export function HomeView({
 }) {
   const drag = useRef({ start: 0, scroll: 0, down: false, moved: false });
   const viewport = useRef<HTMLDivElement>(null);
-  const [edges, setEdges] = useState({ start: true, end: true });
+  const [position, setPosition] = useState({ value: 0, max: 0 });
   const [hitDate, setHitDate] = useState<number | null>(null);
   const ordered = [...products].sort((a, b) => a.date.localeCompare(b.date));
 
@@ -249,9 +38,9 @@ export function HomeView({
     const element = viewport.current;
     if (!element) return;
     const update = () =>
-      setEdges({
-        start: element.scrollLeft < 2,
-        end: element.scrollLeft + element.clientWidth >= element.scrollWidth - 2,
+      setPosition({
+        value: element.scrollLeft,
+        max: Math.max(0, element.scrollWidth - element.clientWidth),
       });
     update();
     const observer = new ResizeObserver(update);
@@ -276,28 +65,19 @@ export function HomeView({
 
   return (
     <main className={styles.home}>
-      <header className={styles.intro}>
-        <span className={styles.period}>
-          {ordered[0]?.date.slice(0, 4) ?? new Date().getFullYear()}
-          <span aria-hidden="true">—</span>持续更新
-        </span>
-      </header>
-
+      <HomeDigitalRain />
       {ordered.length > 0 ? (
         <>
           <div className={styles.timeline}>
             <div
+              id="home-timeline"
               ref={viewport}
               className={styles.viewport}
               role="region"
               aria-label="作品时间轴，左右方向键浏览"
               tabIndex={0}
               onPointerDown={(event) => {
-                if (
-                  event.pointerType !== 'mouse' ||
-                  event.button !== 0 ||
-                  (edges.start && edges.end)
-                )
+                if (event.pointerType !== 'mouse' || event.button !== 0 || position.max === 0)
                   return;
                 drag.current = {
                   start: event.clientX,
@@ -362,6 +142,7 @@ export function HomeView({
                   return (
                     <li
                       key={product.slug}
+                      data-timeline-stop
                       className={styles.entry}
                       data-hit={hitDate === index || undefined}
                       style={{ '--order': index } as CSSProperties}
@@ -423,7 +204,7 @@ export function HomeView({
                     </li>
                   );
                 })}
-                <li className={`${styles.entry} ${styles.future}`}>
+                <li data-timeline-end className={`${styles.entry} ${styles.future}`}>
                   <span className={styles.date}>未完待续</span>
                   <div className={styles.rule} aria-hidden="true">
                     <span className={styles.node} />
@@ -432,28 +213,31 @@ export function HomeView({
               </ol>
             </div>
           </div>
-          {(!edges.start || !edges.end) && (
+          {position.max > 0 && (
             <footer className={styles.footer}>
               <div className={styles.controls}>
-                <span className={styles.hint}>拖动或沿时间浏览</span>
-                <button
-                  className={buttonClassName({ icon: true })}
+                <Button
+                  variant="ghost"
+                  icon
                   data-direction="previous"
-                  onClick={() => move(-1)}
-                  disabled={edges.start}
                   aria-label="向前浏览作品"
+                  aria-controls="home-timeline"
+                  disabled={position.value < 2}
+                  onClick={() => move(-1)}
                 >
-                  <ArrowLeft size={18} strokeWidth={1.5} />
-                </button>
-                <button
-                  className={buttonClassName({ icon: true })}
+                  <ArrowLeft aria-hidden="true" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  icon
                   data-direction="next"
-                  onClick={() => move(1)}
-                  disabled={edges.end}
                   aria-label="向后浏览作品"
+                  aria-controls="home-timeline"
+                  disabled={position.value >= position.max - 2}
+                  onClick={() => move(1)}
                 >
-                  <ArrowRight size={18} strokeWidth={1.5} />
-                </button>
+                  <ArrowRight aria-hidden="true" />
+                </Button>
               </div>
             </footer>
           )}

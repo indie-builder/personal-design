@@ -23,9 +23,8 @@
 | 格式化 | `pnpm format`：oxfmt，仅 TS/TSX/MJS；CSS 保持紧凑手写风格，生成 JSON 不参与 |
 | 已有单元测试 | `pnpm test`：node:test |
 | 浏览器回归 | 先构建并启动生产服务，再运行 `node scripts/design-checks/run-all.mjs`；`DESIGN_BASE_URL` 默认 `http://localhost:3000` |
-| 内容同步 | `pnpm sync:layouts` / `pnpm sync:inspora` / `pnpm sync:ai-coding-dictionary`；其他入口见 `package.json` |
+| 内容同步 | `pnpm sync:layouts` / `pnpm sync:inspora`；其他入口见 `package.json` |
 
-词典同步按上游 Git blob SHA 增量，通过本机默认 `claude -p` 逐段完整翻译变更词条；失败保留旧目录。
 
 ## 验证与浏览器
 

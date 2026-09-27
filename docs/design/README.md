@@ -20,13 +20,16 @@
 ### 首页 `/`
 
 - Lifeline 风格的稀疏单色横向时间轴；作品按 date 升序，同日保持注册顺序，日期只显示日期值，不追加“收录”等日期性质标签。
+- 时间轴起点与页头头像图像左边缘对齐，宽屏随1440px页头容器居中，窄屏跟随页头留白。
 - 日期在细轨上方，名称、用途与真实预览在下方；每个作品一个链接。末尾只留“未完待续”，不恢复站牌、LED、轴标签、图例或额外关于／许可说明。
 - 布局参考预览为八本分类书，随机逐本抽取展示封面；灵感集预览为真实动态媒体；个人网站预览保留小票打印与网站画面。
 - 设计工程工具预览为四个带 favicon 的工具格；可见且前台时按顺序短暂切换为外链箭头，离屏、后台或减少动态效果时静止。
-- 首页时间轴可保留像素漫步者：仅在可见、前台且未启用减少动态效果时，沿横线走到日期下方再上跳顶动日期，落回横线后继续到下一日期；一次性完成整条路线后退出，再次进入首页才重播，以两帧步态推进，不作为全站背景装饰扩散。
-- 水平滚动与拖动浏览；超过 6px 后判定拖动并抑制误点，仅溢出时出现翻页按钮；方向键即时移动一列。
+- 首页时间轴可保留像素漫步者：仅在可见、前台且未启用减少动态效果时，先用1秒从时间轴线下爬出并淡入，站稳后用2秒将整个身体水平镜像向左、再翻回右侧张望，随后沿横线走到日期下方上跳顶动日期，落回横线后继续到下一日期；路线随实际作品数量延长，始终走到“未完待续”节点；到达后停步，在2秒内整身向左翻、再翻回右侧，隐藏前最终转向时间轴内侧（左侧），然后用2秒向下收回并淡出，身体在线处裁切；离屏暂停并从原进度恢复，一次性完成整条路线后退出，再次进入首页才重播，以两帧步态推进，不作为全站背景装饰扩散。
+- 首页不显示“年份 — 持续更新”及“拖动或沿时间浏览”提示，保留时间轴留白；底部右侧提供无常态外框的轻量箭头按钮，无作品名称、文字提示或位置条。
+- 水平滚动与拖动浏览；超过 6px 后判定拖动并抑制误点，仅溢出时显示上一项／下一项按钮，首末端禁用；按钮移动一列，时间轴区域方向键即时移动一列。
 - 进入站内作品时名称衔接到内页页头；返回时原页面先退场，再反向衔接到首页。原生新标签、复制链接与预取行为保留。
 - AI 问答预览以8秒循环呈现提问、短暂等待、数据卡片、完成率图表和追问入口；仅可见且前台播放，离屏／后台暂停，键盘与减少动态效果显示完整静态结果。预览沿用内置试用样本，不调用模型，不嵌套交互控件；整件作品仍是一个原生入口。
+- 首页顶部采用随主题变化的中性灰数字／符号雨，与视口等宽的自适应画布，仅底部渐隐，左右铺满，鼠标附近局部提亮；仅首页显示，不占布局、不接收点击，后台、离屏、键盘和减少动态效果时静止。
 - 页头头像为点击触发的太极彩蛋，支持 Esc 收起；不阻塞作品链接。
 
 实现：[home-view.tsx](../../apps/web/components/home-view.tsx)、[workspace-shell.tsx](../../apps/web/components/workspace-shell.tsx)、[site-receipt-preview.tsx](../../apps/web/components/site-receipt-preview.tsx)、[taichi-avatar.tsx](../../apps/web/components/taichi-avatar.tsx)。
@@ -71,13 +74,11 @@
 - 从首页作品入口进入后，在全屏 iframe 中加载本地保存的原版图谱，标题回退导航叠放在画布左上角；原版负责知识网渲染、动效、镜头、收起式搜索和选择，本站不重建图谱。跳过 loading 开场，背景与前景跟随主题，字体采用 Albert Sans。节点放大约 15%，七个章节使用固定低饱和浅色；选中圆点、纸色间隔和粗外圈置顶。保留原版放射排布，碰撞节点沿原方向向外错开，为名称留出空间；保留标签渲染修正，不强制节点进入固定可视区。配色切换、声音控件和音频初始化已移除。
 - 详情采用 Impeccable 阅读面。`bridge.js` 创建原生 aside，`detail.css` 提供桌面右侧与小屏底部布局；标题、关闭及相邻导航常驻，正文独立滚动。中英释义和逐段对应的完整中英正文同屏，中文概述单独保留但不代替全文翻译；双语表格使用语义 table。内容定位只滚动阅读区；关联术语默认收起为一行，展开后按章节显示紧凑原生链接，相邻词条显示完整名称。旧详情组件不挂载，分享与 Copy Markdown 控件移除。
 - 词条和搜索状态同步到本站 URL 的 `term`、`q`，保留原生链接、修饰键新标签和浏览器历史；关联词条不在当前搜索结果内时清除搜索以显示目标节点。关闭与 Esc 清除选中状态并将焦点返回搜索入口。返回作品统一使用共享页头的标题导航，不另放图谱内返回按钮。
-- `pnpm sync:ai-coding-dictionary` 依据源仓库 Git blob SHA 增量更新，使用本机默认 `claude -p` 完整翻译变更词条并检查中英文段落一一对应；随后 `prepare-runtime.mjs` 将包内 `upstream/` 快照、本站运行适配及更新后的目录生成到 `apps/web/public/ai-coding-atlas/`。
-- 旧目录缺少全文译文时可运行 `pnpm --filter @personal-design/ai-coding-dictionary backfill:zh`；脚本逐词条保存，可中断续跑。构建时若有词条缺少与英文对应的译文，则报错而不发布摘要版。
 - 详情范围见 [详情阅读区契约](execution/ai-coding-dictionary-detail.md)；本轮全文翻译与关联区的实际检查及截图见 [验收记录](execution/evidence/dictionary-full-translation-qa.md)。此前的 [CDP 记录](execution/ai-coding-dictionary-cdp.md) 只证明旧版摘要阅读面与原图谱行为。
 
 - 首页缩略预览按可见性复用原版图谱动画与连线，离屏释放资源；普通首页入口每次创建新的图谱实例，重置上次搜索、选中与镜头状态。
 
-实现：`dictionary-map.tsx`、`packages/ai-coding-dictionary/scripts/sync.mjs`、`packages/ai-coding-dictionary/scripts/prepare-runtime.mjs`、`packages/ai-coding-dictionary/runtime/bridge.js`、`packages/ai-coding-dictionary/runtime/detail.css`。
+实现：`dictionary-map.tsx`、`packages/ai-coding-dictionary/runtime/bridge.js`、`packages/ai-coding-dictionary/runtime/detail.css`。上游快照与增量同步脚本已退役；后续更新需重新捕获上游并重建运行资源。
 
 ### AI 问答 `/products/ai-chat`
 
@@ -131,7 +132,7 @@
 ## 已知核对项
 
 - 首页进入作品的导航、标题清理、双主题、键盘及减少动态效果已有本会话功能检查；ego 截图接口持续超时，尚未完成视觉帧验收。
-- 开册、首页预览与路由动效已接入统一输入／偏好策略；行为回归使用 `sh scripts/design-checks/workspace-navigation.sh`。回退专项检查为 `sh scripts/design-checks/back-motion.sh`。回退稳定性检查为 `sh scripts/design-checks/back-stability.sh`，覆盖旧画册移除后清理、书脊焦点恢复与整页／子项位移不叠加。这些脚本不能替代视觉关键帧验收。
+- 开册、首页预览与路由动效已接入统一输入／偏好策略；行为回归使用 `sh scripts/design-checks/workspace-navigation.sh`。回退专项检查为 `sh scripts/design-checks/back-motion.sh`。回退稳定性检查为 `sh scripts/design-checks/back-stability.sh`，覆盖旧画册移除后清理、书脊焦点恢复与整页／子项位移不叠加。这些脚本写死 portless 开发域名，需先 `pnpm dev` 再运行，不能替代视觉关键帧验收。
 - 书籍开册仍有局部 width / height 插值；属于现有实现，需实测性能，不能表述为全部动效仅使用 transform / opacity。
 
 

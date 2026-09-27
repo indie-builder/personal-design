@@ -17,7 +17,7 @@
 | 视觉与原规则独立复核 | [finish-review.md](finish-review.md) | ship；初轮发现与修复已关闭 |
 | 来源完整性 | [source-integrity.json](evidence/source-integrity.json) | 25份来源快照哈希一致 |
 
-所有浏览器脚本支持 `DESIGN_BASE_URL`，默认 `http://localhost:3000`。生产预览执行 `pnpm build`、`pnpm --filter @personal-design/web start --port 3001`，然后以 `DESIGN_BASE_URL=http://localhost:3001` 运行脚本。Playwright 在根开发依赖中；新机器需 `pnpm exec playwright install chromium`。
+`run-all.mjs` 所含 Playwright 脚本与 portfolio API 契约检查支持 `DESIGN_BASE_URL`，默认 `http://localhost:3000`。生产预览执行 `pnpm build`、`pnpm --filter @personal-design/web start --port 3001`，然后以 `DESIGN_BASE_URL=http://localhost:3001` 运行脚本；`dictionary-search.sh` 同样支持。`global-ux.sh`、`workspace-navigation.sh`、`back-motion.sh`、`back-stability.sh`、`search.sh` 写死 portless 开发域名 `https://personal-design.localhost`，不读 `DESIGN_BASE_URL`：先 `pnpm dev`（首次需 `sudo portless proxy start --https`）再运行。ai-chat 系列按 [AI 问答](ai-chat.md)的隔离 origin 要求运行。Playwright 在根开发依赖中；新机器需 `pnpm exec playwright install chromium`。
 
 ## 视觉证据与检查范围
 

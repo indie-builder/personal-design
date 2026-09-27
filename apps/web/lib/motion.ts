@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState, type RefObject } from 'react';
+
 /** Call in interaction handlers: repeated keyboard actions never wait on motion. */
 export function instantMotion() {
   return (
@@ -71,4 +73,41 @@ export function playExit(
       settle(false);
     },
   };
+}
+
+/**
+ * Home-preview players only move while their tile is on screen and motion is
+ * allowed. Reports `visible && foreground && !instantMotion()` changes through
+ * `onPlay`; visibility, motion policy and tab changes all re-evaluate.
+ */
+export function useVisiblePlay(
+  ref: RefObject<Element | null>,
+  onPlay: (playing: boolean) => void,
+  threshold = 0.3,
+) {
+  const [playing, setPlaying] = useState(false);
+  const report = useRef(onPlay);
+  useEffect(() => {
+    report.current = onPlay;
+  }, [onPlay]);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    let visible = false;
+    const update = () => {
+      const next = visible && !document.hidden && !instantMotion();
+      report.current(next);
+      setPlaying(next);
+    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visible = !!entry?.isIntersecting && entry.intersectionRatio >= threshold;
+        update();
+      },
+      { threshold },
+    );
+    observer.observe(element);
+    return observeMotionPolicy(update);
+  }, [ref, threshold]);
+  return playing;
 }
