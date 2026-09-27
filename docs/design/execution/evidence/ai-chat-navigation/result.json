@@ -1,5 +1,5 @@
 {
-  "base": "https://personal-design.localhost",
+  "base": "http://localhost:3000",
   "checks": [
     "1440x900 dark: external header, bounded drawer/picker/editor, no overflow",
     "1280x800 light: external header, bounded drawer/picker/editor, no overflow",

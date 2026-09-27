@@ -18,7 +18,6 @@
     "typecheck": "pnpm -r typecheck",
     "sync:layouts": "pnpm --filter @personal-design/layout-compositions sync",
     "sync:design-engineer-tools": "pnpm --filter @personal-design/design-engineer-tools sync",
-    "sync:ai-coding-dictionary": "pnpm --filter @personal-design/ai-coding-dictionary sync",
     "sync:personal-sites": "pnpm --filter @personal-design/personal-sites sync",
     "sync:inspora": "pnpm --filter @personal-design/inspora sync",
     "test:portfolio-api": "node --test scripts/portfolio-api.test.mjs",

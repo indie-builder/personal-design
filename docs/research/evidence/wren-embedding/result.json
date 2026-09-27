@@ -1,0 +1,27 @@
+{
+  "node": "v24.21.0",
+  "total_ms": 670,
+  "ok": true,
+  "imports_ms": 196,
+  "query_ms": 165,
+  "rows": [
+    {
+      "region": "华东",
+      "net_revenue": "140.00"
+    },
+    {
+      "region": "华南",
+      "net_revenue": "60.00"
+    }
+  ],
+  "followup": [
+    {
+      "region": "华东",
+      "net_revenue": "140.00"
+    }
+  ],
+  "cube_sql": "SELECT region AS region, SUM(net_amount) AS net_revenue FROM Orders WHERE status = 'paid' GROUP BY 1",
+  "duckdb_sql": "WITH Orders AS (SELECT \"wren_src_Orders\".\"region\" AS region, \"wren_src_Orders\".net_amount AS net_amount, \"wren_src_Orders\".\"status\" AS status FROM (SELECT \"Orders\".gross - \"Orders\".refund AS net_amount, \"Orders\".\"region\", \"Orders\".\"status\" FROM (SELECT __source.gross AS gross, __source.refund AS refund, __source.\"region\" AS \"region\", __source.\"status\" AS \"status\" FROM \"sample\".\"main\".raw_orders AS __source) AS \"Orders\") AS \"wren_src_Orders\") SELECT region AS region, SUM(net_amount) AS net_revenue FROM Orders WHERE status = 'paid' GROUP BY 1",
+  "unknown_metric_rejected": true,
+  "unknown_model_error": "[MODEL_NOT_FOUND] Table 'raw_orders' is not defined in the MDL manifest. In strict mode, all table references must correspond to MDL models. phase=SQL_POLICY_CHECK"
+}

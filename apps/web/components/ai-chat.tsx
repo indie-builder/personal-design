@@ -2,57 +2,32 @@
 
 import Image from 'next/image';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { usePiChat } from '@/lib/use-pi-chat';
+import { Check, ChevronDown, Menu, Plus, X } from 'lucide-react';
 import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowUp,
-  Check,
-  ChevronDown,
-  Copy,
-  Menu,
-  Plus,
-  RotateCcw,
-  Square,
-  X,
-} from 'lucide-react';
-import {
-  agentSchema,
   avatarUrl,
-  isMaleAvatar,
-  randomAvatarId,
-  uiExamples,
   defaultAgent,
-  savedSchema,
   metadataSchema,
   type Agent,
-  type ChatMessage,
   type Conversation,
-  type FormSubmission,
-  type SavedChat,
 } from '@personal-design/ai-chat';
-import { SubmittedForm } from './ai-chat-submission';
 import { instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
 import { Button, buttonClassName } from './button';
-import { GeneratedAnswer } from './ai-chat-ui';
+import { AgentCreationScreen } from './ai-chat/agent-creation';
+import { ConversationView } from './ai-chat/conversation';
+import { useSavedChat } from './ai-chat/use-saved-chat';
 import styles from './ai-chat.module.css';
-
-const STORAGE_KEY = 'personal-design:ai-chat:v1';
-const emptyStore: SavedChat = { agents: [defaultAgent], conversations: [] };
 
 function newConversation(agentId: string): Conversation {
   return { id: crypto.randomUUID(), agentId, title: '新对话', messages: [] };
 }
 
 export function AiChat() {
-  const [saved, setSaved] = useState<SavedChat>(emptyStore);
   const [active, setActive] = useState<Conversation | null>(null);
   const [panel, setPanel] = useState<'agents' | 'create' | 'history' | null>(null);
   const [busy, setBusy] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
-  const [storageError, setStorageError] = useState('');
-  const [formError, setFormError] = useState('');
   const [agentDraft, setAgentDraft] = useState({ name: '', prompt: '' });
+  const [formError, setFormError] = useState('');
   const page = useRef<HTMLElement>(null);
   const creationEntry = useRef<Animation | null>(null);
   const creationExit = useRef<ReturnType<typeof playExit> | null>(null);
@@ -61,55 +36,15 @@ export function AiChat() {
   const agentPopover = useRef<HTMLDivElement>(null);
   const agentButton = useRef<HTMLButtonElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
+  const { saved, setSaved, storageError } = useSavedChat((initial) =>
+    setActive(
+      initial.conversations.find((item) =>
+        initial.agents.some((agent) => agent.id === item.agentId),
+      ) ?? newConversation(defaultAgent.id),
+    ),
+  );
 
-  useEffect(() => {
-    let mounted = true;
-    queueMicrotask(() => {
-      if (!mounted) return;
-      // Browser storage is read after hydration; server and first client render must match.
-      let initial = emptyStore;
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) initial = savedSchema.parse(JSON.parse(raw));
-      } catch {
-        setStorageError('本机历史记录无法读取，本次对话仍可使用。');
-      }
-      const agents = initial.agents.some((item) => item.id === defaultAgent.id)
-        ? initial.agents
-        : [defaultAgent, ...initial.agents];
-      initial = {
-        ...initial,
-        agents: agents.map((item) => ({
-          ...item,
-          ...(item.id === defaultAgent.id
-            ? { name: defaultAgent.name, prompt: defaultAgent.prompt }
-            : {}),
-          avatarId: isMaleAvatar(item.avatarId) ? item.avatarId : randomAvatarId(),
-        })),
-      };
-      setSaved(initial);
-      setActive(
-        initial.conversations.find((item) =>
-          initial.agents.some((agent) => agent.id === item.agentId),
-        ) ?? newConversation(defaultAgent.id),
-      );
-    });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!active || storageError) return;
-    queueMicrotask(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
-      } catch {
-        setStorageError('浏览器存储不可用，本次更新暂未保存，请保留当前页面。');
-      }
-    });
-  }, [saved, active, storageError]);
-
+  // 面板开关统一走原生 dialog / popover；创建页按 visualViewport 可视高度定位
   useEffect(() => {
     const surface = page.current;
     const modal = dialog.current;
@@ -233,7 +168,7 @@ export function AiChat() {
   }
 
   const updateMessages = useCallback(
-    (id: string, messages: ChatMessage[]) => {
+    (id: string, messages: Conversation['messages']) => {
       const clean = messages
         .map((message) => ({
           id: message.id,
@@ -265,13 +200,25 @@ export function AiChat() {
         };
       });
     },
-    [active],
+    [active, setSaved],
   );
 
   const agent = saved.agents.find((item) => item.id === active?.agentId) ?? defaultAgent;
   function selectAgent(next: Agent) {
     if (next.id !== agent.id) setActive(newConversation(next.id));
     closePanel();
+  }
+  function startConversation() {
+    setActive(newConversation(agent.id));
+    closePanel();
+  }
+  function createAgent(next: Agent) {
+    leaveCreation(null, () => {
+      setSaved((current) => ({ ...current, agents: [...current.agents, next] }));
+      setActive(newConversation(next.id));
+      setAgentDraft({ name: '', prompt: '' });
+      requestAnimationFrame(() => agentButton.current?.focus());
+    });
   }
 
   return (
@@ -345,106 +292,16 @@ export function AiChat() {
         )}
       </div>
       {panel === 'create' && (
-        <section
-          ref={creation}
-          id="agent-creation"
-          className={styles.createScreen}
-          aria-labelledby="agent-creation-title"
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') {
-              event.preventDefault();
-              leaveCreation('agents');
-            }
-          }}
-        >
-          <div className={`${styles.panelHeader} ${styles.createHeader}`}>
-            <Button
-              icon
-              variant="ghost"
-              aria-label="返回智能体列表"
-              onClick={() => leaveCreation('agents')}
-            >
-              <ArrowLeft size={18} strokeWidth={1.6} />
-            </Button>
-            <h2 id="agent-creation-title">创建智能体</h2>
-            <span aria-hidden="true" />
-          </div>
-          <form
-            className={styles.agentForm}
-            onSubmit={(event) => {
-              event.preventDefault();
-              const data = new FormData(event.currentTarget);
-              const result = agentSchema.safeParse({
-                id: crypto.randomUUID(),
-                name: data.get('name'),
-                prompt: data.get('prompt'),
-                avatarId: randomAvatarId(),
-              });
-              if (!result.success) {
-                setFormError('请填写名称和系统提示词，内容不能只有空格。');
-                return;
-              }
-              if (saved.agents.length >= 100) {
-                setFormError('本机已创建 100 个智能体。');
-                return;
-              }
-              leaveCreation(null, () => {
-                setSaved((current) => ({ ...current, agents: [...current.agents, result.data] }));
-                setActive(newConversation(result.data.id));
-                setAgentDraft({ name: '', prompt: '' });
-                requestAnimationFrame(() => agentButton.current?.focus());
-              });
-            }}
-          >
-            <div className={styles.createFields}>
-              <label>
-                名称
-                <input
-                  name="name"
-                  required
-                  maxLength={40}
-                  value={agentDraft.name}
-                  onChange={(event) =>
-                    setAgentDraft((draft) => ({ ...draft, name: event.target.value }))
-                  }
-                  placeholder="例如：写作助手"
-                  autoComplete="off"
-                  enterKeyHint="next"
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
-                      event.preventDefault();
-                      creation.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus();
-                    }
-                  }}
-                />
-              </label>
-              <label className={styles.promptField}>
-                系统提示词
-                <textarea
-                  name="prompt"
-                  required
-                  maxLength={12000}
-                  rows={8}
-                  value={agentDraft.prompt}
-                  onChange={(event) =>
-                    setAgentDraft((draft) => ({ ...draft, prompt: event.target.value }))
-                  }
-                  placeholder="例如：你是一位写作助手。先理解我的目标，再给出简洁、具体的修改建议。"
-                />
-              </label>
-            </div>
-            <div className={styles.formActions}>
-              {formError && <p role="alert">{formError}</p>}
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={!agentDraft.name.trim() || !agentDraft.prompt.trim()}
-              >
-                创建并开始对话
-              </Button>
-            </div>
-          </form>
-        </section>
+        <AgentCreationScreen
+          editorRef={creation}
+          agentCount={saved.agents.length}
+          draft={agentDraft}
+          setDraft={setAgentDraft}
+          formError={formError}
+          setFormError={setFormError}
+          onCreate={createAgent}
+          onBack={() => leaveCreation('agents')}
+        />
       )}
 
       <div
@@ -514,14 +371,7 @@ export function AiChat() {
               <X size={20} strokeWidth={1.6} />
             </Button>
           </div>
-          <Button
-            className={styles.drawerNew}
-            variant="subtle"
-            onClick={() => {
-              setActive(newConversation(agent.id));
-              closePanel();
-            }}
-          >
+          <Button className={styles.drawerNew} variant="subtle" onClick={startConversation}>
             <Plus size={18} strokeWidth={1.6} />
             新建对话
           </Button>
@@ -551,344 +401,5 @@ export function AiChat() {
         </div>
       </dialog>
     </main>
-  );
-}
-
-function ConversationView({
-  conversation,
-  agent,
-  onMessages,
-  onBusy,
-  onHeaderHiddenChange,
-}: {
-  conversation: Conversation;
-  agent: Agent;
-  onMessages: (id: string, messages: ChatMessage[]) => void;
-  onBusy: (busy: boolean) => void;
-  onHeaderHiddenChange: (hidden: boolean) => void;
-}) {
-  const { messages, sendMessage, status, error, stop, regenerate, clearError, updateUiState } =
-    usePiChat(conversation, agent);
-  const [input, setInput] = useState('');
-  const [copyStatus, setCopyStatus] = useState<{ id: string; ok: boolean } | null>(null);
-  useEffect(() => {
-    if (!copyStatus) return;
-    const timer = setTimeout(() => setCopyStatus(null), 2000);
-    return () => clearTimeout(timer);
-  }, [copyStatus]);
-  const [restoredMessages] = useState(
-    () => new Set(conversation.messages.map((message) => message.id)),
-  );
-  const [atBottom, setAtBottom] = useState(true);
-  const composerHidden = !atBottom;
-  const scroll = useRef<HTMLDivElement>(null);
-  const composerArea = useRef<HTMLDivElement>(null);
-  const scrollGesture = useRef({ top: 0, travel: 0, userUntil: 0 });
-  useEffect(() => onHeaderHiddenChange(false), [onHeaderHiddenChange]);
-  const textarea = useRef<HTMLTextAreaElement>(null);
-  const busy = status === 'submitted' || status === 'streaming';
-  const busyRef = useRef(busy);
-  useEffect(() => {
-    busyRef.current = busy;
-  }, [busy]);
-  useEffect(() => {
-    onBusy(busy);
-    if (busy) onHeaderHiddenChange(false);
-    return () => onBusy(false);
-  }, [busy, onBusy, onHeaderHiddenChange]);
-  useEffect(() => {
-    onMessages(conversation.id, messages);
-  }, [conversation.id, messages, onMessages]);
-  useEffect(
-    () => () => {
-      if (busyRef.current) void stop();
-    },
-    [stop],
-  );
-  useEffect(() => {
-    if (atBottom && scroll.current) {
-      scroll.current.scrollTop = scroll.current.scrollHeight;
-      scrollGesture.current.top = scroll.current.scrollTop;
-      scrollGesture.current.travel = 0;
-    }
-  }, [messages, status, atBottom]);
-
-  useEffect(() => {
-    const area = composerArea.current;
-    const viewport = scroll.current;
-    if (!area || !viewport) return;
-    const fit = () => {
-      area.parentElement?.style.setProperty('--composer-height', `${area.offsetHeight}px`);
-      if (atBottom) {
-        viewport.scrollTop = viewport.scrollHeight;
-        scrollGesture.current.top = viewport.scrollTop;
-        scrollGesture.current.travel = 0;
-      }
-    };
-    fit();
-    const observer = new ResizeObserver(fit);
-    observer.observe(area);
-    return () => observer.disconnect();
-  }, [atBottom]);
-
-  const send = useCallback(
-    (text: string, submission?: FormSubmission) => {
-      const value = text.trim();
-      if (!value || busy || value.length > 4000) return;
-      clearError();
-      setInput('');
-      setAtBottom(true);
-      void sendMessage(value, submission);
-    },
-    [busy, clearError, sendMessage],
-  );
-
-  return (
-    <section className={styles.thread} aria-label="对话">
-      <div
-        ref={scroll}
-        className={styles.messages}
-        onWheel={() => {
-          scrollGesture.current.userUntil = performance.now() + 1200;
-        }}
-        onTouchMove={() => {
-          scrollGesture.current.userUntil = performance.now() + 1200;
-        }}
-        onPointerDown={() => {
-          scrollGesture.current.userUntil = performance.now() + 1200;
-        }}
-        onScroll={() => {
-          const element = scroll.current;
-          if (!element) return;
-          setAtBottom(element.scrollHeight - element.scrollTop - element.clientHeight < 80);
-          const gesture = scrollGesture.current;
-          const top = Math.max(0, element.scrollTop);
-          const delta = top - gesture.top;
-          gesture.top = top;
-          if (performance.now() > gesture.userUntil) return;
-          gesture.userUntil = performance.now() + 1200;
-          gesture.travel =
-            Math.sign(delta) === Math.sign(gesture.travel) ? gesture.travel + delta : delta;
-          if (top < 24 || document.activeElement === textarea.current) {
-            onHeaderHiddenChange(false);
-            gesture.travel = 0;
-          } else if (Math.abs(gesture.travel) >= 12) {
-            onHeaderHiddenChange(gesture.travel > 0);
-            gesture.travel = 0;
-          }
-        }}
-      >
-        <div className={styles.messageInner}>
-          {!messages.length && (
-            <div className={styles.welcome}>
-              <h2>
-                {agent.id === defaultAgent.id ? '找到适合团队的协作方式' : '今天想聊些什么？'}
-              </h2>
-              <p>
-                {agent.id === defaultAgent.id
-                  ? '从选方案到安排试用，一起把需求理清楚。'
-                  : '说说你的需求，我们一起理清思路。'}
-              </p>
-              <div className={styles.suggestions} aria-label="示例问题">
-                {uiExamples.map((example) => (
-                  <Button
-                    key={example.id}
-                    variant="default"
-                    disabled={busy}
-                    aria-label={example.question}
-                    onClick={() => send(example.prompt)}
-                  >
-                    <span className={styles.promptQuestion}>{example.question}</span>
-                    <span className={styles.promptDescription}>{example.description}</span>
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-          {messages.map((message, index) => {
-            const text = message.parts
-              .filter((part) => part.type === 'text')
-              .map((part) => part.text)
-              .join('\n');
-            const streaming = busy && index === messages.length - 1;
-            if (message.role === 'assistant' && !text) return null;
-            return (
-              <article
-                key={message.id}
-                data-arriving={!restoredMessages.has(message.id) || undefined}
-                className={message.role === 'user' ? styles.userMessage : styles.assistantMessage}
-                aria-label={message.role === 'user' ? '你的问题' : `${agent.name}的回答`}
-              >
-                {message.role === 'user' ? (
-                  <>
-                    <p>{text}</p>
-                    {message.metadata?.submission && (
-                      <SubmittedForm submission={message.metadata.submission} />
-                    )}
-                  </>
-                ) : (
-                  <div className={styles.answerContent}>
-                    <div data-answer-body>
-                      <GeneratedAnswer
-                        text={text}
-                        streaming={streaming}
-                        readOnly={busy || index !== messages.length - 1}
-                        onReply={send}
-                        initialState={message.metadata?.uiState}
-                        onStateUpdate={(state) => updateUiState(message.id, state)}
-                      />
-                    </div>
-                    {!streaming && (
-                      <div className={styles.messageActions} role="group" aria-label="回答操作">
-                        <Button
-                          icon
-                          variant="ghost"
-                          aria-label="复制回答"
-                          title="复制回答"
-                          onClick={async (event) => {
-                            const content = event.currentTarget
-                              .closest('article')
-                              ?.querySelector<HTMLElement>('[data-answer-body]')?.innerText;
-                            if (!content) return;
-                            try {
-                              await navigator.clipboard.writeText(content);
-                              setCopyStatus({ id: message.id, ok: true });
-                            } catch {
-                              setCopyStatus({ id: message.id, ok: false });
-                            }
-                          }}
-                        >
-                          {copyStatus?.id === message.id && copyStatus.ok ? (
-                            <Check size={16} />
-                          ) : (
-                            <Copy size={16} />
-                          )}
-                        </Button>
-                        {!busy && index === messages.length - 1 && (
-                          <Button
-                            icon
-                            variant="ghost"
-                            aria-label="重新生成"
-                            title="重新生成"
-                            onClick={() => {
-                              setCopyStatus(null);
-                              setAtBottom(true);
-                              void regenerate();
-                            }}
-                          >
-                            <RotateCcw size={16} />
-                          </Button>
-                        )}
-                        {copyStatus?.id === message.id && (
-                          <span role="status">{copyStatus.ok ? '已复制' : '复制失败，请重试'}</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </article>
-            );
-          })}
-          {busy && (
-            <p className={styles.progress} role="status" data-generation-status>
-              <span className={styles.waitDots} aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
-              {status === 'submitted' ? '正在思考…' : '正在生成回答…'}
-            </p>
-          )}
-          {error && (
-            <div className={styles.error} role="alert">
-              <p>
-                {error.message === 'Failed to fetch'
-                  ? '网络连接中断，请检查网络后重试。'
-                  : error.message}
-              </p>
-              <Button
-                onClick={() => {
-                  clearError();
-                  void regenerate();
-                }}
-              >
-                重试
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-      <div
-        ref={composerArea}
-        className={styles.composerArea}
-        data-hidden={composerHidden || undefined}
-      >
-        {!atBottom && (
-          <Button
-            icon
-            className={styles.toBottom}
-            aria-label="回到最新消息"
-            onClick={() => {
-              onHeaderHiddenChange(false);
-              setAtBottom(true);
-            }}
-          >
-            <ArrowDown size={20} strokeWidth={1.6} />
-          </Button>
-        )}
-        <div
-          className={styles.composerPanel}
-          data-composer-panel=""
-          data-hidden={composerHidden || undefined}
-          inert={composerHidden}
-          aria-hidden={composerHidden || undefined}
-          onFocusCapture={() => onHeaderHiddenChange(false)}
-        >
-          <form
-            className={styles.composer}
-            onSubmit={(event) => {
-              event.preventDefault();
-              send(input);
-            }}
-          >
-            <textarea
-              ref={textarea}
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              aria-label={`发消息给${agent.name}`}
-              placeholder={`发消息给${agent.name}…`}
-              rows={1}
-              maxLength={4000}
-              onKeyDown={(event) => {
-                if (
-                  event.key === 'Enter' &&
-                  !event.shiftKey &&
-                  !event.nativeEvent.isComposing &&
-                  !window.matchMedia('(pointer: coarse)').matches
-                ) {
-                  event.preventDefault();
-                  send(input);
-                }
-              }}
-            />
-            {busy ? (
-              <Button icon variant="primary" aria-label="停止生成" onClick={() => void stop()}>
-                <Square size={16} fill="currentColor" />
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                icon
-                variant="primary"
-                aria-label="发送消息"
-                disabled={!input.trim()}
-              >
-                <ArrowUp size={20} strokeWidth={1.6} />
-              </Button>
-            )}
-          </form>
-        </div>
-      </div>
-    </section>
   );
 }

@@ -1,13 +1,14 @@
 'use client';
 
 import { useLayoutEffect, useRef } from 'react';
+import { paramsHref } from '@/lib/site-url';
 import styles from './dictionary-map.module.css';
 
 function runtimeUrl(term: string | null, query: string) {
-  const params = new URLSearchParams();
-  if (term) params.set('term', term);
-  if (query) params.set('q', query);
-  return `/ai-coding-atlas/index.html${params.size ? `?${params}` : ''}`;
+  return paramsHref('/ai-coding-atlas/index.html', new URLSearchParams(), {
+    term: term ?? '',
+    q: query,
+  });
 }
 
 /** The captured original frontend runs in its own document so its CSS and renderer remain intact. */
@@ -35,12 +36,11 @@ export function DictionaryMap() {
       const previousTerm = params.get('term');
       const previousQuery = params.get('q') ?? '';
       if (previousTerm === term && previousQuery === q) return;
-      if (term) params.set('term', term);
-      else params.delete('term');
-      if (q) params.set('q', q);
-      else params.delete('q');
-      params.delete('lang');
-      const target = `${location.pathname}${params.size ? `?${params}` : ''}`;
+      const target = paramsHref(location.pathname, params, {
+        term: term ?? '',
+        q,
+        lang: '',
+      });
       if (previousTerm !== term && previousQuery === q) history.pushState(null, '', target);
       else history.replaceState(null, '', target);
     };

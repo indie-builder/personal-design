@@ -2,10 +2,5 @@
   "name": "@personal-design/ai-coding-dictionary",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "scripts": {
-    "sync": "node scripts/sync.mjs && node scripts/prepare-runtime.mjs",
-    "backfill:zh": "node scripts/backfill-zh.mjs",
-    "prepare:runtime": "node scripts/prepare-runtime.mjs"
-  }
+  "type": "module"
 }
