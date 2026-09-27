@@ -7,7 +7,7 @@ import react from "@vitejs/plugin-react";
 
 // @proj = 外部成片工程源码（本机经 workbench/proj 符号链接接入，不进库；scripts/open.mjs 负责链接）。
 // 未链接时自动落到 proj-stub 降级实现：工程可构建可运行，素材 tab 显示接入提示。
-// @demos = 仓库 demos/（相对符号链接 demosrc，进库）——158 张镜头卡的 demo 源码直接当动效库。
+// @demos = 仓库 demos/（相对符号链接 demosrc，进库）——镜头卡 demo 源码直接当动效库。
 // preserveSymlinks 让两者按虚拟路径解析，其 'react'/'remotion' 裸导入
 // 落到本工程 node_modules（避免双实例）；src/proj.d.ts 让 tsc 不检查外部源码。
 const root = fileURLToPath(new URL(".", import.meta.url));
