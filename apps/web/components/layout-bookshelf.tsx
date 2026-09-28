@@ -95,6 +95,7 @@ export function LayoutBookshelf({ categories, items }: Props) {
         reveal: commitOpen,
       });
     };
+    element.style.setProperty('--extract-from', getComputedStyle(element).transform);
     setExtracting(index);
   }
   useEffect(() => {

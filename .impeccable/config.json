@@ -1,3 +1,18 @@
 {
-  "buildPath": "code"
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "apps/web/components/layout-bookshelf.module.css"
+        ],
+        "createdAt": "2026-09-28T15:53:03.453Z",
+        "reason": "Agent review: line 4 .shelf has no border-radius; its 8px bottom border depicts the physical shelf beneath the books, as required by PRODUCT.md and DESIGN.md physical bookshelf treatment and verified in browser screenshots. This is not a rounded-card accent."
+      }
+    ]
+  }
 }

@@ -87,13 +87,13 @@
 
 /* Same hinged solid and extraction path as the homepage preview. */
 .books:has([data-extracting]) { transform-style:preserve-3d; }
-.spine[data-extracting] { --pull-x:-56px; z-index:8; transform-style:preserve-3d; transform-origin:50% 100%; animation:shelf-book-extract 1680ms cubic-bezier(.45,0,.2,1) both; }
+.spine[data-extracting] { --pull-x:-56px; z-index:8; transform-style:preserve-3d; transform-origin:50% 100%; transition:none; animation:shelf-book-extract 1680ms cubic-bezier(.45,0,.2,1) both; }
 .spine[data-extracting]:nth-child(7) { --pull-x:-110px; }
 .spine[data-extracting]:nth-child(8) { --pull-x:-150px; }
 .spine[data-extracting] > [data-book-cover] { position:absolute; top:0; left:100%; width:220px; height:100%; box-sizing:border-box; padding:44px 28px; display:flex; flex-direction:column; gap:32px; align-items:center; justify-content:center; text-align:center; font:500 28px/1.5 var(--font-sans); color:var(--binding-ink); background:var(--binding); border:1px solid color-mix(in srgb,var(--binding-ink) 22%,transparent); border-radius:0 4px 4px 0; box-shadow:inset -3px 0 #f5f1e7,inset 0 0 0 7px var(--binding),inset 0 0 0 8px color-mix(in srgb,var(--binding-ink) 22%,transparent); transform-origin:0 50%; transform:rotateY(90deg); backface-visibility:hidden; animation:shelf-cover-extract 1680ms ease both; }
 .spine[data-extracting] > [data-book-cover] small { font-size:12px; font-weight:400; }
 @keyframes shelf-book-extract {
-  0% { transform:translate3d(0,0,0) rotateX(0) rotateY(0); }
+  0% { transform:var(--extract-from,none); }
   40% { transform:translate3d(0,-28px,95px) rotateX(-10deg) rotateY(0); }
   78%,100% { transform:translate3d(var(--pull-x),-44px,125px) rotateX(0) rotateY(-90deg); }
 }
