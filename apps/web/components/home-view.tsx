@@ -31,20 +31,34 @@ export function HomeView({
 }) {
   const drag = useRef({ start: 0, scroll: 0, down: false, moved: false });
   const viewport = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ value: 0, max: 0 });
+  const [position, setPosition] = useState({ previous: false, next: false, scrollable: false });
   const [hitDate, setHitDate] = useState<number | null>(null);
   const ordered = [...products].sort((a, b) => a.date.localeCompare(b.date));
 
   useEffect(() => {
     const element = viewport.current;
     if (!element) return;
-    const update = () =>
-      setPosition({
-        value: element.scrollLeft,
-        max: Math.max(0, element.scrollWidth - element.clientWidth),
-      });
-    update();
-    const observer = new ResizeObserver(update);
+    let max = 0;
+    let current: typeof position | undefined;
+    const update = () => {
+      const left = element.scrollLeft;
+      const next = { previous: left >= 2, next: left < max - 2, scrollable: max > 0 };
+      if (
+        current &&
+        current.previous === next.previous &&
+        current.next === next.next &&
+        current.scrollable === next.scrollable
+      )
+        return;
+      current = next;
+      setPosition(next);
+    };
+    const measure = () => {
+      max = Math.max(0, element.scrollWidth - element.clientWidth);
+      update();
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
     observer.observe(element);
     if (element.firstElementChild) observer.observe(element.firstElementChild);
     element.addEventListener('scroll', update, { passive: true });
@@ -78,7 +92,7 @@ export function HomeView({
               aria-label="作品时间轴，左右方向键浏览"
               tabIndex={0}
               onPointerDown={(event) => {
-                if (event.pointerType !== 'mouse' || event.button !== 0 || position.max === 0)
+                if (event.pointerType !== 'mouse' || event.button !== 0 || !position.scrollable)
                   return;
                 drag.current = {
                   start: event.clientX,
@@ -216,7 +230,7 @@ export function HomeView({
               </ol>
             </div>
           </div>
-          {position.max > 0 && (
+          {position.scrollable && (
             <footer className={styles.footer}>
               <div className={styles.controls}>
                 <Button
@@ -225,7 +239,7 @@ export function HomeView({
                   data-direction="previous"
                   aria-label="向前浏览作品"
                   aria-controls="home-timeline"
-                  disabled={position.value < 2}
+                  disabled={!position.previous}
                   onClick={() => move(-1)}
                 >
                   <ArrowLeft aria-hidden="true" />
@@ -236,7 +250,7 @@ export function HomeView({
                   data-direction="next"
                   aria-label="向后浏览作品"
                   aria-controls="home-timeline"
-                  disabled={position.value >= position.max - 2}
+                  disabled={!position.next}
                   onClick={() => move(1)}
                 >
                   <ArrowRight aria-hidden="true" />

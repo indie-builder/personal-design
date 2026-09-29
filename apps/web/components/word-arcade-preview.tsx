@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Arcade, headlines } from '@personal-design/word-arcade';
 import { instantMotion, useVisiblePlay } from '@/lib/motion';
-import { drawArcade } from './word-arcade-draw';
+import { arcadeBackgroundPaths, drawArcade } from './word-arcade-draw';
 
 export function WordArcadePreview() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -15,6 +15,7 @@ export function WordArcadePreview() {
       ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
     let game: Arcade;
+    let background: Path2D[][] | undefined;
     let frame = 0,
       last = 0,
       rest = 0;
@@ -27,7 +28,7 @@ export function WordArcadePreview() {
     const draw = () => {
       if (!game) return;
       const quiet = instantMotion();
-      drawArcade(ctx, game, ink, paper, quiet);
+      drawArcade(ctx, game, ink, paper, quiet, background);
       ctx.fillStyle = ink;
       ctx.font = font;
       ctx.textAlign = 'left';
@@ -77,6 +78,8 @@ export function WordArcadePreview() {
       canvas.width = Math.round(width * scale);
       canvas.height = Math.round(height * scale);
       ctx.setTransform(scale, 0, 0, scale, 0, 0);
+      // Preserve fractional-DPR edge coverage with the original rect drawing path.
+      background = Number.isInteger(scale) ? arcadeBackgroundPaths(width, height) : undefined;
       ctx.font = font;
       const letters = Array.from(headlines[0]).filter((char) => /[\p{L}\p{N}]/u.test(char));
       const widths = letters.map((char) => ctx.measureText(char).width);

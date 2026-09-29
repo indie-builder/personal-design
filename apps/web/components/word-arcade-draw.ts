@@ -1,5 +1,19 @@
 import { Arcade, pixelPatterns } from '@personal-design/word-arcade';
 
+/** Cache geometry only: alpha, color and animation time still change every frame. */
+export function arcadeBackgroundPaths(width: number, height: number) {
+  return Array.from({ length: Math.ceil(width / 30) }, (_, col) =>
+    Array.from({ length: Math.ceil(height / 30) }, (_, row) => {
+      const path = new Path2D();
+      pixelPatterns[(col * 17 + row * 7) % pixelPatterns.length]!.forEach((line, y) => {
+        for (let x = 0; x < line.length; x++)
+          if (line[x] === 'X') path.rect(col * 30 + x * 2 + 7, row * 30 + y * 2 + 7, 2, 2);
+      });
+      return path;
+    }),
+  );
+}
+
 /** Source pixel patterns and game primitives, drawn at CSS-pixel scale. */
 export function drawArcade(
   ctx: CanvasRenderingContext2D,
@@ -7,6 +21,7 @@ export function drawArcade(
   ink: string,
   paper: string,
   reduced: boolean,
+  background?: Path2D[][],
 ) {
   const { width, height, floor, kind, playerX, time } = game;
   ctx.clearRect(0, 0, width, height);
@@ -15,6 +30,10 @@ export function drawArcade(
     for (let row = 0; row < Math.ceil(height / 30); row++) {
       const phase = (row + col * 7 - (reduced ? 0 : time * (4 + (col % 5)))) % 23;
       ctx.globalAlpha = 0.005 + Math.max(0, 1 - Math.abs(phase) / 9) * 0.035;
+      if (background) {
+        ctx.fill(background[col]![row]!);
+        continue;
+      }
       const pattern = pixelPatterns[(col * 17 + row * 7) % pixelPatterns.length]!;
       pattern.forEach((line, y) => {
         for (let x = 0; x < line.length; x++)

@@ -484,11 +484,21 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
 `;class tg extends eF.Effect{constructor({font:e="arial",characters:t=" .:,'-^=*+?!|0#X%WM@",fontSize:r=54,cellSize:a=16,color:i="#ffffff",invert:n=!1}={}){super("ASCIIEffect",tv,{uniforms:new Map([["uCharacters",new eA.Uniform(new eA.Texture)],["uCellSize",new eA.Uniform(a)],["uCharactersCount",new eA.Uniform(t.length)],["uColor",new eA.Uniform(new eA.Color(i))],["uInvert",new eA.Uniform(n)]])});const o=this.uniforms.get("uCharacters");o&&(o.value=this.createCharactersTexture(t,e,r))}createCharactersTexture(e,t,r){let a=document.createElement("canvas");a.width=a.height=1024;let i=new eA.CanvasTexture(a,void 0,eA.RepeatWrapping,eA.RepeatWrapping,eA.NearestFilter,eA.NearestFilter),n=a.getContext("2d");if(!n)throw Error("Context not available");n.clearRect(0,0,1024,1024),n.font=`${r}px ${t}`,n.textAlign="center",n.textBaseline="middle",n.fillStyle="#fff";for(let t=0;t<e.length;t++){let r=e[t],a=t%16,i=Math.floor(t/16);n.fillText(r,64*a+32,64*i+32)}return i.needsUpdate=!0,i}}eF.Effect;var ty=e.i(73903),tx=e.i(22059),tT=e.i(15907),tb=e.i(33612);let tS={t:0,done:!1};function tw(e){return e>=1?1:1-2**(-10*e)}var tC=e.i(15494),tE=e.i(15877);let tU=ty.nodes.filter(e=>e.layout),tO=Math.ceil(Math.sqrt(tC.MOTION_COUNT)),tA=Math.ceil(tC.MOTION_COUNT/tO),tk=[tO,tA],tF=new Float32Array(tO*tA*4),tM=new er.DataTexture(tF,tO,tA,er.RGBAFormat,er.FloatType);tM.minFilter=er.NearestFilter,tM.magFilter=er.NearestFilter,tM.needsUpdate=!0;let tD=new Float32Array(3*tC.MOTION_COUNT),tL=new Float32Array(tC.MOTION_COUNT).fill(1),tR=new Float32Array(tC.MOTION_COUNT),tP=new Float32Array(tC.MOTION_COUNT),tI=new Float32Array(3*tC.MOTION_COUNT),tB=new Float32Array(3*tC.MOTION_COUNT),tz=new Float32Array(3*tC.MOTION_COUNT),t_=new Float32Array(tC.MOTION_COUNT),tN=new Float32Array(tC.MOTION_COUNT),tV=new Float32Array(3*tC.MOTION_COUNT),tG=new Float32Array(3*tC.MOTION_COUNT),tH=new Float32Array(tC.MOTION_COUNT),tY=new Float32Array(tC.MOTION_COUNT),tj=new Float32Array(3*tC.MOTION_COUNT),tW=[];function tX(e){let t=43758.5453*Math.sin(127.1*e+311.7);return t-Math.floor(t)}let tK=1;for(let e of tU){let[t,r,a]=e.layout;tK=Math.max(tK,Math.hypot(t,r,a))}tU.forEach((e,t)=>{let[r,a,i]=e.layout,n=(0,ty.nodeRadius)(e.inDegree);tR[t]=n,tP[t]=n+3;let o=2.39996*t;t_[t]=o;for(let e=0;e<3;e++){let r=3*t+e;tI[3*t+e]=o+6.283*tX(r),tB[3*t+e]=3*(.45+1.1*tX(r+7.1)),tz[3*t+e]=.19*(.6+1.1*tX(r+13.3))}tH[t]=42*(.45+1.4*tX(t+.5)),tY[t]=.24*(.55+.95*tX(t+4.2)),tj[3*t]=(tX(t+21.1)-.5)*8,tj[3*t+1]=(tX(t+31.7)-.5)*8,tj[3*t+2]=(tX(t+41.3)-.5)*8,tN[t]=Math.hypot(r,a,i)/tK*.9;let s=new Set;for(let t of(0,ty.neighborsOf)(e.slug)){let e=tC.slugToMotionIndex.get(t);void 0!==e&&s.add(e)}tW.push(s)});let tq=null;function tZ(){let e,t=(0,tT.c)(1);return t[0]===Symbol.for("react.memo_cache_sentinel")?(e=[],t[0]=e):e=t[0],(0,ea.useEffect)(tQ,e),(0,eo.useFrame)(tJ,-10),null}/* Radial collision correction supplements the original motion; tD/tF also drive hit testing. */
 const atlasSpacingOffsets = new Float32Array(tC.MOTION_COUNT * 3);
 const atlasSpacingPoint = new er.Vector3();
+// Frame-local scratch is reused; arithmetic, ordering and interpolation stay unchanged.
+const atlasSpacingNodes = [], atlasSpacingPlaced = [], atlasSpacingBlocked = [], atlasSpacingIntervals = [];
+const atlasSpacingTargets = new Array(tC.MOTION_COUNT);
+const atlasSpacingNodePool = Array.from({ length: tC.MOTION_COUNT }, (_, index) => ({
+  index, baseX: 0, baseY: 0, pixels: 0, related: false, x: 0, y: 0, radius: 0, ux: 0, uy: 0,
+  parts: [], disk: { x: 0, y: 0, w: 0, h: 0, disk: true },
+  label: { x: 0, y: 0, w: 0, h: 0, disk: false },
+}));
 function atlasSpaceFocus(frame, delta, selected) {
   const { camera, size } = frame;
   const matrix = camera.matrixWorld.elements;
   const mix = window.__atlasInstant ? 1 : 1 - Math.exp(-Math.min(delta, 0.05) / 0.16);
-  const nodes = [];
+  const nodes = atlasSpacingNodes;
+  nodes.length = 0;
+  atlasSpacingTargets.fill(null);
   if (selected >= 0 && !tE.repackState.active) {
     const neighbors = tW[selected];
     for (let index = 0; index < tC.MOTION_COUNT; index++) {
@@ -502,7 +512,10 @@ function atlasSpaceFocus(frame, delta, selected) {
       const baseY = ((1 - atlasSpacingPoint.y) * size.height) / 2;
       const radius = tR[index] * pixels;
       const related = index === selected || neighbors.has(index);
-      const parts = [{ x: 0, y: 0, w: radius + 6, h: radius + 6, disk: true }];
+      const node = atlasSpacingNodePool[index], parts = node.parts;
+      node.disk.w = node.disk.h = radius + 6;
+      parts.length = 1;
+      parts[0] = node.disk;
       // Only readable foreground labels reserve space; background discs still cannot cover them.
       if (related) {
         const font =
@@ -512,15 +525,18 @@ function atlasSpaceFocus(frame, delta, selected) {
         atlasSpacingPoint.y += matrix[5] * tP[index];
         atlasSpacingPoint.z += matrix[6] * tP[index];
         atlasSpacingPoint.project(camera);
-        parts.push({
-          x: ((atlasSpacingPoint.x + 1) * size.width) / 2 - baseX,
-          y: ((1 - atlasSpacingPoint.y) * size.height) / 2 - baseY - font * 0.6,
-          w: tU[index].title.length * font * 0.31 + 4,
-          h: font * 0.6 + 4,
-          disk: false,
-        });
+        node.label.x = ((atlasSpacingPoint.x + 1) * size.width) / 2 - baseX;
+        node.label.y = ((1 - atlasSpacingPoint.y) * size.height) / 2 - baseY - font * 0.6;
+        node.label.w = tU[index].title.length * font * 0.31 + 4;
+        node.label.h = font * 0.6 + 4;
+        parts.push(node.label);
       }
-      nodes.push({ index, baseX, baseY, pixels, parts, related, x: baseX, y: baseY });
+      node.baseX = node.x = baseX;
+      node.baseY = node.y = baseY;
+      node.pixels = pixels;
+      node.related = related;
+      nodes.push(node);
+      atlasSpacingTargets[index] = node;
     }
     const center = nodes.find((node) => node.index === selected);
     if (center) {
@@ -538,11 +554,13 @@ function atlasSpaceFocus(frame, delta, selected) {
           a.radius - b.radius ||
           a.index - b.index,
       );
-      const placed = [];
+      const placed = atlasSpacingPlaced;
+      placed.length = 0;
       for (const node of nodes) {
         if (node !== center) {
           // Find the first unoccupied distance on this node's original ray, without rotating it.
-          const blocked = [];
+          const blocked = atlasSpacingBlocked;
+          blocked.length = 0;
           for (const other of placed)
             for (const part of node.parts)
               for (const obstacle of other.parts) {
@@ -564,18 +582,23 @@ function atlasSpaceFocus(frame, delta, selected) {
                     (Math.abs(node.uy) < 1e-6 && Math.abs(y) >= h)
                   )
                     continue;
-                  const xs =
-                    Math.abs(node.ux) < 1e-6
-                      ? [-Infinity, Infinity]
-                      : [(x - w) / node.ux, (x + w) / node.ux].sort((a, b) => a - b);
-                  const ys =
-                    Math.abs(node.uy) < 1e-6
-                      ? [-Infinity, Infinity]
-                      : [(y - h) / node.uy, (y + h) / node.uy].sort((a, b) => a - b);
-                  near = Math.max(xs[0], ys[0]);
-                  far = Math.min(xs[1], ys[1]);
+                  let xNear = -Infinity, xFar = Infinity, yNear = -Infinity, yFar = Infinity;
+                  if (Math.abs(node.ux) >= 1e-6) {
+                    const x1 = (x - w) / node.ux, x2 = (x + w) / node.ux;
+                    xNear = Math.min(x1, x2); xFar = Math.max(x1, x2);
+                  }
+                  if (Math.abs(node.uy) >= 1e-6) {
+                    const y1 = (y - h) / node.uy, y2 = (y + h) / node.uy;
+                    yNear = Math.min(y1, y2); yFar = Math.max(y1, y2);
+                  }
+                  near = Math.max(xNear, yNear);
+                  far = Math.min(xFar, yFar);
                 }
-                if (near < far && far + 1 > node.radius) blocked.push([near - 1, far + 1]);
+                if (near < far && far + 1 > node.radius) {
+                  const interval = atlasSpacingIntervals[blocked.length] ??= [0, 0];
+                  interval[0] = near - 1; interval[1] = far + 1;
+                  blocked.push(interval);
+                }
               }
           blocked.sort((a, b) => a[0] - b[0]);
           for (const [near, far] of blocked)
@@ -587,9 +610,8 @@ function atlasSpaceFocus(frame, delta, selected) {
       }
     }
   }
-  const targets = new Map(nodes.map((node) => [node.index, node]));
   for (let index = 0; index < tC.MOTION_COUNT; index++) {
-    const node = targets.get(index);
+    const node = atlasSpacingTargets[index];
     const dx = node ? (node.x - node.baseX) / node.pixels : 0;
     const dy = node ? -(node.y - node.baseY) / node.pixels : 0;
     for (let axis = 0; axis < 3; axis++) {
