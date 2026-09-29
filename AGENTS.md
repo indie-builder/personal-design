@@ -30,7 +30,7 @@
 
 - 绝不在写完代码后再补写单元测试。复杂功能高度优先 E2E；必须隔离测试系统时，先列出所有可能的失败方式，再写代码。
 - 开发期间只跑相关定向 E2E，开发结束再跑全套。E2E 交付可验证、可重复执行的验收产物，记录复现命令、结果与限制；已有检查入口见 [验收索引](docs/design/execution/README.md)。
-- Agent 浏览器操作与页面验收必须使用 ego-lite 应用内置的 [ego-browser 技能](</Applications/ego lite.app/Contents/Frameworks/ego Framework.framework/Resources/ego-skills/ego-browser/SKILL.md>)：先读技能，再通过 `ego-browser nodejs` heredoc 执行。不使用 `agent-browser` 或其他位置的同名技能；路径失效时在应用内查找新版。此入口跟随应用当前版本；现有数据同步脚本的 Playwright 实现不受此约束。
+- 禁用 ego-lite / ego-browser。Agent 浏览器操作与页面验收使用 Codex 内置浏览器，需要底层控制时使用其支持的 CDP 接口；现有数据同步脚本的 Playwright 实现不受此约束。
 - `next-dev-loop` 是用户有意移除的技能，更新技能时不要恢复。
 
 ## 提交
