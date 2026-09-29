@@ -6,6 +6,7 @@ import { instantMotion } from '@/lib/motion';
 import type { Product } from '@/lib/products';
 import { Button } from './button';
 import { MotionVideo } from './motion-video';
+import { WordArcadePreview } from './word-arcade-preview';
 import { AiChatPreview } from './ai-chat-preview';
 import { SiteReceiptPreview } from './site-receipt-preview';
 import { HomeDigitalRain } from './home-digital-rain';
@@ -175,6 +176,8 @@ export function HomeView({
                             <BookPreview categories={layoutCategories} />
                           ) : product.slug === 'design-engineer-tools' ? (
                             <ToolPreview tools={toolsPreview} />
+                          ) : product.slug === 'word-arcade' ? (
+                            <WordArcadePreview />
                           ) : product.slug === 'ai-chat' ? (
                             <AiChatPreview />
                           ) : product.slug === 'ai-coding-dictionary' ? (

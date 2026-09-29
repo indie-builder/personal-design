@@ -3,6 +3,7 @@
  * 新增产品：在 packages/ 建内容包、在 app/products/<slug>/ 建页面，
  * 然后在这里注册一条。独立部署的作品直接注册线上地址。
  */
+import { arcadeProduct } from '@personal-design/word-arcade';
 import { personalSite } from '@personal-design/personal-sites';
 import { toolCategoryCount, toolCount } from '@personal-design/design-engineer-tools';
 
@@ -27,6 +28,7 @@ export interface Product {
 
 /** 按上线日期升序 */
 export const products: Product[] = [
+  arcadeProduct,
   personalSite,
   {
     slug: 'layout-compositions',

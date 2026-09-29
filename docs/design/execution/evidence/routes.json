@@ -1,5 +1,5 @@
 {
-  "total": 359,
+  "total": 361,
   "failed": [],
   "results": [
     {
@@ -2510,6 +2510,20 @@
     },
     {
       "route": "/products/muse",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true,
+      "isRedirectStub": false
+    },
+    {
+      "route": "/icon.png",
+      "status": 200,
+      "kind": "asset",
+      "hasMain": false,
+      "isRedirectStub": false
+    },
+    {
+      "route": "/products/word-arcade",
       "status": 200,
       "kind": "page",
       "hasMain": true,

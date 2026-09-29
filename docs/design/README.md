@@ -99,6 +99,16 @@
 
 实现：`components/ai-chat.tsx`、`components/ai-chat-ui.tsx`、`app/api/ai-chat/route.ts`、`packages/ai-chat/src/index.ts`。配置与验收见 [AI 问答](execution/ai-chat.md)；82项官方定义的源码审查、10组回放覆盖及验证边界见 [一致性审查](execution/ai-chat-consistency-audit.md)。
 
+### 文字游乐场 `/products/word-arcade`
+
+- 第七个作品，首页时间轴提供真实打砖块静态预览；内页沿用共享标题返回与主题切换。
+- 五款游戏直接选择，也可刷新轮换；每轮不重复抽取五款，轮次边界不连续重复。可选会话存储不可用时仍可正常游玩。
+- 仅大标题的文字／数字参与碰撞、射击、收集或越障，首关8个目标；标点不计入目标，不显示说明性副标题。HUD明确显示剩余字数，蛇的奖励字母不推进过关。打砖块、文字射击与飞字打靶每次命中10分；贪吃蛇收集文字增长；跑酷按距离和越障得分，过关保留累计分数、提高速度并更换标题。
+- 主动点击或 Enter 开始，鼠标／触摸定位，方向键辅助操作，空格跳跃／射击，Esc 暂停。暂停／重来有显式按钮；扣命可继续，结束可再来一局，过关可继续下一关。
+- 失焦、后台、布局缩放暂停；切换游戏与返回释放旧循环。减少动态效果关闭装饰运动，主动游戏仍可运行。
+
+实现：`components/word-arcade.tsx`、`components/word-arcade-draw.ts`、`packages/word-arcade/src/game.ts`。验证与限制见 [文字游乐场验收](execution/word-arcade.md)。
+
 ### 布局旧地址兼容 `/products/layout-compositions/[id]`
 
 旧地址重定向到对应分类与书页；有图时用一次性zoom参数直接打开相同灯箱，关闭回到该图鉴触发点；缺图时定位书页，未知编号404，不再维护独立详情表面。
