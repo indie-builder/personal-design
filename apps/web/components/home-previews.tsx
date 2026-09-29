@@ -79,21 +79,39 @@ export function BookPreview({ categories }: { categories: { name: string; count:
 /** Reuse the atlas renderer only while this timeline item is visible and motion is allowed. */
 export function DictionaryPreview() {
   const host = useRef<HTMLDivElement>(null);
+  const release = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const onPlay = useCallback((playing: boolean) => {
     const element = host.current;
     if (!element) return;
-    const frame = element.querySelector('iframe');
+    clearTimeout(release.current);
+    let frame = element.querySelector('iframe');
     if (playing && !frame) {
-      const next = document.createElement('iframe');
-      next.src = '/ai-coding-atlas/index.html?preview=1&term=agent';
-      next.title = 'AI Coding 知识图谱预览';
-      next.tabIndex = -1;
-      next.setAttribute('aria-hidden', 'true');
-      next.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-      element.append(next);
-    } else if (!playing && frame) frame.remove();
+      frame = document.createElement('iframe');
+      frame.src = '/ai-coding-atlas/index.html?preview=1&term=agent';
+      frame.title = 'AI Coding 知识图谱预览';
+      frame.tabIndex = -1;
+      frame.setAttribute('aria-hidden', 'true');
+      frame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+      frame.dataset.previewPlaying = 'true';
+      element.append(frame);
+    }
+    if (!frame) return;
+    frame.dataset.previewPlaying = String(playing);
+    // Preserve geometry while paused, so resuming cannot reset the camera to a zero-size view.
+    frame.style.visibility = playing ? 'visible' : 'hidden';
+    if (!playing) {
+      const paused = frame;
+      release.current = setTimeout(() => paused.remove(), 1500);
+    }
   }, []);
   useVisiblePlay(host, onPlay);
+  useEffect(() => {
+    const element = host.current;
+    return () => {
+      clearTimeout(release.current);
+      element?.querySelector('iframe')?.remove();
+    };
+  }, []);
   const nodes = [
     { name: 'Model', x: 58, y: 55, r: 12, color: '#bdced9' },
     { name: 'Token', x: 147, y: 32, r: 10, color: '#bdced9' },

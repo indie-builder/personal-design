@@ -25,9 +25,10 @@
   let visible = !window.frameElement;
   let unsubscribe;
   const listeners = new Set();
+  const previewPaused = () => window.__atlasPreview && window.frameElement?.dataset.previewPlaying === 'false';
   // Keep the original renderer: only continuous animation needs a continuous frame loop.
   const repaint = () => {
-    if (renderer && visible && !document.hidden) renderer.invalidate(3);
+    if (renderer && visible && !document.hidden && !previewPaused()) renderer.invalidate(3);
   };
   const renderPolicy = () => {
     for (const listener of listeners) listener();
@@ -41,7 +42,7 @@
     repaint();
   };
   window.__atlasRenderPolicy = {
-    getSnapshot: () => !visible || document.hidden ? 'never' : window.__atlasInstant ? 'demand' : 'always',
+    getSnapshot: () => !visible || document.hidden || previewPaused() ? 'never' : window.__atlasInstant ? 'demand' : 'always',
     subscribe: (listener) => {
       listeners.add(listener);
       return () => listeners.delete(listener);
@@ -58,6 +59,9 @@
     renderPolicy();
   });
   if (window.frameElement) visibility.observe(window.frameElement);
+  const playback = new MutationObserver(renderPolicy);
+  if (window.__atlasPreview && window.frameElement)
+    playback.observe(window.frameElement, { attributes: true, attributeFilter: ['data-preview-playing'] });
   document.addEventListener('visibilitychange', renderPolicy);
   for (const event of ['pointermove', 'pointerdown', 'pointerup', 'wheel'])
     addEventListener(event, repaint, { passive: true });
@@ -96,6 +100,7 @@
     () => {
       observer.disconnect();
       visibility.disconnect();
+      playback.disconnect();
       unsubscribe?.();
       document.removeEventListener('visibilitychange', renderPolicy);
       reduced.removeEventListener('change', apply);
