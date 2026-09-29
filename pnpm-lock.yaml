@@ -208,6 +208,9 @@ importers:
       '@personal-design/personal-sites':
         specifier: workspace:*
         version: link:../../packages/personal-sites
+      '@personal-design/word-arcade':
+        specifier: workspace:*
+        version: link:../../packages/word-arcade
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
@@ -335,6 +338,8 @@ importers:
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
+
+  packages/word-arcade: {}
 
 packages:
 

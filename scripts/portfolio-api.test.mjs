@@ -30,6 +30,7 @@ test('portfolio is complete and public', async () => {
     'personal-sites',
     'ai-coding-dictionary',
     'ai-chat',
+    'word-arcade',
   ]);
   publicOnly(result);
 });
