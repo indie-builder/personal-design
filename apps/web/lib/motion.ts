@@ -107,7 +107,12 @@ export function useVisiblePlay(
       { threshold },
     );
     observer.observe(element);
-    return observeMotionPolicy(update);
+    const stop = observeMotionPolicy(update);
+    return () => {
+      observer.disconnect();
+      stop();
+      report.current(false);
+    };
   }, [ref, threshold]);
   return playing;
 }

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { categoryLabel } from '@/lib/category-label';
 import { useLightbox } from './lifeline/lightbox';
-import { instantMotion } from '@/lib/motion';
+import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 import { Button } from './button';
 import styles from './layout-bookshelf.module.css';
 import type { BookPage } from './layout-bookshelf';
@@ -42,8 +42,23 @@ export function BookReader({
   const swiped = useRef(false);
   useEffect(() => {
     reader.current?.focus({ preventScroll: true });
-    return () => clearTimeout(timer.current);
   }, []);
+  useEffect(() => {
+    if (!turn) return;
+    const finish = () => {
+      clearTimeout(timer.current);
+      setSpread(turn.to);
+      setTurn(null);
+    };
+    timer.current = setTimeout(finish, 680);
+    const stop = observeMotionPolicy(() => {
+      if (instantMotion() || document.hidden) finish();
+    });
+    return () => {
+      clearTimeout(timer.current);
+      stop();
+    };
+  }, [turn]);
   const zoomOpened = useRef(false);
   useEffect(() => {
     if (!zoomId || zoomOpened.current) return;
@@ -92,10 +107,6 @@ export function BookReader({
       return;
     }
     setTurn({ from: spread, to: next, direction });
-    timer.current = setTimeout(() => {
-      setSpread(next);
-      setTurn(null);
-    }, 680);
   }
   const left = turn?.direction === -1 ? turn.to : spread;
   const right = turn?.direction === 1 ? turn.to + 1 : spread + 1;

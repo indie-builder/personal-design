@@ -1,6 +1,6 @@
 'use client';
 
-import { instantMotion } from '@/lib/motion';
+import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 import { useMediaStatus } from '@/lib/use-media-status';
 import { useLightboxSwipe } from './use-lightbox-swipe';
 import {
@@ -83,26 +83,30 @@ export function useLightboxController() {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<Element | null>(null);
   const closeTimerRef = useRef(0);
+  const enterFramesRef = useRef([0, 0]);
   const closingRef = useRef(false);
   const swipeRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReducedMotion(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
+  const cancelPendingMotion = useCallback(() => {
+    enterFramesRef.current.forEach(cancelAnimationFrame);
+    clearTimeout(closeTimerRef.current);
   }, []);
 
-  // 卸载兜底：关闭动画的兜底定时器不遗留（回调是 setActive(null)，纯洁癖）
-  useEffect(() => () => clearTimeout(closeTimerRef.current), []);
+  const finishClose = useCallback(() => {
+    cancelPendingMotion();
+    closingRef.current = false;
+    setActive(null);
+    setExpanded(false);
+  }, [cancelPendingMotion]);
+
+  useEffect(() => cancelPendingMotion, [cancelPendingMotion]);
 
   const open = useCallback(
     (item: LightboxItem, options: OpenOptions) => {
-      const immediate = instantMotion();
+      const immediate = instantMotion() || document.hidden;
       setInstant(immediate);
       setNaturalRatio(null);
-      clearTimeout(closeTimerRef.current);
+      cancelPendingMotion();
       closingRef.current = false;
       setActive({
         item,
@@ -116,22 +120,20 @@ export function useLightboxController() {
       setMediaStatus('loading');
       setExpanded(immediate);
     },
-    [setMediaStatus],
+    [cancelPendingMotion, setMediaStatus],
   );
 
   const activeRef = useRef<ActiveImage | null>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     activeRef.current = active;
   }, [active]);
 
   const close = useCallback(() => {
-    const immediate = reducedMotion || instantMotion();
+    if (!activeRef.current) return;
+    const immediate = instantMotion() || document.hidden;
     setInstant(immediate);
     if (immediate) {
-      clearTimeout(closeTimerRef.current);
-      closingRef.current = false;
-      setActive(null);
-      setExpanded(false);
+      finishClose();
       return;
     }
     // 关闭动画的目标：重新测量触发元素（marquee/滚动后原 rect 已失效）
@@ -140,18 +142,18 @@ export function useLightboxController() {
     closingRef.current = true;
     setExpanded(false);
     // 兜底通道：动画结束事件丢失时也保证卸载
-    clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = window.setTimeout(() => setActive(null), EXIT_DURATION + 80);
-  }, [reducedMotion]);
+    cancelPendingMotion();
+    closeTimerRef.current = window.setTimeout(finishClose, EXIT_DURATION + 80);
+  }, [cancelPendingMotion, finishClose]);
 
   const go = useCallback(
     (dir: 1 | -1) => {
-      setInstant(instantMotion());
+      setInstant(instantMotion() || document.hidden);
       setNaturalRatio(null);
       // 关闭动画期间按方向键：取消卸载倒计时，灯箱恢复展开（修闪没竞态）
       const current = activeRef.current;
       if (!current || current.siblings.length < 2) return;
-      clearTimeout(closeTimerRef.current);
+      cancelPendingMotion();
       closingRef.current = false;
       setExpanded(true);
       setActive((cur) => {
@@ -164,7 +166,7 @@ export function useLightboxController() {
       setThumbError(false);
       setMediaStatus('loading');
     },
-    [setMediaStatus],
+    [cancelPendingMotion, setMediaStatus],
   );
 
   // 每次目标图变化都重新计时载入看门狗
@@ -178,32 +180,52 @@ export function useLightboxController() {
   const fullReady = mediaStatus === 'ready';
   const loadError = mediaStatus === 'error';
 
+  useEffect(
+    () =>
+      observeMotionPolicy(() => {
+        setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        const immediate = instantMotion() || document.hidden;
+        setInstant(immediate);
+        if (!isOpen || !immediate) return;
+        cancelPendingMotion();
+        if (closingRef.current) finishClose();
+        else setExpanded(true);
+        if (swipeRef.current) {
+          swipeRef.current.style.transition = 'none';
+          swipeRef.current.style.transform = '';
+        }
+      }),
+    [isOpen, cancelPendingMotion, finishClose],
+  );
+
   useEffect(() => {
     if (active && !previousFocusRef.current)
       previousFocusRef.current = active.sourceEl ?? document.activeElement;
   }, [active]);
 
-  // 打开后双帧展开；锁背景滚动；body 挂标记（暂停灵感墙 marquee）
+  // 打开后双帧展开；切换策略或关闭时取消尚未执行的帧。
+  useEffect(() => {
+    if (!active || expanded || instant || closingRef.current) return;
+    const frames = enterFramesRef.current;
+    frames[0] = requestAnimationFrame(() => {
+      frames[1] = requestAnimationFrame(() => {
+        if (!closingRef.current) setExpanded(true);
+      });
+    });
+    return () => frames.forEach(cancelAnimationFrame);
+  }, [active, expanded, instant]);
+
+  // 锁背景滚动；body 挂标记（暂停灵感墙 marquee）。
   useEffect(() => {
     if (!isOpen) return;
-    let inner = 0;
-    const raf = instant
-      ? 0
-      : requestAnimationFrame(() => {
-          inner = requestAnimationFrame(() => {
-            if (!closingRef.current) setExpanded(true);
-          });
-        });
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     document.body.dataset.lightboxOpen = 'true';
     return () => {
-      cancelAnimationFrame(raf);
-      cancelAnimationFrame(inner);
       document.body.style.overflow = previousOverflow;
       delete document.body.dataset.lightboxOpen;
     };
-  }, [isOpen, instant]);
+  }, [isOpen]);
 
   // dialog 挂载（frame 就绪）后初始聚焦到关闭按钮——frame 为 null 时 dialog 不存在，
   // 在 [active] effect 里 focus 会静默落空（aria-modal 名副其实的第一步）
@@ -333,7 +355,7 @@ export function useLightboxController() {
   const { handlers: swipeHandlers, consumeClickSuppression } = useLightboxSwipe({
     swipeRef,
     enabled: hasSiblings && expanded,
-    reducedMotion,
+    reducedMotion: reducedMotion || instant,
     go,
   });
 
@@ -363,14 +385,13 @@ export function useLightboxController() {
 
   return {
     active,
-    setActive,
+    finishClose,
     expanded,
     frame,
     reducedMotion,
     instant,
     dialogRef,
     closeButtonRef,
-    closeTimerRef,
     closingRef,
     swipeRef,
     open,

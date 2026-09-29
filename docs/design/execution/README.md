@@ -13,12 +13,14 @@
 | 灯箱滚动锁/焦点/组内翻图、自动播放、404 | [shared.md](shared.md) | `node scripts/design-checks/shared-browser.cjs` 与 `shared-autoplay.cjs` |
 | 两条从首页出发的完整浏览路径 | [生产结果](evidence/journeys.json) | `node scripts/design-checks/journeys.mjs` |
 | 个人网站宣传片播放/键盘控制/失败重试/外链 | —（实现见 site-showcase-media.tsx） | `node scripts/design-checks/personal-sites.mjs` |
+| 动效策略：预览续播、监听器清理、翻页中断、键盘视频策略 | [验收记录](evidence/motion-policy.md) | `DESIGN_BASE_URL=http://localhost:3002 sh scripts/design-checks/motion-policy.sh`（ego-browser） |
+| 全项目动效审查修复：混合媒体轮播、同帧返回、灯箱/头像中断、词典按需绘制、聊天输入布局 | [修复与验收](evidence/motion-audit-fixes.md) | `muse-motion.sh`、`lightbox-avatar-motion.sh`、`dictionary-motion.sh`、`ai-chat-scroll.sh`（ego-browser，支持复用空间） |
 | 全量静态路由 | [路由结果](evidence/routes.json) | `node scripts/verify-design-routes.mjs` |
 | 对外 portfolio API 契约：公共投影不泄露内部字段、分页/搜索与 400/404 错误语义 | —（测试即规格） | `pnpm test:portfolio-api`（需运行中的生产服务，随 `run-all.mjs` 全套执行） |
 | 视觉与原规则独立复核 | [finish-review.md](finish-review.md) | ship；初轮发现与修复已关闭 |
 | 来源完整性 | [source-integrity.json](evidence/source-integrity.json) | 25份来源快照哈希一致 |
 
-`run-all.mjs` 所含 Playwright 脚本与 portfolio API 契约检查支持 `DESIGN_BASE_URL`，默认 `http://localhost:3000`。生产预览执行 `pnpm build`、`pnpm --filter @personal-design/web start --port 3001`，然后以 `DESIGN_BASE_URL=http://localhost:3001` 运行脚本；`dictionary-search.sh` 同样支持。`global-ux.sh`、`workspace-navigation.sh`、`back-motion.sh`、`back-stability.sh`、`search.sh` 写死 portless 开发域名 `https://personal-design.localhost`，不读 `DESIGN_BASE_URL`：先 `pnpm dev`（首次需 `sudo portless proxy start --https`）再运行。ai-chat 系列按 [AI 问答](ai-chat.md)的隔离 origin 要求运行。Playwright 在根开发依赖中；新机器需 `pnpm exec playwright install chromium`。
+`run-all.mjs` 所含旧 Playwright 脚本与 portfolio API 契约检查支持 `DESIGN_BASE_URL`，默认 `http://localhost:3000`。Agent 浏览器检查遵循根 AGENTS 的应用内 ego-browser 入口。生产预览执行 `pnpm build`、`pnpm --filter @personal-design/web start --port 3012`；`dictionary-search.sh`、`workspace-navigation.sh`、`back-motion.sh`、`back-stability.sh` 以及上表新增专项均支持 `DESIGN_BASE_URL`。三份导航专项支持 `EGO_TASK_SPACE`；词典搜索沿用 `EGO_SPACE_ID`。`global-ux.sh`、`search.sh` 仍写死 portless 开发域名 `https://personal-design.localhost`，需先 `pnpm dev` 再运行。ai-chat 系列按 [AI 问答](ai-chat.md)的隔离 origin 要求运行。
 
 ## 视觉证据与检查范围
 

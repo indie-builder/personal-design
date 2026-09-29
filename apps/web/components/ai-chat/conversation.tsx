@@ -73,17 +73,29 @@ export function ConversationView({
     const area = composerArea.current;
     const viewport = scroll.current;
     if (!area || !viewport) return;
-    const fit = () => {
-      area.parentElement?.style.setProperty('--composer-height', `${area.offsetHeight}px`);
+    let previousHeight = Number.parseFloat(
+      area.parentElement?.style.getPropertyValue('--composer-height') || '100',
+    );
+    const observer = new ResizeObserver(([entry]) => {
+      const height = entry?.borderBoxSize[0]?.blockSize ?? entry?.contentRect.height;
+      if (height === undefined || height === previousHeight) return;
+      // Read the old geometry once; the inset delta gives the new scroll limit.
+      const content = viewport.firstElementChild as HTMLElement | null;
+      const bottom = atBottom
+        ? Math.max(
+            0,
+            (content?.offsetHeight ?? 0) + height - previousHeight - viewport.clientHeight,
+          )
+        : 0;
+      area.parentElement?.style.setProperty('--composer-height', `${height}px`);
+      previousHeight = height;
       if (atBottom) {
-        viewport.scrollTop = viewport.scrollHeight;
-        scrollGesture.current.top = viewport.scrollTop;
+        viewport.scrollTop = bottom;
+        scrollGesture.current.top = bottom;
         scrollGesture.current.travel = 0;
       }
-    };
-    fit();
-    const observer = new ResizeObserver(fit);
-    observer.observe(area);
+    });
+    observer.observe(area, { box: 'border-box' });
     return () => observer.disconnect();
   }, [atBottom]);
 

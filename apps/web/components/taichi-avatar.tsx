@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { timelineAvatarUrl } from '@personal-design/personal-sites';
+import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 import styles from './taichi-avatar.module.css';
 
 // Angles are shoulder, elbow, hip and knee joints; all poses share one clock.
@@ -89,12 +90,12 @@ export function TaichiAvatar() {
   useEffect(() => {
     const element = actor.current;
     if (!playing || !element) return;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const duration = reduced.matches ? 1000 : 9200;
+    const immediate = instantMotion();
+    const duration = immediate ? 1000 : 9200;
     const distance = window.innerWidth < 480 ? 94 : 140;
     const animations: Animation[] = [];
     const travel = element.animate(
-      reduced.matches
+      immediate
         ? [
             { opacity: 0, transform: 'translate(52px,20px)' },
             { opacity: 1, offset: 0.25, transform: 'translate(52px,20px)' },
@@ -113,7 +114,7 @@ export function TaichiAvatar() {
       { duration, fill: 'both', easing: 'linear' },
     );
     animations.push(travel);
-    if (!reduced.matches) {
+    if (!immediate) {
       element.querySelectorAll<SVGGElement>('[data-joint]').forEach((joint) => {
         const key = joint.dataset.joint as Joint;
         animations.push(
@@ -148,18 +149,15 @@ export function TaichiAvatar() {
         stop();
       }
     };
-    const visibility = () => {
-      if (document.hidden) stop();
-    };
+    const stopPolicy = observeMotionPolicy(() => {
+      if (document.hidden || instantMotion() !== immediate) stop();
+    });
     window.addEventListener('keydown', key);
-    document.addEventListener('visibilitychange', visibility);
-    reduced.addEventListener('change', stop);
     return () => {
       travel.onfinish = null;
       animations.forEach((a) => a.cancel());
       window.removeEventListener('keydown', key);
-      document.removeEventListener('visibilitychange', visibility);
-      reduced.removeEventListener('change', stop);
+      stopPolicy();
     };
   }, [playing]);
   return (
