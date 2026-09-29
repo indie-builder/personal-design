@@ -5,12 +5,12 @@ set -eu
 node --input-type=module <<'CONFIG'
 const base=process.env.DESIGN_BASE_URL;
 if(!/^http:\/\/localhost:\d+$/.test(base||'')) throw new Error('Use an isolated localhost port for the scroll fixture.');
-console.log('const config='+JSON.stringify({base,space:process.env.EGO_TASK_SPACE?Number(process.env.EGO_TASK_SPACE):null,root:process.cwd()})+';');
+console.log('const config='+JSON.stringify({base,space:process.env.EGO_TASK_SPACE?Number(process.env.EGO_TASK_SPACE):null,root:process.cwd(),out:process.env.DESIGN_EVIDENCE_DIR})+';');
 CONFIG
 cat <<'JS'
 const assert=(await import('node:assert/strict')).default;const fs=await import('node:fs/promises');
 const task=await taskSpace(config.space||'AI 问答 · 滚动交互验收');console.log({spaceId:task.spaceId});const p=task.page('p1');
-const out=config.root+'/docs/design/execution/evidence/ai-chat-scroll';await fs.mkdir(out,{recursive:true});
+const out=config.out||config.root+'/docs/design/execution/evidence/ai-chat-scroll';await fs.mkdir(out,{recursive:true});
 await p.goto(config.base+'/products/ai-chat');
 await p.evaluate(()=>{const key='personal-design:ai-chat:v1';if(JSON.parse(localStorage.getItem(key)||'{}').conversations?.some(c=>c.id!=='scroll-fixture'))throw new Error('Test origin already contains user conversations.');localStorage.setItem(key,JSON.stringify({agents:[],conversations:[{id:'scroll-fixture',agentId:'general',title:'滚动验收',messages:[{id:'answer',role:'assistant',parts:[{type:'text',text:'root = Stack(['+Array.from({length:40},(_,i)=>'TextContent("滚动验收段落 '+i+'：这是用于检查阅读区域与顶部栏的独立测试内容。")').join(',')+']);'}]}]}]}));});
 const capture=()=>p.evaluate(()=>{const id=window.__chromeCapture=(window.__chromeCapture||0)+1;window.__chromeFrames=[];const panel=document.querySelector('[data-composer-panel]');panel.addEventListener('transitionrun',()=>{const start=performance.now();const tick=()=>{if(window.__chromeCapture!==id)return;window.__chromeFrames.push({t:performance.now()-start,opacity:Number(getComputedStyle(panel).opacity),transform:getComputedStyle(panel).transform});if(performance.now()-start<500)requestAnimationFrame(tick);};tick();},{once:true});});
@@ -36,11 +36,22 @@ for(const width of [1440,390]){
  assert.equal(await p.evaluate(()=>document.querySelector('textarea[aria-label^="发消息给"]').value),'保留尚未发送的草稿');
  await p.focus('button[aria-label="回到最新消息"]');await p.keyboard.press('Enter');await p.waitForFunction(()=>!document.querySelector('[data-composer-panel]').inert);
  assert(await p.evaluate(()=>parseFloat(getComputedStyle(document.querySelector('[data-composer-panel]')).transitionDuration)===0));
- await p.fill('textarea[aria-label^="发消息给"]','第一行\n第二行\n第三行\n第四行');await p.waitForFunction(()=>{const a=document.querySelector('[data-composer-panel]').getBoundingClientRect().height;const h=parseFloat(getComputedStyle(document.querySelector('[aria-label="对话"]')).getPropertyValue('--composer-height'));return Math.abs(a-h)<1;});await p.fill('textarea[aria-label^="发消息给"]','');
+ // Composer growth and shrink must keep the newest answer anchored above the input.
+ for(const draft of ['第一行\n第二行\n第三行\n第四行\n第五行\n第六行','']) {
+  await p.fill('textarea[aria-label^="发消息给"]',draft);
+  await p.waitForFunction(()=>{const panel=document.querySelector('[data-composer-panel]'),viewport=document.querySelector('[aria-label="对话"] > div');const inset=parseFloat(getComputedStyle(document.querySelector('[aria-label="对话"]')).getPropertyValue('--composer-height'));return Math.abs(panel.getBoundingClientRect().height-inset)<1&&Math.abs(viewport.scrollHeight-viewport.clientHeight-viewport.scrollTop)<2&&!panel.inert;});
+ }
  // Natural downward scrolling, without pressing the jump button, also restores it.
  await p.mouse.click(box.x+box.width/2,box.y+200);await p.mouse.wheel(0,-250);await p.waitForFunction(()=>document.querySelector('[data-composer-panel]').inert);await p.mouse.wheel(0,1000);await p.waitForFunction(()=>!document.querySelector('[data-composer-panel]').inert);
  checks.push(width+': hide away from latest, stay hidden on either direction, restore only at latest, animated in/out, draft preserved, stable viewport, keyboard return and multiline inset');
 }
+// The shared route entrance scales an ancestor; scroll calculations must stay
+// in layout coordinates when reopening saved history from the home timeline.
+await p.cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+await p.goto(config.base+'/');await p.waitForSelector('a[aria-label="进入AI 问答"]');
+await p.click('a[aria-label="进入AI 问答"]');await p.waitForSelector('[data-answer-body]');
+await p.waitForFunction(()=>{const viewport=[...document.querySelectorAll('[aria-label="对话"] > div')].find(e=>e.getClientRects().length);return viewport&&Math.abs(viewport.scrollHeight-viewport.clientHeight-viewport.scrollTop)<2&&!document.querySelector('[data-composer-panel]').inert;});
+checks.push('home route entrance keeps saved history at the bottom despite the shared scale transition');
 await p.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
 assert(await p.evaluate(()=>[document.querySelector('main header'),document.querySelector('[data-composer-panel]')].every(e=>parseFloat(getComputedStyle(e).transitionDuration)<=0.001)));checks.push('reduced motion disables toolbar transition');
 await p.cdp('Emulation.clearDeviceMetricsOverride');await p.cdp('Emulation.setEmulatedMedia',{features:[]});

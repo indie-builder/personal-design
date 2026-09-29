@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { browseHref, browseMemoryKey, matchesSearch } from '@/lib/browse-context';
 import { paramsHref } from '@/lib/site-url';
@@ -49,11 +49,17 @@ interface PlateWallProps {
 const DEFAULT_BATCH = 48;
 const SEARCH_DEBOUNCE = 200;
 
-function loadPosts(query: string, category: string, offset: number, limit: number) {
+function loadPosts(
+  query: string,
+  category: string,
+  offset: number,
+  limit: number,
+  signal?: AbortSignal,
+) {
   const params = new URLSearchParams({ offset: String(offset), limit: String(limit) });
   if (query) params.set('q', query);
   if (category !== '全部') params.set('cat', category);
-  return fetch(`/products/muse/api/posts?${params}`).then((response) =>
+  return fetch(`/products/muse/api/posts?${params}`, { signal }).then((response) =>
     response.ok ? (response.json() as Promise<{ items?: PlateWallItem[]; total?: number }>) : null,
   );
 }
@@ -103,6 +109,14 @@ export function PlateWall({
   const [synced, setSynced] = useState({ key: filterKey, items, total: initialTotal });
   const [shown, setShown] = useState(batchSize);
   const moreRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const restoreAbortRef = useRef<AbortController | null>(null);
+  const [restoration, setRestoration] = useState<{
+    y: number;
+    key: string;
+    height: number;
+    ready: boolean;
+  } | null>(null);
 
   const stale = synced.key !== filterKey;
   const listed = useMemo(
@@ -128,7 +142,13 @@ export function PlateWall({
     try {
       sessionStorage.setItem(
         browseMemoryKey('muse-return', returnHref),
-        JSON.stringify({ href: returnHref, shown, y: window.scrollY, key }),
+        JSON.stringify({
+          href: returnHref,
+          shown,
+          y: window.scrollY,
+          key,
+          height: sectionRef.current?.offsetHeight,
+        }),
       );
     } catch {}
   };
@@ -143,7 +163,7 @@ export function PlateWall({
   // 筛选变化：防抖拉取当前筛选的完整首窗
   const fetchIdRef = useRef(0);
   useEffect(() => {
-    if (!stale) return;
+    if (!stale || restoration) return;
     const fetchId = ++fetchIdRef.current;
     const timer = setTimeout(() => {
       void (async () => {
@@ -159,11 +179,20 @@ export function PlateWall({
       })();
     }, SEARCH_DEBOUNCE);
     return () => clearTimeout(timer);
-  }, [stale, active, query, batchSize, shown]);
+  }, [stale, active, query, batchSize, shown, restoration]);
 
-  // URL is the query source of truth, including browser back/forward.
-  useEffect(() => {
-    let frame = 0;
+  // Changing filters must cancel a pending return without moving focus or
+  // allowing the old request to write into the newly selected list.
+  useLayoutEffect(() => {
+    restoreAbortRef.current?.abort();
+    setRestoration(null);
+  }, [filterKey]);
+
+  // Activity reconnects this effect when a preserved list becomes visible.
+  // Reuse that loaded window; only an evicted/reloaded list needs more data.
+  useLayoutEffect(() => {
+    const controller = new AbortController();
+    restoreAbortRef.current = controller;
     try {
       const memoryKey = browseMemoryKey(
         'muse-return',
@@ -176,49 +205,67 @@ export function PlateWall({
         typeof saved?.href === 'string' &&
         browseMemoryKey('muse-return', saved.href) === memoryKey
       ) {
-        const target = Math.max(batchSize, Number(saved.shown) || batchSize);
-        const restore = () => {
-          frame = requestAnimationFrame(() => {
-            setShown(target);
-            frame = requestAnimationFrame(() => {
-              window.scrollTo(0, Number(saved.y) || 0);
-              if (typeof saved.key === 'string')
-                document.getElementById(`muse-${saved.key}`)?.focus({ preventScroll: true });
-            });
-          });
-        };
-        if (target <= items.length) {
-          restore();
-          return () => cancelAnimationFrame(frame);
+        const target = Number.isFinite(saved.shown)
+          ? Math.max(batchSize, Math.trunc(saved.shown))
+          : batchSize;
+        const y = Number.isFinite(saved.y) ? Math.max(0, saved.y) : 0;
+        let loaded = synced.key === filterKey ? synced.items : [];
+        let total = synced.key === filterKey ? synced.total : initialTotal;
+        setShown(target);
+        setRestoration({
+          y,
+          key: typeof saved.key === 'string' ? saved.key : '',
+          height: Math.max(
+            Number.isFinite(saved.height) ? saved.height : 0,
+            y + window.innerHeight,
+          ),
+          ready: loaded.length >= Math.min(target, total),
+        });
+        if (loaded.length < Math.min(target, total)) {
+          void (async () => {
+            try {
+              const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]);
+              while (loaded.length < Math.min(target, total)) {
+                const data = await loadPosts(
+                  query,
+                  active,
+                  loaded.length,
+                  target - loaded.length,
+                  signal,
+                );
+                if (typeof data?.total === 'number' && Number.isFinite(data.total))
+                  total = Math.max(0, data.total);
+                if (!Array.isArray(data?.items) || !data.items.length) break;
+                loaded = [...loaded, ...data.items];
+              }
+            } catch {}
+            if (controller.signal.aborted) return;
+            setSynced({ key: filterKey, items: loaded, total });
+            setShown(Math.min(target, loaded.length));
+            setRestoration((value) => value && { ...value, ready: true });
+          })();
         }
-        // 保存的分批超出首窗：先补齐窗口再恢复位置，保证恢复的滚动高度有效
-        loadPosts(query, active, items.length, target - items.length)
-          .then((data: { items?: PlateWallItem[]; total?: number } | null) => {
-            const slice = Array.isArray(data?.items) ? data.items : [];
-            if (slice.length) {
-              setSynced((prev) =>
-                prev.key === filterKey
-                  ? {
-                      key: prev.key,
-                      items: [...prev.items, ...slice],
-                      total: Number(data?.total) || prev.total,
-                    }
-                  : prev,
-              );
-            }
-          })
-          .catch(() => {})
-          .finally(restore);
       }
     } catch {}
-    return () => cancelAnimationFrame(frame);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- 仅挂载时按存储恢复一次
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Mount / Activity re-show, not ordinary filter or batch updates.
   }, [batchSize]);
+
+  useLayoutEffect(() => {
+    if (!restoration) return;
+    window.scrollTo({ top: restoration.y, behavior: 'instant' });
+    if (!restoration.ready) return;
+    const target =
+      sectionRef.current?.querySelector<HTMLElement>(`#${CSS.escape(`muse-${restoration.key}`)}`) ??
+      sectionRef.current;
+    target?.focus({ preventScroll: true });
+    setRestoration(null);
+  }, [restoration]);
 
   // 滚动追加：本地还有未展示批次则直接扩显示数，否则向分片接口取下一片
   useEffect(() => {
     const sentinel = moreRef.current;
-    if (!sentinel || visible.length >= moreTotal) return;
+    if (!sentinel || restoration || visible.length >= moreTotal) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
@@ -249,11 +296,34 @@ export function PlateWall({
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [shown, listed.length, visible.length, stale, synced, moreTotal, batchSize, active, query]);
+  }, [
+    shown,
+    listed.length,
+    visible.length,
+    stale,
+    synced,
+    moreTotal,
+    batchSize,
+    active,
+    query,
+    restoration,
+  ]);
 
   const clear = () => window.history.replaceState(null, '', pathname);
   return (
-    <section aria-label="灵感浏览">
+    <section
+      ref={sectionRef}
+      aria-label="灵感浏览"
+      aria-busy={!!restoration && !restoration.ready}
+      tabIndex={-1}
+      className={styles.wall}
+      style={restoration ? { minHeight: restoration.height } : undefined}
+    >
+      {restoration && !restoration.ready ? (
+        <p className={styles.restoring} role="status">
+          正在恢复浏览位置…
+        </p>
+      ) : null}
       <CollectionToolbar
         actions={
           <CollectionSearch

@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from
 import { ArrowLeft, ArrowRight, ArrowUpRight, RotateCcw } from 'lucide-react';
 import { Button, buttonClassName } from './button';
 import styles from './inspora-media-carousel.module.css';
-import { instantMotion } from '@/lib/motion';
+import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 import { useMediaStatus } from '@/lib/use-media-status';
 import { MotionVideo } from './motion-video';
 import { LightboxProvider, useLightbox } from './lifeline/lightbox';
@@ -33,26 +33,46 @@ function Carousel({ media }: { media: CarouselMedia[] }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
+  const [destination, setDestination] = useState(0);
   const move = (index: number) => {
     const track = trackRef.current;
     if (!track) return;
+    const next = Math.max(0, Math.min(media.length - 1, index));
+    setDestination(next);
+    if (instantMotion()) setCurrent(next);
     track.scrollTo({
-      left: Math.max(0, Math.min(media.length - 1, index)) * track.clientWidth,
+      left: next * track.clientWidth,
       behavior: instantMotion() ? 'instant' : 'smooth',
     });
   };
+  // Keep one coordinate system for the entire native scroll. Commit the new
+  // media geometry only at scrollend, then align it before the next paint.
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    track?.scrollTo({ left: current * track.clientWidth, behavior: 'instant' });
+  }, [current]);
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
     let width = track.clientWidth;
+    const finish = () => {
+      setCurrent(destination);
+      track.scrollTo({ left: destination * track.clientWidth, behavior: 'instant' });
+    };
     const resize = new ResizeObserver(() => {
       if (width === track.clientWidth) return;
       width = track.clientWidth;
-      track.scrollTo({ left: current * width, behavior: 'instant' });
+      finish();
     });
     resize.observe(track);
-    return () => resize.disconnect();
-  }, [current]);
+    const stop = observeMotionPolicy(() => {
+      if (instantMotion() || document.hidden) finish();
+    });
+    return () => {
+      resize.disconnect();
+      stop();
+    };
+  }, [destination]);
   const selected = media[current];
   const ratio = selected?.width && selected.height ? selected.width / selected.height : 4 / 3;
   useLayoutEffect(() => {
@@ -98,21 +118,21 @@ function Carousel({ media }: { media: CarouselMedia[] }) {
           role="region"
           aria-roledescription="轮播"
           aria-label="作品媒体"
-          onScroll={() => {
+          onScrollEnd={() => {
             const track = trackRef.current;
-            if (track?.clientWidth)
-              setCurrent(
-                Math.max(
-                  0,
-                  Math.min(media.length - 1, Math.round(track.scrollLeft / track.clientWidth)),
-                ),
-              );
+            if (!track?.clientWidth) return;
+            const next = Math.max(
+              0,
+              Math.min(media.length - 1, Math.round(track.scrollLeft / track.clientWidth)),
+            );
+            setCurrent(next);
+            setDestination(next);
           }}
           onKeyDown={(event) => {
             if (event.target !== event.currentTarget) return;
             if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
               event.preventDefault();
-              move(current + (event.key === 'ArrowLeft' ? -1 : 1));
+              move(destination + (event.key === 'ArrowLeft' ? -1 : 1));
             }
             if (event.key === 'Home' || event.key === 'End') {
               event.preventDefault();
@@ -137,8 +157,8 @@ function Carousel({ media }: { media: CarouselMedia[] }) {
               icon
               data-direction="previous"
               aria-label="上一张媒体"
-              disabled={current === 0}
-              onClick={() => move(current - 1)}
+              disabled={destination === 0}
+              onClick={() => move(destination - 1)}
             >
               <ArrowLeft aria-hidden />
             </Button>
@@ -146,8 +166,8 @@ function Carousel({ media }: { media: CarouselMedia[] }) {
               icon
               data-direction="next"
               aria-label="下一张媒体"
-              disabled={current === media.length - 1}
-              onClick={() => move(current + 1)}
+              disabled={destination === media.length - 1}
+              onClick={() => move(destination + 1)}
             >
               <ArrowRight aria-hidden />
             </Button>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type VideoHTMLAttributes } from 'react';
+import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 
 type Props = Omit<VideoHTMLAttributes<HTMLVideoElement>, 'src'> & {
   src: string;
@@ -20,17 +21,18 @@ export function MotionVideo({
   useEffect(() => {
     const video = ref.current;
     if (!video) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
     let visible = false;
     let nearby = false;
     let releaseTimer: ReturnType<typeof setTimeout> | undefined;
     let eligible = false;
     let manualPause = false;
     let manualPlay = false;
+    let automaticPlayback = false;
     let automaticPlayPending = false;
     let automaticPausePending = false;
     let disposed = false;
     const pauseAutomatically = () => {
+      automaticPlayback = false;
       if (video.paused) return;
       automaticPausePending = true;
       video.pause();
@@ -42,20 +44,26 @@ export function MotionVideo({
         !document.hidden &&
         src &&
         video.getAttribute('src') !== src &&
-        (!reduce.matches || props.controls || manualControls)
+        (!instantMotion() || props.controls || manualControls)
       ) {
         video.src = src;
         video.load();
       }
       eligible = active && visible && !document.hidden;
-      if (!eligible || (reduce.matches && !manualPlay)) {
+      if (!eligible || (instantMotion() && automaticPlayback && !manualPlay)) {
         pauseAutomatically();
-      } else if (!manualPause && video.paused && !automaticPlayPending) {
+      } else if (
+        (!instantMotion() || manualPlay) &&
+        !manualPause &&
+        video.paused &&
+        !automaticPlayPending
+      ) {
+        automaticPlayback = true;
         automaticPlayPending = true;
         void video
           .play()
           .then(() => {
-            if (disposed || !eligible || (reduce.matches && !manualPlay)) pauseAutomatically();
+            if (disposed || !eligible || (instantMotion() && !manualPlay)) pauseAutomatically();
           })
           .catch(() => {})
           .finally(() => {
@@ -69,6 +77,7 @@ export function MotionVideo({
         return;
       }
       if (props.controls || manualControls) {
+        automaticPlayback = false;
         manualPause = true;
         manualPlay = false;
       }
@@ -77,7 +86,7 @@ export function MotionVideo({
       // Native or custom controls are an explicit choice, even with reduced motion.
       // Keep that choice through buffering/canplay without treating our own
       // automatic play() calls as user input.
-      if (!automaticPlayPending && (props.controls || manualControls)) {
+      if (!automaticPlayback && (props.controls || manualControls)) {
         manualPlay = true;
         manualPause = false;
       }
@@ -115,8 +124,7 @@ export function MotionVideo({
     near.observe(video);
     distant.observe(video);
     observer.observe(video);
-    document.addEventListener('visibilitychange', update);
-    reduce.addEventListener('change', update);
+    const stopPolicy = observeMotionPolicy(update);
     video.addEventListener('canplay', update);
     video.addEventListener('pause', pause);
     video.addEventListener('play', play);
@@ -127,8 +135,7 @@ export function MotionVideo({
       observer.disconnect();
       distant.disconnect();
       clearTimeout(releaseTimer);
-      document.removeEventListener('visibilitychange', update);
-      reduce.removeEventListener('change', update);
+      stopPolicy();
       video.removeEventListener('canplay', update);
       video.removeEventListener('pause', pause);
       video.removeEventListener('play', play);

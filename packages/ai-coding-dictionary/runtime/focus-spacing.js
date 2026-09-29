@@ -4,7 +4,7 @@ const atlasSpacingPoint = new er.Vector3();
 function atlasSpaceFocus(frame, delta, selected) {
   const { camera, size } = frame;
   const matrix = camera.matrixWorld.elements;
-  const mix = 1 - Math.exp(-Math.min(delta, 0.05) / 0.16);
+  const mix = window.__atlasInstant ? 1 : 1 - Math.exp(-Math.min(delta, 0.05) / 0.16);
   const nodes = [];
   if (selected >= 0 && !tE.repackState.active) {
     const neighbors = tW[selected];

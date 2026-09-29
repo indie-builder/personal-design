@@ -1,10 +1,16 @@
 #!/bin/sh
+# Run against a production build; reuse the current QA space when supplied.
 set -eu
-ego-browser nodejs <<'JS'
+motion_config=$(node -e 'console.log(JSON.stringify({ space: process.env.EGO_TASK_SPACE || "", base: process.env.DESIGN_BASE_URL || "http://localhost:3012" }))')
+ego-browser nodejs <<JS
+const config = $motion_config;
+$(cat <<'CODE'
+const target = path => new URL(path, config.base).href;
 const assert=(await import('node:assert/strict')).default;
-const task=await taskSpace('回退抖动修复');
+const task=await taskSpace(config.space ? Number(config.space) : '回退抖动修复');
+console.log({ spaceId: task.spaceId });
 const page=task.page('p1');
-await page.goto('https://personal-design.localhost/products/layout-compositions?cat=%E6%9E%84%E5%9B%BE%E9%80%BB%E8%BE%91',{waitUntil:'domcontentloaded'});
+await page.goto(target('/products/layout-compositions?cat=%E6%9E%84%E5%9B%BE%E9%80%BB%E8%BE%91'),{waitUntil:'domcontentloaded'});
 await page.evaluate(()=>{
   window.__liveResets=[];
   const original=Element.prototype.animate;
@@ -34,13 +40,13 @@ await page.evaluate(()=>{
   };
 });
 await page.click('a[aria-label="布局参考，返回首页"]');
-await page.waitForURL('https://personal-design.localhost/');
+await page.waitForURL(target('/'));
 const layers=await page.evaluate(()=>window.__homeLayers);
 assert.ok(layers.length>0,'route entry must capture the home project links');
 assert.ok(layers.every(x=>x.translate==='none' && !x.animations.includes('translate')), 'route entry must not stack project starting-style movement');
 await page.waitForFunction(()=>!document.querySelector('[data-route-motion]'));
-cliLog('PASS: reader stays hidden until replacement, shelf focus restores, route entry has one movement owner');
-JS
-ego-browser nodejs <<'JS'
-cliLog(await completeTaskSpace('回退抖动修复', {keep:false}));
+console.log('PASS: reader stays hidden until replacement, shelf focus restores, route entry has one movement owner');
+if (!config.space) await task.finish({ keep: [] });
+CODE
+)
 JS

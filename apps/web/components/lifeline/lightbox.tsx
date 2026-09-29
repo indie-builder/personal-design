@@ -28,14 +28,13 @@ export function useLightbox() {
 export function LightboxProvider({ children }: { children: ReactNode }) {
   const {
     active,
-    setActive,
+    finishClose,
     expanded,
     frame,
     reducedMotion,
     instant,
     dialogRef,
     closeButtonRef,
-    closeTimerRef,
     closingRef,
     swipeRef,
     open,
@@ -140,8 +139,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
                   }}
                   onTransitionEnd={(event) => {
                     if (event.propertyName === 'transform' && closingRef.current) {
-                      clearTimeout(closeTimerRef.current);
-                      setActive(null);
+                      finishClose();
                     }
                   }}
                 />
@@ -216,10 +214,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
                     {active.item.href ? (
                       <Link
                         href={active.item.href}
-                        onClick={() => {
-                          clearTimeout(closeTimerRef.current);
-                          setActive(null);
-                        }}
+                        onClick={finishClose}
                         className="inline-flex items-center gap-1 text-[#c3ccd8] underline-offset-4 transition-colors hover:text-white hover:underline"
                       >
                         查看详情

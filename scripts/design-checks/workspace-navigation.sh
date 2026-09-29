@@ -1,12 +1,17 @@
 #!/bin/sh
-# Run with ego lite and pnpm dev already available.
+# Run against a production build; reuse the current QA space when supplied.
 set -eu
-ego-browser nodejs <<'JS'
+motion_config=$(node -e 'console.log(JSON.stringify({ space: process.env.EGO_TASK_SPACE || "", base: process.env.DESIGN_BASE_URL || "http://localhost:3012" }))')
+ego-browser nodejs <<JS
+const config = $motion_config;
+$(cat <<'CODE'
+const target = path => new URL(path, config.base).href;
 const assert = (await import('node:assert/strict')).default;
-const task = await taskSpace('回退动效修复');
+const task = await taskSpace(config.space ? Number(config.space) : '回退动效修复');
+console.log({ spaceId: task.spaceId });
 const pages = await task.pages();
 const page = pages.find(page => page.label === 'p1') ?? await task.newPage();
-await page.goto('https://personal-design.localhost/', { waitUntil: 'domcontentloaded', timeout: 20000 });
+await page.goto(target('/'), { waitUntil: 'domcontentloaded', timeout: 20000 });
 await page.evaluate(() => {
   window.__motionLog = [];
   const original = Element.prototype.animate;
@@ -50,12 +55,12 @@ for (const theme of ['light', 'dark']) {
     assert.ok(heading.visible, `${name}: title must be restored after navigation`);
     await resetMotion();
     await page.click(`a[aria-label="${name}，返回首页"]`);
-    await page.waitForURL('https://personal-design.localhost/');
+    await page.waitForURL(target('/'));
     await page.waitForTimeout(650);
     assert.equal((await routeMotion()).length, 2, 'return must animate outgoing and incoming surfaces');
     assert.equal(Number((await routeMotion())[0].frames.at(-1).opacity), 0, 'old page must leave before navigation');
     await assertRestored();
-    cliLog(`PASS: ${theme} ${name} navigation`);
+    console.log(`PASS: ${theme} ${name} navigation`);
   }
 }
 await page.cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
@@ -65,7 +70,7 @@ await page.waitForURL('**/products/muse');
 assert.equal((await routeMotion()).length, 0, 'instant navigation must not animate');
 await assertRestored();
 await page.click('a[aria-label="灵感集，返回首页"]');
-await page.waitForURL('https://personal-design.localhost/');
+await page.waitForURL(target('/'));
 await page.cdp('Emulation.setEmulatedMedia', { features: [] });
 await resetMotion();
 await page.press('a[aria-label="进入布局参考"]', 'Enter');
@@ -73,7 +78,7 @@ await page.waitForURL('**/products/layout-compositions');
 assert.equal((await routeMotion()).length, 0, 'instant navigation must not animate');
 await assertRestored();
 
-cliLog('PASS: keyboard and reduced-motion route skips');
+console.log('PASS: keyboard and reduced-motion route skips');
 await resetMotion();
 await page.press('#book-0', 'Enter');
 await page.waitForSelector('[data-book-spread]', { state: 'visible', timeout: 2000 });
@@ -89,7 +94,7 @@ const contrast = await page.evaluate(() => {
   return (values[1] + .05) / (values[0] + .05);
 });
 assert.ok(contrast >= 4.5, `folio contrast: ${contrast}`);
-cliLog('PASS: keyboard opening and folio contrast');
+console.log('PASS: keyboard opening and folio contrast');
 await page.press('[aria-label$="画册"]', 'Escape');
 await page.waitForSelector('#book-0', { state: 'visible' });
 await page.click('#book-0');
@@ -103,18 +108,24 @@ await page.waitForFunction(() => document.querySelector('[aria-busy]')?.getAttri
 await page.cdp('Emulation.setEmulatedMedia', { features: [] });
 await page.press('[aria-label$="画册"]', 'Escape');
 await page.press('a[aria-label="布局参考，返回首页"]', 'Enter');
-await page.waitForURL('https://personal-design.localhost/');
+await page.waitForURL(target('/'));
 await page.keyboard.press('Tab');
 await page.waitForTimeout(700);
-assert.equal(await page.evaluate(() => document.querySelectorAll('[data-book-active="true"]').length), 0, 'keyboard must stop book queue');
+const bookQueue = () => page.evaluate(() => {
+  const host = document.querySelector('[class*="bookMotion"]');
+  return { running: host.dataset.running, books: [...host.querySelectorAll('[data-book-active]')].map(e => ({ active: e.dataset.bookActive, animations: e.getAnimations().map(a => ({ state: a.playState, time: a.currentTime })) })) };
+});
+const stoppedQueue = await bookQueue();
+assert.equal(stoppedQueue.running, 'false', 'keyboard must stop book queue');
+assert.ok(stoppedQueue.books.every(book => book.animations.every(a => a.state !== 'running')), 'keyboard must pause preview timelines');
 await page.waitForTimeout(700);
-assert.equal(await page.evaluate(() => document.querySelectorAll('[data-book-active="true"]').length), 0, 'book queue must stay stopped');
+assert.deepEqual(await bookQueue(), stoppedQueue, 'book queue must keep its current book and progress while stopped');
 // Inject changes exactly during the title transition; no timing race with the automation bridge.
 for (const action of ['keyboard', 'return']) {
   await resetMotion();
   await page.evaluate(action => { window.__interruptRoute = action; }, action);
   await page.click('a[aria-label="进入灵感集"]');
-  await page.waitForURL(action === 'return' ? 'https://personal-design.localhost/' : '**/products/muse');
+  await page.waitForURL(action === 'return' ? target('/') : '**/products/muse');
   if (action === 'return') await page.waitForFunction(() => location.pathname === '/' && window.__motionLog.filter(entry => entry.target === 'workspace-content').length >= 3);
   await page.waitForTimeout(700);
   assert.ok((await routeMotion()).length > 0);
@@ -122,11 +133,11 @@ for (const action of ['keyboard', 'return']) {
   await assertRestored();
   if (action === 'keyboard') {
     await page.press('a[aria-label="灵感集，返回首页"]', 'Enter');
-    await page.waitForURL('https://personal-design.localhost/');
+    await page.waitForURL(target('/'));
   }
 }
-cliLog('PASS: pointer transitions, shared titles, return, both themes, keyboard/reduced-motion skips, opening cancellation, preview queue stop, interruption/reentry cleanup, folio contrast');
-JS
-ego-browser nodejs <<'JS'
-cliLog(await completeTaskSpace('回退动效修复', { keep: false }));
+console.log('PASS: pointer transitions, shared titles, return, both themes, keyboard/reduced-motion skips, opening cancellation, preview queue stop, interruption/reentry cleanup, folio contrast');
+if (!config.space) await task.finish({ keep: [] });
+CODE
+)
 JS

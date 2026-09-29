@@ -71,7 +71,7 @@ export function BookPreview({ categories }: { categories: { name: string; count:
           nextBook();
       }}
     >
-      <BookSpines categories={categories} previewActive={running ? active : -1} />
+      <BookSpines categories={categories} previewActive={active} />
     </div>
   );
 }
