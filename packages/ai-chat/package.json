@@ -10,7 +10,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "sharp": "^0.35.4"
+    "sharp": "^0.35.5"
   },
   "scripts": {
     "sync:avatars": "node scripts/sync-avatars.mjs"

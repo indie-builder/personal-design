@@ -12,7 +12,7 @@
 
 ## 运行链路
 
-- 后端：`@earendil-works/pi-coding-agent` 0.87.1 的 `AgentSession`，`ModelRuntime` 连接智谱 Coding Plan。
+- 后端：`@earendil-works/pi-coding-agent` 0.99.1 的 `AgentSession`，`ModelRuntime` 连接智谱 Coding Plan。
 - 每次请求用 `SessionManager.inMemory()` 恢复已验证的历史与摘要，只将最新用户输入送进 `session.prompt()`；结束或中止即 dispose。没有跨实例全局 Map，适合 Vercel 冷启动。
 - 关闭主机文件／终端工具、扩展、技能及项目上下文发现；只做问答，不开放官方 coding 示例中的主机操作能力。
 - Pi `text_delta` 桥接为 OpenAI NDJSON；前端 `usePiChat` 用官方 `openAIReadableStreamAdapter` 解析。AI SDK 已移除。
@@ -68,7 +68,7 @@
 - `pnpm build`：同时生成官方组件提示词、检查类型并构建。
 - 真实模型：`sh scripts/design-checks/ai-chat-live.sh`，消耗真实模型额度，检查业务入口、图表切换、决策追问和刷新。
 - 完整案例 UI 回放：`DESIGN_BASE_URL=http://localhost:<本地预览端口> sh scripts/design-checks/ai-chat-case.sh`。仅在独立 localhost origin 导入真实模型生成的6轮案例，覆盖输入／目标恢复、表格、三类图表、决策结果及桌面／手机溢出；不改用户日常会话。证据在 `evidence/ai-chat-case/`。
-- 后端定向回归：先运行 `node scripts/design-checks/fixtures/ai-chat-provider.mjs`，再以 `ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907 pnpm --filter @personal-design/web exec next start -p 3107` 启动测试站，运行 `sh scripts/design-checks/ai-chat.sh`；覆盖流协议、上下文、摘要、一次结构修正、错误、中止和请求边界。
+- 后端定向回归：先运行 `node scripts/design-checks/fixtures/ai-chat-provider.mjs`，再从根目录执行 `ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907 pnpm start`。用 `portless alias upgrade-check.personal-design <启动日志中的应用端口>` 注册独立测试域名，将其完整 URL 设为 `DESIGN_BASE_URL`，设置 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"` 后运行 `node scripts/design-checks/ai-chat-api.mjs`；覆盖流协议、上下文、摘要、一次结构修正、错误、中止和请求边界。结束后停止测试预览和夹具，移除测试 alias，再用 `pnpm start` 恢复正常预览。
 - 结构引用回归：`node --test apps/web/lib/openui-content.test.mjs`。
 
 既有业务流程验收：需求填入3人／5个项目／客户只读，推荐团队版，目标从80%调整到85%，效果分析保留85%目标并呈现三类图表，最终选择延长试用并生成行动摘要。表单状态被持久化，用户消息不含 OpenUI 技术指令。截图不能代替所有浏览器或真机键盘验收。

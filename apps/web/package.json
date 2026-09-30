@@ -11,8 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@earendil-works/pi-ai": "^0.87.1",
-    "@earendil-works/pi-coding-agent": "0.87.1",
+    "@earendil-works/pi-ai": "^0.99.1",
+    "@earendil-works/pi-coding-agent": "0.99.1",
     "@openuidev/lang-core": "0.3.0",
     "@openuidev/react-headless": "0.16.3",
     "@openuidev/react-lang": "^0.3.0",
@@ -24,8 +24,8 @@
     "@personal-design/personal-sites": "workspace:*",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
-    "lucide-react": "1.48.0",
-    "next": "16.3.6",
+    "lucide-react": "1.49.0",
+    "next": "16.3.7",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tailwind-merge": "3.7.0",
@@ -35,11 +35,11 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
-    "@types/node": "24.13.6",
+    "@types/node": "24.19.0",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "babel-plugin-react-compiler": "^1.0.0",
-    "oxlint": "^1.85.0",
+    "oxlint": "^1.86.0",
     "postcss": "8.5.28",
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2"
