@@ -1,5 +1,6 @@
 import { modelMessageContent, requestSchema } from '@personal-design/ai-chat';
 
+import { chatErrorMessage } from '@/lib/chat-error';
 import openuiPrompt from '@/lib/openui-system-prompt.json';
 import { createParser } from '@openuidev/lang-core';
 import { createPiRuntime, createChatSession } from '@/lib/pi-chat';
@@ -90,7 +91,7 @@ export async function POST(request: Request) {
             { signal: abortSignal, maxTokens: 2000 },
           );
           if (result.stopReason === 'error' || result.stopReason === 'aborted')
-            throw new Error('Summary failed');
+            throw new Error(result.errorMessage || 'Summary failed');
           const text = result.content
             .filter((p) => p.type === 'text')
             .map((p) => p.text)
@@ -163,7 +164,11 @@ export async function POST(request: Request) {
               last.stopReason === 'error' ||
               last.stopReason === 'aborted'
             )
-              throw new Error('Generation failed');
+              throw new Error(
+                last?.role === 'assistant'
+                  ? last.errorMessage || 'Generation failed'
+                  : 'Generation failed',
+              );
             const parser = createParser(openuiPrompt.schema, 'Stack');
             const result = parser.parse(output);
             if (
@@ -184,7 +189,11 @@ export async function POST(request: Request) {
                 repair.stopReason === 'error' ||
                 repair.stopReason === 'aborted'
               )
-                throw new Error('UI repair failed');
+                throw new Error(
+                  repair?.role === 'assistant'
+                    ? repair.errorMessage || 'UI repair failed'
+                    : 'UI repair failed',
+                );
               const corrected = parser.parse(output);
               if (
                 !corrected.root ||
@@ -198,8 +207,10 @@ export async function POST(request: Request) {
               closed = true;
               controller.close();
             }
-          } catch {
+          } catch (error) {
             if (!closed) {
+              if (!request.signal.aborted)
+                console.error('[ai-chat] stream:', chatErrorMessage(error));
               closed = true;
               controller.error(new Error('问答服务暂时不可用，请重试。'));
             }
@@ -222,7 +233,8 @@ export async function POST(request: Request) {
     if (memory && memory !== parsed.data.memory)
       headers['x-ai-memory'] = Buffer.from(JSON.stringify({ memory })).toString('base64');
     return new Response(stream, { headers });
-  } catch {
+  } catch (error) {
+    if (!request.signal.aborted) console.error('[ai-chat] request:', chatErrorMessage(error));
     return new Response('问答服务暂时不可用，请稍后重试。', { status: 502 });
   }
 }
