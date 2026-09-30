@@ -1,8 +1,8 @@
 /**
- * 灵感集 SQLite schema 与公共语句。两个同步源（inspora / bestx）共用：
+ * 灵感集 SQLite schema 与公共语句。三个同步源（inspora / bestx / collectui）共用：
  * - posts.source 区分来源；posts.tweet_id 是归一化后的原作推文 id，
- *   两个源指向同一条原作时读取侧只展示 inspora 版本（见 src/index.ts）。
- * - bestx 的媒体不入库（热链其公开 CDN），local_* 保持 NULL。
+ *   多源指向同一原作时读取侧仅显示一份（见 src/index.ts）。
+ * - bestx / collectui 的媒体文件不下载（热链公开 CDN），local_* 保持 NULL。
  */
 import { DatabaseSync } from 'node:sqlite';
 
