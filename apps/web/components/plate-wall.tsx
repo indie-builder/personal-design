@@ -49,7 +49,7 @@ interface PlateWallProps {
 const DEFAULT_BATCH = 48;
 const SEARCH_DEBOUNCE = 200;
 
-function loadPosts(
+async function loadPosts(
   query: string,
   category: string,
   offset: number,
@@ -59,9 +59,19 @@ function loadPosts(
   const params = new URLSearchParams({ offset: String(offset), limit: String(limit) });
   if (query) params.set('q', query);
   if (category !== '全部') params.set('cat', category);
-  return fetch(`/products/muse/api/posts?${params}`, { signal }).then((response) =>
-    response.ok ? (response.json() as Promise<{ items?: PlateWallItem[]; total?: number }>) : null,
-  );
+  const response = await fetch(`/products/muse/api/posts?${params}`, {
+    signal: signal ?? AbortSignal.timeout(15000),
+  });
+  if (!response.ok) throw new Error(`Load failed: ${response.status}`);
+  const data = (await response.json()) as { items: PlateWallItem[]; total: number };
+  if (
+    !Array.isArray(data?.items) ||
+    !Number.isSafeInteger(data.total) ||
+    data.total < 0 ||
+    (data.items.length === 0 && offset < data.total)
+  )
+    throw new Error('Invalid posts page');
+  return data;
 }
 
 /** Stable gallery: one native link per work, visible motion previews, scroll-triggered batching. */
@@ -108,6 +118,11 @@ export function PlateWall({
   // 与筛选同步的数据窗口；key 落后于 filterKey 时为待同步，先用已载入窗口本地过滤回显
   const [synced, setSynced] = useState({ key: filterKey, items, total: initialTotal });
   const [shown, setShown] = useState(batchSize);
+  const [loadError, setLoadError] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const observedRetryRef = useRef(0);
+  const currentFilterRef = useRef(filterKey);
+  currentFilterRef.current = filterKey;
   const moreRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const restoreAbortRef = useRef<AbortController | null>(null);
@@ -158,28 +173,33 @@ export function PlateWall({
   if (prevKey !== filterKey) {
     setPrevKey(filterKey);
     setShown(batchSize);
+    setLoadError(false);
   }
 
   // 筛选变化：防抖拉取当前筛选的完整首窗
-  const fetchIdRef = useRef(0);
   useEffect(() => {
-    if (!stale || restoration) return;
-    const fetchId = ++fetchIdRef.current;
+    if (!stale || restoration || loadError) return;
+    let cancelled = false;
     const timer = setTimeout(() => {
       void (async () => {
         try {
           const data = await loadPosts(query, active, 0, Math.max(batchSize, shown));
-          if (fetchIdRef.current !== fetchId || !Array.isArray(data?.items)) return;
+          if (cancelled) return;
           setSynced({
             key: `${active}|${query}`,
             items: data.items,
             total: Number(data.total) || data.items.length,
           });
-        } catch {}
+        } catch {
+          if (!cancelled) setLoadError(true);
+        }
       })();
     }, SEARCH_DEBOUNCE);
-    return () => clearTimeout(timer);
-  }, [stale, active, query, batchSize, shown, restoration]);
+    return () => {
+      clearTimeout(timer);
+      cancelled = true;
+    };
+  }, [stale, active, query, batchSize, shown, restoration, loadError, retry]);
 
   // Changing filters must cancel a pending return without moving focus or
   // allowing the old request to write into the newly selected list.
@@ -238,7 +258,9 @@ export function PlateWall({
                 if (!Array.isArray(data?.items) || !data.items.length) break;
                 loaded = [...loaded, ...data.items];
               }
-            } catch {}
+            } catch {
+              if (!controller.signal.aborted) setLoadError(true);
+            }
             if (controller.signal.aborted) return;
             setSynced({ key: filterKey, items: loaded, total });
             setShown(Math.min(target, loaded.length));
@@ -264,38 +286,57 @@ export function PlateWall({
 
   // 滚动追加：本地还有未展示批次则直接扩显示数，否则向分片接口取下一片
   useEffect(() => {
+    const requestedRetry = observedRetryRef.current !== retry;
+    observedRetryRef.current = retry;
     const sentinel = moreRef.current;
-    if (!sentinel || restoration || visible.length >= moreTotal) return;
+    if (!sentinel || restoration || loadError || visible.length >= moreTotal) return;
+    let cancelled = false;
+    let loading = false;
+    const append = () => {
+      if (loading) return;
+      loading = true;
+      observer.disconnect();
+      if (shown < listed.length) {
+        setShown((count) => Math.min(count + batchSize, listed.length));
+      } else if (!stale && synced.items.length < synced.total) {
+        const offset = synced.items.length;
+        const key = `${active}|${query}`;
+        void (async () => {
+          try {
+            const data = await loadPosts(query, active, offset, batchSize);
+            const slice = data?.items;
+            if (cancelled) return;
+            if (!slice.length) {
+              setSynced((prev) => (prev.key === key ? { ...prev, total: data.total } : prev));
+              return;
+            }
+            setSynced((prev) => {
+              if (prev.key !== key || prev.items.length !== offset) return prev;
+              return {
+                key: prev.key,
+                items: [...prev.items, ...slice],
+                total: Number(data?.total) || prev.total,
+              };
+            });
+            setShown(offset + slice.length);
+          } catch {
+            if (!cancelled && currentFilterRef.current === key) setLoadError(true);
+          }
+        })();
+      }
+    };
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        observer.disconnect();
-        if (shown < listed.length) {
-          setShown((count) => Math.min(count + batchSize, listed.length));
-        } else if (!stale && synced.items.length < synced.total) {
-          const offset = synced.items.length;
-          const key = `${active}|${query}`;
-          void (async () => {
-            try {
-              const data = await loadPosts(query, active, offset, batchSize);
-              const slice = data?.items;
-              if (!Array.isArray(slice) || !slice.length) return;
-              setSynced((prev) => {
-                if (prev.key !== key || prev.items.length !== offset) return prev;
-                return {
-                  key: prev.key,
-                  items: [...prev.items, ...slice],
-                  total: Number(data?.total) || prev.total,
-                };
-              });
-            } catch {}
-          })();
-        }
+        if (entry?.isIntersecting) append();
       },
       { rootMargin: '600px 0px' },
     );
     observer.observe(sentinel);
-    return () => observer.disconnect();
+    if (requestedRetry && !stale) append();
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
   }, [
     shown,
     listed.length,
@@ -307,6 +348,8 @@ export function PlateWall({
     active,
     query,
     restoration,
+    loadError,
+    retry,
   ]);
 
   const clear = () => window.history.replaceState(null, '', pathname);
@@ -337,14 +380,30 @@ export function PlateWall({
         <CategoryTabs categories={categories} active={active} onSelect={select} />
       </CollectionToolbar>
       <div className={styles.results}>
-        <p role="status">{moreTotal} 件灵感</p>
+        <p role="status">
+          {stale ? (loadError ? '暂时无法更新结果' : '正在更新灵感…') : `${moreTotal} 件灵感`}
+        </p>
         {query || active !== '全部' ? (
           <Button variant="ghost" onClick={clear}>
             清除筛选
           </Button>
         ) : null}
       </div>
-      {listed.length === 0 ? (
+      {loadError ? (
+        <div className={styles.results} role="alert">
+          <p>灵感加载失败，请重试。</p>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setLoadError(false);
+              setRetry((value) => value + 1);
+            }}
+          >
+            重试加载
+          </Button>
+        </div>
+      ) : null}
+      {listed.length === 0 && !loadError && !stale ? (
         <div className={styles.empty}>
           <h2>{query || active !== '全部' ? '没有找到匹配的灵感' : '还没有收录内容'}</h2>
           <p>

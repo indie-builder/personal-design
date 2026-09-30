@@ -1,0 +1,39 @@
+{
+  "date": "2026-09-30",
+  "checks": {
+    "build": "passed",
+    "lint": "passed",
+    "typecheck": "passed",
+    "unitTests": 37,
+    "portfolioApiTests": 5,
+    "aiChatIsolatedApi": "9 checks passed; original provider 429 retained in server log",
+    "museBrowser": [
+      "HTTP 503 retry",
+      "network rejection retry",
+      "malformed response retry",
+      "unexpected empty page retry",
+      "filter error versus successful empty result",
+      "keyboard Enter retry",
+      "light/dark error state",
+      "390px no horizontal overflow"
+    ]
+  },
+  "reproduce": {
+    "cwd": "/Users/xbjt/Documents/myself/personal-design",
+    "commands": [
+      "pnpm build",
+      "pnpm --filter @personal-design/web exec next start -p 3000",
+      "pnpm lint",
+      "pnpm --filter @personal-design/web typecheck",
+      "pnpm test",
+      "DESIGN_BASE_URL=http://localhost:3000 pnpm test:portfolio-api"
+    ],
+    "browser": "In Codex built-in browser REPL: const {verifyMuseErrors}=await import(\"file:///Users/xbjt/Documents/myself/personal-design/scripts/design-checks/muse-errors.browser.mjs\"); await verifyMuseErrors(tab,await tab.capabilities.get(\"cdp\"));",
+    "aiChat": "Start node scripts/design-checks/fixtures/ai-chat-provider.mjs; start isolated production server with ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907/v4 pnpm --filter @personal-design/web exec next start -p 3107; node scripts/design-checks/ai-chat-api.mjs"
+  },
+  "limitations": [
+    "Existing run-all browser scripts launch standalone Chromium, conflicting with built-in-browser-only rule; full browser suite not run.",
+    "Return-restoration failure and delayed old-filter response cancellation were reviewed in source, not browser fault-injected.",
+    "No live provider call."
+  ]
+}
