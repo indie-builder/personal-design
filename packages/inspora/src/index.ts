@@ -57,7 +57,7 @@ export interface InsporaPost {
   creatorName: string | null;
   /** 作者主页（多为 x.com） */
   creatorUrl: string | null;
-  /** 作者头像（inspora 为本地路径，bestx 为 CDN 热链） */
+  /** 作者头像（inspora 为本地路径，公开 REST 源为热链） */
   creatorAvatar: string | null;
   description: string | null;
   category: string | null;
@@ -72,8 +72,8 @@ export interface InsporaPost {
   media: InsporaMedia[];
   /** 上游原始 JSON（详情页 RSC 里提取的完整帖子对象） */
   raw: unknown;
-  /** 数据来源：inspora（灵感站）或 bestx（Best Designs on X） */
-  source: 'inspora' | 'bestx';
+  /** 内部数据来源 */
+  source: 'inspora' | 'bestx' | 'collectui';
   /** 归一化后的原作推文 id，跨源去重键（详情补全前 inspora 行可能为空） */
   tweetId: string | null;
 }
@@ -219,20 +219,24 @@ function toPost(row: PostRow, media: InsporaMedia[]): InsporaPost {
     isFeatured: row.is_featured === 1,
     media,
     raw,
-    source: row.source === 'bestx' ? 'bestx' : 'inspora',
+    source: row.source as InsporaPost['source'],
     tweetId: row.tweet_id,
   };
 }
 
 /**
- * 跨源去重：同一原作推文被两个源都收录时，只展示 inspora 版本（数据更全）。
- * inspora 行、无 tweet_id 的行始终可见。整体括号包裹，便于与其他条件 AND 连用。
+ * 同一原作只展示一份，依次优先 inspora、bestx、collectui；同源用 id 决定唯一版本。
+ * 无 tweet_id 的行保留。列表、详情、导航与分类计数共用这一个条件。
  */
 const VISIBLE_POSTS = `(
-  source = 'inspora' OR tweet_id IS NULL
+  tweet_id IS NULL
   OR NOT EXISTS (
     SELECT 1 FROM posts AS twin
-    WHERE twin.source = 'inspora' AND twin.tweet_id = posts.tweet_id
+    WHERE twin.tweet_id = posts.tweet_id AND (
+      (CASE twin.source WHEN 'inspora' THEN 0 WHEN 'bestx' THEN 1 ELSE 2 END)
+        < (CASE posts.source WHEN 'inspora' THEN 0 WHEN 'bestx' THEN 1 ELSE 2 END)
+      OR (twin.source = posts.source AND twin.id < posts.id)
+    )
   )
 )`;
 
@@ -310,7 +314,7 @@ export function getPostBySlug(slug: string): InsporaPost | undefined {
 export function listCategories(): InsporaCategory[] {
   const rows = conn()
     .prepare(
-      'SELECT category AS name, COUNT(*) AS count FROM posts WHERE category IS NOT NULL GROUP BY category ORDER BY count DESC',
+      `SELECT category AS name, COUNT(*) AS count FROM posts WHERE ${VISIBLE_POSTS} AND category IS NOT NULL GROUP BY category ORDER BY count DESC`,
     )
     .all() as unknown as { name: string; count: number }[];
   // node:sqlite 返回 null 原型对象，RSC 序列化只认普通对象
