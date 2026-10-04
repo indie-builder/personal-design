@@ -6,7 +6,6 @@ import { browseHref, browseMemoryKey, matchesSearch } from '@/lib/browse-context
 import { paramsHref } from '@/lib/site-url';
 import { categoryLabel } from '@/lib/category-label';
 import { CollectionSearch } from './collection-search';
-import { CollectionToolbar } from './collection-toolbar';
 import { Button } from './button';
 import styles from './plate-wall.module.css';
 import { PlateCell } from './plate-cell';
@@ -218,9 +217,7 @@ export function PlateWall({
         'muse-return',
         window.location.pathname + window.location.search,
       );
-      const saved = JSON.parse(
-        sessionStorage.getItem(memoryKey) ?? sessionStorage.getItem('muse-return') ?? 'null',
-      );
+      const saved = JSON.parse(sessionStorage.getItem(memoryKey) ?? 'null');
       if (
         typeof saved?.href === 'string' &&
         browseMemoryKey('muse-return', saved.href) === memoryKey
@@ -367,18 +364,19 @@ export function PlateWall({
           正在恢复浏览位置…
         </p>
       ) : null}
-      <CollectionToolbar
-        actions={
+      <div className={styles.toolbar}>
+        <div className={styles.categories}>
+          <CategoryTabs categories={categories} active={active} onSelect={select} />
+        </div>
+        <div className={styles.actions}>
           <CollectionSearch
             value={input}
             onChange={setQuery}
             placeholder="搜索灵感"
             label="搜索标题、作者或标签"
           />
-        }
-      >
-        <CategoryTabs categories={categories} active={active} onSelect={select} />
-      </CollectionToolbar>
+        </div>
+      </div>
       <div className={styles.results}>
         <p role="status">
           {stale ? (loadError ? '暂时无法更新结果' : '正在更新灵感…') : `${moreTotal} 件灵感`}

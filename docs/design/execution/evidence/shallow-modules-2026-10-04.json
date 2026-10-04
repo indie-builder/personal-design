@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-04",
+  "base": "https://upgrade-check.personal-design.localhost:1355",
+  "changes": [
+    "removed cn / tailwind-merge direct dependency",
+    "inlined CollectionToolbar",
+    "removed unused navigation appearance and browse=1 session compatibility",
+    "consolidated chat cancellation and error lifecycle",
+    "removed tools projection and retired script entries"
+  ],
+  "checks": {
+    "typecheck": true,
+    "targetedLint": true,
+    "unitTests": {
+      "passed": 36,
+      "failed": 0
+    },
+    "productionBuild": true,
+    "staticRoutes": {
+      "passed": 361,
+      "failed": 0
+    },
+    "portfolioApi": {
+      "passed": 5,
+      "failed": 0
+    },
+    "chatApi": {
+      "passed": 9,
+      "failed": 0
+    },
+    "navigation": {
+      "passed": true,
+      "checks": [
+        "empty search, URL reload and clear",
+        "category/search in adjacent links, in-app return and native Back restore focus",
+        "retired browse=1 falls back to category navigation",
+        "1440px light: list/detail fit, navigation hit targets",
+        "1280px dark: list/detail fit, navigation hit targets",
+        "390px light: list/detail fit, navigation hit targets",
+        "320px dark: list/detail fit, navigation hit targets"
+      ],
+      "screenshots": [
+        "list-1440-light.png",
+        "detail-1440-light.png",
+        "list-1280-dark.png",
+        "detail-1280-dark.png",
+        "list-390-light.png",
+        "detail-390-light.png",
+        "list-320-dark.png",
+        "detail-320-dark.png"
+      ],
+      "reducedMotion": true
+    },
+    "chat": {
+      "origin": "https://upgrade-check.personal-design.localhost:1355",
+      "results": [
+        "error → normal send clears error and renders answer",
+        "stop → normal send works",
+        "leave during generation aborts → return and continue works"
+      ]
+    }
+  },
+  "visual": {
+    "reviewed": [
+      "list-1440-light.png",
+      "detail-320-dark.png"
+    ],
+    "directory": ".impeccable/review/shallow-modules",
+    "scope": "Static appearance only; not a full animation-frame audit"
+  },
+  "limitations": [
+    "run-all.mjs browser suites launch standalone Chromium and were not run under the current built-in-browser-only policy",
+    "browser emulation does not cover physical iOS or Android devices",
+    "chat used the existing fixture provider, not the live model"
+  ],
+  "integrationRecheck": {
+    "baseCommit": "5b8a05f4a5d50f089a6d104db2df42864af4c8f7",
+    "date": "2026-10-04",
+    "frozenLockfileInstall": true,
+    "workspaceTypecheck": true,
+    "fullLint": true,
+    "fullFormatCheck": true,
+    "unitTests": {
+      "passed": 40,
+      "failed": 0
+    },
+    "productionBuild": true,
+    "note": "Browser and API results above were recorded in the original workspace before rebasing onto the latest main; the isolated PR worktree repeated the checks listed here."
+  }
+}

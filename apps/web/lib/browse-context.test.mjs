@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { browseHref, browseMemoryKey, resolveBrowseContext, resolveUrlBrowseContext } from './browse-context.ts';
+import { browseHref, browseMemoryKey, resolveUrlBrowseContext } from './browse-context.ts';
 const path='/products/layout-compositions';
 const entries=[
  {href:`${path}/001`,title:'First',category:'构图',theme:'balance'},
@@ -27,11 +27,6 @@ test('return memory keys separate searches and categories',()=>{
  assert.notEqual(browseMemoryKey('return',`${path}?cat=构图&q=abc`),browseMemoryKey('return',`${path}?cat=构图`));
  assert.notEqual(browseMemoryKey('return',path),browseMemoryKey('return',`${path}?cat=构图`));
 });
-test('valid saved search trails can be restored',()=>{
- assert.deepEqual(resolveBrowseContext(JSON.stringify({href:`${path}?q=First`,entries}),path,entries[0].href),{href:`${path}?q=First`,entries});
- assert.deepEqual(resolveBrowseContext(JSON.stringify({href:path,entries}),path,entries[0].href),{href:path,entries});
-});
-test('invalid, unrelated or malformed snapshots cannot alter navigation',()=>{
- for(const raw of [null,'{',JSON.stringify({href:'/other',entries}),JSON.stringify({href:path,entries:[null]})])assert.equal(resolveBrowseContext(raw,path,entries[0].href),null);
- assert.equal(resolveBrowseContext(JSON.stringify({href:path,entries}),path,`${path}/999`),null);
+test('retired session markers fall back to the normal detail navigation',()=>{
+ assert.equal(resolveUrlBrowseContext('browse=1&cat=构图&q=First',path,entries[0].href,entries),null);
 });

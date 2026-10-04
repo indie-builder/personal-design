@@ -98,9 +98,7 @@ async function Detail({ params }: PageProps) {
   return (
     <>
       <BrowseNavigation
-        appearance="text"
         listPath="/products/muse"
-        storageKey="muse-return"
         returnLabel="返回灵感集"
         fallbackHref={listHref}
         browseEntries={windowed(browseEntries, currentHref)}
