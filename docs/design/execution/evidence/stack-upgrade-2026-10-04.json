@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-04",
+  "changes": {
+    "next": "16.3.8",
+    "pi": "1.0.2",
+    "pnpm": "12.9.1",
+    "lucideReact": "1.52.0",
+    "remotion": "4.0.532",
+    "nodeTypes": "24.19.1",
+    "globalPortless": "0.15.7",
+    "home": "Package preview query stops resolving media when enough candidates have been found; preserves old homepage output.",
+    "chat": "Coalesce localStorage serialization and writes during generation at 500ms intervals; flush pending snapshots on completion, stop, pagehide, visibility hidden and unmount. Non-streaming changes save immediately."
+  },
+  "verification": {
+    "typecheck": "pnpm typecheck: passed",
+    "lint": "pnpm lint: passed",
+    "format": "pnpm format:check: passed after formatting one hook signature",
+    "unit": "pnpm test: 58 passed",
+    "build": "pnpm build: passed with Next.js 16.3.8 and all 82 OpenUI definitions",
+    "chatApi": "12 checks passed with local fixture; no real model calls",
+    "portfolioApi": "5 checks passed",
+    "staticRoutes": "11 checked, zero failures",
+    "reproduction": [
+      "node scripts/design-checks/fixtures/ai-chat-provider.mjs",
+      "ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907/v1 pnpm start",
+      "portless alias upgrade-check.personal-design <application port from start log>",
+      "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 node scripts/design-checks/ai-chat-api.mjs",
+      "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 pnpm test:portfolio-api",
+      "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 node scripts/verify-design-routes.mjs"
+    ]
+  },
+  "measurements": {
+    "homeQuery": {
+      "posts": 9633,
+      "media": 12943,
+      "originalMs": 284.7,
+      "boundedMs": 0.6,
+      "outputEqual": true,
+      "qualification": "Single run from full test suite, not an end-to-end benchmark or page-load claim."
+    },
+    "clientManifest": {
+      "homeReferencedJsBytes": 119120,
+      "chatReferencedJsBytes": 2952450,
+      "homeReferencesChatComponent": false,
+      "qualification": "Uncompressed file sizes referenced by each client manifest, not network transfer or complete hydration cost."
+    }
+  },
+  "remainingUpgrades": {
+    "direct": "28 unique direct dependencies checked against npm latest. Only @types/node latest differs; keep 24.x aligned with Node 24.",
+    "indirectCandidates": {
+      "ai": "Follow-up: optional peer used only by the unused vercelAIAdapter. Targeted pnpm resolution removed stale ai 7.0.114 and nine exclusive dependency versions; no ai package is required by the app. See ai-optional-peer-2026-10-04.json.",
+      "recharts": "2.15.4 -> 3.10.1; requires upstream OpenUI compatibility",
+      "zustand": "4.5.7 -> 5.0.15; requires upstream OpenUI compatibility",
+      "node-domexception": "1.0.0 is deprecated; even latest 2.0.2 is deprecated, prefer upstream removal"
+    },
+    "node": "Keep 24.21.0 LTS; Node 26.10.0 is Current, planned LTS 2026-10-28."
+  },
+  "limitations": [
+    "Codex built-in browser is unavailable in this session. No visual, interaction or browser lifecycle regression claimed.",
+    "run-all.mjs browser suites launch standalone Playwright, so they were not run under the current browser restriction. Applicable HTTP checks ran separately.",
+    "Persistence scheduler is unit-tested, but React lifecycle integration still needs the existing chat-lifecycle.browser.mjs in the built-in browser.",
+    "No real provider, Remotion video rendering, production deployment or commit performed.",
+    "Pi Harness and full OpenUI library are retained; no framework migration or stream-render batching introduced."
+  ]
+}

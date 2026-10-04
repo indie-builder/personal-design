@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-04",
+  "intent": "Evaluate updating residual AI SDK 7.0.114 to 7.0.127 within OpenUI compatibility.",
+  "finding": "@openuidev/react-headless 0.16.3 declares ai ^6.0.0 || ^7.0.0 as an optional peer. Its dynamic ai import belongs to vercelAIAdapter; the application uses openAIReadableStreamAdapter and Pi instead.",
+  "resolution": "pnpm --filter @personal-design/web update ai --depth 10 --no-save removed the unused optional peer. No direct dependency or override was added. Explicit ai@7.0.127 was initially rejected with ERR_PNPM_UPDATE_VERSION_ON_INDIRECT_DEP; the supported unversioned resolution was used.",
+  "removedPackageVersions": [
+    "ai@7.0.114",
+    "@ai-sdk/gateway@4.0.92",
+    "@ai-sdk/provider-utils@5.0.47",
+    "@ai-sdk/provider@4.0.18",
+    "@standard-schema/spec@1.1.0",
+    "@vercel/oidc@3.2.0",
+    "@workflow/serde@4.1.0",
+    "eventsource-parser@3.1.1",
+    "json-schema@0.4.0",
+    "undici@7.29.1"
+  ],
+  "verification": {
+    "frozenInstall": "pnpm install --frozen-lockfile passed",
+    "typecheck": "passed",
+    "lint": "passed",
+    "format": "passed",
+    "unit": "58 passed",
+    "productionBuild": "passed, all 82 OpenUI definitions retained",
+    "chatApi": "12 existing fixture checks passed, including summary reuse/failure, repair, abort and validation",
+    "portfolioApi": "5 passed",
+    "staticRoutes": "11 checked, no failures",
+    "officialAdapter": "Imported installed OpenUI openAIReadableStreamAdapter in Node, parsed a real response from the fixture-backed production /api/ai-chat, verified text contains 3000 and Stack plus TEXT_MESSAGE_END.",
+    "chatReferencedJsBytesBefore": 2952450,
+    "chatReferencedJsBytesAfter": 2952450
+  },
+  "reproduction": [
+    "pnpm install --frozen-lockfile && pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build",
+    "node scripts/design-checks/fixtures/ai-chat-provider.mjs",
+    "ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907/v1 pnpm start",
+    "portless alias upgrade-check.personal-design <application port>",
+    "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 node scripts/design-checks/ai-chat-api.mjs",
+    "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 pnpm test:portfolio-api",
+    "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 node scripts/verify-design-routes.mjs"
+  ],
+  "limitations": [
+    "No built-in browser available; no new browser visual or interaction acceptance.",
+    "Fixture model only; no live model requests.",
+    "Manifest bytes are uncompressed referenced assets, not transfer size. No browser bundle improvement claimed.",
+    "Recharts 2, Zustand 4 and Node 24 remain unchanged. No commit or deployment."
+  ]
+}
