@@ -1,4 +1,4 @@
-// In Codex's built-in browser REPL, with a production preview tab:
+// With a compatible production preview tab adapter:
 // const { verifyShallowNavigation } = await import('file:///ABSOLUTE_REPO/scripts/design-checks/shallow-navigation.browser.mjs');
 // await verifyShallowNavigation(tab, await tab.capabilities.get('cdp'), await browser.capabilities.get('viewport'));
 import assert from 'node:assert/strict';

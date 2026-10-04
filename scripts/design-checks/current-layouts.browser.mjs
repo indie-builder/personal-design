@@ -1,4 +1,4 @@
-// Codex built-in browser only; pass an existing production tab and its capabilities.
+// Pass a compatible production tab, CDP session and viewport adapter.
 // await verifyCurrentLayouts(tab, await tab.capabilities.get('cdp'), await browser.capabilities.get('viewport'));
 import assert from 'node:assert/strict';
 

@@ -25,6 +25,9 @@ jobs:
         env:
           COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
 
+      - name: Navigation contracts
+        run: pnpm check:navigation && pnpm test:navigation
+
       - name: Typecheck
         run: pnpm -r typecheck
 

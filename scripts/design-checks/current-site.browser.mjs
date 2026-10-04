@@ -1,4 +1,4 @@
-// Run in Codex's built-in browser with a production tab; this never launches a browser.
+// Pass a compatible production tab, CDP session and viewport adapter.
 // await verifyCurrentSite(tab, await tab.capabilities.get('cdp'), await browser.capabilities.get('viewport'));
 import assert from 'node:assert/strict';
 import { verifyTimelineBounds } from './home-performance.browser.mjs';

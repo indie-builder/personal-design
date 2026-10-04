@@ -1,12 +1,12 @@
-# AI Coding 词典：内置浏览器 CDP 验收
+# AI Coding 词典：CDP 验收
 
-运行 `pnpm build`，再启动 `pnpm --filter @personal-design/web exec next start -p 3102`。只使用 Codex 内置浏览器的 `cdp` capability；本记录不调用 ego-lite。
+此前浏览器工具限制已撤销。当前从仓库根目录运行 `pnpm build`、`pnpm start`，使用启动日志中的 Portless URL；可使用 Playwright、CDP 或环境可用的浏览器工具完成下列场景。使用 CDP 时连接被测标签页，工具适配及生产预览配置见[当前验收入口](README.md)。
 
-既有图谱验收证据：[JSON 记录](evidence/ai-coding-dictionary-cdp.json)。本文件以下为当前可重复步骤；新详情的最终 E2E 仍待记录，不能以旧 JSON 代替。原始文件快照在 `packages/ai-coding-dictionary/upstream/`，生成文件在 `apps/web/public/ai-coding-atlas/`（不提交生成副本）。图谱 JS/CSS 沿用快照，构建脚本处理资源地址、数据模块、loading 状态及本站桥接；按用户要求增强选中圆点／外圈／名称，并移除配色切换与音效入口。当前详情由 `bridge.js` 和 `detail.css` 实现，`prepare-runtime.mjs` 将原版 t8 详情组件替换为 null，分享和复制控件不再挂载。
+既有图谱验收证据：[JSON 记录](evidence/ai-coding-dictionary-cdp.json)，只证明当时图谱与摘要阅读面的限定范围。下方场景包含后来补充的完整双语详情要求，复跑时需核对当前 DOM 并单独记录结果；完整详情的历史证据与现行契约见 [详情阅读区](ai-coding-dictionary-detail.md)。当前详情由 `bridge.js` 和 `detail.css` 实现，运行文件位于 `apps/web/public/ai-coding-atlas/`。上游快照与 `prepare-runtime.mjs` 等准备脚本已退役；迁入时曾由准备脚本处理资源地址、数据模块、loading 状态、本站桥接及旧 t8 详情组件替换，不能将其描述为当前构建步骤。
 
 ## 重复步骤
 
-1. 在内置浏览器打开 `/products/ai-coding-dictionary?term=harness`，读取该 tab 的 CDP 文档并取得 capability。
+1. 在所选浏览器打开 Portless 预览的 `/products/ai-coding-dictionary?term=harness`，获取该标签页的 CDP session 或兼容接口。
 2. 使用 `Runtime.evaluate` 读取 `document.querySelector('iframe').contentWindow`；确认其 `__atlasJourney` 已就绪、`canvas` 存在、loading 元素不可见、外部 `a[href^="http"]` 数量为 0。
 3. 确认 `.dictionary-detail` 标题是 Harness，`.dictionary-definition` 与 `.dictionary-definition-en` 各一份，`.dictionary-pair` 数量等于该词条英文正文段落数，每对含完整中文译文与英文原文。点击详情“下一词条”链接，确认词条及父页面 URL 都变为 `model-provider-request`；浏览器后退应回到 Harness。再做一次下一词条 → 浏览器后退，动画完成后仍应是 Harness 且仅一份阅读面。
 4. 读取 `.dictionary-close` 按钮的 `getBoundingClientRect()`，用 `Input.dispatchMouseEvent` 执行按下／松开。随后点击原始 Search 按钮，用 `Input.insertText` 输入「缓存」。确认 `__atlasJourney.getState().matchSlugs` 为 `['prefix-cache']`，父页面 `q` 同步。
@@ -21,7 +21,7 @@
 
 ## 原始文件一致性
 
-通过 CDP 的 `Runtime.evaluate` 在本地页面 fetch 上述 JSON 中列出的三个文件，恢复两种本地 URL 前缀后，使用 `crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))` 计算散列。CSS 应与 JSON 记录及 `upstream/` 原始文件相同。JSON 中的 renderer 散列是迁入时基线；当前 renderer 有选中状态、图谱可读性及移除旧详情组件等补丁，差异以 `prepare-runtime.mjs` 中的 `replaceOne` 列表为准，不再宣称它与原版逐字相同。
+历史检查曾通过 CDP 的 `Runtime.evaluate` 在本地页面 fetch 上述 JSON 中列出的三个文件，恢复两种本地 URL 前缀后，使用 `crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))` 计算散列，并将 CSS 与当时的 `upstream/` 快照比较。JSON 中的 renderer 散列是迁入时基线，后续已有选中状态、图谱可读性及移除旧详情组件等补丁；当时差异由 `prepare-runtime.mjs` 的 `replaceOne` 列表记录。快照与脚本现已退役，不能按旧散列推定当前资源一致性；重验需另行明确比较基线与当前文件。
 
 阅读面、双语桥接、返回作品入口属于本站适配，不纳入原始文件一致性比较。中文搜索通过数据模块补充检索词，继续使用原版的搜索和图谱重排代码。
 
@@ -33,7 +33,7 @@
 
 用户优先保留原版向四周散开的形态。`focus-spacing.js` 保持各节点相对选中点的原始投影角度，只在碰撞时沿该方向向外寻找空位，选中点固定。关联节点优先排布，圆点与可读名称都预留间距；背景圆点也参与避让，避免前景遮挡。取消上一版 24px 的硬上限。不限制节点落入固定矩形，不改变原版背景淡化参数。原版 tD/tF 共用位置供节点、连线、标签和点击命中使用；关闭详情后位移平滑归零，搜索重排期间不施加避让。
 
-内置浏览器打开 Turn（815px 宽），对照调整前画面检查四向连线、相邻圆点和漂浮。点击左上方 Agent 圆点，确认 URL 与详情均变为 agent，再关闭详情确认回到总览。
+使用所选浏览器打开 Turn（815px 宽），对照调整前画面检查四向连线、相邻圆点和漂浮。点击左上方 Agent 圆点，确认 URL 与详情均变为 agent，再关闭详情确认回到总览。
 
 ## 视觉适配范围
 

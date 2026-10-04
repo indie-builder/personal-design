@@ -1,5 +1,5 @@
 {
-  "base": "http://localhost:3000",
+  "base": "https://personal-design.localhost:1355",
   "results": [
     {
       "name": "theme follows OS initially and dynamically",
@@ -34,7 +34,7 @@
       "passed": true
     },
     {
-      "name": "reflow 320px /products/layout-compositions/001",
+      "name": "reflow 320px /products/layout-compositions?cat=构图逻辑&page=001",
       "passed": true
     },
     {
@@ -58,7 +58,7 @@
       "passed": true
     },
     {
-      "name": "reflow 720px /products/layout-compositions/001",
+      "name": "reflow 720px /products/layout-compositions?cat=构图逻辑&page=001",
       "passed": true
     },
     {

@@ -1,4 +1,4 @@
-// Built-in browser REPL; production preview uses fixtures/ai-chat-provider.mjs on :3907.
+// Compatible browser tab adapter; production preview uses fixtures/ai-chat-provider.mjs on :3907.
 // const { verifyChatLifecycle } = await import('file:///ABSOLUTE_REPO/scripts/design-checks/chat-lifecycle.browser.mjs');
 // await verifyChatLifecycle(tab, await tab.capabilities.get('cdp'));
 export async function verifyChatLifecycle(tab, cdp) {

@@ -1,5 +1,7 @@
 # 文字游乐场
 
+历史结果保留当时的浏览器和验证范围；此前浏览器工具限制已撤销。当前可使用 Playwright、CDP 或环境可用的浏览器工具，启动与适配方式见[验收入口](README.md)。
+
 ## 范围与参考
 
 2026-09-29 用户指定复刻已打开页面上半部的小型文字游戏，随后确认全部五款。仅参考上半部交互，不包含下方“探索游戏”、账号、聊天或生成服务。来源通过 Codex 内置浏览器实看，并核对该区域已加载脚本中的规则。新作品为 `/products/word-arcade`，日期 2026-09-29。
@@ -18,10 +20,10 @@
 node --test packages/word-arcade/src/game.test.mjs
 pnpm --filter @personal-design/web typecheck
 pnpm build
-pnpm --filter @personal-design/web exec next start --port 3012
+pnpm start # 使用启动日志中的 Portless URL
 ```
 
-内置浏览器打开 `http://localhost:3012/products/word-arcade` 后，在 cua_repl 中载入 `scripts/design-checks/word-arcade.browser.mjs`，传入该页 tab 与其支持的 `cdp` capability。脚本通过实际 UI 启动五款、取得分数、暂停并重置；不启动其他浏览器。截图与详细记录在 `.impeccable/review/word-arcade/`，视觉对照在根 `design-qa.md`。
+使用所选浏览器打开启动日志所示 Portless URL 的 `/products/word-arcade` 后，按[当前验收入口](README.md)载入 `scripts/design-checks/word-arcade.browser.mjs`，传入兼容的 `tab` 与该页 CDP 适配器；使用原生 Playwright Page 时需先包装接口。脚本通过实际 UI 启动五款、取得分数、暂停并重置。截图与详细记录在 `.impeccable/review/word-arcade/`，视觉对照在根 `design-qa.md`。
 
 缩放时按新几何重排并暂停保留进度；恢复需主动点击。切走页面释放 RAF、DOM 动画、观察器与事件。减少动态效果取消背景移动和击飞碎片；主动开始后的必要游戏物理仍可运行。
 
@@ -36,7 +38,7 @@ pnpm --filter @personal-design/web exec next start --port 3012
 
 ### 限制
 
-内置浏览器当前不支持`Input.dispatchTouchEvent`，已验证390px布局和鼠标／键盘事件，真实触摸手势尚未实机验收。触摸指针处理与捕获已实现，不能将窄屏回归冒充触摸实机测试。旧`run-all.mjs`多项脚本会通过Playwright启动独立浏览器，与根AGENTS.md的内置浏览器要求冲突，因此未运行该旧全套浏览器启动器；本次使用内置浏览器专项，加全量单元／API／预渲染路由检查。未声称覆盖原集合全站行为。
+当时使用的内置浏览器不支持`Input.dispatchTouchEvent`，已验证390px布局和鼠标／键盘事件，真实触摸手势尚未实机验收。触摸指针处理与捕获已实现，不能将窄屏回归冒充触摸实机测试。本次未运行`run-all.mjs`，使用内置浏览器专项，加全量单元／API／预渲染路由检查。未声称覆盖原集合全站行为；当前既有 Playwright 回归子集入口为 `pnpm check:browser`。
 
 ## 第二轮检查（2026-09-29）
 
@@ -82,7 +84,7 @@ pnpm --filter @personal-design/web exec next start --port 3012
 - 新生产预览 `http://localhost:3013`：Portfolio API 5项通过，全部361条静态路由检查通过。
 - 内置浏览器1440×900与390×844再次运行 `verifyWordArcade`：五款分别实际得分、暂停、重开，均通过，控制台错误0。390px深色主题下内容宽度390px，无横向溢出。
 - 既有几何数据上的五款×三个尺寸共15个模型可解性案例通过；不作真人通关率声明。
-- 本轮操作JSON与截图保存于 `.impeccable/review/word-arcade/premerge/`。旧全套启动器仍因独立浏览器约束未执行；真机触摸与其他浏览器引擎限制沿用。
+- 本轮操作JSON与截图保存于 `.impeccable/review/word-arcade/premerge/`。本轮仍未执行既有浏览器套件；真机触摸与其他浏览器引擎未验证。
 
 ## 首页动态预览（2026-09-30）
 

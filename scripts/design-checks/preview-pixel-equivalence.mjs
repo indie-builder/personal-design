@@ -57,7 +57,7 @@ window.comparison={pass:results.every(r=>r.changed===0),cases:results.length,max
 );
 
 console.log(
-  'Open http://localhost:3020/canvas.html in the Codex browser after serving ' +
+  'Open http://localhost:3020/canvas.html in a browser after serving ' +
     dir +
     '; expect pass=true and 144 identical frames.',
 );

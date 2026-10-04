@@ -2,6 +2,8 @@
 
 2026-09-30。基线 `c4e00c8`。用户明确要求保持效果：不降低帧率、DPR、节点数量、画质，不改动效时序、物理规则、预取和导航速度。
 
+历史结果保留当时的浏览器和验证范围；此前浏览器工具限制已撤销。当前可使用 Playwright、CDP 或环境可用的浏览器工具，启动与适配方式见[验收入口](README.md)。
+
 ## 实施
 
 - **游戏预览**：缓存像素背景的Path2D几何，仍逐帧使用原来的时间、透明度和颜色。整数DPR合并绘制调用；小数DPR保留原fillRect路径，避免边缘覆盖差异。曾试验文字贴图缓存，发现1灰阶合成差异后弃用，最终标题仍按原方式绘制。正式游戏页调用不传缓存，规则和绘制路径保持原状。
@@ -18,7 +20,7 @@
 3. 内置浏览器确认短暂离屏时同一个iframe仍存在、隐藏且frameloop=never，返回后同一实例visible/always；1.8秒离屏后释放。最终构建相同检查通过。
 4. 首页首端、中间、末端按钮状态与原阈值一致；390px深色游戏预览继续运动；键盘和减少动态效果停住，指针恢复后继续。
 5. 进入完整词典页后，首页预览iframe数量为0，完整词典Canvas正常出现，浏览器错误0。
-6. `pnpm test`共36项通过，类型检查、Lint、格式检查、生产构建通过。旧独立浏览器启动器因AGENTS约束未执行，本轮使用内置浏览器定向检查；真机触摸和其他浏览器引擎未验证。
+6. `pnpm test`共36项通过，类型检查、Lint、格式检查、生产构建通过。本轮未执行独立浏览器套件，使用内置浏览器定向检查；真机触摸和其他浏览器引擎未验证。
 
 ## 性能对比
 
@@ -39,11 +41,11 @@
 ```sh
 pnpm test
 pnpm build
-pnpm --filter @personal-design/web exec next start --port 3013
+pnpm start # 使用启动日志中的 Portless URL
 node scripts/design-checks/preview-pixel-equivalence.mjs
 python3 -m http.server 3020 --bind 127.0.0.1 --directory .impeccable/review/home-performance/equivalence
 ```
 
-在Codex内置浏览器打开3020的`canvas.html`，运行 `verifyPreviewPixels`；在3013首页显示词典缩略图、Canvas就绪后运行 `verifyDictionaryReuse`，运行 `verifyTimelineBounds` 检查按钮。三个检查导出自 `scripts/design-checks/home-performance.browser.mjs`，只使用传入的内置浏览器CDP能力，不启动其他浏览器。
+使用所选浏览器打开独立静态夹具服务 `http://127.0.0.1:3020/canvas.html`，运行 `verifyPreviewPixels`；在 `pnpm start` 日志所示 Portless 首页显示词典缩略图、Canvas 就绪后运行 `verifyDictionaryReuse`，运行 `verifyTimelineBounds` 检查按钮。三个检查导出自 `scripts/design-checks/home-performance.browser.mjs`，接收与被测页面对应的兼容 CDP 接口，可由 Playwright CDP session 或其他浏览器工具适配提供；3020 是生成的静态对照夹具服务，不是 Next 应用端口。当前启动与覆盖边界见[验收入口](README.md)。
 
 截图与JSON记录：`.impeccable/review/home-performance/after/`（`pixels.json`、`final-lifecycle.json`、`motion-states.json`、桌面及深色窄屏截图）。

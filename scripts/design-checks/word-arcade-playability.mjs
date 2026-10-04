@@ -2,7 +2,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { Arcade } from '../../packages/word-arcade/src/game.ts';
 import { resolve, dirname } from 'node:path';
-if (!process.argv[2]) throw new Error('Pass the JSON layouts captured from the built-in browser');
+if (!process.argv[2]) throw new Error('Pass the JSON layouts captured from the browser');
 const layoutFile = resolve(process.argv[2]);
 const layouts=JSON.parse(readFileSync(layoutFile));
 const output=[];

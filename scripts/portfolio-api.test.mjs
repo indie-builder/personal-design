@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 // 对 /api/portfolio 的集成契约检查：需对运行中的生产服务执行，
 // 基址与 design-checks 一致（DESIGN_BASE_URL，默认 https://personal-design.localhost），
-// 已纳入 run-all.mjs 全套回归；单独运行用 pnpm test:portfolio-api，
+// 已纳入 pnpm check:http；单独运行用 pnpm test:portfolio-api，
 // 其他 Portless 域名可用 PORTFOLIO_API_BASE 覆盖。
 // 注意：layouts 的 350/8 是数据快照钉，同步增删图鉴后需同步更新。
 const base =

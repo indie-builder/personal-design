@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-04",
+  "baseline": "151133c4cdc3916fc13bc2b7389837a6089c1fb0",
+  "scope": "Repository navigation, active acceptance index, HTTP runner and CI document guard; no product UI changes",
+  "changes": [
+    "Separate active acceptance commands from dated history and retain existing evidence",
+    "Register current HTTP/browser checks and validate links, exports and local driver dependencies in CI",
+    "Expose HTTP-only runner and restore existing Playwright regression suite via pnpm check:browser",
+    "Add branch baseline, bounded search, feature pointers and complete skill-update procedure",
+    "Remove all agent-specific browser restrictions and browser package/launcher bans from documentation and CI guard"
+  ],
+  "verification": [
+    {
+      "command": "pnpm check:navigation",
+      "result": "pass"
+    },
+    {
+      "command": "pnpm test:navigation",
+      "result": "pass",
+      "tests": 12,
+      "method": "Failure cases written before implementation; revised policy regression proves browser tools and launchers are allowed"
+    },
+    {
+      "command": "pnpm test",
+      "result": "pass",
+      "tests": 64
+    },
+    {
+      "command": "pnpm typecheck",
+      "result": "pass"
+    },
+    {
+      "command": "pnpm lint",
+      "result": "pass"
+    },
+    {
+      "command": "pnpm format:check",
+      "result": "pass"
+    },
+    {
+      "command": "pnpm build",
+      "result": "pass"
+    },
+    {
+      "command": "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://personal-design.localhost:1355 pnpm check:http",
+      "result": "pass",
+      "routes": 11,
+      "portfolioTests": 5
+    },
+    {
+      "command": "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 pnpm check:http chat-api",
+      "result": "pass",
+      "apiChecks": 12,
+      "provider": "Existing fixture on 127.0.0.1:3907; production preview launched through root pnpm start with test-only credentials"
+    },
+    {
+      "check": "HTTP runner subprocess probes",
+      "result": "pass",
+      "cases": [
+        "unknown suite rejected",
+        "wrong chat origin rejected",
+        "URL path rejected",
+        "child failure propagated while other suites run",
+        "missing suite fails preflight before any execution"
+      ]
+    },
+    {
+      "check": "Scoped oxlint, Node syntax checks and git diff --check",
+      "result": "pass"
+    },
+    {
+      "command": "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://personal-design.localhost:1355 pnpm check:browser",
+      "result": "pass",
+      "suites": 12,
+      "driver": "Playwright Chromium",
+      "coverage": [
+        "foundation/theme/reflow",
+        "11 prerendered routes",
+        "5 portfolio API tests",
+        "homepage behavior",
+        "bookshelf/reader/states",
+        "muse behavior/recovery",
+        "lightbox/focus",
+        "autoplay",
+        "two navigation journeys",
+        "personal site playback"
+      ]
+    }
+  ],
+  "cleanup": "Stopped fixture and test preview, removed temporary alias, restored normal root pnpm start at https://personal-design.localhost:1355; pre-existing other worktree service untouched",
+  "limitations": [
+    "Registry checks local file targets, not Markdown anchor existence, external URLs or semantic agreement of all prose",
+    "Local import inspection checks literal paths; it does not restrict browser vendors or launch methods",
+    "Legacy full chat component replays, collection performance and detailed motion coverage remain explicitly documented coverage gaps",
+    "GitHub-hosted CI was not run; its commands were verified locally",
+    "Playwright suite is a regression subset; this run does not establish full chat, dictionary, arcade or frame-by-frame visual coverage"
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "documents": [
+    "AGENTS.md",
+    "README.md",
+    "PRODUCT.md",
+    "apps/web/AGENTS.md",
+    "docs/agents/navigation.md",
+    "docs/design/README.md",
+    "docs/design/execution/README.md"
+  ],
+  "http": [
+    {
+      "id": "routes",
+      "file": "scripts/verify-design-routes.mjs"
+    },
+    {
+      "id": "portfolio",
+      "file": "scripts/portfolio-api.test.mjs"
+    },
+    {
+      "id": "chat-api",
+      "file": "scripts/design-checks/ai-chat-api.mjs",
+      "origin": "https://upgrade-check.personal-design.localhost"
+    }
+  ],
+  "browser": [
+    {
+      "id": "site",
+      "file": "scripts/design-checks/current-site.browser.mjs",
+      "exports": [
+        "verifyCurrentSite"
+      ]
+    },
+    {
+      "id": "layouts",
+      "file": "scripts/design-checks/current-layouts.browser.mjs",
+      "exports": [
+        "verifyCurrentLayouts"
+      ]
+    },
+    {
+      "id": "navigation",
+      "file": "scripts/design-checks/shallow-navigation.browser.mjs",
+      "exports": [
+        "verifyShallowNavigation"
+      ]
+    },
+    {
+      "id": "muse-errors",
+      "file": "scripts/design-checks/muse-errors.browser.mjs",
+      "exports": [
+        "verifyMuseErrors"
+      ]
+    },
+    {
+      "id": "chat",
+      "file": "scripts/design-checks/chat-lifecycle.browser.mjs",
+      "exports": [
+        "verifyChatLifecycle"
+      ]
+    },
+    {
+      "id": "home-performance",
+      "file": "scripts/design-checks/home-performance.browser.mjs",
+      "exports": [
+        "verifyTimelineBounds",
+        "verifyDictionaryReuse",
+        "verifyPreviewPixels"
+      ]
+    },
+    {
+      "id": "arcade",
+      "file": "scripts/design-checks/word-arcade.browser.mjs",
+      "exports": [
+        "verifyWordArcade",
+        "verifyRunnerAlignment",
+        "verifyRestartHeadline",
+        "verifyPointerCancel",
+        "startVisiblePlaythrough"
+      ]
+    },
+    {
+      "id": "arcade-preview",
+      "file": "scripts/design-checks/word-arcade-preview.browser.mjs",
+      "exports": [
+        "previewPixels",
+        "assertPreviewMotion"
+      ]
+    },
+    {
+      "id": "playwright-run-all",
+      "file": "scripts/design-checks/run-all.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-home",
+      "file": "scripts/design-checks/home.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-layouts-check",
+      "file": "scripts/design-checks/layouts-check.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-layouts-states",
+      "file": "scripts/design-checks/layouts-states.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-muse-behavior",
+      "file": "scripts/design-checks/muse-behavior.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-muse-recovery",
+      "file": "scripts/design-checks/muse-recovery.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-shared-browser",
+      "file": "scripts/design-checks/shared-browser.cjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-shared-autoplay",
+      "file": "scripts/design-checks/shared-autoplay.cjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-journeys",
+      "file": "scripts/design-checks/journeys.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-personal-sites",
+      "file": "scripts/design-checks/personal-sites.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-muse-performance",
+      "file": "scripts/design-checks/muse-performance.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-layout-first-paint",
+      "file": "scripts/design-checks/layout-first-paint.mjs",
+      "exports": []
+    },
+    {
+      "id": "playwright-foundation",
+      "file": "scripts/verify-design.mjs",
+      "exports": []
+    }
+  ]
+}

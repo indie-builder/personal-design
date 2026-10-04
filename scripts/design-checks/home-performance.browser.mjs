@@ -1,4 +1,4 @@
-// Use a production homepage tab and the Codex in-app browser's CDP capability.
+// Use a production homepage and a compatible CDP session.
 // These checks only exercise scrolling/rendering; they do not mutate game state.
 const evaluate = async (cdp, expression) => {
   const r = await cdp.send(
