@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-04",
+  "changes": {
+    "chat": "First nonempty delta publishes immediately. Subsequent deltas coalesce in bounded 32ms windows; completion/error/stop flush pending content. Unmount cancels timers. Existing 500ms storage coalescing remains.",
+    "remotion": "Version-scoped parent overrides for minimist 1.2.8, semver 7.8.5 and esbuild 0.28.2; all targets match registry latest stable at verification.",
+    "retained": "OpenUI 0.16.3 still requires recharts ^2.15.4 and zustand ^4.5.5. No forced major upgrade or Pi Harness removal."
+  },
+  "verification": {
+    "streamUnit": "6 tests authored before implementation and observed failing before implementation. Cover first delta, continuous deltas, trailing flush, empty stream, cancellation and stress input.",
+    "syntheticMeasurement": "1000 deltas at 1ms intervals -> 33 publish callbacks, identical final text. Fake timers; not React commits, frame rate or browser latency.",
+    "allUnit": "64 passed",
+    "typecheck": "passed",
+    "lint": "passed",
+    "format": "passed",
+    "build": "passed; 82 OpenUI components retained",
+    "audit": "No known vulnerabilities found",
+    "chatApi": "12 fixture checks passed",
+    "portfolioApi": "5 passed",
+    "routes": "11 static routes passed",
+    "adapterIntegration": "Production Pi response -> official OpenUI adapter -> createChatStream: 4 deltas, 2 callbacks, identical final text and valid completion.",
+    "remotion": [
+      "frozen lockfile install and personal-sites typecheck passed",
+      "CLI positional, boolean, numeric, frame-range and JSON props parsing passed",
+      "semver comparison, prerelease, equality and invalid-input checks passed",
+      "esbuild JS API and native Darwin arm64 binary 0.28.2, TSX transform and invalid-source rejection passed",
+      "Real PersonalSitePromo frames 60-89 rendered to H.264, 1920x1080, 30fps, 30 frames, 1 second; ffmpeg full decode passed",
+      "Frame 75 PNG rendered and decoded; dimensions and nonempty pixels checked"
+    ]
+  },
+  "knownFailure": {
+    "command": "pnpm --filter @personal-design/personal-sites exec remotion versions",
+    "result": "Exit 1: detected zod 4.6.5 while Remotion expects 4.5.4",
+    "baseline": "Reproduced using HEAD manifests/workspace/lockfile in an isolated /tmp offline frozen installation with old minimist, semver and esbuild. Not introduced by this change; video and poster render successfully."
+  },
+  "reproduction": [
+    "node --test apps/web/lib/chat-stream.test.mjs",
+    "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && pnpm audit",
+    "node scripts/design-checks/fixtures/ai-chat-provider.mjs",
+    "ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907/v1 pnpm start",
+    "portless alias upgrade-check.personal-design <application port>",
+    "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 node scripts/design-checks/ai-chat-api.mjs",
+    "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 pnpm test:portfolio-api",
+    "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:1355 node scripts/verify-design-routes.mjs",
+    "pnpm --filter @personal-design/personal-sites exec remotion render promo/src/index.tsx PersonalSitePromo /tmp/personal-design-remotion-overrides-IT2uAm/promo-60-89.mp4 --public-dir=promo/public --codec=h264 --muted --crf=19 --pixel-format=yuv420p --concurrency=2 --frames=60-89",
+    "pnpm --filter @personal-design/personal-sites exec remotion still promo/src/index.tsx PersonalSitePromo /tmp/personal-design-remotion-overrides-IT2uAm/poster-75.png --public-dir=promo/public --frame=75"
+  ],
+  "artifactsDirectory": "/tmp/personal-design-remotion-overrides-IT2uAm",
+  "limitations": [
+    "No Codex built-in browser available; React hook lifecycle, visual continuity and browser frame rate not verified.",
+    "No real model request; fixture protocol integration only.",
+    "No Studio browser interaction, full 36-second render or non-macOS-arm64 native binary validation.",
+    "Remotion output directory must exist before rerunning commands; artifacts under /tmp are temporary."
+  ]
+}

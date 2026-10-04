@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { EventType, openAIReadableStreamAdapter } from '@openuidev/react-headless';
+import { createChatStream } from './chat-stream';
 import {
   memorySchema,
   messageSchema,
@@ -21,11 +22,13 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [error, setError] = useState<Error>();
   const controller = useRef<AbortController | null>(null);
+  const stream = useRef<ReturnType<typeof createChatStream> | null>(null);
   const mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
     return () => {
       mounted.current = false;
+      stream.current?.cancel();
       controller.current?.abort();
     };
   }, []);
@@ -33,7 +36,10 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
     current.current = next;
     if (mounted.current) setTranscript(next);
   }, []);
-  const stop = useCallback(() => controller.current?.abort(), []);
+  const stop = useCallback(() => {
+    stream.current?.flush();
+    controller.current?.abort();
+  }, []);
   const run = useCallback(
     async (history: ChatMessage[]) => {
       if (controller.current) return;
@@ -74,20 +80,27 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
           role: 'assistant',
           text: '',
         };
+        stream.current = createChatStream((text) => {
+          if (mounted.current) {
+            setStatus('streaming');
+            commit({ messages: [...history, { ...answer, text }], memory });
+          }
+        });
         let text = '';
         let finished = false;
         for await (const event of openAIReadableStreamAdapter().parse(response)) {
           if (requestController.signal.aborted) break;
           if (event.type === EventType.TEXT_MESSAGE_CONTENT) {
             text += event.delta;
-            if (mounted.current) setStatus('streaming');
-            commit({ messages: [...history, { ...answer, text }], memory });
+            stream.current.append(event.delta);
           } else if (event.type === EventType.TEXT_MESSAGE_END) finished = true;
         }
         if (!requestController.signal.aborted && (!finished || !text.trim()))
           throw new Error('回答中断，请重试。');
+        stream.current.flush();
         if (mounted.current) setStatus('ready');
       } catch (cause) {
+        stream.current?.flush();
         if (mounted.current) {
           if (requestController.signal.aborted) setStatus('ready');
           else {
@@ -100,6 +113,8 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
           }
         }
       } finally {
+        stream.current?.cancel();
+        stream.current = null;
         if (controller.current === requestController) controller.current = null;
       }
     },

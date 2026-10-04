@@ -2,6 +2,13 @@ packages:
   - apps/*
   - packages/*
 
+overrides:
+  '@remotion/cli@4.0.532>minimist': 1.2.8
+  '@remotion/cli@4.0.532>semver': 7.8.5
+  '@remotion/studio@4.0.532>semver': 7.8.5
+  '@remotion/studio-server@4.0.532>semver': 7.8.5
+  '@remotion/bundler@4.0.532>esbuild': 0.28.2
+
 allowBuilds:
   '@google/genai': false
   '@openuidev/lang-core': false
