@@ -89,8 +89,7 @@ export const submissionSchema = z.object({
 });
 // Raw ActionEvent input; messageSchema validates it before persistence and transport.
 export type FormSubmission = { formName?: string; formState: Record<string, unknown> };
-export const metadataSchema = z.object({
-  memory: memorySchema.optional(),
+const metadataSchema = z.object({
   submission: submissionSchema.optional(),
   uiState: z.record(z.string(), z.unknown()).optional(),
 });
@@ -98,16 +97,13 @@ export const messageSchema = z.object({
   id: z.string().min(1).max(100),
   role: z.enum(['user', 'assistant']),
   metadata: metadataSchema.optional(),
-  parts: z
-    .array(z.object({ type: z.literal('text'), text: z.string().max(60000) }))
-    .min(1)
-    .max(8),
+  text: z.string().max(60000),
 });
 export type ChatMessage = z.infer<typeof messageSchema>;
 
 // OpenUI's content/context envelope keeps display text separate from model context.
 export function modelMessageContent(message: ChatMessage): string {
-  const text = message.parts.map((part) => part.text).join('\n');
+  const { text } = message;
   const submission = message.role === 'user' ? message.metadata?.submission : undefined;
   if (!submission) return text;
   const context = [
@@ -130,8 +126,10 @@ export const savedSchema = z.object({
       agentId: z.string(),
       title: z.string(),
       messages: z.array(messageSchema),
+      memory: memorySchema.optional(),
     }),
   ),
 });
 export type SavedChat = z.infer<typeof savedSchema>;
 export type Conversation = SavedChat['conversations'][number];
+export type ChatTranscript = Pick<Conversation, 'messages' | 'memory'>;

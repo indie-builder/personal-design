@@ -14,7 +14,7 @@ const task=await taskSpace(config.space||'AI 问答 · 业务流程回归');cons
 const fixture=JSON.parse(await fs.readFile(config.root+'/scripts/design-checks/fixtures/ai-chat-case.json','utf8'));
 const output=config.root+'/docs/design/execution/evidence/ai-chat-case';await fs.mkdir(output,{recursive:true});
 await p.goto(config.base+'/products/ai-chat');
-await p.evaluate(c=>{const key='personal-design:ai-chat:v1';const old=JSON.parse(localStorage.getItem(key)||'{}');if(old.conversations?.some(x=>x.id!=='case-fixture'))throw new Error('Origin contains user records');localStorage.setItem(key,JSON.stringify({agents:[],conversations:[c]}));},fixture);
+await p.evaluate(c=>{const key='personal-design:ai-chat:v2';const old=JSON.parse(localStorage.getItem(key)||'{}');if(old.conversations?.some(x=>x.id!=='case-fixture'))throw new Error('Origin contains user records');localStorage.setItem(key,JSON.stringify({agents:[],conversations:[c]}));},fixture);
 const checks=[];
 for (const width of [1440,390]){
  await p.cdp('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:width<640});await p.reload();

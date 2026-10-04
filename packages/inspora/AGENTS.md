@@ -2,7 +2,7 @@
 
 - 对外名称「灵感集」，路由 `/products/muse`。访客文案、链接与 metadata 不出现来源站点名；来源事实仅保留在包内与脚本注释。原始 JSON 留在包内，页面只展示真实作品信息及原作入口，详见 [页面契约](../../docs/design/README.md)。
 - `inspora.db` 使用 `node:sqlite`；它与 `apps/web/public/inspora/` 均为生成物，随仓库提交。
-- 读取统一用 [src/index.ts](src/index.ts) 的 `listPosts`、`getPostBySlug`、`listCategories`、`upstreamUrl` 等 API，不在 App 读 DB 或拼路径。媒体查询须分批。
+- 读取统一用 [src/index.ts](src/index.ts) 的 `listPosts`、`getPostBySlug`、媒体 `previewSrc` 等 API，不在 App 读 DB 或拼路径。媒体查询须分批。
 
 ## 同步约束
 

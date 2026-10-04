@@ -2,11 +2,10 @@ export type BrowseEntry = { href: string; title: string };
 export type BrowseContext = { href: string; entries: BrowseEntry[] };
 export type FilterableBrowseEntry = BrowseEntry & {
   category: string;
-  theme?: string;
   search?: string[];
 };
 
-const filterNames = ['cat', 'theme', 'q'] as const;
+const filterNames = ['cat', 'q'] as const;
 
 export function matchesSearch(query: string, fields: (string | undefined)[]): boolean {
   return fields
@@ -50,26 +49,15 @@ export function resolveUrlBrowseContext(
   if (params.get('browse') !== '2') return null;
   const requestedCat = params.get('cat') ?? '';
   const category = catalog.some((entry) => entry.category === requestedCat) ? requestedCat : '';
-  const requestedTheme = params.get('theme') ?? '';
-  const theme = catalog.some(
-    (entry) => entry.theme === requestedTheme && (!category || entry.category === category),
-  )
-    ? requestedTheme
-    : '';
   const queryText = params.get('q') ?? '';
   const entries = catalog.filter(
     (entry) =>
       matchesSearch(queryText, [entry.title, ...(entry.search ?? [])]) &&
-      (!category || entry.category === category) &&
-      (!theme || entry.theme === theme),
+      (!category || entry.category === category),
   );
   if (!entries.some((entry) => entry.href === pathname)) return null;
   const filters = new URLSearchParams();
   if (queryText) filters.set('q', queryText);
   if (category) filters.set('cat', category);
-  if (theme) filters.set('theme', theme);
-  // Returning from a layout detail reopens its book at the image just viewed.
-  if (listPath === '/products/layout-compositions' && category)
-    filters.set('page', pathname.split('/').at(-1)!);
   return { href: `${listPath}${filters.size ? `?${filters}` : ''}`, entries };
 }

@@ -1,5 +1,4 @@
 import { spawn } from 'node:child_process';
-import { statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -10,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 // muse-performance / layout-first-paint 需要 MEDIA_VERSION 版本化构建，不纳入
 // 默认套件，按 docs/design/README.md「验收要求」单独运行。
 const here = dirname(fileURLToPath(import.meta.url));
-const base = process.env.DESIGN_BASE_URL ?? 'http://localhost:3000';
+const base = process.env.DESIGN_BASE_URL ?? 'https://personal-design.localhost';
 
 const suites = [
   '../verify-design.mjs',
@@ -25,14 +24,7 @@ const suites = [
   'shared-autoplay.cjs',
   'journeys.mjs',
   'personal-sites.mjs',
-].filter((name) => {
-  try {
-    statSync(join(here, name));
-    return true;
-  } catch {
-    return false;
-  }
-});
+];
 
 const failed = [];
 for (const suite of suites) {

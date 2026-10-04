@@ -1,9 +1,5 @@
 .overlay { position:fixed; inset:0; z-index:40; pointer-events:none; perspective:1800px; }
 .book { position:absolute; top:0; left:0; transform-style:preserve-3d; }
-.cover { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:32px; padding:24px; text-align:center; color:var(--cover-ink); background:var(--cover); border-radius:2px 6px 6px 2px; box-shadow:inset -4px 0 #f5f1e7,inset 0 0 0 10px var(--cover),inset 0 0 0 11px color-mix(in srgb,var(--cover-ink) 25%,transparent),0 14px 28px -16px #0008; transform-origin:left center; transform:rotateY(88deg); backface-visibility:hidden; }
-.cover span { font-size:clamp(20px,3vw,32px); line-height:1.5; font-weight:500; }
+.cover { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:32px; padding:44px 28px; text-align:center; color:var(--cover-ink); background:var(--cover); border-radius:2px 6px 6px 2px; font-weight:500; border:1px solid color-mix(in srgb,var(--cover-ink) 22%,transparent); box-shadow:inset -3px 0 #f5f1e7,inset 0 0 0 7px var(--cover),inset 0 0 0 8px color-mix(in srgb,var(--cover-ink) 22%,transparent); transform-origin:left center; transform:rotateY(0deg); backface-visibility:hidden; }
+.cover span { font-size:28px; line-height:1.5; font-weight:500; }
 .cover small { font-size:12px; }
-.spine { position:absolute; inset:0; padding:24px 8px; display:flex; align-items:center; writing-mode:vertical-rl; color:var(--cover-ink); background:var(--cover); border-radius:3px; font-size:22px; transform-origin:left center; box-shadow:inset 3px 0 5px #fff3,inset -5px 0 6px #0002; backface-visibility:hidden; }
-.book[data-extracted] .spine { visibility:hidden; }
-.book[data-extracted] .cover { transform:rotateY(0deg); padding:44px 28px; gap:32px; font-weight:500; border:1px solid color-mix(in srgb,var(--cover-ink) 22%,transparent); box-shadow:inset -3px 0 #f5f1e7,inset 0 0 0 7px var(--cover),inset 0 0 0 8px color-mix(in srgb,var(--cover-ink) 22%,transparent); }
-.book[data-extracted] .cover span { font-size:28px; }

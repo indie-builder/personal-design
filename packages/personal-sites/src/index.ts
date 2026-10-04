@@ -10,8 +10,6 @@ export const personalSite = {
   date: '2026-09-09',
   href: '/products/personal-sites',
   cover: localMedia('/personal-sites/home.webp'),
-  stats: [],
-  line: 'sites' as const,
 };
 
 export const timelineAvatarUrl = localMedia('/personal-sites/profile-avatar.webp');

@@ -7,7 +7,7 @@ console.log('const config='+JSON.stringify({space:Number(process.env.EGO_TASK_SP
 CONFIG
 cat <<'JS'
 const assert=(await import('node:assert/strict')).default,fs=await import('node:fs/promises');const t=await taskSpace(config.space),p=t.page('p1');const out=config.root+'/docs/design/execution/evidence/ai-chat-button-layout';await fs.mkdir(out,{recursive:true});const checks=[];
-const makeLatest=async id=>{await p.evaluate(id=>{const k='personal-design:ai-chat:v1',s=JSON.parse(localStorage.getItem(k));if(s.conversations.some(c=>!['component-fixture','contract-fixture'].includes(c.id)))throw Error('Not test records');const c=s.conversations[0],i=c.messages.findIndex(m=>m.id===id);if(i<0)throw Error('Missing test message');c.messages.push(...c.messages.splice(i,1));localStorage.setItem(k,JSON.stringify(s));},id);await p.reload();await p.waitForSelector('.ai-openui');};
+const makeLatest=async id=>{await p.evaluate(id=>{const k='personal-design:ai-chat:v2',s=JSON.parse(localStorage.getItem(k));if(s.conversations.some(c=>!['component-fixture','contract-fixture'].includes(c.id)))throw Error('Not test records');const c=s.conversations[0],i=c.messages.findIndex(m=>m.id===id);if(i<0)throw Error('Missing test message');c.messages.push(...c.messages.splice(i,1));localStorage.setItem(k,JSON.stringify(s));},id);await p.reload();await p.waitForSelector('.ai-openui');};
 await makeLatest('catalog-5');
 await p.fill('[data-mobile-editable] details[open] input[type=text]','测试修改');await p.waitForSelector('button:text-is("确认修改")');
 for(const [width,theme]of [[320,'light'],[390,'dark'],[1440,'light']]){

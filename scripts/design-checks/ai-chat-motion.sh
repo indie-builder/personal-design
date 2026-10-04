@@ -40,7 +40,7 @@ async function frame(name,selector,trigger) {
 }
 try {
   await p.goto(config.base+'/products/ai-chat');
-  await p.evaluate(()=>{localStorage.removeItem('personal-design:ai-chat:v1');localStorage.setItem('theme','light');});
+  await p.evaluate(()=>{localStorage.removeItem('personal-design:ai-chat:v2');localStorage.setItem('theme','light');});
   await p.reload();await p.waitForSelector('button[aria-controls="ai-agent-list"]');
   await p.cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
   await p.cdp('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
@@ -107,8 +107,8 @@ try {
   await p.fill('input[name="name"]','动效检查');await p.fill('textarea[name="prompt"]','用中文回答');
   await p.evaluate(()=>{document.documentElement.dataset.input='pointer';const b=document.querySelector('#agent-creation button[type="submit"]');b.click();b.click();});
   await p.waitForFunction(()=>!document.querySelector('#agent-creation'));
-  await p.waitForFunction(()=>JSON.parse(localStorage.getItem('personal-design:ai-chat:v1')).agents.length===2);
-  assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('personal-design:ai-chat:v1')).agents.filter(a=>a.name==='动效检查').length),1);
+  await p.waitForFunction(()=>JSON.parse(localStorage.getItem('personal-design:ai-chat:v2')).agents.length===2);
+  assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('personal-design:ai-chat:v2')).agents.filter(a=>a.name==='动效检查').length),1);
   check('repeated submit commits exactly once');
 
   await p.evaluate(()=>{window.__chatTransitionRuns=[];document.addEventListener('transitionrun',e=>{if(e.target.matches('article[data-arriving]'))window.__chatTransitionRuns.push({id:e.target.getAttribute('aria-label'),property:e.propertyName});});});

@@ -15,7 +15,7 @@
 
 ## 本地运行
 
-需要 Node.js 24、pnpm 12。`pnpm dev` 使用全局安装的 portless，地址为 <https://personal-design.localhost>；也可以用 `pnpm dev:direct` 在 <http://localhost:3000> 启动。
+需要 Node.js 24、pnpm 12。`pnpm dev` 使用全局安装的 portless，地址为 <https://personal-design.localhost>；生产预览通过根目录 `pnpm start` 使用同一路由，切换模式前停止原服务。worktree 使用启动日志中的独立子域名。
 
 ```bash
 pnpm install

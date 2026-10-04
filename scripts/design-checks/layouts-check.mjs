@@ -88,6 +88,7 @@ try {
   // 图片点击放大即详情；Esc 关闭放大后焦点回到当前书页。
   await page.locator('button[data-page-id]').first().click();
   await page.locator('[role="dialog"]').waitFor();
+  assert((await page.getByRole('link', { name: '查看详情', exact: true }).count()) === 0, '放大即详情，不应出现二次详情跳转');
   const zoomedId = await page.evaluate(() =>
     document.querySelector('[data-book-spread] button[data-page-id]')?.getAttribute('data-page-id'),
   );

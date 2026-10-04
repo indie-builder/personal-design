@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 
 /** Call in interaction handlers: repeated keyboard actions never wait on motion. */
 export function instantMotion() {
@@ -85,7 +85,6 @@ export function useVisiblePlay(
   onPlay: (playing: boolean) => void,
   threshold = 0.3,
 ) {
-  const [playing, setPlaying] = useState(false);
   const report = useRef(onPlay);
   useEffect(() => {
     report.current = onPlay;
@@ -97,7 +96,6 @@ export function useVisiblePlay(
     const update = () => {
       const next = visible && !document.hidden && !instantMotion();
       report.current(next);
-      setPlaying(next);
     };
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -114,5 +112,4 @@ export function useVisiblePlay(
       report.current(false);
     };
   }, [ref, threshold]);
-  return playing;
 }

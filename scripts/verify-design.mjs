@@ -35,7 +35,7 @@ try {
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => document.activeElement?.id === 'workspace-content');
   });
-  const routes = ['/', '/products/muse', '/products/layout-compositions', '/products/muse/file-management-dashboard', '/products/layout-compositions/001', '/missing-page'];
+  const routes = ['/', '/products/muse', '/products/layout-compositions', '/products/muse/file-management-dashboard', '/products/layout-compositions?cat=构图逻辑&page=001', '/missing-page'];
   for (const width of [320, 720]) {
     await page.setViewportSize({ width, height: 900 });
     for (const route of routes) await check(`reflow ${width}px ${route}`, async () => {

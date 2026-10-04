@@ -19,20 +19,6 @@ layout.json 记录页面来源和元素坐标。截图不使用登录数据；�
 实时页面在字体与内容加载后冻结为 PNG；视频使用这些固定素材，不在渲染时请求线上页面。
 `styleframe.html` 和 out/qa/styleframe.png 是制作前的静态方向验证。
 
-## 音效来源
+## 无声输出
 
-均从 video-shotcraft 所附 Mixkit Sound Effects Free License 素材复用。
-
-| 本地文件 | 原始音效来源 |
-| --- | --- |
-| transition-soft.mp3 | Air zoom vacuum · https://assets.mixkit.co/active_storage/sfx/2608/2608-preview.mp3 |
-| whoosh-fast.mp3 | Fast whoosh transition · https://assets.mixkit.co/active_storage/sfx/1490/1490-preview.mp3 |
-| swoosh-quick.mp3 | Fast small sweep transition · https://assets.mixkit.co/active_storage/sfx/166/166-preview.mp3 |
-| paper-slide.mp3 | Paper slide · https://assets.mixkit.co/active_storage/sfx/1530/1530-preview.mp3 |
-| impact.mp3 | Cinematic whoosh deep impact · https://assets.mixkit.co/active_storage/sfx/1143/1143-preview.mp3 |
-| riser.mp3 | 上一项前1.6秒的反向剪辑，首尾淡入淡出 |
-| shimmer.mp3 | Sweeping sparkle presentation intro · https://assets.mixkit.co/active_storage/sfx/2633/2633-preview.mp3 |
-
-当前交付为完全无声版本：不含背景音乐或转场音效，视频文件不保留音轨。
-渲染默认 sound=false，并使用 --muted 导出，后续重新生成也保持无声。
-上述音源仅为历史制作素材，不在当前成片中使用。
+宣传片为完全无声版本，视频文件不保留音轨。工程只包含画面，渲染使用 `--muted` 导出。

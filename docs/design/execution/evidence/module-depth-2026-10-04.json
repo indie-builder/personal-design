@@ -1,0 +1,215 @@
+{
+  "date": "2026-10-04",
+  "baseCommit": "6218c031bdb53c343808461992824d8aa6718e9a",
+  "branch": "codex/deepen-current-modules",
+  "base": "https://upgrade-check.personal-design.localhost:1355",
+  "changedFlowsPassed": true,
+  "allSitePassed": false,
+  "checks": {
+    "workspaceTypecheck": true,
+    "lint": true,
+    "format": true,
+    "unitTests": {
+      "passed": 38,
+      "failed": 0
+    },
+    "productionBuild": {
+      "passed": true,
+      "generatedEntries": 16,
+      "previousGeneratedEntries": 367
+    },
+    "portfolioApi": {
+      "passed": 5,
+      "failed": 0
+    },
+    "chatApi": {
+      "passed": 12,
+      "failed": 0
+    },
+    "staticRoutes": {
+      "passed": 11,
+      "failed": 0
+    },
+    "retiredLayoutHttp404": [
+      "001",
+      "063",
+      "999"
+    ],
+    "missingSuiteRegression": {
+      "before": "ALL 0 SUITES PASSED, exit 0",
+      "after": "FAILED with exit 1"
+    },
+    "navigation": {
+      "passed": true,
+      "checks": [
+        "empty search, URL reload and clear",
+        "category/search in adjacent links, in-app return and native Back restore focus",
+        "retired browse=1 falls back to category navigation",
+        "1440px light: list/detail fit, navigation hit targets",
+        "1280px dark: list/detail fit, navigation hit targets",
+        "390px light: list/detail fit, navigation hit targets",
+        "320px dark: list/detail fit, navigation hit targets"
+      ],
+      "screenshots": [
+        "list-1440-light.png",
+        "detail-1440-light.png",
+        "list-1280-dark.png",
+        "detail-1280-dark.png",
+        "list-390-light.png",
+        "detail-390-light.png",
+        "list-320-dark.png",
+        "detail-320-dark.png"
+      ],
+      "reducedMotion": true
+    },
+    "layouts": {
+      "passed": true,
+      "base": "https://upgrade-check.personal-design.localhost:1355",
+      "checks": [
+        "pointer open/flip/zoom, Escape restores page focus, header return restores spine focus",
+        "keyboard open and native Back restore spine focus",
+        "cat/page opens directly, retired zoom is ignored, missing image stays disabled",
+        "1280px reduced motion: shelf/reader fit, arrow flip and Escape restore focus",
+        "390px reduced motion: shelf/reader fit, arrow flip and Escape restore focus",
+        "320px reduced motion: shelf/reader fit, arrow flip and Escape restore focus"
+      ]
+    },
+    "museErrors": [
+      "http: error, keyboard retry, append recovered",
+      "network: error, keyboard retry, append recovered",
+      "malformed: error, keyboard retry, append recovered",
+      "empty: error, keyboard retry, append recovered",
+      "filter failure differs from successful empty response"
+    ],
+    "chat": {
+      "origin": "https://upgrade-check.personal-design.localhost:1355",
+      "results": [
+        "error → normal send clears error and renders answer",
+        "stop → normal send works",
+        "leave during generation aborts → return and continue works",
+        "one conversation memory persists → reload reuses it → last-turn regeneration replaces only the answer",
+        "multiple answers share one ThemeProvider; visible SVG bars change to the dark and light chart palettes",
+        "summary header is saved before first delta; stop preserves it for the next request",
+        "v2 initializes without importing v1 history and leaves v1 storage unchanged"
+      ]
+    },
+    "site": {
+      "passed": false,
+      "base": "https://upgrade-check.personal-design.localhost:1355",
+      "checks": [
+        {
+          "width": 1440,
+          "theme": "light",
+          "home": "bounds, button, arrows, seven products, skip link"
+        },
+        {
+          "width": 1440,
+          "tools": 127,
+          "externalLinks": "valid href, name and safe new tab; not opened"
+        },
+        {
+          "width": 1440,
+          "promo": "autoplay, Space pause, Enter resume, reduced-motion manual play, external link"
+        },
+        {
+          "width": 1440,
+          "dictionary": "local graph canvas and 71 entries; theme results recorded separately"
+        },
+        {
+          "width": 1440,
+          "arcade": "five choices, start, pause, reset"
+        },
+        {
+          "width": 1440,
+          "retiredRoute": "404 and home return"
+        },
+        {
+          "width": 390,
+          "theme": "dark",
+          "home": "bounds, button, arrows, seven products, skip link"
+        },
+        {
+          "width": 390,
+          "tools": 127,
+          "externalLinks": "valid href, name and safe new tab; not opened"
+        },
+        {
+          "width": 390,
+          "promo": "autoplay, Space pause, Enter resume, reduced-motion manual play, external link"
+        },
+        {
+          "width": 390,
+          "dictionary": "local graph canvas and 71 entries; theme results recorded separately"
+        },
+        {
+          "width": 390,
+          "arcade": "five choices, start, pause, reset"
+        },
+        {
+          "width": 390,
+          "retiredRoute": "404 and home return"
+        }
+      ],
+      "issues": [
+        {
+          "width": 390,
+          "surface": "dictionary",
+          "expectedTheme": "dark",
+          "state": {
+            "frame": "light",
+            "host": "dark"
+          }
+        }
+      ]
+    },
+    "finalBrowseFilters": {
+      "href": "/products/muse/session-progress-and-recovery-timeline?browse=2&cat=Product&q=dashboard",
+      "ignored": [
+        "theme",
+        "post"
+      ]
+    }
+  },
+  "visual": {
+    "reviewed": [
+      "list-1440-light.png",
+      "detail-320-dark.png"
+    ],
+    "directory": ".impeccable/review/shallow-modules",
+    "scope": "Static list/detail screenshots plus behavioral animation/focus checks; no full frame-by-frame audit"
+  },
+  "knownIssues": [
+    {
+      "surface": "dictionary",
+      "case": "390px dark: iframe data-theme changes to light after hydration while host and __atlasTheme remain dark",
+      "baselineReproduced": true,
+      "baseline": "original workspace production service on port 4491, isolated baseline-check origin",
+      "samples": [
+        {
+          "timeMs": 0,
+          "host": "dark",
+          "frame": "dark",
+          "atlas": {
+            "ink": "#fafafa",
+            "paper": "#202020"
+          }
+        },
+        {
+          "timeMs": 1200,
+          "host": "dark",
+          "frame": "light",
+          "atlas": {
+            "ink": "#fafafa",
+            "paper": "#202020"
+          }
+        }
+      ],
+      "productionCodeChanged": false
+    }
+  ],
+  "limitations": [
+    "Legacy standalone Chromium run-all browser suites were not executed under the built-in-browser-only rule; updated built-in suites were run instead",
+    "Chat used the local fixture provider, not a live model",
+    "Browser dimensions are emulated, not physical mobile devices"
+  ]
+}

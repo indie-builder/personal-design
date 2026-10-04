@@ -44,6 +44,8 @@ export interface InsporaMedia {
   alt: string | null;
   /** 媒体地址：本地副本存在时为本地路径（或外置 base URL），否则为原站热链 URL */
   src: string | null;
+  /** 轻量视频预览；没有合适预览或为图片时保留完整媒体地址。 */
+  previewSrc: string | null;
   /** 视频封面（本地优先，缺省原站） */
   poster: string | null;
   /** 缩略图（本地优先，缺省原站）：图片为最小 variant，视频为封面 */
@@ -70,43 +72,30 @@ export interface InsporaPost {
   publishedAt: string | null;
   isFeatured: boolean;
   media: InsporaMedia[];
-  /** 上游原始 JSON（详情页 RSC 里提取的完整帖子对象） */
-  raw: unknown;
   /** 内部数据来源 */
   source: 'inspora' | 'bestx' | 'collectui';
   /** 归一化后的原作推文 id，跨源去重键（详情补全前 inspora 行可能为空） */
   tweetId: string | null;
 }
 
-export interface InsporaCategory {
-  name: string;
-  count: number;
-}
-
 /** Use the provider's existing lightweight clip for simultaneous previews; full playback keeps src. */
-export function videoPreviewUrl(
-  post: Pick<InsporaPost, 'raw'>,
-  media: Pick<InsporaMedia, 'id' | 'type' | 'src'>,
-): string | null {
-  if (
-    media.type !== 'video' ||
-    !post.raw ||
-    typeof post.raw !== 'object' ||
-    !('media' in post.raw) ||
-    !Array.isArray(post.raw.media)
-  )
-    return media.src;
-  const record = post.raw.media.find(
-    (entry) => entry && typeof entry === 'object' && entry.id === media.id,
-  );
-  const preview = record?.videoPreview;
+function videoPreviewUrl(row: MediaRow, src: string | null): string | null {
+  if (row.type !== 'video' || !row.raw_json) return src;
+  let record;
+  try {
+    record = JSON.parse(row.raw_json);
+  } catch {
+    return src;
+  }
+  if (!record || typeof record !== 'object' || record.id !== row.id) return src;
+  const preview = record.videoPreview;
   if (
     !preview ||
     typeof preview !== 'object' ||
     typeof preview.url !== 'string' ||
     !preview.url.startsWith('https://')
   )
-    return media.src;
+    return src;
   const smallerResolution =
     preview.width > 0 &&
     preview.height > 0 &&
@@ -119,7 +108,7 @@ export function videoPreviewUrl(
     preview.bytes >= record.sizeBytes &&
     !smallerResolution
   )
-    return media.src;
+    return src;
   return preview.url;
 }
 
@@ -139,7 +128,6 @@ interface PostRow {
   created_at: string;
   published_at: string | null;
   is_featured: number;
-  raw_json: string | null;
   source: string;
   tweet_id: string | null;
 }
@@ -158,7 +146,12 @@ interface MediaRow {
   local_path: string | null;
   local_poster_path: string | null;
   local_thumb_path: string | null;
+  raw_json: string | null;
 }
+
+const POST_COLUMNS = `id, slug, title, creator_name, creator_url, creator_avatar,
+  description, category, industries, colors, styles, source_url, created_at,
+  published_at, is_featured, source, tweet_id`;
 
 function parseJsonArray(value: string | null): string[] {
   if (!value) return [];
@@ -171,6 +164,7 @@ function parseJsonArray(value: string | null): string[] {
 }
 
 function toMedia(row: MediaRow): InsporaMedia {
+  const src = mediaUrl(row.local_path, row.url);
   return {
     id: row.id,
     postId: row.post_id,
@@ -182,21 +176,14 @@ function toMedia(row: MediaRow): InsporaMedia {
     height: row.height,
     sizeBytes: row.size_bytes,
     alt: row.alt,
-    src: mediaUrl(row.local_path, row.url),
+    src,
+    previewSrc: videoPreviewUrl(row, src),
     poster: mediaUrl(row.local_poster_path, row.poster_url),
     thumb: mediaUrl(row.local_thumb_path, row.poster_url ?? row.url),
   };
 }
 
 function toPost(row: PostRow, media: InsporaMedia[]): InsporaPost {
-  let raw: unknown = null;
-  if (row.raw_json) {
-    try {
-      raw = JSON.parse(row.raw_json);
-    } catch {
-      raw = null;
-    }
-  }
   return {
     id: row.id,
     slug: row.slug,
@@ -218,7 +205,6 @@ function toPost(row: PostRow, media: InsporaMedia[]): InsporaPost {
     publishedAt: row.published_at,
     isFeatured: row.is_featured === 1,
     media,
-    raw,
     source: row.source as InsporaPost['source'],
     tweetId: row.tweet_id,
   };
@@ -262,13 +248,13 @@ function mediaForPosts(postIds: string[]): Map<string, InsporaMedia[]> {
 /** 全部帖子，按发布时间倒序 */
 export function listPosts(): InsporaPost[] {
   const rows = conn()
-    .prepare(`SELECT * FROM posts WHERE ${VISIBLE_POSTS} ORDER BY created_at DESC`)
+    .prepare(`SELECT ${POST_COLUMNS} FROM posts WHERE ${VISIBLE_POSTS} ORDER BY created_at DESC`)
     .all() as unknown as PostRow[];
   const mediaMap = mediaForPosts(rows.map((r) => r.id));
   return rows.map((r) => toPost(r, mediaMap.get(r.id) ?? []));
 }
 
-/** 浏览导航用的轻量条目：不含媒体与 raw，避免每次请求全量加载万级媒体行和大 JSON */
+/** 浏览导航用的轻量条目：不含媒体，避免每次请求全量加载万级媒体行 */
 export interface InsporaPostRef {
   slug: string;
   title: string;
@@ -304,19 +290,9 @@ export function listPostRefs(): InsporaPostRef[] {
 
 export function getPostBySlug(slug: string): InsporaPost | undefined {
   const row = conn()
-    .prepare(`SELECT * FROM posts WHERE slug = ? AND ${VISIBLE_POSTS}`)
+    .prepare(`SELECT ${POST_COLUMNS} FROM posts WHERE slug = ? AND ${VISIBLE_POSTS}`)
     .get(slug) as PostRow | undefined;
   if (!row) return undefined;
   const mediaMap = mediaForPosts([row.id]);
   return toPost(row, mediaMap.get(row.id) ?? []);
-}
-
-export function listCategories(): InsporaCategory[] {
-  const rows = conn()
-    .prepare(
-      `SELECT category AS name, COUNT(*) AS count FROM posts WHERE ${VISIBLE_POSTS} AND category IS NOT NULL GROUP BY category ORDER BY count DESC`,
-    )
-    .all() as unknown as { name: string; count: number }[];
-  // node:sqlite 返回 null 原型对象，RSC 序列化只认普通对象
-  return rows.map((row) => ({ name: row.name, count: row.count }));
 }

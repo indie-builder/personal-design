@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useLayoutEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 // 常驻单例翻页监听：page 组件只把翻页目标写进 <html> dataset（useLayoutEffect，
 // paint 前就绪），keydown 在模块级只注册一次——详情→详情导航的过渡窗口内监听不卸，
@@ -38,70 +38,23 @@ function ensureNavListener() {
     const { detailPrev, detailNext } = document.documentElement.dataset;
     if (event.key === 'ArrowLeft' && detailPrev) {
       event.preventDefault();
-      try {
-        sessionStorage.setItem('detail-nav', detailPrev);
-      } catch {}
       navRouter?.push(detailPrev);
     } else if (event.key === 'ArrowRight' && detailNext) {
       event.preventDefault();
-      try {
-        sessionStorage.setItem('detail-nav', detailNext);
-      } catch {}
       navRouter?.push(detailNext);
     }
   });
 }
 
-/** 详情页键盘 ←/→ 翻页（与灯箱翻图心智一致）；并负责 detail-in 翻页跳过标记 */
+/** 详情页键盘 ←/→ 翻页；输入控件、媒体轮播与灯箱优先处理自己的方向键。 */
 export function DetailKeyboardNav({
   prevHref,
   nextHref,
-  hrefPattern = '^/products/layout-compositions/\\d+',
 }: {
   prevHref?: string;
   nextHref?: string;
-  /** 判定「详情→详情」链接的正则（用于翻页跳过入场动画） */
-  hrefPattern?: string;
 }) {
   const router = useRouter();
-  const pathname = usePathname();
-
-  // 详情→详情导航后跳过一次入场动画：离开前记下目标路径，
-  // 路径真正到达后才消费（导航过渡期间旧树也会跑 effect，不能提前消费；
-  // StrictMode 双跑 effect，已消费过的实例不能走 else 删除分支）
-  const consumedNavRef = useRef(false);
-  useEffect(() => {
-    let target: string | null = null;
-    try {
-      target = sessionStorage.getItem('detail-nav');
-    } catch {}
-    if (target && target.split('?')[0] === pathname) {
-      try {
-        sessionStorage.removeItem('detail-nav');
-      } catch {}
-      consumedNavRef.current = true;
-      document.documentElement.dataset.detailNav = 'true';
-    } else if (!target && !consumedNavRef.current) {
-      delete document.documentElement.dataset.detailNav;
-    }
-  }, [pathname]);
-
-  useEffect(() => {
-    const pattern = new RegExp(hrefPattern);
-    const onClickCapture = (event: MouseEvent) => {
-      if (event.button !== 0 || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
-        return;
-      const anchor = (event.target as Element).closest?.('a[href]');
-      const href = anchor?.getAttribute('href') ?? '';
-      if (pattern.test(href)) {
-        try {
-          sessionStorage.setItem('detail-nav', href);
-        } catch {}
-      }
-    };
-    document.addEventListener('click', onClickCapture, true);
-    return () => document.removeEventListener('click', onClickCapture, true);
-  }, [hrefPattern]);
 
   // 翻页目标写进 <html> dataset（paint 前就绪），常驻单例监听读它导航；
   // 卸载时清理，避免离开详情页后误导航
