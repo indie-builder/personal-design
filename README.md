@@ -12,6 +12,7 @@
 | [个人网站](apps/web/app/products/personal-sites) | 观看网站宣传片，再打开独立部署的个人网站。 |
 | [AI Coding 词典](apps/web/app/products/ai-coding-dictionary) | 在可搜索的知识网中探索术语，逐段对照阅读中英文内容。 |
 | [AI 问答](apps/web/app/products/ai-chat) | 选择或创建智能体，用文字、表格和交互卡片展开对话；会话保存在当前浏览器。 |
+| [文字游乐场](apps/web/app/products/word-arcade) | 五款以标题文字为对象的本地小游戏，支持切换、暂停与重来。 |
 
 ## 本地运行
 
@@ -25,7 +26,7 @@ pnpm dev
 
 首次运行会自动启动 HTTPS 代理并信任本地证书；macOS/Linux 绑定 443 端口时可能要求 sudo 密码。生产预览先运行 `pnpm build`，再运行 `pnpm start`；两种模式共用同一域名，切换前用 Ctrl+C 停止当前服务。Git worktree 自动使用独立子域名，以启动日志中的 URL 为准。
 
-全套回归运行 `node scripts/design-checks/run-all.mjs`，默认访问上述域名。单独运行旧检查脚本或验收 worktree 时，用 `DESIGN_BASE_URL` 指定实际 Portless URL；Node.js 检查通过 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"` 信任 Portless 本地 CA。
+当前验收统一从[验收入口](docs/design/execution/README.md)选择：`pnpm check:http` 运行 HTTP／内容 API，`pnpm check:browser` 运行现有 Playwright 浏览器套件，其他交互检查可用当前环境的浏览器工具。用 `DESIGN_BASE_URL` 指定启动日志中的实际 Portless URL；Node.js 检查通过 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"` 信任本地 CA。`pnpm check:navigation` 校验现行入口和链接；历史检查结果不代表当前代码已验收。
 
 ## 项目结构
 

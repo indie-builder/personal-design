@@ -1,4 +1,4 @@
-// Built-in browser only: import this module, then await verifyMuseErrors(tab, await tab.capabilities.get('cdp')).
+// Import this module, then await verifyMuseErrors(tab, cdp) with compatible adapters.
 // Failures: HTTP/network/malformed/empty pages, stale filter errors, missing retry, lost append listener.
 export async function verifyMuseErrors(tab, cdp) {
   const base = new URL(await tab.url()).origin;

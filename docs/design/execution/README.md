@@ -1,84 +1,92 @@
-# 全站设计交付证据
+# 当前验收入口
 
-2026-09-05。依据 OpenDesign 原始规则完成全站实现；用户产品事实和数据包保持。原文快照位于 `../open-design/source/`，25份文件哈希无变化。
+本页维护当前可执行入口与覆盖边界。页面行为以[页面契约](../README.md)为准；以前的通过次数、截图和命令在[历史交付索引](history.md)，不能证明当前代码已通过。
 
-## 验收索引
+## 准备生产预览
 
-| 范围 | 实现与状态报告 | 可复现检查 |
+从仓库根目录执行 `pnpm build`，再执行 `pnpm start`。切换开发／生产模式前先停止当前服务；主工作区及 worktree 都使用启动日志给出的 Portless URL。将实际 URL 设为 `DESIGN_BASE_URL`，Node HTTP 检查另外设置 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"`。
+
+浏览器验收保持工具中立：可使用 Playwright、CDP 或当前环境可用的浏览器工具，按检查所需能力选择。现行检查登记在 [current-checks.json](../../../scripts/design-checks/current-checks.json)。`pnpm check:navigation` 核对现行文档链接、脚本路径及导出函数；`pnpm test:navigation` 验证这项检查自身的失败分支。CI 同时执行两者及原有类型、lint、格式、单元测试和构建。
+
+## 浏览器回归子集
+
+生产预览就绪后，在另一个终端从仓库根目录执行：
+
+```sh
+export DESIGN_BASE_URL=https://personal-design.localhost # worktree 改成启动日志中的 URL
+export NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"
+pnpm check:browser
+```
+
+`pnpm check:browser` 执行 [run-all.mjs](../../../scripts/design-checks/run-all.mjs)，依次运行已有的独立 Playwright 检查及配套 HTTP／portfolio API 检查，汇总结果，任一失败返回非零退出码。若本机缺少 Chromium，先执行 `pnpm exec playwright install chromium`。`DESIGN_BASE_URL` 可选择实际 Portless URL，默认 `https://personal-design.localhost`；应用始终通过根目录 `pnpm build`、`pnpm start` 提供生产预览。
+
+套件包含基础设计、路由、首页、布局、灵感、共享媒体、浏览路径和个人网站检查，是现有浏览器回归子集，不代表全站完整覆盖。旧场景中的路由、选择器或断言如不符合现行契约，应记录失败并适配；不能以历史通过推定当前通过。聊天、词典详情、文字游戏及专项视觉检查按下方接口和页面契约另行执行。
+
+## 终端 HTTP 与 API
+
+```sh
+export DESIGN_BASE_URL=https://personal-design.localhost # worktree 改成启动日志中的 URL
+export NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"
+pnpm check:http --list
+pnpm check:http
+```
+
+默认依次执行预渲染路由和 portfolio API，不启动浏览器，不调用模型。可用 `pnpm check:http routes` 或 `pnpm check:http portfolio` 定向执行；任一失败返回非零退出码，缺失脚本不是跳过成功。
+
+| 范围 | 入口 | 前置与结果 |
 | --- | --- | --- |
-| 基础控件、主题、导航、重排 | [foundation.md](foundation.md) | `node scripts/verify-design.mjs`；[17项生产断言](evidence/foundation.json) |
-| 首页时间轴翻页步长、方向键、拖动、减少动态效果、窄屏（封面失败为冒烟） | [home.md](home.md) | `node scripts/design-checks/home.mjs`；[结果](evidence/home-behavior.json) |
-| 灵感检索、URL/返回、媒体轮播、超时恢复 | [muse.md](muse.md) | `node scripts/design-checks/muse-behavior.mjs` 与 `muse-recovery.mjs` |
-| 布局书架与画册：翻页步长、页码目录、放大即详情、缺图、高清降级、旧链接与 404 | [layouts.md](layouts.md) | `node scripts/design-checks/layouts-check.mjs` 与 `layouts-states.mjs`；[列表](evidence/layouts-check.json)、[状态](evidence/layouts-states.json) |
-| 灯箱滚动锁/焦点/组内翻图、自动播放、404 | [shared.md](shared.md) | `node scripts/design-checks/shared-browser.cjs` 与 `shared-autoplay.cjs` |
-| 两条从首页出发的完整浏览路径 | [生产结果](evidence/journeys.json) | `node scripts/design-checks/journeys.mjs` |
-| 个人网站宣传片播放/键盘控制/失败重试/外链 | —（实现见 site-showcase-media.tsx） | `node scripts/design-checks/personal-sites.mjs` |
-| 动效策略：预览续播、监听器清理、翻页中断、键盘视频策略 | [验收记录](evidence/motion-policy.md) | `DESIGN_BASE_URL=http://localhost:3002 sh scripts/design-checks/motion-policy.sh`（ego-browser） |
-| 全项目动效审查修复：混合媒体轮播、同帧返回、灯箱/头像中断、词典按需绘制、聊天输入布局 | [修复与验收](evidence/motion-audit-fixes.md) | `muse-motion.sh`、`lightbox-avatar-motion.sh`、`dictionary-motion.sh`、`ai-chat-scroll.sh`（ego-browser，支持复用空间） |
-| 全量静态路由 | [路由结果](evidence/routes.json) | `node scripts/verify-design-routes.mjs` |
-| 对外 portfolio API 契约：公共投影不泄露内部字段、分页/搜索与 400/404 错误语义 | —（测试即规格） | `pnpm test:portfolio-api`（需运行中的生产服务，随 `run-all.mjs` 全套执行） |
-| 视觉与原规则独立复核 | [finish-review.md](finish-review.md) | ship；初轮发现与修复已关闭 |
-| 来源完整性 | [source-integrity.json](evidence/source-integrity.json) | 25份来源快照哈希一致 |
+| 预渲染路由 HTTP 状态与 main 地标 | [verify-design-routes.mjs](../../../scripts/verify-design-routes.mjs) | 读取本次生产构建的 manifest；写入 `evidence/routes.json` |
+| portfolio 公共投影、分页、搜索、错误语义 | [portfolio-api.test.mjs](../../../scripts/portfolio-api.test.mjs) | 生产服务；结果在终端，不代替浏览器交互 |
+| 聊天流协议、摘要、错误、中止、输入边界 | [ai-chat-api.mjs](../../../scripts/design-checks/ai-chat-api.mjs) | 下述隔离假模型环境；显式运行 `pnpm check:http chat-api`，写入 `evidence/ai-chat/api-result.json` |
 
-`run-all.mjs` 所含旧 Playwright 脚本与 portfolio API 契约检查支持 `DESIGN_BASE_URL`，默认 `http://localhost:3000`。Agent 浏览器检查遵循根 AGENTS 的应用内 ego-browser 入口。生产预览执行 `pnpm build`、`pnpm --filter @personal-design/web start --port 3012`；`dictionary-search.sh`、`workspace-navigation.sh`、`back-motion.sh`、`back-stability.sh` 以及上表新增专项均支持 `DESIGN_BASE_URL`。三份导航专项支持 `EGO_TASK_SPACE`；词典搜索沿用 `EGO_SPACE_ID`。`global-ux.sh`、`search.sh` 仍写死 portless 开发域名 `https://personal-design.localhost`，需先 `pnpm dev` 再运行。ai-chat 系列按 [AI 问答](ai-chat.md)的隔离 origin 要求运行。
+## 可选的 tab／CDP 适配接口
 
-## 视觉证据与检查范围
+现有 `*.browser.mjs` 导出函数可复用已打开的生产页面，通过调用方注入兼容的 `tab`、`cdp` 与 `viewport`；这些模块本身不创建浏览器，终端直接 `node` 执行文件不会运行验收。可由当前浏览器工具提供接口，也可为 Playwright 编写适配层；没有可用浏览器能力时，完成可运行的静态与 HTTP 检查，并明确报告交互／视觉未验收。
 
-截图索引：[captures.json](evidence/captures.json)。图片在仓库本机 `.impeccable/review/full-design/`，由 `node scripts/capture-design.mjs` 生成。首页、灵感列表、布局列表、两个详情模板、404分别覆盖1440×900、1024×768、390×844；另有5张暗色截图。媒体正常态等待实际图片加载，错误/超时态由行为脚本明确注入。
+`tab` 不是可直接替换为 Playwright `Page` 的接口。按模块需要包装异步 `url()`、`goto()`、`reload()`、`back()`、截图、`dev.logs()` 及 `tab.playwright` 定位器链；定位器 `waitFor({ state, timeoutMs })` 的 `timeoutMs` 要映射为 Playwright 的 `timeout`，`waitForLoadState({ state })` 要转换调用参数，`domSnapshot()` 需提供对应实现。CDP `send()` 的第三参数超时选项也需适配；直接赋值 `tab.playwright = page` 不足以保证兼容。只有 CDP 参数的函数可在满足所用命令与返回值协议后复用。
 
-一轮集中检查和一轮确认完成；修正搜索占位符/边框对比度、首次主题事件竞争、首页/404主内容landmark、时间轴整数滚动导致终点前停滞。独立视觉复核无剩余实质问题。
+以下展示可选的注入接口，`tab` 和 `cdp` 由调用方先准备。例如 Playwright 可通过 `page.context().newCDPSession(page)` 获取 Chromium 标签页的 CDP session，再包装所需接口。尺寸变更使用**被测标签页**的 CDP，避免多标签页时改到其他页面：
 
-最终 typecheck、全站 ESLint（零warning）、生产构建通过。构建510个静态条目：508个产品/内容页面、404与框架内部global-error。HTTP检查覆盖509个可访问条目（508个200与1个404）；框架内部global-error不当作用户路由。全部返回预期状态并具有主内容标记。全量路由检查不等于逐条内容的视觉检查；模板变体见各模块报告。
+```js
+// tab：兼容适配器；cdp：同一标签页的 CDP 适配器，由调用方注入。
+const viewport = {
+  set: ({ width, height }) => cdp.send('Emulation.setDeviceMetricsOverride', {
+    width, height, deviceScaleFactor: 1, mobile: false,
+  }),
+  reset: () => cdp.send('Emulation.clearDeviceMetricsOverride'),
+};
+const { verifyCurrentSite } = await import('file:///ABSOLUTE_REPO/scripts/design-checks/current-site.browser.mjs');
+const result = await verifyCurrentSite(tab, cdp, viewport);
+console.log(result);
+// 该检查可能返回问题列表而不抛错；必须检查 passed。
+if (!result.passed) throw new Error(JSON.stringify(result.issues));
+```
 
-## 实际限制
+| 改动范围 | 模块与调用 | 覆盖及限制 |
+| --- | --- | --- |
+| 全站基础路径 | [current-site.browser.mjs](../../../scripts/design-checks/current-site.browser.mjs)：`verifyCurrentSite(tab, cdp, viewport)` | 多尺寸、主题、主要产品基础操作、退役路由；检查返回的 `passed` / `issues`，不是逐帧视觉审计 |
+| 书架、画册、放大 | [current-layouts.browser.mjs](../../../scripts/design-checks/current-layouts.browser.mjs)：`verifyCurrentLayouts(tab, cdp, viewport)` | 当前书架／画册状态、页码、放大、旧链接与焦点 |
+| 筛选与返回现场 | [shallow-navigation.browser.mjs](../../../scripts/design-checks/shallow-navigation.browser.mjs)：`verifyShallowNavigation(tab, cdp, viewport)` | 1440／1280／390／320px、键盘、减少动态效果、站内与原生返回；截图写入 `.impeccable/review/shallow-modules/` |
+| 灵感加载故障 | [muse-errors.browser.mjs](../../../scripts/design-checks/muse-errors.browser.mjs)：`verifyMuseErrors(tab, cdp)` | 网络／HTTP／格式／空页故障、重试、筛选变化与继续追加 |
+| 聊天生命周期 | [chat-lifecycle.browser.mjs](../../../scripts/design-checks/chat-lifecycle.browser.mjs)：`verifyChatLifecycle(tab, cdp)` | 假模型隔离 origin；错误后继续、停止、离页中止、摘要、存储版本与图表主题 |
+| 首页性能与预览 | [home-performance.browser.mjs](../../../scripts/design-checks/home-performance.browser.mjs)：`verifyTimelineBounds(cdp)`、`verifyDictionaryReuse(cdp)` | 时间轴边界；先使词典预览可见并等待 Canvas 就绪，再检查实例复用。`verifyPreviewPixels(cdp)` 另需[像素等价性夹具](home-performance.md#复现) |
+| 五款文字游戏 | [word-arcade.browser.mjs](../../../scripts/design-checks/word-arcade.browser.mjs)：`verifyWordArcade(tab, cdp)` | 进入游戏页后运行；真实得分、暂停、重置；附加对齐／重开／中断函数的前置状态见文件注释及[记录](word-arcade.md) |
+| 首页游戏预览 | [word-arcade-preview.browser.mjs](../../../scripts/design-checks/word-arcade-preview.browser.mjs)：`assertPreviewMotion(cdp, expected)` | 先用时间轴按钮露出预览；分别在可视、减少动态效果、键盘、离屏状态采样，不能一次调用代表全部状态 |
 
-- Chromium自动化覆盖桌面、模拟触摸及reduced-motion；未宣称真实iOS/Android设备或所有浏览器引擎验收。720px为1440px在200%下的等效CSS布局宽度重排检查，不冒充真实浏览器缩放操作。
-- 外部高清图和视频依赖来源服务；已验证有界超时、重试/缩略图降级与原媒体入口，不保证第三方始终可用。8张上游缺图保持真实缺图状态。
-- 数据中不存在的缺作者/空产品等分支以代码审阅覆盖，未修改数据制造成功证据。
-- 既有未提交改动已保存执行基线，内容包未改动；本次未提交、推送或部署。
+开发时选择相关项；交付时运行适用的全部当前项，并逐项记录缺少前置条件或未执行的项目。HTTP、行为、状态和视觉分别报告；返回值、异常和 screenshots 均按实际结果留存。
 
-## 文字游乐场
+## 聊天隔离环境
 
-五款文字小游戏的内置浏览器回归、复现方式与验证限制见 [文字游乐场](word-arcade.md)。
+1. 停止普通预览。启动现有[假模型夹具](../../../scripts/design-checks/fixtures/ai-chat-provider.mjs)：`node scripts/design-checks/fixtures/ai-chat-provider.mjs`，监听本机 3907。
+2. 在另一个终端从根目录启动 `ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907/v1 pnpm start`。这使用步骤一之前已完成的生产构建。
+3. 用启动日志中的应用端口注册 `portless alias upgrade-check.personal-design <应用端口>`。用 `portless list` 查看测试路由，将 `DESIGN_BASE_URL` 设为其完整 HTTPS URL（代理非443端口时保留端口），设置本地 CA 后运行 `pnpm check:http chat-api`。域名必须是 `upgrade-check.personal-design.localhost`。
+4. 使用所选浏览器打开这个隔离域名，再通过兼容适配器运行聊天生命周期函数。脚本会暂时替换 v1/v2 会话存储，并在 `finally` 中恢复快照；使用专用测试 origin，不能把“会恢复”描述成“不触碰存储”。浏览器或进程异常退出时可能无法恢复。
+5. 完成后停止本轮启动的假模型与测试预览，执行 `portless alias --remove upgrade-check.personal-design` 移除测试 alias，再以正常环境运行 `pnpm start`。不把测试环境留作普通预览。
 
-## 技术栈升级与定向优化
+## 覆盖缺口与历史入口
 
-2026-10-04 升级 Next 16.3.8、Pi 1.0.2、pnpm 12.9.1、Lucide 1.52.0、Remotion 4.0.532 与 Node 24 类型；首页改为包内有界预览查询，聊天流式保存按500ms合并并在结束及离页时补写。类型、lint、格式、58项单测、生产构建、12项假模型聊天API、5项内容API和11条静态路由通过。当前会话没有内置浏览器，未声称交互或视觉通过；复现命令、单次取数测量和剩余间接依赖见 [本轮证据](evidence/stack-upgrade-2026-10-04.json)。
+[历史交付索引](history.md)及各日期报告保留旧命令和历史结果。复用时需核对脚本依赖、Portless 地址、测试 origin 和当前页面契约；脚本未登记或旧断言失效表示尚需核验或适配，不限制浏览器工具选择。
 
-后续定向核查确认 AI SDK 是 OpenUI 未使用适配器的可选 peer。重新解析清除残留 `ai` 及9个专属依赖版本，冻结安装、58项单测、构建、12项聊天API、5项内容API、11条静态路由与官方流适配器集成检查通过；聊天引用JS字节数不变。见 [可选依赖清理证据](evidence/ai-optional-peer-2026-10-04.json)。
+尚未按当前契约完整验证的覆盖：聊天完整六轮案例及官方组件压力／移动输入／只读／提交回放，真实模型端到端流程，灵感媒体性能与画册首帧测量，以及灯箱、头像和路由动效的细粒度关键帧。可使用现有脚本、Playwright、CDP 或其他可用浏览器工具补齐，必要时适配旧场景。现有基础检查只覆盖其中部分行为；不能用其通过替代这些专项。性能检查的版本化媒体前置条件继续有效。
 
-## 聊天流式更新与 Remotion 定向升级
-
-2026-10-04：聊天首片段立即显示，后续按32ms窗口合并更新并在完成／错误／停止时补齐。Remotion版本限定覆盖minimist 1.2.8、semver 7.8.5、esbuild 0.28.2；64项单测、生产构建、12项聊天API、5项内容API与11条静态路由通过，真实1秒短片及海报渲染成功。原有 `remotion versions` 的Zod版本检查失败已在HEAD基线复现；未进行浏览器帧率和交互验收。复现命令、调度层测量及限制见 [验收证据](evidence/chat-stream-remotion-2026-10-04.json)。
-
-## 首页等价性能优化
-
-保持现有视觉、帧率与预取策略的计算／绘制／生命周期优化，见 [性能与等价性验证](home-performance.md)。
-
-## Loop X 删除测试复扫
-
-2026-10-04 基于 `d3c07ff` 的复扫移除首页无用布局预览数据、工具目录单调用透传层、无人使用的 Interface 字段与导出，并退役历史截图修补入口。工具页 JSX 与 CSS 逐项保持等价；保留共享导航、搜索、媒体、聊天及同步 Module 的实际职责。两次审查后的候选、保留理由、复现命令及限制见 [loopx-deletion-audit-2026-10-04.json](evidence/loopx-deletion-audit-2026-10-04.json)。
-
-类型、lint、格式、38项单测、生产构建、11条静态路由和5项 portfolio API 均通过。当前会话未提供 Codex 内置浏览器，本轮未重跑交互及视觉验收；HTTP内容与源码等价检查不替代浏览器验收。
-
-## 第二轮模块接口收缩
-
-第二轮（2026-10-04）移除旧图鉴路由／post／zoom兼容链、无消费的详情动画标记与视觉模式、冗余产品字段和音效；灵感媒体直接提供 `previewSrc`，分类只统计一次；聊天使用 `text` 与唯一 `Conversation.memory`，每段对话共享一个主题 Provider。v2 存储独立初始化，旧 v1 记录不读取、不迁移、不覆盖。结果见 [module-depth-2026-10-04.json](evidence/module-depth-2026-10-04.json)。
-
-全仓类型／lint／格式、38项现有测试、生产构建、11条静态路由、旧图鉴001／063／999的HTTP404、5项portfolio API与12项聊天API均通过。内置浏览器运行 `shallow-navigation.browser.mjs`、`current-layouts.browser.mjs`、`muse-errors.browser.mjs`、`chat-lifecycle.browser.mjs` 和 `current-site.browser.mjs`；各文件头部记录调用方式。多标签页验收时，viewport须作用于被测标签页，可用其CDP的 `Emulation.setDeviceMetricsOverride` / `Emulation.clearDeviceMetricsOverride` 实现传入的 `set` / `reset`。
-
-全站基础检查显式记录一项未通过：390px深色词典的iframe在hydration后把自身 `data-theme` 改回light，宿主与 `__atlasTheme` 仍为dark。此现象已在本轮修改前的原工作区生产服务复现，词典生产代码未改；其余基础路径通过。结果中 `changedFlowsPassed` 与 `allSitePassed` 分开记录，不把此问题或逐帧动效标为已通过。
-
-验收先执行 `pnpm build`、`pnpm start`，使用worktree启动日志中的独立URL。聊天测试使用现有假模型 `node scripts/design-checks/fixtures/ai-chat-provider.mjs`；以 `ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907/v1 pnpm start` 启动测试预览，再用 `portless alias upgrade-check.personal-design <应用端口>` 注册隔离origin。Node检查设置 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"` 与 `DESIGN_BASE_URL`；浏览器脚本从tab读取实际origin。结束后停止假模型与测试预览、移除alias并恢复正常 `pnpm start`。
-
-## 第一轮浅模块清理
-
-PR 基于主分支 `5b8a05f` 的隔离工作树重新通过全仓类型／lint／格式、40项单测和生产构建；下方浏览器及API证据来自清理时的原工作区，详见结果中的 `integrationRecheck`。
-
-2026-10-04 的[验收结果](evidence/shallow-modules-2026-10-04.json)记录类型／lint、36项单测、生产构建、361条静态路由、5项 portfolio API、9项 AI API，以及内置浏览器的筛选返回与聊天生命周期检查。`browse=1` 旧会话格式已退役，旧链接回退为普通详情导航；当前 `browse=2` 与按筛选保存的滚动／焦点记录继续使用。
-
-对运行中的生产预览，在 Codex 内置浏览器 REPL 中将生产页绑定为 `tab`，从仓库绝对路径导入 `scripts/design-checks/shallow-navigation.browser.mjs`，执行 `verifyShallowNavigation(tab, await tab.capabilities.get('cdp'), await browser.capabilities.get('viewport'))`。脚本覆盖1440／1280／390／320px、双主题、键盘、减少动态效果、站内返回与原生后退；截图保存到 `.impeccable/review/shallow-modules/`。
-
-聊天检查先按 [AI 问答](ai-chat.md)配置现有假模型与独立 `upgrade-check.personal-design.localhost` origin，再导入 `scripts/design-checks/chat-lifecycle.browser.mjs` 执行 `verifyChatLifecycle(tab, await tab.capabilities.get('cdp'))`；端口取当前 tab 的 origin。检查使用界面新建测试会话，不清空已有记录；请求中止观测结束即恢复。结束后停止假模型并恢复正常预览。
-
-本轮没有运行会启动独立 Chromium 的 `run-all.mjs` 浏览器部分；上述可复跑脚本使用内置浏览器。静态截图不代表全站逐帧动效验收，假模型检查不代表真实模型结果。
+历史已知问题包括 390px 深色词典 iframe 曾恢复成浅色；见[当时记录](history.md#第二轮模块接口收缩)。重跑时如仍出现，应保留失败而不是引用历史通过。真实触摸设备和逐帧视觉连续性也需独立证据。

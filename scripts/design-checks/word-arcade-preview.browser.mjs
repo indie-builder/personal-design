@@ -1,4 +1,4 @@
-// Built-in browser only. Failures: static visible tile, motion continuing under
+// CDP browser check. Failures: static visible tile, motion continuing under
 // reduced motion/keyboard/offscreen, failure to resume, or a loop surviving exit.
 // Before calling, reveal the Word Arcade tile using the timeline's native buttons.
 export async function previewPixels(cdp) {

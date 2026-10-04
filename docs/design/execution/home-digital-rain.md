@@ -1,5 +1,7 @@
 # 首页数字背景验收
 
+本页为历史结果，保留当时使用的工具、命令和限制；此前浏览器工具限制已撤销。当前验收可使用 Playwright、CDP 或环境可用的浏览器工具，应用由根目录 `pnpm build`、`pnpm start` 经 Portless 启动，见[当前验收入口](README.md)。
+
 2026-09-27。参考 https://aiforui.dev/ 顶部字符雨：浅蓝12px字符、16px行距、逐列下落、尾迹、左右与底部渐隐、鼠标局部提亮。保留首页时间轴结构，单个 Canvas，无新增依赖。
 
 ## 执行与结果
@@ -7,13 +9,13 @@
 - `pnpm --filter @personal-design/web typecheck`、定向 oxlint 与 `git diff --check` 通过。
 - `pnpm build` 被已有的缺失脚本 `packages/ai-coding-dictionary/scripts/prepare-runtime.mjs` 阻塞；绕过该前置步骤执行 `pnpm --filter @personal-design/web exec next build` 通过（365个静态页面）。
 - 生产预览：`pnpm --filter @personal-design/web exec next start --port 3001`。
-- 浏览器只使用应用内 ego-browser。先创建一个 TaskSpace，在 p2 打开本地预览；复现命令：`EGO_SPACE_ID=<任务空间ID> DESIGN_BASE_URL=http://localhost:3001 sh scripts/design-checks/home-digital-rain.sh`。
+- 当时使用 ego-browser，创建 TaskSpace 后在 p2 打开本地预览；历史命令：`EGO_SPACE_ID=<任务空间ID> DESIGN_BASE_URL=http://localhost:3001 sh scripts/design-checks/home-digital-rain.sh`。
 - 1440、1280、390px × 深浅主题：画布有实际像素、没有页面横向溢出、不捕获指针、辅助技术隐藏；减少动态效果下图像保持静止。六张截图位于 `.impeccable/review/home-digital-rain/`，已实看桌面与窄屏的双主题截图。
 - 恢复普通动效后图像持续变化；方向键仍能移动时间轴并停止背景动效。进入工具页后，Next Activity 缓存的首页隐藏，背景 effect 清理；站内返回首页后恢复绘制与播放。
 
 ## 限制
 
-后台暂停已接入共享 motion policy；Ego 的跨标签聚焦未稳定产生 document.hidden，未宣称通过真实后台暂停验收。浏览器原生后退未单独验证，本次没有改动导航逻辑。既有全站回归入口使用 Playwright，与当前必须使用 ego-browser 的规则不符，本次未执行该入口；仅完成上述定向生产回归。未覆盖其他浏览器内核及真实手机。
+后台暂停已接入共享 motion policy；当时 Ego 的跨标签聚焦未稳定产生 document.hidden，未宣称通过真实后台暂停验收。浏览器原生后退未单独验证，本次没有改动导航逻辑。本次未执行既有 Playwright 回归入口，仅完成上述定向生产回归；这不限制当前工具选择。未覆盖其他浏览器内核及真实手机。
 
 ## 中性灰配色调整
 

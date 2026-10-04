@@ -24,15 +24,13 @@
 
 ## 实现边界
 
-`packages/ai-coding-dictionary/runtime/bridge.js` 负责原生 aside 阅读面和逐段对照，`runtime/detail.css` 负责排版及响应式。`scripts/translate-claude.mjs` 通过本机默认 `claude -p` 生成完整中文译文，`sync.mjs` 仅更新变更词条，`backfill-zh.mjs` 可断点补齐旧目录。`scripts/prepare-runtime.mjs` 将原版 t8 详情组件替换为 null，旧详情及分享、复制控件不挂载；原版图谱运行资源继续沿用。
+[dictionary-map.tsx](../../../apps/web/components/dictionary-map.tsx) 承载本地图谱 iframe 与站内 URL／主题同步；[bridge.js](../../../packages/ai-coding-dictionary/runtime/bridge.js) 负责原生 aside 阅读面和逐段对照，[detail.css](../../../packages/ai-coding-dictionary/runtime/detail.css) 负责排版及响应式。词条保存在 [catalog.json](../../../packages/ai-coding-dictionary/catalog.json)，站点交付 [public/ai-coding-atlas/](../../../apps/web/public/ai-coding-atlas/) 的本地运行版本；旧详情及分享、复制控件不挂载。
 
-## 评审处置
+上游快照与同步、翻译、运行资源准备脚本已于2026-09-27退役，不属于当前实现入口。更新词典需重新捕获上游并重建运行资源，范围以 [PRODUCT.md](../../../PRODUCT.md) 为准。
 
-**Ship — 本次受限的视觉与代码范围。** 当前契约覆盖阅读层级、完整双语内容、章节目录、常驻操作与响应式边界；此处为视觉／代码处置；随后主任务完成了下述浏览器行为验收，焦点恢复修正也通过复核。
+## 当前验收
 
-## 验收
-
-此前的 CDP 截图只证明摘要版阅读面；当前完整翻译和默认收起的关联区重新检查了段落对应、双语表格、展开跳转、浏览器历史、1500px 桌面和 390px 小屏，实际结果与截图见 [本轮验收记录](evidence/dictionary-full-translation-qa.md)。旧截图不能代替新实现的证据。
+当前启动方式、浏览器入口及已知缺口见 [验收索引](README.md)。修改阅读面时按本页契约验证双语段落与表格、内容定位、关联展开、搜索外词条跳转、历史与焦点返回，并检查桌面／小屏和双主题。下方历史截图和“Ship”只证明当时限定范围，不代表当前版本通过。
 
 ## 作品级导航
 
@@ -47,10 +45,24 @@ Next Cache Components 的 Activity 会保留路由 DOM，因此词典在 useLayo
 
 复验：从首页选中第五项，搜索“缓存”并打开 Prefix cache，经标题回退到首页，再点击第五项；检查 URL 无 term/q、focusedSlug 为 null、query 为空、阅读面关闭、iframe performance.timeOrigin 已更新。再次退出和进入仍应一致。检查首页预览可见时出现原版 canvas，离开首页后释放预览 iframe。
 
-## 2026-09-26 搜索控件验收
+## 搜索控件契约
 
 搜索入口统一44px、18px图标与中性主题，单层内描边承担普通和聚焦状态，去掉叠加的原版边框、阴影与输入轮廓。
 
-复现：生产构建并启动后运行 `DESIGN_BASE_URL=http://localhost:3001 sh scripts/design-checks/dictionary-search.sh`，截图默认保存到 `/tmp/dictionary-search/`。已通过1440px亮色、1280px暗色、390px亮色与320px暗色下的搜索、清除、无结果、Tab、斜杠、Esc、详情打开与焦点返回；小屏同时启用减少动态效果。构建、Web类型检查与diff检查通过。
+## 历史评审与验收（非当前执行入口）
 
-仅检查搜索区域及关联详情路径，不代表全站逐页视觉或动画验收；未运行旧 `run-all.mjs`，其浏览器脚本直接启动 Playwright，不符合当前必须使用 ego-browser 的规则。
+下方记录保留当时结论与限制。此前浏览器工具限制已撤销，相关覆盖可使用 Playwright、CDP 或环境可用的浏览器工具按 [当前验收索引](README.md)核验，必要时适配旧脚本的依赖和页面契约。历史命令只定位当时执行环境；其他交付记录见 [执行历史](history.md)。
+
+### 详情阅读面与全文翻译（执行日期未单独记录）
+
+当时评审结论为 **Ship — 受限的视觉与代码范围**，覆盖阅读层级、完整双语内容、章节目录、常驻操作与响应式边界；随后完成浏览器行为验收及焦点恢复复核。
+
+此前 CDP 截图只证明摘要版阅读面；完整翻译和默认收起的关联区另行检查了段落对应、双语表格、展开跳转、浏览器历史、1500px桌面和390px小屏，结果与截图见 [历史全文翻译验收](evidence/dictionary-full-translation-qa.md)。这些证据对应各自版本。
+
+当时译文由 `translate-claude.mjs` 生成，`sync.mjs`、`backfill-zh.mjs` 用于更新和补齐，`prepare-runtime.mjs` 用于替换原版 t8 详情组件。这里只说明历史交付方法；上述脚本均已退役。
+
+### 2026-09-26 搜索控件验收
+
+当时命令为 `DESIGN_BASE_URL=http://localhost:3001 sh scripts/design-checks/dictionary-search.sh`，截图保存到 `/tmp/dictionary-search/`。记录称1440px亮色、1280px暗色、390px亮色与320px暗色下的搜索、清除、无结果、Tab、斜杠、Esc、详情打开与焦点返回通过；小屏同时启用减少动态效果。构建、Web类型检查与diff检查通过。
+
+该次只检查搜索区域及关联详情路径，不代表全站逐页视觉或动画验收。当时没有运行 `run-all.mjs`；这是该次覆盖范围的限制。当前可通过 `pnpm check:browser` 执行既有 Playwright 回归子集，入口及额外专项见验收索引。

@@ -1,5 +1,7 @@
 # 开书起始抖动修复 · 2026-09-28
 
+本页保留历史命令与结果；此前浏览器工具限制已撤销。当前可使用 Playwright、CDP 或环境可用的浏览器工具，应用由根目录 `pnpm build`、`pnpm start` 经 Portless 启动，见[当前验收入口](../README.md)。
+
 原因：书脊悬停已执行 translateY(-20px) rotate(-2deg)，抽书首帧却从零变换开始；进入抽书状态后 hover 过渡也可能争用 transform。点击前保存实际 computed transform，用作抽书首帧，并在抽书期间关闭 transition。所有分类共用此入口。
 
 复现与回归（生产服务）：
@@ -16,4 +18,4 @@ DESIGN_BASE_URL=http://localhost:3002 sh scripts/design-checks/book-opening-stab
 
 视觉：检查1440px浅色画册、1280px深色起始书脊及画册截图；本机截图保存在 `.impeccable/review/book-opening/`。起始几何连续性有自动断言；没有逐帧录屏，因此不将此记录表述为整段3D动画所有交接点的视觉认证。
 
-范围限制：本轮为开书定向回归；未运行其他产品的全站套件。现有 run-all.mjs 使用 Playwright，按当前仓库“浏览器操作必须使用应用内 ego-browser”的规则没有调用该入口。未覆盖真实移动设备或其他浏览器引擎，未提交、推送、部署。
+范围限制：本轮为开书定向回归，未运行 `run-all.mjs` 的 Playwright 套件及其他产品专项。这是当时的覆盖范围，不限制当前工具选择。未覆盖真实移动设备或其他浏览器引擎，未提交、推送、部署。

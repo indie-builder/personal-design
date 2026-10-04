@@ -1,6 +1,6 @@
 # 设计文档入口
 
-现行版本：2026-09-12。本站现有设计的统一规范，不另换视觉体系。
+本站现有设计的统一规范与页面契约，不另换视觉体系。当前验收入口与历史交付证据分别维护。
 
 ## 阅读顺序与职责
 
@@ -12,8 +12,9 @@
 | [控件标准](controls/README.md) | 共享控件用途及获准例外 |
 | [OpenDesign 迁移规则](open-design/rules.md) | 来源依据与本站适配；source 只读 |
 | [前端 Agent 指引](../../apps/web/AGENTS.md) | 修改和验证代码的操作要求 |
+| [当前验收索引](execution/README.md) | 当前启动与检查入口、适用范围和待验证覆盖 |
 
-`execution/`、`redesign-v2/`、`emil-design-eng/` 及历史 review 图像记录当时交付结果，不能覆盖以上现行规范。不要把旧截图或单次检查当作当前版本已通过验收。
+回溯交付结果时读 [执行历史](execution/history.md)；回溯本入口原有的2026-09页面调整与核对记录时读 [设计历史](execution/design-history.md)。`execution/` 内专项文档按各自的现行契约／历史标记阅读；`redesign-v2/`、`emil-design-eng/` 及历史 review 图像只记录当时交付结果。历史证据不能覆盖现行规范，也不能证明当前版本已通过验收。
 
 ## 页面契约
 
@@ -32,7 +33,7 @@
 - 首页顶部采用随主题变化的中性灰数字／符号雨，与视口等宽的自适应画布，仅底部渐隐，左右铺满，鼠标附近局部提亮；仅首页显示，不占布局、不接收点击，后台、离屏、键盘和减少动态效果时静止。
 - 页头头像为点击触发的太极彩蛋，支持 Esc 收起；不阻塞作品链接。
 
-实现：[home-view.tsx](../../apps/web/components/home-view.tsx)、[workspace-shell.tsx](../../apps/web/components/workspace-shell.tsx)、[site-receipt-preview.tsx](../../apps/web/components/site-receipt-preview.tsx)、[taichi-avatar.tsx](../../apps/web/components/taichi-avatar.tsx)。
+实现：[home-view.tsx](../../apps/web/components/home-view.tsx)、[home-previews.tsx](../../apps/web/components/home-previews.tsx)、[workspace-shell.tsx](../../apps/web/components/workspace-shell.tsx)、[site-receipt-preview.tsx](../../apps/web/components/site-receipt-preview.tsx)、[taichi-avatar.tsx](../../apps/web/components/taichi-avatar.tsx)。
 
 ### 布局参考 `/products/layout-compositions`
 
@@ -52,13 +53,13 @@
 - 每件作品是原生链接，进入 `/products/muse/[slug]` 详情；分类及浏览上下文随链接传递，返回恢复分类、已加载数量、位置与焦点。
 - 作品详情通过原生链接进入；q保留搜索关键词，post参数不再触发跳转。
 
-实现：`plate-wall.tsx`、`category-tabs.tsx`。
+实现：[plate-wall.tsx](../../apps/web/components/plate-wall.tsx)、[category-tabs.tsx](../../apps/web/components/category-tabs.tsx)、[muse-catalog.ts](../../apps/web/lib/muse-catalog.ts)。
 
 ### 灵感详情 `/products/muse/[slug]`
 
 恢复标题、作者、中文分类、原作入口、媒体和实际说明；视频使用原生控制，图片可点击放大，多媒体可切换。相邻作品沿进入时的筛选范围，返回灵感集保留浏览现场。
 
-实现：`inspora-media-carousel.tsx`、`browse-navigation.tsx`。
+实现：[inspora-media-carousel.tsx](../../apps/web/components/inspora-media-carousel.tsx)、[browse-navigation.tsx](../../apps/web/components/browse-navigation.tsx)。
 
 ### 设计工程工具 `/products/design-engineer-tools`
 
@@ -67,18 +68,18 @@
 - 每个分类使用与网格间距对齐的浅色线框，分类内部不再额外分隔；首页预览复用四个跨分类的 favicon 工具格。
 - 不搬运目标工具网站内容；同步失败保留上一次成功目录。
 
-实现：[工具页](../../apps/web/app/products/design-engineer-tools/page.tsx)、[页面样式](../../apps/web/app/products/design-engineer-tools/page.module.css)、`packages/design-engineer-tools/scripts/sync.mjs`。
+实现：[工具页](../../apps/web/app/products/design-engineer-tools/page.tsx)、[页面样式](../../apps/web/app/products/design-engineer-tools/page.module.css)、[sync.mjs](../../packages/design-engineer-tools/scripts/sync.mjs)。
 
 ### AI Coding 词典 `/products/ai-coding-dictionary`
 
 - 从首页作品入口进入后，在全屏 iframe 中加载本地保存的原版图谱，标题回退导航叠放在画布左上角；原版负责知识网渲染、动效、镜头、收起式搜索和选择，本站不重建图谱。跳过 loading 开场，背景与前景跟随主题，字体采用 Albert Sans。节点放大约 15%，七个章节使用固定低饱和浅色；选中圆点、纸色间隔和粗外圈置顶。保留原版放射排布，碰撞节点沿原方向向外错开，为名称留出空间；保留标签渲染修正，不强制节点进入固定可视区。配色切换、声音控件和音频初始化已移除。
 - 详情采用 Impeccable 阅读面。`bridge.js` 创建原生 aside，`detail.css` 提供桌面右侧与小屏底部布局；标题、关闭及相邻导航常驻，正文独立滚动。中英释义和逐段对应的完整中英正文同屏，中文概述单独保留但不代替全文翻译；双语表格使用语义 table。内容定位只滚动阅读区；关联术语默认收起为一行，展开后按章节显示紧凑原生链接，相邻词条显示完整名称。旧详情组件不挂载，分享与 Copy Markdown 控件移除。
 - 词条和搜索状态同步到本站 URL 的 `term`、`q`，保留原生链接、修饰键新标签和浏览器历史；关联词条不在当前搜索结果内时清除搜索以显示目标节点。关闭与 Esc 清除选中状态并将焦点返回搜索入口。返回作品统一使用共享页头的标题导航，不另放图谱内返回按钮。
-- 详情范围见 [详情阅读区契约](execution/ai-coding-dictionary-detail.md)；本轮全文翻译与关联区的实际检查及截图见 [验收记录](execution/evidence/dictionary-full-translation-qa.md)。此前的 [CDP 记录](execution/ai-coding-dictionary-cdp.md) 只证明旧版摘要阅读面与原图谱行为。
+- 详情范围见 [详情阅读区契约](execution/ai-coding-dictionary-detail.md)；全文翻译与关联区的历史检查及截图见 [历史验收记录](execution/evidence/dictionary-full-translation-qa.md)。此前的 [CDP 记录](execution/ai-coding-dictionary-cdp.md) 只证明旧版摘要阅读面与原图谱行为。
 
 - 首页缩略预览按可见性复用原版图谱动画与连线，离屏释放资源；普通首页入口每次创建新的图谱实例，重置上次搜索、选中与镜头状态。
 
-实现：`dictionary-map.tsx`、`packages/ai-coding-dictionary/runtime/bridge.js`、`packages/ai-coding-dictionary/runtime/detail.css`。上游快照与增量同步脚本已退役；后续更新需重新捕获上游并重建运行资源。
+实现：[dictionary-map.tsx](../../apps/web/components/dictionary-map.tsx)、[bridge.js](../../packages/ai-coding-dictionary/runtime/bridge.js)、[detail.css](../../packages/ai-coding-dictionary/runtime/detail.css)。上游快照与增量同步脚本已退役；后续更新需重新捕获上游并重建运行资源。
 
 ### AI 问答 `/products/ai-chat`
 
@@ -97,7 +98,7 @@
 - 支持停止、重新生成、失败重试、格式错误提示及一次结构自动修正。等待提示仅生成期间显示；结束后消息底部出现复制按钮，最新回答同时显示重新生成按钮，均为44px中性圆形触控按钮，复制渲染后的正文并反馈成功／失败。生成期间禁用会话／智能体切换，防止回复串入其他会话。离开页面中止正在生成的回答。
 - 导航抽屉使用原生 dialog；创建页是聊天容器内部的独立 section，原聊天保持挂载作为退场底层，并在创建页活动期间 inert、对辅助技术隐藏。创建页不自动弹出键盘，名称回车进入提示词，返回／Esc 回到列表并保留本次草稿，成功后清空草稿；输入正文可独立滚动，手机键盘出现时按 visualViewport 保持提交区可见。抽屉支持 Esc 和焦点回归；深色主题复用现有主题机制。桌面 Enter 发送、Shift+Enter 换行，触摸端 Enter 保留换行；输入法组合期间不误发送。
 
-实现：`components/ai-chat.tsx`、`components/ai-chat-ui.tsx`、`app/api/ai-chat/route.ts`、`packages/ai-chat/src/index.ts`。配置与验收见 [AI 问答](execution/ai-chat.md)；82项官方定义的源码审查、10组回放覆盖及验证边界见 [一致性审查](execution/ai-chat-consistency-audit.md)。
+实现：[ai-chat.tsx](../../apps/web/components/ai-chat.tsx)、[ai-chat-ui.tsx](../../apps/web/components/ai-chat-ui.tsx)、[use-saved-chat.ts](../../apps/web/components/ai-chat/use-saved-chat.ts)、[chat-persistence.ts](../../apps/web/lib/chat-persistence.ts)、[use-pi-chat.ts](../../apps/web/lib/use-pi-chat.ts)、[chat-stream.ts](../../apps/web/lib/chat-stream.ts)、[API route.ts](../../apps/web/app/api/ai-chat/route.ts)、[内容与会话模型](../../packages/ai-chat/src/index.ts)。配置见 [AI 问答](execution/ai-chat.md)，当前检查见 [验收索引](execution/README.md)；82项官方定义的源码审查、10组回放覆盖及验证边界见 [历史一致性审查](execution/ai-chat-consistency-audit.md)。
 
 ### 文字游乐场 `/products/word-arcade`
 
@@ -107,7 +108,7 @@
 - 主动点击或 Enter 开始，鼠标／触摸定位，方向键辅助操作，空格跳跃／射击，Esc 暂停。暂停／重来有显式按钮；扣命可继续，结束可再来一局，过关可继续下一关。
 - 失焦、后台、布局缩放暂停；切换游戏与返回释放旧循环。减少动态效果关闭装饰运动，主动游戏仍可运行。
 
-实现：`components/word-arcade.tsx`、`components/word-arcade-draw.ts`、`packages/word-arcade/src/game.ts`。验证与限制见 [文字游乐场验收](execution/word-arcade.md)。
+实现：[word-arcade.tsx](../../apps/web/components/word-arcade.tsx)、[word-arcade-draw.ts](../../apps/web/components/word-arcade-draw.ts)、[game.ts](../../packages/word-arcade/src/game.ts)。验证与限制见 [文字游乐场验收](execution/word-arcade.md)。
 
 ### 个人网站 `/products/personal-sites`
 
@@ -123,29 +124,15 @@
 
 ## 修改后的验收要求
 
-性能约束：灵感集和布局画册在服务器输出当前筛选首屏，媒体不能等客户端脚本才出现。灵感网格链接在悬停或键盘聚焦后预取；视频保留可视自动播放，远离视口的装饰性预览可释放并重载，原生／手动播放器保留播放位置。本地媒体 URL 使用部署提交号作为版本（Vercel 自动提供；其他部署可设置 `MEDIA_VERSION` 为40位提交号），只有带版本号的地址使用长期缓存。标准行为套件用 `node scripts/design-checks/run-all.mjs` 一键运行（对生产构建地址，`DESIGN_BASE_URL` 指定）；性能回归另运行 `node scripts/design-checks/muse-performance.mjs <生产构建地址>` 和 `node scripts/design-checks/layout-first-paint.mjs <生产构建地址>`，前者需要带版本号的构建。
+性能约束：灵感集和布局画册在服务器输出当前筛选首屏，媒体不能等客户端脚本才出现。灵感网格链接在悬停或键盘聚焦后预取；视频保留可视自动播放，远离视口的装饰性预览可释放并重载，原生／手动播放器保留播放位置。本地媒体 URL 使用部署提交号作为版本（Vercel 自动提供；其他部署可设置 `MEDIA_VERSION` 为40位提交号），只有带版本号的地址使用长期缓存。当前检查入口、生产预览方式和覆盖缺口统一见 [验收索引](execution/README.md)。首页性能可使用现有 [home-performance.browser.mjs](../../scripts/design-checks/home-performance.browser.mjs)；灵感性能与布局首屏的既有检查尚需按当前页面契约核验或适配，首页检查不替代这两项覆盖。
 
 本节是要求，不是所有现有代码已达标的声明。
 
 1. 对照修改范围运行类型检查、相关文件 lint、适用的已有测试；涉及路由或页面渲染时执行生产构建。
-2. 使用项目规定的 ego-browser 检查 1280 / 1440px 桌面、双主题、键盘、减少动态效果；小屏检查现有布局与操作是否被裁切。
+2. 使用 Playwright、CDP 或当前环境可用的浏览器工具检查 1280 / 1440px 桌面、双主题、键盘、减少动态效果；小屏检查现有布局与操作是否被裁切。现有回归子集执行 `pnpm check:browser`，准备及覆盖边界见验收索引。
 3. 改集合或详情时验证分类／主题 → 专注／画册 → 相邻浏览 → 返回现场；改媒体时验证等待、失败、暂停、放大、Esc 与焦点回归。
-4. 改动效时同时列出进入和退出入口，按 DESIGN.md 的成对动效规则及状态矩阵验收；运行回退专项和综合动效回归。分别记录行为存在、状态正确、视觉连续三个门槛；站内返回与浏览器原生后退单独记录，缺少视觉证据时不得标为全部通过。
+4. 改动效时同时列出进入和退出入口，按 DESIGN.md 的成对动效规则及状态矩阵验收；从 [当前验收索引](execution/README.md)选择适用的回退与动效检查，并记录未覆盖的入口。分别记录行为存在、状态正确、视觉连续三个门槛；站内返回与浏览器原生后退单独记录，缺少视觉证据时不得标为全部通过。
 5. 报告实际检查范围与限制，不把共享模板数量写成逐页视觉验收数量。
 
-## 已知核对项
 
-- 首页进入作品的导航、标题清理、双主题、键盘及减少动态效果已有本会话功能检查；ego 截图接口持续超时，尚未完成视觉帧验收。
-- 开册、首页预览与路由动效已接入统一输入／偏好策略；行为回归使用 `sh scripts/design-checks/workspace-navigation.sh`。回退专项检查为 `sh scripts/design-checks/back-motion.sh`。回退稳定性检查为 `sh scripts/design-checks/back-stability.sh`，覆盖旧画册移除后清理、书脊焦点恢复与整页／子项位移不叠加。三者支持 `DESIGN_BASE_URL`（默认 `http://localhost:3012`）和复用 `EGO_TASK_SPACE`，对生产构建运行；不能替代视觉关键帧验收。
-- 书籍开册仍有局部 width / height 插值；属于现有实现，需实测性能，不能表述为全部动效仅使用 transform / opacity。
-
-
-
-
-全局 UX 回归：旧 `global-ux.sh` 为历史检查；当前按本文页面契约验证书架/画册、详情返回与窄屏布局，不再验收旧图鉴地址或post跳转。
-
-2026-09-12 全局优化验收：global-ux、projection-switch、type-dial 浏览器回归通过，8项浏览上下文/洗牌测试通过，typecheck、定向eslint和生产构建通过。实际检查了暗色桌面灵感全览、画册目录、个人网站播放提示截图；静态截图不替代全站逐帧动效验收。
-
-2026-09-12：按用户要求撤销灵感放映台，恢复网格＋分类＋作品详情；当前回归见 `scripts/design-checks/global-ux.sh`。先前放映台验收记录为历史，不再描述现行实现。
-
-2026-09-12 用户恢复搜索：灵感分类栏右侧与布局书架顶部使用CollectionSearch。q与分类/主题组合过滤，URL可分享，详情返回与相邻作品保持关键词；画册搜索结果可定位跨页，页脚翻页保持。当前搜索回归：`sh scripts/design-checks/search.sh`。
+历史功能结果、旧脚本名称与尚未完成的视觉核对见 [设计历史](execution/design-history.md)；这些记录不构成当前检查结果。

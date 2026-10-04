@@ -2,15 +2,10 @@ import { spawn } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// 全站浏览器回归套件入口：对运行中的生产构建逐个执行 scripts/design-checks
-// 下的行为脚本、根 verify 脚本与 /api/portfolio 契约检查，汇总 PASS/FAIL，
-// 任一失败即非零退出。
-// 前置：pnpm build && pnpm start（或等价预览），用 DESIGN_BASE_URL 指定地址。
-// muse-performance / layout-first-paint 需要 MEDIA_VERSION 版本化构建，不纳入
-// 默认套件，按 docs/design/README.md「验收要求」单独运行。
+// Existing Playwright regression suite, plus HTTP/API checks. This is not full product coverage.
+// Run against pnpm build + pnpm start, with DESIGN_BASE_URL set to the actual Portless URL.
 const here = dirname(fileURLToPath(import.meta.url));
 const base = process.env.DESIGN_BASE_URL ?? 'https://personal-design.localhost';
-
 const suites = [
   '../verify-design.mjs',
   '../verify-design-routes.mjs',
@@ -25,7 +20,6 @@ const suites = [
   'journeys.mjs',
   'personal-sites.mjs',
 ];
-
 const failed = [];
 for (const suite of suites) {
   const startedAt = Date.now();
@@ -34,12 +28,12 @@ for (const suite of suites) {
       stdio: ['ignore', 'inherit', 'inherit'],
       env: { ...process.env, DESIGN_BASE_URL: base },
     });
-    child.on('exit', (code) => resolve(code ?? 1));
+    child.once('error', (error) => { console.error(error.message); resolve(1); });
+    child.once('exit', (code) => resolve(code ?? 1));
   });
   const seconds = ((Date.now() - startedAt) / 1000).toFixed(1);
   console.log(`\n=== ${suite.split('/').pop()} ${exit === 0 ? 'PASS' : `FAIL (exit ${exit})`} ${seconds}s ===\n`);
   if (exit !== 0) failed.push(suite);
 }
-
-console.log(failed.length ? `FAILED: ${failed.join(', ')}` : `ALL ${suites.length} SUITES PASSED`);
+console.log(failed.length ? `FAILED: ${failed.join(', ')}` : `ALL ${suites.length} SUITES PASSED (see acceptance index for remaining coverage)`);
 process.exitCode = failed.length ? 1 : 0;

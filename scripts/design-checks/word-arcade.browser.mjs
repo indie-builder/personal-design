@@ -1,7 +1,7 @@
-// Run inside Codex's built-in browser REPL, with a local production tab and its CDP capability:
+// Run with a compatible production tab adapter and CDP session:
 // const { verifyWordArcade } = await import('file:///ABSOLUTE_REPO/scripts/design-checks/word-arcade.browser.mjs');
 // await verifyWordArcade(tab, await tab.capabilities.get('cdp'));
-// Uses only the supplied browser. Never launches a second browser.
+// The caller supplies the browser connection.
 export async function verifyWordArcade(tab, cdp) {
   const results = [];
   const expect = (condition, message) => { if (!condition) throw new Error(message); };
