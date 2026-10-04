@@ -34,6 +34,22 @@
 - 禁用 ego-lite / ego-browser。Agent 浏览器操作与页面验收使用 Codex 内置浏览器，需要底层控制时使用其支持的 CDP 接口；现有数据同步脚本的 Playwright 实现不受此约束。
 - `next-dev-loop` 是用户有意移除的技能，更新技能时不要恢复。
 
+## Agent skills
+
+`CLAUDE.md` 链接到本文件，共用一份配置；技能遵循上述项目规则，不能恢复 `next-dev-loop` 或改用被禁用的浏览器。
+
+### Issue tracker
+
+使用本仓库 GitHub Issues 管理任务与规格，操作约定见 [issue-tracker.md](docs/agents/issue-tracker.md)。
+
+### Triage labels
+
+采用默认五类标签角色，映射见 [triage-labels.md](docs/agents/triage-labels.md)。
+
+### Domain docs
+
+采用 single-context，根 `GLOSSARY.md` 与 `docs/adr/` 按需创建；阅读规则与现有文档边界见 [domain.md](docs/agents/domain.md)。
+
 ## 提交
 
 AI commit 必须包含实际模型的署名：
