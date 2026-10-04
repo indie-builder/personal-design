@@ -29,7 +29,7 @@ const fixture = {
   messages: examples.map((text, i) => ({
     id: 'catalog-' + i,
     role: 'assistant',
-    parts: [{ type: 'text', text }],
+    text,
   })),
 };
 writeFileSync(

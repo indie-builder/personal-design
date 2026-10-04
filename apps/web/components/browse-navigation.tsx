@@ -58,7 +58,6 @@ function Navigation({
   fallbackHref,
   currentHref,
   entries,
-  listPath,
   fromList = false,
 }: Props & { fromList?: boolean }) {
   const index = entries.findIndex((entry) => entry.href === currentHref);
@@ -118,7 +117,6 @@ function Navigation({
       <DetailKeyboardNav
         prevHref={prev ? href(prev) : undefined}
         nextHref={next ? href(next) : undefined}
-        hrefPattern={`^${listPath}/`}
       />
     </>
   );

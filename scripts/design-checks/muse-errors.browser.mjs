@@ -1,6 +1,7 @@
 // Built-in browser only: import this module, then await verifyMuseErrors(tab, await tab.capabilities.get('cdp')).
 // Failures: HTTP/network/malformed/empty pages, stale filter errors, missing retry, lost append listener.
 export async function verifyMuseErrors(tab, cdp) {
+  const base = new URL(await tab.url()).origin;
   const evaluate = (expression) =>
     cdp.send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
   const check = (ok, message) => {
@@ -18,7 +19,7 @@ export async function verifyMuseErrors(tab, cdp) {
   const restore = () => evaluate('window.fetch = window.__museFetch');
   const results = [];
   for (const mode of ['http', 'network', 'malformed', 'empty']) {
-    await tab.goto('http://localhost:3000/products/muse');
+    await tab.goto(base + '/products/muse');
     await tab.playwright.getByPlaceholder('搜索灵感').waitFor({ state: 'visible' });
     const before = await cards();
     await install(mode);
@@ -39,7 +40,7 @@ export async function verifyMuseErrors(tab, cdp) {
       await restore();
     }
   }
-  await tab.goto('http://localhost:3000/products/muse');
+  await tab.goto(base + '/products/muse');
   await tab.playwright.getByPlaceholder('搜索灵感').waitFor({ state: 'visible' });
   await install('http');
   try {

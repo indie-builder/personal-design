@@ -45,9 +45,19 @@
 
 保持现有视觉、帧率与预取策略的计算／绘制／生命周期优化，见 [性能与等价性验证](home-performance.md)。
 
-## 浅模块清理
+## 第二轮模块接口收缩
 
-PR 基于最新主分支 `5b8a05f` 的隔离工作树重新通过全仓类型／lint／格式、40项单测和生产构建；下方浏览器及API证据来自清理时的原工作区，详见结果中的 `integrationRecheck`。
+第二轮（2026-10-04）移除旧图鉴路由／post／zoom兼容链、无消费的详情动画标记与视觉模式、冗余产品字段和音效；灵感媒体直接提供 `previewSrc`，分类只统计一次；聊天使用 `text` 与唯一 `Conversation.memory`，每段对话共享一个主题 Provider。v2 存储独立初始化，旧 v1 记录不读取、不迁移、不覆盖。结果见 [module-depth-2026-10-04.json](evidence/module-depth-2026-10-04.json)。
+
+全仓类型／lint／格式、38项现有测试、生产构建、11条静态路由、旧图鉴001／063／999的HTTP404、5项portfolio API与12项聊天API均通过。内置浏览器运行 `shallow-navigation.browser.mjs`、`current-layouts.browser.mjs`、`muse-errors.browser.mjs`、`chat-lifecycle.browser.mjs` 和 `current-site.browser.mjs`；各文件头部记录调用方式。多标签页验收时，viewport须作用于被测标签页，可用其CDP的 `Emulation.setDeviceMetricsOverride` / `Emulation.clearDeviceMetricsOverride` 实现传入的 `set` / `reset`。
+
+全站基础检查显式记录一项未通过：390px深色词典的iframe在hydration后把自身 `data-theme` 改回light，宿主与 `__atlasTheme` 仍为dark。此现象已在本轮修改前的原工作区生产服务复现，词典生产代码未改；其余基础路径通过。结果中 `changedFlowsPassed` 与 `allSitePassed` 分开记录，不把此问题或逐帧动效标为已通过。
+
+验收先执行 `pnpm build`、`pnpm start`，使用worktree启动日志中的独立URL。聊天测试使用现有假模型 `node scripts/design-checks/fixtures/ai-chat-provider.mjs`；以 `ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907/v1 pnpm start` 启动测试预览，再用 `portless alias upgrade-check.personal-design <应用端口>` 注册隔离origin。Node检查设置 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"` 与 `DESIGN_BASE_URL`；浏览器脚本从tab读取实际origin。结束后停止假模型与测试预览、移除alias并恢复正常 `pnpm start`。
+
+## 第一轮浅模块清理
+
+PR 基于主分支 `5b8a05f` 的隔离工作树重新通过全仓类型／lint／格式、40项单测和生产构建；下方浏览器及API证据来自清理时的原工作区，详见结果中的 `integrationRecheck`。
 
 2026-10-04 的[验收结果](evidence/shallow-modules-2026-10-04.json)记录类型／lint、36项单测、生产构建、361条静态路由、5项 portfolio API、9项 AI API，以及内置浏览器的筛选返回与聊天生命周期检查。`browse=1` 旧会话格式已退役，旧链接回退为普通详情导航；当前 `browse=2` 与按筛选保存的滚动／焦点记录继续使用。
 

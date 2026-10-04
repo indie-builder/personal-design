@@ -21,8 +21,10 @@ await page.press('a[aria-label="进入布局参考"]','Enter');await page.waitFo
 await page.press('#book-0','Enter');await page.waitForSelector('select[aria-label="跳转到图鉴"]',{state:'visible'});
 await page.evaluate(()=>history.back());await page.waitForSelector('#book-0',{state:'visible'});
 assert.equal(await page.evaluate(()=>document.activeElement?.id),'book-0');
-// Saved image URLs enter the corresponding book and magnification flow.
-await page.goto('https://personal-design.localhost/products/layout-compositions/001',{waitUntil:'commit'});
+// Current book URLs select the page; magnification is an explicit user action.
+await page.goto('https://personal-design.localhost/products/layout-compositions?cat=构图逻辑&page=001',{waitUntil:'commit'});
+await page.waitForSelector('button[data-page-id="001"]',{state:'visible'});
+await page.press('button[data-page-id="001"]','Enter');
 await page.waitForSelector('[role="dialog"]',{state:'visible'});
 assert.ok((await page.url()).includes('/products/layout-compositions?'));
 await page.keyboard.press('Escape');await page.waitForSelector('[role="dialog"]',{state:'detached'});
@@ -42,9 +44,9 @@ await page.click('[aria-label="分类"] button:last-child');
 await page.waitForFunction(()=>!!new URLSearchParams(location.search).get('cat'));
 assert.ok(await page.evaluate(()=>document.querySelectorAll('a[id^="muse-"]').length)>0);
 await page.goto('https://personal-design.localhost/products/muse?post=sticker-footer',{waitUntil:'commit'});
-await page.waitForURL('**/products/muse/sticker-footer**');
-await page.waitForSelector('main h1',{state:'visible'});
+await page.waitForSelector('a[id^="muse-"]',{state:'visible'});
+assert.equal(new URL(await page.url()).pathname,'/products/muse');
 await page.cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
 assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),390);
-cliLog({status:'PASS',checks:'book jump and return, legacy magnification, restored gallery and detail, return focus, category, legacy post links, narrow viewport'});
+cliLog({status:'PASS',checks:'book jump and return, explicit magnification, restored gallery and detail, return focus, category, obsolete post parameter ignored, narrow viewport'});
 EOF

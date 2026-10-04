@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { browseHref, browseMemoryKey, matchesSearch } from '@/lib/browse-context';
 import { paramsHref } from '@/lib/site-url';
 import { categoryLabel } from '@/lib/category-label';
@@ -83,18 +83,6 @@ export function PlateWall({
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [active, select] = useCatParam(categories.map((category) => category.name));
-  const router = useRouter();
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    const post = params.get('post');
-    if (post)
-      router.replace(
-        browseHref(
-          `${pathname}/${encodeURIComponent(post)}`,
-          paramsHref(pathname, params, { post: '' }),
-        ),
-      );
-  }, [searchParams, pathname, router]);
   const query = searchParams.get('q') ?? '';
   // 输入即时回显在本地，停顿后写入 URL（URL 是筛选的唯一事实源）
   const [input, setInput] = useState(query);

@@ -6,8 +6,8 @@ import { Check, ChevronDown, Menu, Plus, X } from 'lucide-react';
 import {
   avatarUrl,
   defaultAgent,
-  metadataSchema,
   type Agent,
+  type ChatTranscript,
   type Conversation,
 } from '@personal-design/ai-chat';
 import { instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
@@ -167,19 +167,9 @@ export function AiChat() {
     requestAnimationFrame(() => target?.focus());
   }
 
-  const updateMessages = useCallback(
-    (id: string, messages: Conversation['messages']) => {
-      const clean = messages
-        .map((message) => ({
-          id: message.id,
-          role: message.role as 'user' | 'assistant',
-          metadata: metadataSchema.safeParse(message.metadata).data,
-          parts: message.parts
-            .filter((part) => part.type === 'text')
-            .map((part) => ({ type: 'text' as const, text: part.text })),
-        }))
-        .filter((message) => message.parts.length > 0);
-      if (!clean.length) return;
+  const updateTranscript = useCallback(
+    (id: string, transcript: ChatTranscript) => {
+      if (!transcript.messages.length) return;
       setSaved((current) => {
         const existing = current.conversations.find((conversation) => conversation.id === id);
         const source = existing ?? (active?.id === id ? active : null);
@@ -187,9 +177,9 @@ export function AiChat() {
         const updated = {
           ...source,
           title:
-            clean.find((message) => message.role === 'user')?.parts[0]?.text.slice(0, 48) ||
+            transcript.messages.find((message) => message.role === 'user')?.text.slice(0, 48) ||
             '新对话',
-          messages: clean,
+          ...transcript,
         };
         return {
           ...current,
@@ -281,7 +271,7 @@ export function AiChat() {
             key={active.id}
             conversation={active}
             agent={agent}
-            onMessages={updateMessages}
+            onTranscript={updateTranscript}
             onBusy={setBusy}
             onHeaderHiddenChange={setHeaderHidden}
           />

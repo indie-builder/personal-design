@@ -15,8 +15,6 @@ export function BookReader({
   name,
   pages,
   initialId,
-  zoomId,
-  onZoomHandled,
   onPage,
   onClose,
   closing,
@@ -24,8 +22,6 @@ export function BookReader({
   name: string;
   pages: BookPage[];
   initialId: string;
-  zoomId: string;
-  onZoomHandled: () => void;
   onPage: (id: string) => void;
   onClose: () => void;
   closing: boolean;
@@ -59,19 +55,6 @@ export function BookReader({
       stop();
     };
   }, [turn]);
-  const zoomOpened = useRef(false);
-  useEffect(() => {
-    if (!zoomId || zoomOpened.current) return;
-    const button = reader.current?.querySelector<HTMLButtonElement>(
-      `[data-page-id="${CSS.escape(zoomId)}"]`,
-    );
-    if (button && !button.disabled) {
-      zoomOpened.current = true;
-      button.focus({ preventScroll: true });
-      button.click();
-    }
-    onZoomHandled();
-  }, [zoomId, onZoomHandled]);
   // Fetching and decoding must finish before a flip starts, or the incoming
   // pages pop in mid-animation; one spread each way covers both flip directions.
   const warmed = useRef(new Set<string>());

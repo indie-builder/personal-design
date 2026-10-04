@@ -23,8 +23,6 @@
   --color-border-hover: #bdbdbd;
   --color-control-border: #848484;
   --color-accent: #353535;
-  --color-line-muse: #d23c2e;
-  --color-line-layouts: #1a6fb4;
   --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -66,8 +64,6 @@ html[data-theme='dark'] {
   --color-border-hover: #848484;
   --color-control-border: #848484;
   --color-accent: #ededed;
-  --color-line-muse: #e86050;
-  --color-line-layouts: #55a0e0;
 }
 html { min-width: 320px; scrollbar-color: var(--color-border-hover) var(--color-paper); scrollbar-width: thin; }
 body { margin: 0; background: var(--color-workspace); color: var(--color-body); font-family: var(--font-sans); font-size: 14px; line-height: 1.75; -webkit-font-smoothing: antialiased; }

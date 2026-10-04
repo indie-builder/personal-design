@@ -10,7 +10,7 @@ cat <<'JS'
 const fs=await import('node:fs/promises');const assert=(await import('node:assert/strict')).default;
 const task=await taskSpace(config.space);const p=task.page('p1');const out=config.root+'/docs/design/execution/evidence/ai-chat-catalog';await fs.mkdir(out,{recursive:true});
 const fixture=JSON.parse(await fs.readFile(config.root+'/scripts/design-checks/fixtures/ai-chat-components.json','utf8'));
-await p.goto(config.base+'/products/ai-chat');await p.evaluate(c=>{const key='personal-design:ai-chat:v1';if(JSON.parse(localStorage.getItem(key)||'{}').conversations?.some(x=>!['component-fixture','case-fixture'].includes(x.id)))throw Error('Contains user records');localStorage.setItem(key,JSON.stringify({agents:[],conversations:[c]}));},fixture);await p.reload();await p.waitForSelector('.ai-openui');
+await p.goto(config.base+'/products/ai-chat');await p.evaluate(c=>{const key='personal-design:ai-chat:v2';if(JSON.parse(localStorage.getItem(key)||'{}').conversations?.some(x=>!['component-fixture','case-fixture'].includes(x.id)))throw Error('Contains user records');localStorage.setItem(key,JSON.stringify({agents:[],conversations:[c]}));},fixture);await p.reload();await p.waitForSelector('.ai-openui');
 const checks=[];
 for(const [width,theme] of [[320,'light'],[390,'dark'],[1440,'light']]){
  await p.cdp('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<640});await p.evaluate(t=>document.documentElement.dataset.theme=t,theme);

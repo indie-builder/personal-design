@@ -1,5 +1,5 @@
 import React from 'react';
-import { AbsoluteFill, Audio, Easing, Img, Sequence, interpolate, staticFile, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, Easing, Img, Sequence, interpolate, staticFile, useCurrentFrame } from 'remotion';
 import { PageCam } from './lib/PageCam';
 import layout from '../public/textures/layout.json';
 
@@ -140,22 +140,7 @@ function Outro() {
   </AbsoluteFill>;
 }
 
-// Peak delays measured from decoded 48kHz sources, see out/audio-source-analysis.json.
-const PEAK_F: Record<string, number> = { 'transition-soft.mp3':13.5, 'whoosh-fast.mp3':21.6, 'swoosh-quick.mp3':8.25, 'paper-slide.mp3':10.65, 'impact.mp3':16.5, 'shimmer.mp3':27.3, 'riser.mp3':31.5 };
-const OUTPUT_OFFSET_F = 1.274; // 2026-09-09: 3 cross-correlation probes, AAC 48kHz / MP4; see out/audio-output-analysis.json.
-export const SFX = [
-  {from:SHOTS.brand.from+28,src:'transition-soft.mp3',volume:.27,duration:42},
-  {from:SHOTS.news.from,src:'whoosh-fast.mp3',volume:.24,duration:30},
-  {from:SHOTS.collections.from,src:'swoosh-quick.mp3',volume:.23,duration:24},
-  {from:SHOTS.collections.from+120,src:'paper-slide.mp3',volume:.45,duration:20},
-  {from:SHOTS.lead.from+20,src:'transition-soft.mp3',volume:.2,duration:42},
-  {from:SHOTS.reading.from,src:'whoosh-fast.mp3',volume:.22,duration:30},
-  {from:SHOTS.reading.from+90,src:'swoosh-quick.mp3',volume:.22,duration:24},
-  {from:SHOTS.outro.from+5,src:'riser.mp3',volume:.16,duration:60},
-  {from:SHOTS.outro.from+48,src:'impact.mp3',volume:.33,duration:75},
-  {from:SHOTS.outro.from+70,src:'shimmer.mp3',volume:.16,duration:65},
-];
-export function Promo({sound=false}:{sound?:boolean}) {
+export function Promo() {
   return <AbsoluteFill style={surface}>
     <Sequence {...{from:SHOTS.brand.from,durationInFrames:SHOTS.brand.duration}}><Brand/></Sequence>
     <Sequence from={SHOTS.news.from} durationInFrames={SHOTS.news.duration}><News/></Sequence>
@@ -163,6 +148,5 @@ export function Promo({sound=false}:{sound?:boolean}) {
     <Sequence from={SHOTS.lead.from} durationInFrames={SHOTS.lead.duration}><Lead/></Sequence>
     <Sequence from={SHOTS.reading.from} durationInFrames={SHOTS.reading.duration}><Reading/></Sequence>
     <Sequence from={SHOTS.outro.from} durationInFrames={SHOTS.outro.duration}><Outro/></Sequence>
-    {sound&&SFX.map((s,i)=><Sequence key={i} from={Math.max(0,Math.round(s.from-PEAK_F[s.src]-OUTPUT_OFFSET_F))} durationInFrames={s.duration}><Audio src={staticFile(`audio/${s.src}`)} volume={f=>s.volume*Math.min(1,(s.duration-f)/6)}/></Sequence>)}
   </AbsoluteFill>;
 }

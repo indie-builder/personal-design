@@ -9,7 +9,7 @@ import {
   type SavedChat,
 } from '@personal-design/ai-chat';
 
-const STORAGE_KEY = 'personal-design:ai-chat:v1';
+const STORAGE_KEY = 'personal-design:ai-chat:v2';
 export const emptyStore: SavedChat = { agents: [defaultAgent], conversations: [] };
 
 /** 补齐默认智能体，并把非男生头像的记录重新随机分配。 */
