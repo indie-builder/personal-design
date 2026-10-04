@@ -18,16 +18,17 @@
 | --- | --- |
 | 安装／构建 | `pnpm install` / `pnpm build` |
 | 开发 | `pnpm dev`：全局 portless，`https://personal-design.localhost`；路由见 `portless.json` |
-| 直连开发／生产预览 | `pnpm dev:direct` / `pnpm start`：`http://localhost:3000` |
+| 生产预览 | `pnpm build` 后 `pnpm start`：通过 portless，`https://personal-design.localhost` |
 | Web 类型检查／单文件 lint | `pnpm --filter @personal-design/web typecheck` / `pnpm --filter @personal-design/web exec oxlint <file>` |
 | 格式化 | `pnpm format`：oxfmt，仅 TS/TSX/MJS；CSS 保持紧凑手写风格，生成 JSON 不参与 |
 | 已有单元测试 | `pnpm test`：node:test |
-| 浏览器回归 | 先构建并启动生产服务，再运行 `node scripts/design-checks/run-all.mjs`；`DESIGN_BASE_URL` 默认 `http://localhost:3000` |
+| 浏览器回归 | 先构建并通过 `pnpm start` 启动生产预览，再运行 `node scripts/design-checks/run-all.mjs`；`DESIGN_BASE_URL` 默认 `https://personal-design.localhost`，Node 检查需设置 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"` |
 | 内容同步 | `pnpm sync:layouts` / `pnpm sync:inspora`；其他入口见 `package.json` |
 
 
 ## 验证与浏览器
 
+- 后续开发与本地生产预览统一使用根目录 `pnpm dev` / `pnpm start`，不直接运行 `next dev/start` 或指定应用端口。两种模式共用域名，切换前先停止当前服务；worktree 使用启动日志中的独立子域名，定向检查用 `DESIGN_BASE_URL` 指向实际 URL。
 - 绝不在写完代码后再补写单元测试。复杂功能高度优先 E2E；必须隔离测试系统时，先列出所有可能的失败方式，再写代码。
 - 开发期间只跑相关定向 E2E，开发结束再跑全套。E2E 交付可验证、可重复执行的验收产物，记录复现命令、结果与限制；已有检查入口见 [验收索引](docs/design/execution/README.md)。
 - 禁用 ego-lite / ego-browser。Agent 浏览器操作与页面验收使用 Codex 内置浏览器，需要底层控制时使用其支持的 CDP 接口；现有数据同步脚本的 Playwright 实现不受此约束。

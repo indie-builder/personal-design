@@ -20,7 +20,7 @@
 | 视觉与原规则独立复核 | [finish-review.md](finish-review.md) | ship；初轮发现与修复已关闭 |
 | 来源完整性 | [source-integrity.json](evidence/source-integrity.json) | 25份来源快照哈希一致 |
 
-`run-all.mjs` 所含旧 Playwright 脚本与 portfolio API 契约检查支持 `DESIGN_BASE_URL`，默认 `http://localhost:3000`。Agent 浏览器检查遵循根 AGENTS 的应用内 ego-browser 入口。生产预览执行 `pnpm build`、`pnpm --filter @personal-design/web start --port 3012`；`dictionary-search.sh`、`workspace-navigation.sh`、`back-motion.sh`、`back-stability.sh` 以及上表新增专项均支持 `DESIGN_BASE_URL`。三份导航专项支持 `EGO_TASK_SPACE`；词典搜索沿用 `EGO_SPACE_ID`。`global-ux.sh`、`search.sh` 仍写死 portless 开发域名 `https://personal-design.localhost`，需先 `pnpm dev` 再运行。ai-chat 系列按 [AI 问答](ai-chat.md)的隔离 origin 要求运行。
+`run-all.mjs` 与 portfolio API 契约检查支持 `DESIGN_BASE_URL`，默认 `https://personal-design.localhost`。生产预览统一执行 `pnpm build`、`pnpm start`；Node.js 检查设置 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"`，无需关闭 TLS 验证。worktree 使用启动日志中的独立子域名。单独运行旧专项检查时显式传入 `DESIGN_BASE_URL`，覆盖脚本保留的历史端口默认值。Agent 浏览器检查遵循根 AGENTS 的 Codex 内置浏览器入口；表中 ego-browser 脚本是历史验收入口，Agent 不调用。ai-chat 系列保留 [AI 问答](ai-chat.md)的隔离 origin 要求，不对日常浏览器会话注入测试数据。
 
 ## 视觉证据与检查范围
 
@@ -44,3 +44,13 @@
 ## 首页等价性能优化
 
 保持现有视觉、帧率与预取策略的计算／绘制／生命周期优化，见 [性能与等价性验证](home-performance.md)。
+
+## 浅模块清理
+
+2026-10-04 的[验收结果](evidence/shallow-modules-2026-10-04.json)记录类型／lint、36项单测、生产构建、361条静态路由、5项 portfolio API、9项 AI API，以及内置浏览器的筛选返回与聊天生命周期检查。`browse=1` 旧会话格式已退役，旧链接回退为普通详情导航；当前 `browse=2` 与按筛选保存的滚动／焦点记录继续使用。
+
+生产预览先按根 AGENTS 执行 `pnpm build`、`pnpm start`，使用启动日志中的实际 URL。在 Codex 内置浏览器 REPL 中将生产页绑定为 `tab`，从仓库绝对路径导入 `scripts/design-checks/shallow-navigation.browser.mjs`，执行 `verifyShallowNavigation(tab, await tab.capabilities.get('cdp'), await browser.capabilities.get('viewport'))`。脚本覆盖1440／1280／390／320px、双主题、键盘、减少动态效果、站内返回与原生后退；截图保存到 `.impeccable/review/shallow-modules/`。
+
+聊天检查先按 [AI 问答](ai-chat.md)配置现有假模型与独立 `upgrade-check.personal-design.localhost` origin，再导入 `scripts/design-checks/chat-lifecycle.browser.mjs` 执行 `verifyChatLifecycle(tab, await tab.capabilities.get('cdp'))`；端口取当前 tab 的 origin。检查使用界面新建测试会话，不清空已有记录；请求中止观测结束即恢复。结束后停止假模型并恢复正常 `pnpm start` 预览。
+
+本轮没有运行会启动独立 Chromium 的 `run-all.mjs` 浏览器部分；上述可复跑脚本使用内置浏览器。静态截图不代表全站逐帧动效验收，假模型检查不代表真实模型结果。

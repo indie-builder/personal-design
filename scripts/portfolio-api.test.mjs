@@ -2,12 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 // 对 /api/portfolio 的集成契约检查：需对运行中的生产服务执行，
-// 基址与 design-checks 一致（DESIGN_BASE_URL，默认 http://localhost:3000），
+// 基址与 design-checks 一致（DESIGN_BASE_URL，默认 https://personal-design.localhost），
 // 已纳入 run-all.mjs 全套回归；单独运行用 pnpm test:portfolio-api，
-// 连本机 7200 开发服务时用 PORTFOLIO_API_BASE 覆盖。
+// 其他 Portless 域名可用 PORTFOLIO_API_BASE 覆盖。
 // 注意：layouts 的 350/8 是数据快照钉，同步增删图鉴后需同步更新。
 const base =
-  process.env.PORTFOLIO_API_BASE ?? process.env.DESIGN_BASE_URL ?? 'http://localhost:3000';
+  process.env.PORTFOLIO_API_BASE ?? process.env.DESIGN_BASE_URL ?? 'https://personal-design.localhost';
 async function get(path = '') {
   const response = await fetch(`${base}/api/portfolio${path}`);
   assert.equal(response.status, 200);

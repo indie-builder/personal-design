@@ -7,7 +7,7 @@ import { arcadeProduct } from '@personal-design/word-arcade';
 import { personalSite } from '@personal-design/personal-sites';
 import { toolCategoryCount, toolCount } from '@personal-design/design-engineer-tools';
 
-export type LineId = 'muse' | 'layouts' | 'tools' | 'sites';
+type LineId = 'muse' | 'layouts' | 'tools' | 'sites';
 
 export interface Product {
   slug: string;

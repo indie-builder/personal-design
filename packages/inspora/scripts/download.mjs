@@ -9,7 +9,7 @@ export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const extOf = (url) => path.extname(new URL(url).pathname) || '';
 
-export async function fileNonEmpty(p) {
+async function fileNonEmpty(p) {
   try {
     return (await stat(p)).size > 0;
   } catch {

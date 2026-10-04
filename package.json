@@ -2,15 +2,14 @@
   "name": "personal-design",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@12.6.0",
+  "packageManager": "pnpm@12.8.1",
   "engines": {
     "node": "24.x"
   },
   "scripts": {
     "dev": "portless",
-    "dev:direct": "pnpm --filter @personal-design/web dev",
     "build": "pnpm --filter @personal-design/web build",
-    "start": "pnpm --filter @personal-design/web start",
+    "start": "portless --script start",
     "lint": "pnpm --filter @personal-design/web lint",
     "test": "node --test \"apps/web/lib/*.test.mjs\" \"packages/*/src/*.test.mjs\" \"packages/*/scripts/*.test.mjs\"",
     "format": "oxfmt --write 'apps/web/{app,components,lib}/**/*.{ts,tsx}' 'apps/web/*.{ts,mjs}' 'packages/*/src/**/*.ts' 'packages/*/scripts/**/*.mjs'",
@@ -24,7 +23,7 @@
     "sync:ai-chat-avatars": "pnpm --filter @personal-design/ai-chat sync:avatars"
   },
   "devDependencies": {
-    "oxfmt": "^0.70.0",
+    "oxfmt": "^0.71.0",
     "playwright": "1.63.0"
   }
 }

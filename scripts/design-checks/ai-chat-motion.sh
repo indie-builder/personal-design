@@ -1,5 +1,5 @@
 #!/bin/sh
-# Same local provider/setup as ai-chat.sh; output includes paused real animation frames.
+# Same local provider/setup as ai-chat-api.mjs; output includes paused real animation frames.
 set -eu
 {
 node --input-type=module <<'CONFIG'

@@ -15,12 +15,17 @@
 
 ## 本地运行
 
-需要 Node.js 24、pnpm 12。`pnpm dev` 使用全局安装的 portless，地址为 <https://personal-design.localhost>；也可以用 `pnpm dev:direct` 在 <http://localhost:3000> 启动。
+需要 Node.js 24、pnpm 12，以及全局安装的 [Portless](https://github.com/vercel-labs/portless)。开发与本地生产预览统一通过 Portless 运行，地址为 <https://personal-design.localhost>，无需指定应用端口。
 
 ```bash
+npm install -g portless          # 本机已安装可跳过
 pnpm install
 pnpm dev
 ```
+
+首次运行会自动启动 HTTPS 代理并信任本地证书；macOS/Linux 绑定 443 端口时可能要求 sudo 密码。生产预览先运行 `pnpm build`，再运行 `pnpm start`；两种模式共用同一域名，切换前用 Ctrl+C 停止当前服务。Git worktree 自动使用独立子域名，以启动日志中的 URL 为准。
+
+全套回归运行 `node scripts/design-checks/run-all.mjs`，默认访问上述域名。单独运行旧检查脚本或验收 worktree 时，用 `DESIGN_BASE_URL` 指定实际 Portless URL；Node.js 检查通过 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"` 信任 Portless 本地 CA。
 
 ## 项目结构
 
@@ -34,7 +39,7 @@ pnpm dev
 
 ```bash
 pnpm build                       # 生产构建
-pnpm start                       # 启动生产服务
+pnpm start                       # 通过 Portless 启动本地生产预览
 pnpm lint                        # 代码检查
 pnpm typecheck                   # 类型检查
 pnpm test                        # 单元测试

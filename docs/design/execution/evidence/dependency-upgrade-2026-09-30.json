@@ -1,0 +1,466 @@
+{
+  "date": "2026-09-30",
+  "node": "v24.21.0",
+  "nodePolicy": "24.x LTS; latest patch retained",
+  "dependencies": [
+    {
+      "name": "oxfmt",
+      "installed": "0.71.0",
+      "latest": "0.71.0",
+      "current": true
+    },
+    {
+      "name": "playwright",
+      "installed": "1.63.0",
+      "latest": "1.63.0",
+      "current": true
+    },
+    {
+      "name": "@earendil-works/pi-ai",
+      "installed": "0.99.1",
+      "latest": "0.99.1",
+      "current": true
+    },
+    {
+      "name": "@earendil-works/pi-coding-agent",
+      "installed": "0.99.1",
+      "latest": "0.99.1",
+      "current": true
+    },
+    {
+      "name": "@openuidev/lang-core",
+      "installed": "0.3.0",
+      "latest": "0.3.0",
+      "current": true
+    },
+    {
+      "name": "@openuidev/react-headless",
+      "installed": "0.16.3",
+      "latest": "0.16.3",
+      "current": true
+    },
+    {
+      "name": "@openuidev/react-lang",
+      "installed": "0.3.0",
+      "latest": "0.3.0",
+      "current": true
+    },
+    {
+      "name": "@openuidev/react-ui",
+      "installed": "0.16.3",
+      "latest": "0.16.3",
+      "current": true
+    },
+    {
+      "name": "class-variance-authority",
+      "installed": "0.7.1",
+      "latest": "0.7.1",
+      "current": true
+    },
+    {
+      "name": "clsx",
+      "installed": "2.1.1",
+      "latest": "2.1.1",
+      "current": true
+    },
+    {
+      "name": "lucide-react",
+      "installed": "1.49.0",
+      "latest": "1.49.0",
+      "current": true
+    },
+    {
+      "name": "next",
+      "installed": "16.3.7",
+      "latest": "16.3.7",
+      "current": true
+    },
+    {
+      "name": "react",
+      "installed": "19.3.0",
+      "latest": "19.3.0",
+      "current": true
+    },
+    {
+      "name": "react-dom",
+      "installed": "19.3.0",
+      "latest": "19.3.0",
+      "current": true
+    },
+    {
+      "name": "tailwind-merge",
+      "installed": "3.7.0",
+      "latest": "3.7.0",
+      "current": true
+    },
+    {
+      "name": "tslib",
+      "installed": "2.8.1",
+      "latest": "2.8.1",
+      "current": true
+    },
+    {
+      "name": "zod",
+      "installed": "4.6.5",
+      "latest": "4.6.5",
+      "current": true
+    },
+    {
+      "name": "@tailwindcss/postcss",
+      "installed": "4.3.3",
+      "latest": "4.3.3",
+      "current": true
+    },
+    {
+      "name": "@types/node",
+      "installed": "24.19.0",
+      "latest": "24.19.0",
+      "current": true
+    },
+    {
+      "name": "@types/react",
+      "installed": "19.3.0",
+      "latest": "19.3.0",
+      "current": true
+    },
+    {
+      "name": "@types/react-dom",
+      "installed": "19.3.0",
+      "latest": "19.3.0",
+      "current": true
+    },
+    {
+      "name": "babel-plugin-react-compiler",
+      "installed": "1.0.0",
+      "latest": "1.0.0",
+      "current": true
+    },
+    {
+      "name": "oxlint",
+      "installed": "1.86.0",
+      "latest": "1.86.0",
+      "current": true
+    },
+    {
+      "name": "postcss",
+      "installed": "8.5.28",
+      "latest": "8.5.28",
+      "current": true
+    },
+    {
+      "name": "tailwindcss",
+      "installed": "4.3.3",
+      "latest": "4.3.3",
+      "current": true
+    },
+    {
+      "name": "typescript",
+      "installed": "7.0.2",
+      "latest": "7.0.2",
+      "current": true
+    },
+    {
+      "name": "sharp",
+      "installed": "0.35.5",
+      "latest": "0.35.5",
+      "current": true
+    },
+    {
+      "name": "@remotion/cli",
+      "installed": "4.0.530",
+      "latest": "4.0.530",
+      "current": true
+    },
+    {
+      "name": "remotion",
+      "installed": "4.0.530",
+      "latest": "4.0.530",
+      "current": true
+    },
+    {
+      "name": "pnpm",
+      "installed": "12.8.1",
+      "latest": "12.8.1",
+      "current": true
+    },
+    {
+      "name": "portless",
+      "installed": "0.15.6",
+      "latest": "0.15.6",
+      "current": true
+    }
+  ],
+  "validation": {
+    "frozenLockfile": true,
+    "typecheck": true,
+    "lint": true,
+    "unitTests": {
+      "passed": 37
+    },
+    "build": {
+      "passed": true,
+      "next": "16.3.7"
+    },
+    "routes": {
+      "total": 361,
+      "failed": [],
+      "evidence": ".impeccable/review/dependency-upgrade-2026-09-30/routes.json"
+    },
+    "portfolioApi": {
+      "passed": 5
+    },
+    "piApi": {
+      "passed": true,
+      "checks": [
+        "Pi NDJSON renders with the current official schema",
+        "restored context, no host tools",
+        "structured submission reaches current and restored Pi context without losing zero, false or arrays",
+        "summary input includes structured form context and memory delivery",
+        "one automatic repair reconnects orphaned action",
+        "provider failure is not reported as success",
+        "abort and next request",
+        "body, origin and schema validation",
+        "submission shape and size validation"
+      ]
+    },
+    "browser": {
+      "passed": true,
+      "checks": [
+        {
+          "check": "homepage navigation under reduced motion",
+          "passed": true,
+          "step": 420
+        },
+        {
+          "check": "album next spread",
+          "passed": true
+        },
+        {
+          "check": "album lightbox and Escape",
+          "passed": true
+        },
+        {
+          "check": "browser back restores bookshelf",
+          "passed": true
+        },
+        {
+          "check": "product page smoke",
+          "width": 1440,
+          "route": "/",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/",
+          "scroll": 1440,
+          "viewport": 1440
+        },
+        {
+          "check": "product page smoke",
+          "width": 1440,
+          "route": "/products/layout-compositions",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/layout-compositions",
+          "scroll": 1440,
+          "viewport": 1440
+        },
+        {
+          "check": "product page smoke",
+          "width": 1440,
+          "route": "/products/muse",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/muse",
+          "scroll": 1440,
+          "viewport": 1440
+        },
+        {
+          "check": "product page smoke",
+          "width": 1440,
+          "route": "/products/design-engineer-tools",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/design-engineer-tools",
+          "scroll": 1440,
+          "viewport": 1440
+        },
+        {
+          "check": "product page smoke",
+          "width": 1440,
+          "route": "/products/personal-sites",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/personal-sites",
+          "scroll": 1440,
+          "viewport": 1440
+        },
+        {
+          "check": "product page smoke",
+          "width": 1440,
+          "route": "/products/ai-coding-dictionary",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/ai-coding-dictionary",
+          "scroll": 1440,
+          "viewport": 1440
+        },
+        {
+          "check": "product page smoke",
+          "width": 1440,
+          "route": "/products/ai-chat",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/ai-chat",
+          "scroll": 1440,
+          "viewport": 1440
+        },
+        {
+          "check": "product page smoke",
+          "width": 1440,
+          "route": "/products/word-arcade",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/word-arcade",
+          "scroll": 1440,
+          "viewport": 1440
+        },
+        {
+          "check": "product page smoke",
+          "width": 390,
+          "route": "/",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/",
+          "scroll": 390,
+          "viewport": 390
+        },
+        {
+          "check": "product page smoke",
+          "width": 390,
+          "route": "/products/layout-compositions",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/layout-compositions",
+          "scroll": 390,
+          "viewport": 390
+        },
+        {
+          "check": "product page smoke",
+          "width": 390,
+          "route": "/products/muse",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/muse",
+          "scroll": 390,
+          "viewport": 390
+        },
+        {
+          "check": "product page smoke",
+          "width": 390,
+          "route": "/products/design-engineer-tools",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/design-engineer-tools",
+          "scroll": 390,
+          "viewport": 390
+        },
+        {
+          "check": "product page smoke",
+          "width": 390,
+          "route": "/products/personal-sites",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/personal-sites",
+          "scroll": 390,
+          "viewport": 390
+        },
+        {
+          "check": "product page smoke",
+          "width": 390,
+          "route": "/products/ai-coding-dictionary",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/ai-coding-dictionary",
+          "scroll": 390,
+          "viewport": 390
+        },
+        {
+          "check": "product page smoke",
+          "width": 390,
+          "route": "/products/ai-chat",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/ai-chat",
+          "scroll": 390,
+          "viewport": 390
+        },
+        {
+          "check": "product page smoke",
+          "width": 390,
+          "route": "/products/word-arcade",
+          "passed": true,
+          "error": false,
+          "main": true,
+          "pathname": "/products/word-arcade",
+          "scroll": 390,
+          "viewport": 390
+        },
+        {
+          "check": "isolated Pi to OpenUI response and reload persistence",
+          "width": 390,
+          "passed": true,
+          "provider": "fixture only"
+        }
+      ],
+      "screenshots": [
+        "home-light.jpg",
+        "home-dark.jpg",
+        "ai-chat-response-390.jpg",
+        "ai-chat-response-1440.jpg"
+      ],
+      "limits": [
+        "Representative browser checks; legacy Playwright suite not executed",
+        "Mock provider; no live model call"
+      ]
+    }
+  },
+  "reproduction": {
+    "checks": [
+      "pnpm install --frozen-lockfile",
+      "pnpm typecheck",
+      "pnpm lint",
+      "pnpm test",
+      "pnpm build"
+    ],
+    "productionPreview": "pnpm start",
+    "routes": "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=<portless preview URL> node scripts/verify-design-routes.mjs",
+    "portfolio": "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=<portless preview URL> pnpm test:portfolio-api",
+    "pi": [
+      "node scripts/design-checks/fixtures/ai-chat-provider.mjs",
+      "ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907 pnpm start",
+      "portless alias upgrade-check.personal-design <app port from preview startup log>",
+      "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://upgrade-check.personal-design.localhost:<proxy port from startup log> node scripts/design-checks/ai-chat-api.mjs"
+    ],
+    "browser": "Codex built-in browser; 1440x900 and 390x844; light/dark theme, reduced-motion timeline, album pagination/lightbox/Escape/browser back, eight route templates, isolated mock AI response and reload"
+  },
+  "limits": [
+    "Legacy run-all browser scripts launch separate Playwright browsers and were not run under the built-in-browser-only repository rule.",
+    "Pi tested against mock provider; no live model call or deployment.",
+    "Node types remain on 24.x to match runtime."
+  ],
+  "artifacts": ".impeccable/review/dependency-upgrade-2026-09-30/"
+}

@@ -47,7 +47,7 @@ export interface OpenOptions {
 // Shared 200ms enter / 140ms exit; FLIP keeps the trigger-to-media relationship.
 export const EASE = 'var(--ease-out)';
 export const DURATION = 200;
-export const EXIT_DURATION = 140;
+const EXIT_DURATION = 140;
 
 interface ActiveImage {
   item: LightboxItem;

@@ -8,6 +8,9 @@
 > 现行行为的回归以 `node scripts/design-checks/run-all.mjs` 为准；
 > 仍可运行的 `v2-muse-spinner.mjs` 保留作诊断。下文对本轮脚本的引用按历史记录阅读。
 
+> **补充（2026-10-04）**：`v2-journeys.mjs`、`v2-routes.mjs` 与无调用的历史截图修补入口 `v2-capture-corrections.mjs` 已退役并移除。
+> 当前分别运行 [journeys.mjs](../../../scripts/design-checks/journeys.mjs) 与 [verify-design-routes.mjs](../../../scripts/verify-design-routes.mjs)，均已纳入现行全套回归；下方历史证据保持原样。
+
 ## 方案与覆盖
 
 - [完整目标](../../goals/ui-ux-redesign-v2.md)
@@ -27,9 +30,9 @@
 | 首页两个入口及媒体失败 | `scripts/design-checks/v2-home.mjs` | [结果](evidence/home.json)、[生产日志](evidence/home-production.log) |
 | 灵感直接详情/返回现场/播放/来源/JSON/超时 | `scripts/design-checks/v2-muse.mjs` | [生产日志](evidence/muse-production.log)及模块报告 |
 | 图鉴350条、主题/搜索、缺图、触摸、放大 | `scripts/design-checks/v2-layouts.mjs` | [16场景](evidence/layouts.json)、[生产日志](evidence/layouts-production.log) |
-| 首页出发的两条完整旅程 | `scripts/design-checks/v2-journeys.mjs` | [结果](evidence/journeys.json) |
+| 首页出发的两条完整旅程 | `scripts/design-checks/v2-journeys.mjs`（已退役；现行：[journeys.mjs](../../../scripts/design-checks/journeys.mjs)） | [结果](evidence/journeys.json) |
 | 视频控制首屏可达、滚动稳定 | `scripts/design-checks/v2-muse-video-viewport.mjs` | [三尺寸几何结果](evidence/video-viewport.json) |
-| 全部可访问静态路由 | `scripts/design-checks/v2-routes.mjs` | [509条HTTP+主内容](evidence/routes.json) |
+| 全部可访问静态路由 | `scripts/design-checks/v2-routes.mjs`（已退役；现行：[verify-design-routes.mjs](../../../scripts/verify-design-routes.mjs)） | [509条HTTP+主内容](evidence/routes.json) |
 | 视觉捕获 | `scripts/design-checks/v2-capture.mjs` | [截图索引](evidence/captures.json)；本机图片 `.impeccable/review/redesign-v2/` |
 | 原始规范保持 | SHA256核对manifest | [25份原文](evidence/source-integrity.json) |
 

@@ -1,9 +1,9 @@
-// Requires fixture provider :3907 and a separate Next server with test-only credentials.
+// Requires fixture provider :3907 and an isolated preview with test-only credentials.
 import assert from 'node:assert/strict';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {createParser} from '../../apps/web/node_modules/@openuidev/lang-core/dist/index.mjs';
 const base=process.env.DESIGN_BASE_URL||'http://localhost:3107';
-assert(base==='http://localhost:3107','Use the isolated test server');
+assert(base==='http://localhost:3107'||new URL(base).hostname==='upgrade-check.personal-design.localhost','Use the isolated test server');
 const {schema}=JSON.parse(await readFile(new URL('../../apps/web/lib/openui-system-prompt.json',import.meta.url)));
 const agent={id:'test',name:'测试助手',prompt:'你是一个团队协作顾问。'};
 const message=(text,index=0)=>({id:'m'+index,role:index%2?'assistant':'user',parts:[{type:'text',text}]});

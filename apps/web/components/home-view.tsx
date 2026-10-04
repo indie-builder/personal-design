@@ -18,14 +18,12 @@ import styles from './home-view.module.css';
 
 export function HomeView({
   products,
-  layoutPreviews = [],
   musePreviews = [],
   toolsPreview = [],
   layoutCategories = [],
 }: {
   products: Product[];
   layoutCategories?: { name: string; count: number }[];
-  layoutPreviews?: Preview[];
   musePreviews?: Preview[];
   toolsPreview?: ToolPreviewItem[];
 }) {
@@ -147,12 +145,7 @@ export function HomeView({
               <ol className={styles.entries}>
                 <TimelineWalker stops={ordered.length} onHit={setHitDate} />
                 {ordered.map((product, index) => {
-                  const previews =
-                    product.slug === 'layout-compositions'
-                      ? layoutPreviews
-                      : product.slug === 'muse'
-                        ? musePreviews
-                        : [];
+                  const previews = product.slug === 'muse' ? musePreviews : [];
                   const isLayout = product.slug === 'layout-compositions';
                   return (
                     <li

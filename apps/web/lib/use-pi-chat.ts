@@ -29,7 +29,6 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
     current.current = next;
     if (mounted.current) setMessages(next);
   }, []);
-  const clearError = useCallback(() => setError(undefined), []);
   const stop = useCallback(() => controller.current?.abort(), []);
   const run = useCallback(
     async (history: ChatMessage[]) => {
@@ -128,6 +127,7 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
     [run],
   );
   const regenerate = useCallback(() => {
+    setError(undefined);
     let index = current.current.length - 1;
     while (index >= 0 && current.current[index]?.role !== 'user') index--;
     if (index >= 0) return run(current.current.slice(0, index + 1));
@@ -144,5 +144,5 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
     },
     [commit],
   );
-  return { messages, sendMessage, status, error, stop, regenerate, clearError, updateUiState };
+  return { messages, sendMessage, status, error, stop, regenerate, updateUiState };
 }
