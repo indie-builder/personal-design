@@ -254,6 +254,46 @@ export function listPosts(): InsporaPost[] {
   return rows.map((r) => toPost(r, mediaMap.get(r.id) ?? []));
 }
 
+export interface InsporaPostPreview {
+  src: string;
+  alt: string;
+  videoSrc?: string;
+}
+
+/** 前 limit 个首媒体封面，另将第一个可播放的首媒体视频置前（允许重复）。 */
+export function listPostPreviews(limit = 3): InsporaPostPreview[] {
+  if (!Number.isSafeInteger(limit) || limit < 0) throw new RangeError('Invalid preview limit');
+  // 与 listPosts 的帖子及媒体排序相同；只读首媒体，不加载整帖或后续媒体。
+  // iterate 在够用时停止，文件存在性与空字符串回退仍由原媒体解析决定。
+  const query = `SELECT posts.title, media.* FROM posts
+    JOIN media ON media.rowid = (
+      SELECT rowid FROM media WHERE post_id = posts.id ORDER BY position LIMIT 1
+    )
+    WHERE ${VISIBLE_POSTS}`;
+  const previews: InsporaPostPreview[] = [];
+  if (limit > 0) {
+    for (const row of conn().prepare(`${query} ORDER BY posts.created_at DESC`).iterate()) {
+      const media = toMedia(row as unknown as MediaRow);
+      const src = media.thumb ?? media.poster;
+      if (src) previews.push({ src, alt: row.title as string });
+      if (previews.length === limit) break;
+    }
+  }
+  for (const row of conn()
+    .prepare(`${query} AND media.type = 'video' ORDER BY posts.created_at DESC`)
+    .iterate()) {
+    const media = toMedia(row as unknown as MediaRow);
+    if (!media.src) continue;
+    previews.unshift({
+      src: media.thumb ?? media.poster ?? '',
+      alt: row.title as string,
+      videoSrc: media.previewSrc ?? media.src,
+    });
+    break;
+  }
+  return previews;
+}
+
 /** 浏览导航用的轻量条目：不含媒体，避免每次请求全量加载万级媒体行 */
 export interface InsporaPostRef {
   slug: string;

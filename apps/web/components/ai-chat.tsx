@@ -36,12 +36,14 @@ export function AiChat() {
   const agentPopover = useRef<HTMLDivElement>(null);
   const agentButton = useRef<HTMLButtonElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
-  const { saved, setSaved, storageError } = useSavedChat((initial) =>
-    setActive(
-      initial.conversations.find((item) =>
-        initial.agents.some((agent) => agent.id === item.agentId),
-      ) ?? newConversation(defaultAgent.id),
-    ),
+  const { saved, setSaved, storageError } = useSavedChat(
+    (initial) =>
+      setActive(
+        initial.conversations.find((item) =>
+          initial.agents.some((agent) => agent.id === item.agentId),
+        ) ?? newConversation(defaultAgent.id),
+      ),
+    busy,
   );
 
   // 面板开关统一走原生 dialog / popover；创建页按 visualViewport 可视高度定位
