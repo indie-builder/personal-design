@@ -25,7 +25,9 @@ Next 文档从 `apps/web/node_modules/next/dist/docs` 枚举实际文件名，�
 
 ## 更新技能集
 
-“更新已安装项”和“与上游技能清单对齐”是两个操作。用户要求完整更新时，先对比上游全部 `SKILL.md` 与 [skills-lock.json](../../skills-lock.json) 的同来源条目，列出新增、变化和退役项。保留其他来源、本地修改和明确移除的技能。
+“更新已安装项”和“与上游技能清单对齐”是两个操作。用户要求完整更新时，先对比上游全部 `SKILL.md` 与 [skills-lock.json](../../skills-lock.json) 的同来源条目，列出新增、变化和退役项。
+
+`mattpocock/skills` 始终以上游最新清单和内容为准：补齐新增项、更新变化项，直接删除上游已移除技能的本地目录、代理链接、锁文件条目和失效引用。其他来源及其本地修改保持原样；用户明确移除的技能保持未安装。
 
 本项目使用 `.agents/skills/<name>` 保存技能，`.claude/skills/<name>` 是相对符号链接；Codex 直接使用前者。用 skills CLI 的 `--help` 核对当前安装参数，显式选择差集与 `claude-code codex` 两个代理，不用不加区分的全来源更新。
 
