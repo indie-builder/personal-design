@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { buttonClassName } from '../button';
 import styles from './lightbox.module.css';
 import { createPortal } from 'react-dom';
@@ -164,7 +163,7 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
                     ) : null}
                   </div>
                 ) : null}
-                {/* 图注：编号 + 名称 + 计数 + 详情入口（移动端切换按钮并入此栏） */}
+                {/* 图注：名称与计数（移动端切换按钮并入此栏） */}
                 <div
                   className={styles.caption}
                   style={{
@@ -198,11 +197,6 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
                         </button>
                       </span>
                     ) : null}
-                    {active.item.serial ? (
-                      <span className="mr-2 shrink-0 font-mono text-xs text-[#bdbdbd]">
-                        {active.item.serial}
-                      </span>
-                    ) : null}
                     <span className="truncate">{active.item.alt}</span>
                   </p>
                   <span className="flex shrink-0 items-center gap-3">
@@ -210,16 +204,6 @@ export function LightboxProvider({ children }: { children: ReactNode }) {
                       <span className="font-mono text-xs text-[#bdbdbd]">
                         {active.index + 1} / {active.siblings.length}
                       </span>
-                    ) : null}
-                    {active.item.href ? (
-                      <Link
-                        href={active.item.href}
-                        onClick={finishClose}
-                        className="inline-flex items-center gap-1 text-[#c3ccd8] underline-offset-4 transition-colors hover:text-white hover:underline"
-                      >
-                        查看详情
-                        <ArrowRight size={18} strokeWidth={1.6} aria-hidden />
-                      </Link>
                     ) : null}
                   </span>
                 </div>

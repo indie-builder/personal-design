@@ -2,8 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp, Check, Copy, RotateCcw, Square } from 'lucide-react';
-import type { Agent, ChatMessage, Conversation, FormSubmission } from '@personal-design/ai-chat';
+import type {
+  Agent,
+  ChatMessage,
+  ChatTranscript,
+  Conversation,
+  FormSubmission,
+} from '@personal-design/ai-chat';
 import { defaultAgent, uiExamples } from '@personal-design/ai-chat';
+import { ThemeProvider } from '@openuidev/react-ui';
+import { answerLightTheme, answerDarkTheme } from '@/lib/ai-chat-ui-theme';
 import { usePiChat } from '@/lib/use-pi-chat';
 import { Button } from '../button';
 import { SubmittedForm } from '../ai-chat-submission';
@@ -13,20 +21,33 @@ import styles from '../ai-chat.module.css';
 export function ConversationView({
   conversation,
   agent,
-  onMessages,
+  onTranscript,
   onBusy,
   onHeaderHiddenChange,
 }: {
   conversation: Conversation;
   agent: Agent;
-  onMessages: (id: string, messages: ChatMessage[]) => void;
+  onTranscript: (id: string, transcript: ChatTranscript) => void;
   onBusy: (busy: boolean) => void;
   onHeaderHiddenChange: (hidden: boolean) => void;
 }) {
-  const { messages, sendMessage, status, error, stop, regenerate, updateUiState } = usePiChat(
+  const { transcript, sendMessage, status, error, stop, regenerate, updateUiState } = usePiChat(
     conversation,
     agent,
   );
+  const { messages } = transcript;
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
+  useEffect(() => {
+    const sync = () =>
+      setMode(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    return () => observer.disconnect();
+  }, []);
   const [input, setInput] = useState('');
   const [copyStatus, setCopyStatus] = useState<{ id: string; ok: boolean } | null>(null);
   useEffect(() => {
@@ -51,8 +72,8 @@ export function ConversationView({
     return () => onBusy(false);
   }, [busy, onBusy, onHeaderHiddenChange]);
   useEffect(() => {
-    onMessages(conversation.id, messages);
-  }, [conversation.id, messages, onMessages]);
+    onTranscript(conversation.id, transcript);
+  }, [conversation.id, transcript, onTranscript]);
   useEffect(() => {
     if (atBottom && scroll.current) {
       scroll.current.scrollTop = scroll.current.scrollHeight;
@@ -136,102 +157,106 @@ export function ConversationView({
           }
         }}
       >
-        <div className={styles.messageInner}>
-          {!messages.length && (
-            <div className={styles.welcome}>
-              <h2>
-                {agent.id === defaultAgent.id ? '找到适合团队的协作方式' : '今天想聊些什么？'}
-              </h2>
-              <p>
-                {agent.id === defaultAgent.id
-                  ? '从选方案到安排试用，一起把需求理清楚。'
-                  : '说说你的需求，我们一起理清思路。'}
-              </p>
-              <div className={styles.suggestions} aria-label="示例问题">
-                {uiExamples.map((example) => (
-                  <Button
-                    key={example.id}
-                    variant="default"
-                    disabled={busy}
-                    aria-label={example.question}
-                    onClick={() => send(example.prompt)}
-                  >
-                    <span className={styles.promptQuestion}>{example.question}</span>
-                    <span className={styles.promptDescription}>{example.description}</span>
-                  </Button>
-                ))}
+        <ThemeProvider
+          mode={mode}
+          lightTheme={answerLightTheme}
+          darkTheme={answerDarkTheme}
+          cssSelector=".ai-openui"
+        >
+          <div className={styles.messageInner}>
+            {!messages.length && (
+              <div className={styles.welcome}>
+                <h2>
+                  {agent.id === defaultAgent.id ? '找到适合团队的协作方式' : '今天想聊些什么？'}
+                </h2>
+                <p>
+                  {agent.id === defaultAgent.id
+                    ? '从选方案到安排试用，一起把需求理清楚。'
+                    : '说说你的需求，我们一起理清思路。'}
+                </p>
+                <div className={styles.suggestions} aria-label="示例问题">
+                  {uiExamples.map((example) => (
+                    <Button
+                      key={example.id}
+                      variant="default"
+                      disabled={busy}
+                      aria-label={example.question}
+                      onClick={() => send(example.prompt)}
+                    >
+                      <span className={styles.promptQuestion}>{example.question}</span>
+                      <span className={styles.promptDescription}>{example.description}</span>
+                    </Button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-          {messages.map((message, index) => {
-            const text = message.parts
-              .filter((part) => part.type === 'text')
-              .map((part) => part.text)
-              .join('\n');
-            const streaming = busy && index === messages.length - 1;
-            if (message.role === 'assistant' && !text) return null;
-            return (
-              <article
-                key={message.id}
-                data-arriving={!restoredMessages.has(message.id) || undefined}
-                className={message.role === 'user' ? styles.userMessage : styles.assistantMessage}
-                aria-label={message.role === 'user' ? '你的问题' : `${agent.name}的回答`}
-              >
-                {message.role === 'user' ? (
-                  <>
-                    <p>{text}</p>
-                    {message.metadata?.submission && (
-                      <SubmittedForm submission={message.metadata.submission} />
-                    )}
-                  </>
-                ) : (
-                  <div className={styles.answerContent}>
-                    <div data-answer-body>
-                      <GeneratedAnswer
-                        text={text}
-                        streaming={streaming}
-                        readOnly={busy || index !== messages.length - 1}
-                        onReply={send}
-                        initialState={message.metadata?.uiState}
-                        onStateUpdate={(state) => updateUiState(message.id, state)}
-                      />
+            )}
+            {messages.map((message, index) => {
+              const { text } = message;
+              const streaming = busy && index === messages.length - 1;
+              if (message.role === 'assistant' && !text) return null;
+              return (
+                <article
+                  key={message.id}
+                  data-arriving={!restoredMessages.has(message.id) || undefined}
+                  className={message.role === 'user' ? styles.userMessage : styles.assistantMessage}
+                  aria-label={message.role === 'user' ? '你的问题' : `${agent.name}的回答`}
+                >
+                  {message.role === 'user' ? (
+                    <>
+                      <p>{text}</p>
+                      {message.metadata?.submission && (
+                        <SubmittedForm submission={message.metadata.submission} />
+                      )}
+                    </>
+                  ) : (
+                    <div className={styles.answerContent}>
+                      <div data-answer-body>
+                        <GeneratedAnswer
+                          text={text}
+                          streaming={streaming}
+                          readOnly={busy || index !== messages.length - 1}
+                          onReply={send}
+                          initialState={message.metadata?.uiState}
+                          onStateUpdate={(state) => updateUiState(message.id, state)}
+                        />
+                      </div>
+                      {!streaming && (
+                        <MessageActions
+                          message={message}
+                          isLatest={index === messages.length - 1}
+                          busy={busy}
+                          copyStatus={copyStatus}
+                          setCopyStatus={setCopyStatus}
+                          onRegenerate={() => {
+                            setCopyStatus(null);
+                            setAtBottom(true);
+                            void regenerate();
+                          }}
+                        />
+                      )}
                     </div>
-                    {!streaming && (
-                      <MessageActions
-                        message={message}
-                        isLatest={index === messages.length - 1}
-                        busy={busy}
-                        copyStatus={copyStatus}
-                        setCopyStatus={setCopyStatus}
-                        onRegenerate={() => {
-                          setCopyStatus(null);
-                          setAtBottom(true);
-                          void regenerate();
-                        }}
-                      />
-                    )}
-                  </div>
-                )}
-              </article>
-            );
-          })}
-          {busy && (
-            <p className={styles.progress} role="status" data-generation-status>
-              <span className={styles.waitDots} aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
-              {status === 'submitted' ? '正在思考…' : '正在生成回答…'}
-            </p>
-          )}
-          {error && (
-            <div className={styles.error} role="alert">
-              <p>{error.message}</p>
-              <Button onClick={() => void regenerate()}>重试</Button>
-            </div>
-          )}
-        </div>
+                  )}
+                </article>
+              );
+            })}
+            {busy && (
+              <p className={styles.progress} role="status" data-generation-status>
+                <span className={styles.waitDots} aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                {status === 'submitted' ? '正在思考…' : '正在生成回答…'}
+              </p>
+            )}
+            {error && (
+              <div className={styles.error} role="alert">
+                <p>{error.message}</p>
+                <Button onClick={() => void regenerate()}>重试</Button>
+              </div>
+            )}
+          </div>
+        </ThemeProvider>
       </div>
       <div
         ref={composerArea}

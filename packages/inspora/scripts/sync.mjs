@@ -1,19 +1,19 @@
 /**
- * 灵感集同步入口 —— 一条管线适配两类数据源：
+ * 灵感集同步入口 —— 一条管线适配三类数据源：
  *
  * - inspora：inspora.design（列表/详情走 RSC 抓取，需 Playwright，
  *   Vercel checkpoint 时回退 ego-browser），媒体只下缩略图/海报/头像。
  *   见 scripts/source-inspora.mjs。
  * - bestx：Best Designs on X（bestdesignsonx.com，公开 Supabase REST +
  *   CDN 热链，无需浏览器、无本地媒体）。见 scripts/source-bestx.mjs。
+ * - collectui：Collect UI（collectui.com），复用公开 REST 管线，同一原作多行媒体合并。
  *
- * 两源互相独立：一个失败不影响另一个写入；同一原作（X 推文）被两源
- * 同时收录时，读取侧（src/index.ts）只展示 inspora 版本。
+ * 各源互相独立：一个失败不影响其他源写入；同一原作（X 推文）读取侧仅保留一份。
  *
  * 用法：
- *   node scripts/sync.mjs                      # 两个源都增量（日常）
- *   node scripts/sync.mjs --full               # 两个源全量 backfill（首次）
- *   node scripts/sync.mjs --source=bestx       # 只跑一个源（inspora | bestx）
+ *   node scripts/sync.mjs                      # 三个源都增量（日常）
+ *   node scripts/sync.mjs --full               # 三个源全量 backfill（首次）
+ *   node scripts/sync.mjs --source=collectui   # 只跑一个源（inspora | bestx | collectui）
  *   node scripts/sync.mjs --max-pages N        # inspora 分类翻页上限（调试）
  */
 import { openDatabase } from './db.mjs';
@@ -31,13 +31,17 @@ const maxPagesIdx = args.indexOf('--max-pages');
 const MAX_PAGES = maxPagesIdx >= 0 ? Number(args[maxPagesIdx + 1]) : Infinity;
 const sourceIdx = args.findIndex((arg) => arg.startsWith('--source='));
 const ONLY = sourceIdx >= 0 ? args[sourceIdx].split('=')[1] : null;
-if (ONLY && !['inspora', 'bestx'].includes(ONLY)) {
-  console.error(`未知来源: ${ONLY}（可选 inspora | bestx）`);
+if (ONLY && !['inspora', 'bestx', 'collectui'].includes(ONLY)) {
+  console.error(`未知来源: ${ONLY}（可选 inspora | bestx | collectui）`);
   process.exit(2);
 }
 
 const sources = [
   { name: 'bestx', run: ({ db, stmts }) => syncBestx({ db, stmts, full: FULL }) },
+  {
+    name: 'collectui',
+    run: ({ db, stmts }) => syncBestx({ db, stmts, full: FULL, source: 'collectui' }),
+  },
   {
     name: 'inspora',
     run: ({ db, stmts }) => syncInspora({ db, stmts, full: FULL, maxPages: MAX_PAGES }),

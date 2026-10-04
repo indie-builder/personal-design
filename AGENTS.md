@@ -9,7 +9,7 @@
 ## 工程与命令
 
 - 使用 **pnpm 12.x workspace**（Node 24.x）。`apps/web` 是唯一站点（Next.js App Router + Tailwind v4），`packages/<product>` 存放内容、类型与同步脚本。
-- 新增产品：内容包 + `apps/web/app/products/<slug>/` + `apps/web/lib/products.ts` 注册。`date` 必填并按升序排列；`line` 是历史保留字段，不新增装饰线路色。仅需独立部署时拆 `apps/<product>`。
+- 新增产品：内容包 + `apps/web/app/products/<slug>/` + `apps/web/lib/products.ts` 注册。`date` 必填并按升序排列，不新增装饰线路色。仅需独立部署时拆 `apps/<product>`。
 - App 通过包的 `src/index.ts` API 取数与媒体地址，不直接读 DB 或手拼路径。本地媒体由包同步脚本生成到 `apps/web/public/`；远程媒体遵循各包的热链／本地优先策略。
 
 以下命令从仓库根目录执行；lint 的 `<file>` 相对 `apps/web`。

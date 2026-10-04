@@ -45,6 +45,4 @@ export const arcadeProduct = {
   date: '2026-09-29',
   href: '/products/word-arcade',
   cover: '',
-  stats: ['5 款小游戏'],
-  line: 'tools' as const,
 };

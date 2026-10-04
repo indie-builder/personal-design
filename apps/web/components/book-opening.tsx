@@ -6,7 +6,6 @@ import styles from './book-opening.module.css';
 
 export interface OpeningBook {
   index: number;
-  extracted?: boolean;
   title: string;
   color: string;
   ink: string;
@@ -18,12 +17,10 @@ export interface OpeningBook {
 export function BookOpening({ book, onDone }: { book: OpeningBook; onDone: () => void }) {
   const root = useRef<HTMLDivElement>(null);
   const cover = useRef<HTMLDivElement>(null);
-  const spine = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!root.current || !cover.current || !spine.current) return;
+    if (!root.current || !cover.current) return;
     const actor = root.current;
     const front = cover.current;
-    const side = spine.current;
     const animations: Animation[] = [];
     let stopped = false;
     let revealed = false;
@@ -51,54 +48,10 @@ export function BookOpening({ book, onDone }: { book: OpeningBook; onDone: () =>
       animations.push(animation);
       return animation.finished;
     };
-    const width = book.extracted ? book.rect.width : Math.min(300, window.innerWidth * 0.38);
-    const height = book.extracted ? book.rect.height : Math.min(400, window.innerHeight * 0.56);
-    const x = book.extracted ? book.rect.left : (window.innerWidth - width) / 2;
-    const y = book.extracted ? book.rect.top : Math.max(100, (window.innerHeight - height) / 2);
-    const origin = `translate(${book.rect.left}px,${book.rect.top}px)`;
-    const center = `translate(${x}px,${y}px)`;
+    const { width, height, left, top } = book.rect;
+    const origin = `translate(${left}px,${top}px)`;
     const run = async () => {
       if (stopped) return;
-      if (!book.extracted) {
-        // Lift before rotating, so the cover clears the adjacent books.
-        await play(
-          actor,
-          [
-            { transform: origin },
-            { transform: `translate(${book.rect.left}px,${book.rect.top - 38}px)` },
-          ],
-          240,
-        );
-        if (stopped) return;
-        await Promise.all([
-          play(
-            actor,
-            [
-              {
-                transform: `translate(${book.rect.left}px,${book.rect.top - 38}px)`,
-                width: `${book.rect.width}px`,
-                height: `${book.rect.height}px`,
-              },
-              { transform: center, width: `${width}px`, height: `${height}px` },
-            ],
-            620,
-          ),
-          play(front, [{ transform: 'rotateY(88deg)' }, { transform: 'rotateY(0deg)' }], 620),
-          play(
-            side,
-            [
-              { opacity: 1, transform: 'rotateY(0deg)' },
-              { opacity: 0, transform: 'rotateY(-90deg)', offset: 0.65 },
-              { opacity: 0, transform: 'rotateY(-90deg)' },
-            ],
-            620,
-          ),
-        ]);
-        if (stopped) return;
-        // Keep the title visible briefly before revealing the actual requested spread.
-        await play(front, [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(0deg)' }], 260);
-        if (stopped) return;
-      }
       reveal();
       const deadline = performance.now() + 2000;
       const settle = () => {
@@ -117,7 +70,7 @@ export function BookOpening({ book, onDone }: { book: OpeningBook; onDone: () =>
           await play(
             actor,
             [
-              { transform: center, width: `${width}px`, height: `${height}px` },
+              { transform: origin, width: `${width}px`, height: `${height}px` },
               {
                 transform: `translate(${box.left + box.width / 2}px,${box.top}px)`,
                 width: `${box.width / 2}px`,
@@ -174,7 +127,6 @@ export function BookOpening({ book, onDone }: { book: OpeningBook; onDone: () =>
       <div
         ref={root}
         className={styles.book}
-        data-extracted={book.extracted || undefined}
         style={
           {
             '--cover': book.color,
@@ -185,9 +137,6 @@ export function BookOpening({ book, onDone }: { book: OpeningBook; onDone: () =>
           } as CSSProperties
         }
       >
-        <div ref={spine} className={styles.spine} style={{ width: book.rect.width }}>
-          {book.title}
-        </div>
         <div ref={cover} className={styles.cover}>
           <span>{book.title}</span>
           <small>排版构图图鉴</small>

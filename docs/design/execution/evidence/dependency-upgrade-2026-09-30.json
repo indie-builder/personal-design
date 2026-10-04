@@ -462,5 +462,18 @@
     "Pi tested against mock provider; no live model call or deployment.",
     "Node types remain on 24.x to match runtime."
   ],
-  "artifacts": ".impeccable/review/dependency-upgrade-2026-09-30/"
+  "artifacts": ".impeccable/review/dependency-upgrade-2026-09-30/",
+  "integrationValidation": {
+    "baseCommit": "385d7a1a86e3f8ac93207c48eb510adbe0dd00b7",
+    "node": "v24.21.0",
+    "pnpm": "12.8.1",
+    "frozenLockfile": true,
+    "typecheck": true,
+    "lint": true,
+    "formatCheck": true,
+    "unitTests": {
+      "passed": 41
+    },
+    "build": true
+  }
 }

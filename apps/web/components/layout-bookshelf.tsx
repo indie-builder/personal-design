@@ -87,7 +87,6 @@ export function LayoutBookshelf({ categories, items }: Props) {
       const [color, ink] = bindings[index % bindings.length]!;
       setOpening({
         index,
-        extracted: true,
         title: categoryLabel(name),
         color,
         ink,
@@ -140,7 +139,6 @@ export function LayoutBookshelf({ categories, items }: Props) {
         null,
         '',
         paramsHref(path, new URLSearchParams(window.location.search), {
-          zoom: '',
           cat: '',
           page: '',
         }),
@@ -227,8 +225,6 @@ export function LayoutBookshelf({ categories, items }: Props) {
           name={active.name}
           pages={pages}
           initialId={params.get('page') || ''}
-          zoomId={params.get('zoom') || ''}
-          onZoomHandled={() => update({ zoom: '' })}
           onPage={(id) => update({ page: id })}
           onClose={close}
         />

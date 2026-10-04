@@ -2,18 +2,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { EventType, openAIReadableStreamAdapter } from '@openuidev/react-headless';
 import {
-  metadataSchema,
+  memorySchema,
   messageSchema,
   type FormSubmission,
   type Agent,
   type ChatMessage,
+  type ChatTranscript,
   type Conversation,
 } from '@personal-design/ai-chat';
 
 // Keep the browser's existing transcript; OpenUI's official adapter owns stream parsing.
 export function usePiChat(conversation: Conversation, agent: Agent) {
-  const [messages, setMessages] = useState<ChatMessage[]>(conversation.messages);
-  const current = useRef(messages);
+  const [transcript, setTranscript] = useState<ChatTranscript>({
+    messages: conversation.messages,
+    memory: conversation.memory,
+  });
+  const current = useRef(transcript);
   const [status, setStatus] = useState<'ready' | 'submitted' | 'streaming' | 'error'>('ready');
   const [error, setError] = useState<Error>();
   const controller = useRef<AbortController | null>(null);
@@ -25,9 +29,9 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
       controller.current?.abort();
     };
   }, []);
-  const commit = useCallback((next: ChatMessage[]) => {
+  const commit = useCallback((next: ChatTranscript) => {
     current.current = next;
-    if (mounted.current) setMessages(next);
+    if (mounted.current) setTranscript(next);
   }, []);
   const stop = useCallback(() => controller.current?.abort(), []);
   const run = useCallback(
@@ -37,12 +41,10 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
       controller.current = requestController;
       setError(undefined);
       setStatus('submitted');
-      commit(history);
-      const memory = [...history]
-        .reverse()
-        .map((m) => m.metadata?.memory)
-        .find(Boolean);
-      const boundary = memory ? history.findIndex((m) => m.id === memory.throughId) : -1;
+      let memory = current.current.memory;
+      const boundary = history.findIndex((m) => m.id === memory?.throughId);
+      if (boundary < 0) memory = undefined;
+      commit({ messages: history, memory });
       try {
         const response = await fetch('/api/ai-chat', {
           method: 'POST',
@@ -54,23 +56,23 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
               ...message,
               ...(metadata?.submission ? { metadata: { submission: metadata.submission } } : {}),
             })),
-            ...(boundary >= 0 ? { memory } : {}),
+            ...(memory ? { memory } : {}),
           }),
         });
         if (!response.ok) throw new Error(await response.text());
-        let metadata: ChatMessage['metadata'] = memory ? { memory } : undefined;
         const encoded = response.headers.get('x-ai-memory');
-        if (encoded)
-          metadata = metadataSchema.parse(
+        if (encoded) {
+          memory = memorySchema.parse(
             JSON.parse(
               new TextDecoder().decode(Uint8Array.from(atob(encoded), (c) => c.charCodeAt(0))),
-            ),
+            ).memory,
           );
+          commit({ messages: history, memory });
+        }
         const answer: ChatMessage = {
           id: crypto.randomUUID(),
           role: 'assistant',
-          parts: [{ type: 'text', text: '' }],
-          metadata,
+          text: '',
         };
         let text = '';
         let finished = false;
@@ -79,7 +81,7 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
           if (event.type === EventType.TEXT_MESSAGE_CONTENT) {
             text += event.delta;
             if (mounted.current) setStatus('streaming');
-            commit([...history, { ...answer, parts: [{ type: 'text', text }] }]);
+            commit({ messages: [...history, { ...answer, text }], memory });
           } else if (event.type === EventType.TEXT_MESSAGE_END) finished = true;
         }
         if (!requestController.signal.aborted && (!finished || !text.trim()))
@@ -112,12 +114,12 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
             JSON.stringify({
               id: crypto.randomUUID(),
               role: 'user',
-              parts: [{ type: 'text', text }],
+              text,
               ...(submission ? { metadata: { submission } } : {}),
             }),
           ),
         );
-        return run([...current.current, message]);
+        return run([...current.current.messages, message]);
       } catch {
         setError(new Error('提交内容过长或格式不正确，请检查后重试。'));
         setStatus('error');
@@ -128,21 +130,23 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
   );
   const regenerate = useCallback(() => {
     setError(undefined);
-    let index = current.current.length - 1;
-    while (index >= 0 && current.current[index]?.role !== 'user') index--;
-    if (index >= 0) return run(current.current.slice(0, index + 1));
+    const { messages } = current.current;
+    let index = messages.length - 1;
+    while (index >= 0 && messages[index]?.role !== 'user') index--;
+    if (index >= 0) return run(messages.slice(0, index + 1));
   }, [run]);
   const updateUiState = useCallback(
     (id: string, uiState: Record<string, unknown>) => {
-      const message = current.current.find((m) => m.id === id);
+      const message = current.current.messages.find((m) => m.id === id);
       if (!message || JSON.stringify(message.metadata?.uiState) === JSON.stringify(uiState)) return;
-      commit(
-        current.current.map((m) =>
+      commit({
+        ...current.current,
+        messages: current.current.messages.map((m) =>
           m.id === id ? { ...m, metadata: { ...m.metadata, uiState } } : m,
         ),
-      );
+      });
     },
     [commit],
   );
-  return { messages, sendMessage, status, error, stop, regenerate, updateUiState };
+  return { transcript, sendMessage, status, error, stop, regenerate, updateUiState };
 }

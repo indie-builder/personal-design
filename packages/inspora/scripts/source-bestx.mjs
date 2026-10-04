@@ -1,5 +1,5 @@
 /**
- * Best Designs on X（bestdesignsonx.com）同步源。
+ * Best Designs on X（bestdesignsonx.com）与 Collect UI（collectui.com）公开同步源。
  *
  * 数据面：站点自用的公开 Supabase REST（anon key 本就随其前端 bundle 分发），
  * 表 bestdesignsonx，`status=eq.Published`，按 published_at 倒序翻页，无需浏览器。
@@ -7,13 +7,14 @@
  *   media 为站点 CDN（cdn.bestdesignsonx.com，X 媒体镜像）直链数组。
  * - 媒体（图/视频封面/视频）全部热链，不入库下载；头像同样热链。
  * - 去重键 = 归一化推文 id（tweet_id），与 inspora 的 source_url 同源可比对；
- *   两个源指向同一条原作时，读取侧只展示 inspora 版本（见 src/index.ts）。
+ *   多源指向同一条原作时，读取侧仅显示一份（见 src/index.ts）。
  * - 增量逻辑：按 published_at 倒序，遇到已入库 tweet_id 即停；完整发现后事务写入。
  *   上游行内字段更新（互动数等）不会回扫，需要刷新时用 `--full`。
+ * Collect UI 同服务的 collectui_posts 表按站点 created_at,id 倒序；每行媒体合并到原作。
  */
 import { sleep } from './download.mjs';
 
-const SUPABASE_URL = 'https://tuzpqmdnxvlzwqthgseg.supabase.co/rest/v1/bestdesignsonx';
+const SUPABASE_URL = 'https://tuzpqmdnxvlzwqthgseg.supabase.co/rest/v1/';
 const ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1enBxbWRueHZsendxdGhnc2VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUxOTY4MjYsImV4cCI6MjA1MDc3MjgyNn0.rIjO0FCY9rPgsJXCxBho3sCRiepy3s319_BoK6DPZ-U';
 const FIELDS =
@@ -121,44 +122,109 @@ export function mapBestxPost(row) {
   };
 }
 
+/** Collect UI 同一原作的每件媒体占一行，复用推文键与标题规则，媒体保持 CDN 热链。 */
+export function mapCollectuiPost(row) {
+  const tweetId = tweetIdOf(row.source_url);
+  const createdAt = isoOf(row.created_at);
+  if (!tweetId || !createdAt || !row.media_url || !['image', 'video'].includes(row.media_type))
+    return null;
+  const author = row.designer ?? row.metadata?.author ?? {};
+  const handle = author.username ?? row.designer_username;
+  const title = deriveTitle(row.title, handle);
+  const entity = row.metadata?.entities?.media?.[row.media_index ?? 0];
+  // 上游 thumbnail 常为 mp4，不能传给图片海报；优先使用原始媒体的静态封面。
+  const poster =
+    row.thumbnail && !/\.mp4(?:[?#]|$)/i.test(row.thumbnail)
+      ? row.thumbnail
+      : (entity?.media_url_https ?? null);
+  return {
+    id: `collectui-${tweetId}`,
+    slug: `c-${tweetId}`,
+    tweetId,
+    title,
+    description: row.title?.trim() !== title ? (row.title?.trim() ?? null) : null,
+    creatorName: author.name || (handle ? `@${handle}` : null),
+    creatorUrl: handle ? `https://x.com/${handle}` : null,
+    creatorAvatar: author.profile_image_url ?? null,
+    sourceUrl: row.source_url,
+    category: null,
+    styles: row.categories ?? [],
+    createdAt,
+    publishedAt: isoOf(row.published_at),
+    isFeatured: row.featured === true,
+    raw: { entries: [row] },
+    media: [
+      {
+        id: `collectui-${row.id}`,
+        position: row.media_index ?? 0,
+        type: row.media_type,
+        url: row.media_url,
+        posterUrl: row.media_type === 'video' ? poster : null,
+        width: intOf(entity?.original_info?.width),
+        height: intOf(entity?.original_info?.height),
+        raw: row,
+      },
+    ],
+  };
+}
+
 /**
  * 增量（默认）：published_at 倒序翻到已入库 tweet_id 即停；
  * `--full`：翻完全表并 upsert。两态都是完整发现后事务写入。
  */
-export async function syncBestx({ db, stmts, full = false, pageSize = 120, pageSleepMs = 250 }) {
-  const known = new Set(stmts.knownTweetIds('bestx'));
+export async function syncBestx({
+  db,
+  stmts,
+  full = false,
+  source = 'bestx',
+  pageSize = 120,
+  pageSleepMs = 250,
+}) {
+  if (!['bestx', 'collectui'].includes(source)) throw new Error(`未知公开来源: ${source}`);
+  const collectui = source === 'collectui';
+  const known = new Set(stmts.knownTweetIds(source));
   const headers = { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` };
   const items = new Map(); // tweetId → 映射结果（同推文重复行保留先见的）
   let complete = false;
   let page = 0;
   while (!complete) {
     const params = new URLSearchParams({
-      select: FIELDS,
+      select: collectui ? '*,designer:designer_username(*)' : FIELDS,
       status: 'eq.Published',
       // 不过滤 published_at：站点列表同样展示没有发布时间的存量行，
       // 它们经 nullslast 落在排序尾部，由 --full 收进，日常增量从头部即停
-      order: 'published_at.desc.nullslast',
+      order: collectui ? 'created_at.desc,id.desc' : 'published_at.desc.nullslast',
       offset: String(page * pageSize),
       limit: String(pageSize),
     });
-    const res = await fetch(`${SUPABASE_URL}?${params}`, { headers });
+    const table = collectui ? 'collectui_posts' : 'bestdesignsonx';
+    const res = await fetch(`${SUPABASE_URL}${table}?${params}`, {
+      headers,
+      signal: AbortSignal.timeout(30000),
+    });
     if (!res.ok) {
-      throw new Error(`bestx 列表 HTTP ${res.status}（第 ${page + 1} 页），未写入新增作品`);
+      throw new Error(`${source} 列表 HTTP ${res.status}（第 ${page + 1} 页），未写入新增作品`);
     }
     const rows = await res.json();
-    if (!Array.isArray(rows)) throw new Error('bestx 列表数据无效');
+    if (!Array.isArray(rows)) throw new Error(`${source} 列表数据无效`);
     for (const row of rows) {
-      const item = mapBestxPost(row);
+      const item = collectui ? mapCollectuiPost(row) : mapBestxPost(row);
       if (!item) continue;
       if (!full && known.has(item.tweetId)) {
         complete = true;
         break;
       }
-      items.set(item.tweetId, item);
+      const previous = items.get(item.tweetId);
+      if (collectui && previous) {
+        previous.raw.entries.push(row);
+        if (!previous.media.some((media) => media.url === item.media[0].url))
+          previous.media.push(...item.media);
+        previous.styles = [...new Set([...previous.styles, ...item.styles])];
+      } else if (!previous) items.set(item.tweetId, item);
     }
     page++;
     if (rows.length < pageSize) complete = true;
-    console.log(`bestx 第 ${page} 页: 累计 ${items.size} 条`);
+    console.log(`${source} 第 ${page} 页: 累计 ${items.size} 条`);
     if (!complete) await sleep(pageSleepMs);
   }
 
@@ -179,17 +245,18 @@ export async function syncBestx({ db, stmts, full = false, pageSize = 120, pageS
         item.category,
         null,
         null,
-        null,
+        item.styles ? JSON.stringify(item.styles) : null,
         item.sourceUrl,
         item.createdAt,
         item.publishedAt,
         item.isFeatured ? 1 : 0,
         JSON.stringify(item.raw),
-        now, // bestx 无详情补全阶段，入库即视为已补全
+        now, // 公开 REST 源无详情补全阶段，入库即视为已补全
         now,
-        'bestx',
+        source,
         item.tweetId,
       );
+      item.media.sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
       for (const [position, media] of item.media.entries()) {
         stmts.upsertMedia.run(
           media.id,

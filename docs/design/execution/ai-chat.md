@@ -8,7 +8,7 @@
 
 手机字号、触控尺寸、中性主题、Albert Sans、成对动效遵循 DESIGN.md。输入区在最新消息区域显示，离开底部即收起；“回到最新消息”按钮水平居中且独立可用；向上滑动阅读时内层工具栏以180ms位移／淡出收起，反向滚动恢复，消息区高度不变。自动跟随回复不隐藏工具栏；键盘和减少动态效果即时切换。
 
-生成期间显示等待状态，结束后显示复制与重新生成图标。复制渲染后的内容，不复制 OpenUI Lang。智能体仅有名称和系统提示词；头像从15张男生素材随机分配。会话、智能体、摘要及表单状态保存于当前浏览器 `personal-design:ai-chat:v1`，没有账号或跨设备同步。主题入口、保存位置说明、免责声明均不展示。
+生成期间显示等待状态，结束后显示复制与重新生成图标。复制渲染后的内容，不复制 OpenUI Lang。智能体仅有名称和系统提示词；头像从15张男生素材随机分配。会话、智能体、摘要及表单状态保存于当前浏览器 `personal-design:ai-chat:v2`，没有账号或跨设备同步。当前消息使用单个 `text` 字段；旧 v1 存储原地保留，不读取、不迁移、不覆盖。主题入口、保存位置说明、免责声明均不展示。
 
 ## 运行链路
 
@@ -17,7 +17,7 @@
 - 关闭主机文件／终端工具、扩展、技能及项目上下文发现；只做问答，不开放官方 coding 示例中的主机操作能力。
 - Pi `text_delta` 桥接为 OpenAI NDJSON；前端 `usePiChat` 用官方 `openAIReadableStreamAdapter` 解析。AI SDK 已移除。
 - 输入检查角色、字段长度、消息数量、512KB体积及 Origin。上游错误不透出密钥或原始异常。
-- 超过16条或24000字符时，用 Pi `completeSimple` 合并早期摘要，保留最近6条原文。摘要最多1500字，新摘要经 `x-ai-memory` 响应头回传并保存到消息 metadata。摘要失败不丢弃原始会话。
+- 超过16条或24000字符时，用 Pi `completeSimple` 合并早期摘要，保留最近6条原文。摘要最多1500字，新摘要经 `x-ai-memory` 响应头回传，仅保存到 Conversation.memory。摘要失败不丢弃原始会话。
 
 参考：[OpenUI Pi Harness](https://www.openui.com/docs/agent/agent-runtimes/pi)、[OpenUI headless](https://www.openui.com/docs/api-reference/react-headless)。
 

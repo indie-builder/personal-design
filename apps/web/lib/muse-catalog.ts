@@ -1,5 +1,5 @@
 import type { PlateWallItem } from '@/components/plate-wall';
-import { listCategories, listPosts, videoPreviewUrl } from '@personal-design/inspora';
+import { listPosts } from '@personal-design/inspora';
 import { matchesSearch } from '@/lib/browse-context';
 import { categoryLabel } from '@/lib/category-label';
 
@@ -11,7 +11,7 @@ const posts = listPosts();
 // 只把客户端需要的字段传下去，控制 RSC 负载
 export const museItems: PlateWallItem[] = posts.flatMap((post) => {
   const first = post.media[0];
-  const src = first?.type === 'video' ? videoPreviewUrl(post, first) : (first?.thumb ?? first?.src);
+  const src = first?.type === 'video' ? first.previewSrc : (first?.thumb ?? first?.src);
   return [
     {
       key: post.slug,
@@ -33,15 +33,15 @@ export const museItems: PlateWallItem[] = posts.flatMap((post) => {
 });
 
 export const museTabs = (() => {
-  const tabs = listCategories()
-    .map((category) => ({
-      ...category,
-      count: museItems.filter((item) => item.category === category.name).length,
-    }))
-    .filter((category) => category.count > 0);
-  const uncategorized = museItems.filter((item) => item.category === '未分类').length;
-  if (uncategorized && !tabs.some((category) => category.name === '未分类'))
-    tabs.push({ name: '未分类', count: uncategorized });
+  const counts = new Map<string, number>();
+  for (const item of museItems) counts.set(item.category, (counts.get(item.category) ?? 0) + 1);
+  const uncategorized = counts.get('未分类');
+  counts.delete('未分类');
+  // Map 与稳定排序让同数分类保持首次出现在作品列表中的顺序。
+  const tabs = Array.from(counts, ([name, count]) => ({ name, count })).sort(
+    (a, b) => b.count - a.count,
+  );
+  if (uncategorized) tabs.push({ name: '未分类', count: uncategorized });
   return tabs;
 })();
 

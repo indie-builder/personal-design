@@ -5,9 +5,6 @@
  */
 import { arcadeProduct } from '@personal-design/word-arcade';
 import { personalSite } from '@personal-design/personal-sites';
-import { toolCategoryCount, toolCount } from '@personal-design/design-engineer-tools';
-
-type LineId = 'muse' | 'layouts' | 'tools' | 'sites';
 
 export interface Product {
   slug: string;
@@ -21,9 +18,6 @@ export interface Product {
   href: string;
   /** 首页卡片封面图（public 下路径） */
   cover: string;
-  stats: string[];
-  /** 所属线路（映射 globals.css 的 --color-line-* token） */
-  line: LineId;
 }
 
 /** 按上线日期升序 */
@@ -39,8 +33,6 @@ export const products: Product[] = [
     date: '2026-09-03',
     href: '/products/layout-compositions',
     cover: '/layout-compositions/thumbnails/01-composition-logic/001.webp',
-    stats: ['8 个分类', '33 个主题', '350 张高清图'],
-    line: 'layouts' as const,
   },
   {
     slug: 'muse',
@@ -50,8 +42,6 @@ export const products: Product[] = [
     date: '2026-09-03',
     href: '/products/muse',
     cover: '/inspora/thumbnails/54c9d760-395c-4ff7-8446-4432034d9f44.webp',
-    stats: [],
-    line: 'muse' as const,
   },
   {
     slug: 'design-engineer-tools',
@@ -61,8 +51,6 @@ export const products: Product[] = [
     date: '2026-09-04',
     href: '/products/design-engineer-tools',
     cover: '',
-    stats: [`${toolCount} 个工具`, `${toolCategoryCount} 个分类`],
-    line: 'tools' as const,
   },
   {
     slug: 'ai-coding-dictionary',
@@ -73,8 +61,6 @@ export const products: Product[] = [
     dateLabel: '收录',
     href: '/products/ai-coding-dictionary',
     cover: '',
-    stats: [],
-    line: 'tools' as const,
   },
   {
     slug: 'ai-chat',
@@ -84,7 +70,5 @@ export const products: Product[] = [
     date: '2026-09-26',
     href: '/products/ai-chat',
     cover: '',
-    stats: [],
-    line: 'tools' as const,
   },
 ].sort((a, b) => a.date.localeCompare(b.date));

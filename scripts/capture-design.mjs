@@ -7,7 +7,7 @@ await mkdir(out, { recursive: true });
 const browser = await chromium.launch();
 const routes = [
   ['home','/'], ['muse','/products/muse'], ['layouts','/products/layout-compositions'],
-  ['muse-detail','/products/muse/file-management-dashboard'], ['layout-detail','/products/layout-compositions/001'], ['404','/does-not-exist'],
+  ['muse-detail','/products/muse/file-management-dashboard'], ['layout-detail','/products/layout-compositions?cat=构图逻辑&page=001'], ['404','/does-not-exist'],
 ];
 const evidence = [];
 try {

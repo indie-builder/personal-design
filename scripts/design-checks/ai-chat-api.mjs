@@ -6,7 +6,7 @@ const base=process.env.DESIGN_BASE_URL||'http://localhost:3107';
 assert(base==='http://localhost:3107'||new URL(base).hostname==='upgrade-check.personal-design.localhost','Use the isolated test server');
 const {schema}=JSON.parse(await readFile(new URL('../../apps/web/lib/openui-system-prompt.json',import.meta.url)));
 const agent={id:'test',name:'测试助手',prompt:'你是一个团队协作顾问。'};
-const message=(text,index=0)=>({id:'m'+index,role:index%2?'assistant':'user',parts:[{type:'text',text}]});
+const message=(text,index=0)=>({id:'m'+index,role:index%2?'assistant':'user',text});
 const post=(messages,extra={})=>fetch(base+'/api/ai-chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent,messages,...extra})});
 const output=async response=>{assert.equal(response.status,200);const lines=(await response.text()).trim().split('\n').map(JSON.parse);assert.equal(lines.at(-1).choices[0].finish_reason,'stop');return lines.map(l=>l.choices[0].delta.content||'').join('');};
 const parser=createParser(schema,'Stack');const checks=[];
@@ -20,9 +20,22 @@ await output(await post([submitted]));requests=await(await fetch('http://localho
 const decode=content=>JSON.parse(content.split(']]>openui:context\n')[1]);
 assert.deepEqual(decode(requests.at(-1).messages.at(-1).content)[1],formState);
 await output(await post([submitted,message(text,1),message('继续',2)]));requests=await(await fetch('http://localhost:3907/requests')).json();assert(requests.at(-1).messages.some(m=>m.role==='user'&&m.content.includes(']]>openui:context')));checks.push('structured submission reaches current and restored Pi context without losing zero, false or arrays');
-const response=await post(Array.from({length:17},(_,i)=>i===0?submitted:message('第'+i+'轮，预算3000元。',i)));
+const longHistory=Array.from({length:17},(_,i)=>i===0?submitted:message('第'+i+'轮，预算3000元。',i));
+const response=await post(longHistory);
 const memory=JSON.parse(Buffer.from(response.headers.get('x-ai-memory'),'base64').toString()).memory;
 await output(response);assert(memory.summary.includes('3000'));assert.equal(memory.throughId,'m10');requests=await(await fetch('http://localhost:3907/requests')).json();assert(requests.some(r=>r.messages.some(m=>m.content?.includes('你是对话记忆整理器'))&&r.messages.some(m=>m.content?.includes(']]>openui:context')&&m.content.includes('3000'))));checks.push('summary input includes structured form context and memory delivery');
+const beforeReuse=requests.length;
+const reused=await post([...longHistory.slice(-6),message(text,17),message('复用摘要继续',18)],{memory});
+assert.equal(reused.headers.get('x-ai-memory'),null);await output(reused);
+requests=await(await fetch('http://localhost:3907/requests')).json();
+assert.equal(requests.length,beforeReuse+1);assert(requests.at(-1).messages.some(m=>m.content?.includes(memory.summary)));assert(!requests.at(-1).messages.some(m=>m.content?.includes('第1轮')));assert(requests.at(-1).messages.some(m=>m.content?.includes('第11轮')));checks.push('reused conversation memory reaches Pi once with the six retained original messages');
+await fetch('http://localhost:3907/reset');
+const failedHistory=longHistory.map((m,i)=>i===0?{...m,text:'触发摘要失败：首轮原文必须保留'}:m);
+const failed=await post(failedHistory,{memory});assert.equal(failed.status,502);assert.equal(failed.headers.get('x-ai-memory'),null);await failed.text();
+requests=await(await fetch('http://localhost:3907/requests')).json();assert.equal(requests.length,1);assert(requests[0].messages.some(m=>m.content?.includes('首轮原文必须保留')&&m.content.includes('第10轮')&&m.content.includes(memory.summary)));
+const retried=await post(failedHistory,{memory});const retriedMemory=JSON.parse(Buffer.from(retried.headers.get('x-ai-memory'),'base64').toString()).memory;await output(retried);assert.equal(retriedMemory.throughId,'m10');
+requests=await(await fetch('http://localhost:3907/requests')).json();assert(requests[1].messages.some(m=>m.content?.includes('首轮原文必须保留')&&m.content.includes('第10轮')));assert(requests.at(-1).messages.some(m=>m.content?.includes('第11轮')));assert(requests.at(-1).messages.some(m=>m.content?.includes('第16轮')));checks.push('failed summary returns no replacement memory; retry accepts all original input and retains recent turns');
+
 text=await output(await post([message('触发结构修复')]));assert.equal(parser.parse(text).meta.orphaned.length,0);checks.push('one automatic repair reconnects orphaned action');
 await assert.rejects(async()=>output(await post([message('触发服务错误')])));checks.push('provider failure is not reported as success');
 const controller=new AbortController();const slow=await fetch(base+'/api/ai-chat',{method:'POST',signal:controller.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({agent,messages:[message('慢速回答')]})});controller.abort();await slow.body?.cancel().catch(()=>{});await output(await post([message('停止后继续')]));checks.push('abort and next request');
@@ -32,4 +45,9 @@ assert.equal((await fetch(base+'/api/ai-chat',{method:'POST',body:'x'.repeat(512
 assert.equal((await post([{...submitted,metadata:{submission:{formState:[]}}}])).status,400);
 assert.equal((await post([{...submitted,metadata:{submission:{formState:{large:'x'.repeat(60001)}}}}])).status,400);
 checks.push('submission shape and size validation');
+assert.equal((await post([{id:'legacy',role:'user',parts:[{type:'text',text:'旧格式必须拒绝'}]}])).status,400);
+assert.equal((await post([{id:'missing',role:'user'}])).status,400);
+assert.equal((await post([message('x'.repeat(60001))])).status,400);
+await output(await post([message('x'.repeat(60000))]));checks.push('text is required and limited to 60000 characters; old parts-only messages are rejected');
+
 const dir=new URL('../../docs/design/execution/evidence/ai-chat/',import.meta.url);await mkdir(dir,{recursive:true});await writeFile(new URL('api-result.json',dir),JSON.stringify({passed:true,checks},null,2)+'\n');console.log(checks);

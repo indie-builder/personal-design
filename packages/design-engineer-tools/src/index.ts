@@ -22,11 +22,6 @@ interface ToolCatalog {
 
 const toolCatalog = rawCatalog as ToolCatalog;
 export const toolCategories = toolCatalog.categories;
-export const toolCategoryCount = toolCategories.length;
-export const toolCount = toolCategories.reduce(
-  (count, category) => count + category.tools.length,
-  0,
-);
 
 /** A compact, varied live-content preview for the portfolio timeline. */
 export const toolPreview = toolCategories

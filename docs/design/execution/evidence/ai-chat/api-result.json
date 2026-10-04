@@ -5,10 +5,13 @@
     "restored context, no host tools",
     "structured submission reaches current and restored Pi context without losing zero, false or arrays",
     "summary input includes structured form context and memory delivery",
+    "reused conversation memory reaches Pi once with the six retained original messages",
+    "failed summary returns no replacement memory; retry accepts all original input and retains recent turns",
     "one automatic repair reconnects orphaned action",
     "provider failure is not reported as success",
     "abort and next request",
     "body, origin and schema validation",
-    "submission shape and size validation"
+    "submission shape and size validation",
+    "text is required and limited to 60000 characters; old parts-only messages are rejected"
   ]
 }

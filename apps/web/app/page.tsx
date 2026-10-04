@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { categories } from '@personal-design/layout-compositions';
-import { listPosts, videoPreviewUrl } from '@personal-design/inspora';
+import { listPosts } from '@personal-design/inspora';
 import { toolPreview } from '@personal-design/design-engineer-tools';
 import { products } from '@/lib/products';
 import { HomeView } from '@/components/home-view';
@@ -22,7 +22,7 @@ export default function HomePage() {
     musePreviews.unshift({
       src: motionMedia.thumb ?? motionMedia.poster ?? '',
       alt: motionPost.title,
-      videoSrc: videoPreviewUrl(motionPost, motionMedia) ?? motionMedia.src,
+      videoSrc: motionMedia.previewSrc ?? motionMedia.src,
     });
   return (
     <HomeView

@@ -20,10 +20,6 @@ export interface LightboxItem {
   /** 已缓存的缩略图：FLIP 期间先显示，高清图加载完成后替换 */
   thumb?: string;
   alt: string;
-  /** 编号（图注用），如「001」 */
-  serial?: string;
-  /** 详情页链接（图注「查看详情」入口） */
-  href?: string;
 }
 
 interface Rect {
