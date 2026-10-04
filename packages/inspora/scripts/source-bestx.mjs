@@ -145,7 +145,7 @@ export function mapCollectuiPost(row) {
     description: row.title?.trim() !== title ? (row.title?.trim() ?? null) : null,
     creatorName: author.name || (handle ? `@${handle}` : null),
     creatorUrl: handle ? `https://x.com/${handle}` : null,
-    creatorAvatar: author.profile_image_url ?? null,
+    creatorAvatar: author.avatar_url ?? author.profile_image_url ?? null,
     sourceUrl: row.source_url,
     category: null,
     styles: row.categories ?? [],
@@ -189,7 +189,7 @@ export async function syncBestx({
   let page = 0;
   while (!complete) {
     const params = new URLSearchParams({
-      select: collectui ? '*,designer:designer_username(*)' : FIELDS,
+      select: collectui ? '*,designer:designer_x_profile_id(*)' : FIELDS,
       status: 'eq.Published',
       // 不过滤 published_at：站点列表同样展示没有发布时间的存量行，
       // 它们经 nullslast 落在排序尾部，由 --full 收进，日常增量从头部即停

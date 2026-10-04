@@ -38,7 +38,7 @@
 
 ## Agent skills
 
-`CLAUDE.md` 链接到本文件，共用一份配置；技能遵循上述项目规则，不能恢复 `next-dev-loop`。
+`CLAUDE.md` 链接到本文件，共用一份配置。安装、同步或更新技能时，按[技能同步规则](docs/agents/navigation.md#更新技能集)核对最新上游清单、实体目录、软链接与退役清理；技能执行遵循上述项目规则。
 
 ### Issue tracker
 

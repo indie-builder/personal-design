@@ -49,6 +49,30 @@ test('Collect UI 保留原作与作者，视频封面使用图片，不把 mp4 �
   assert.equal(mapCollectuiPost({ ...row('invalid'), created_at: 'bad' }), null);
 });
 
+test('Collect UI 使用当前作者关联并保存作者头像', async (t) => {
+  const { db, stmts } = openDatabase(':memory:');
+  t.after(() => db.close());
+  const post = row('current');
+  post.designer = {
+    name: 'Designer',
+    username: 'designer',
+    avatar_url: 'https://cdn.collectui.com/current-avatar',
+  };
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    const select = new URL(url).searchParams.get('select');
+    return select === '*,designer:designer_x_profile_id(*)'
+      ? Response.json([post])
+      : Response.json({ code: 'PGRST200' }, { status: 400 });
+  });
+  assert.deepEqual(await syncBestx({ db, stmts, source: 'collectui', pageSleepMs: 0 }), {
+    discovered: 1,
+    inserted: 1,
+  });
+  const saved = db.prepare('SELECT creator_name, creator_avatar FROM posts').get();
+  assert.equal(saved.creator_name, 'Designer');
+  assert.equal(saved.creator_avatar, post.designer.avatar_url);
+});
+
 test('Collect UI 合并跨页的同原作媒体，按媒体序号排序；重跑增量不重复写入', async (t) => {
   const { db, stmts } = openDatabase(':memory:');
   t.after(() => db.close());
