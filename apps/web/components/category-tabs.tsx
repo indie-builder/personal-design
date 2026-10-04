@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { categoryLabel } from '@/lib/category-label';
 import { paramsHref } from '@/lib/site-url';
 import styles from './category-tabs.module.css';
-import { cn } from '@/lib/utils';
+import { clsx } from 'clsx';
 
 /** ?cat= 参数读写：active 派生 + select（replace 不产生历史记录） */
 export function useCatParam(
@@ -43,7 +43,7 @@ export function CategoryTabs({
   className?: string;
 }) {
   return (
-    <div role="group" aria-label="分类" className={cn(styles.tabs, className)}>
+    <div role="group" aria-label="分类" className={clsx(styles.tabs, className)}>
       {[{ name: '全部' }, ...categories].map((category) => (
         <button
           key={categoryLabel(category.name)}

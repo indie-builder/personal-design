@@ -23,10 +23,10 @@ export interface ToolCatalog {
 export const toolCatalog = rawCatalog as ToolCatalog;
 export const toolCategories = toolCatalog.categories;
 export const toolCategoryCount = toolCategories.length;
-export const tools = toolCategories.flatMap((category) =>
-  category.tools.map((tool) => ({ ...tool, category: category.id })),
+export const toolCount = toolCategories.reduce(
+  (count, category) => count + category.tools.length,
+  0,
 );
-export const toolCount = tools.length;
 
 /** A compact, varied live-content preview for the portfolio timeline. */
 export const toolPreview = toolCategories

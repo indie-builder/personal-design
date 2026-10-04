@@ -23,8 +23,10 @@ export function ConversationView({
   onBusy: (busy: boolean) => void;
   onHeaderHiddenChange: (hidden: boolean) => void;
 }) {
-  const { messages, sendMessage, status, error, stop, regenerate, clearError, updateUiState } =
-    usePiChat(conversation, agent);
+  const { messages, sendMessage, status, error, stop, regenerate, updateUiState } = usePiChat(
+    conversation,
+    agent,
+  );
   const [input, setInput] = useState('');
   const [copyStatus, setCopyStatus] = useState<{ id: string; ok: boolean } | null>(null);
   useEffect(() => {
@@ -43,10 +45,6 @@ export function ConversationView({
   useEffect(() => onHeaderHiddenChange(false), [onHeaderHiddenChange]);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const busy = status === 'submitted' || status === 'streaming';
-  const busyRef = useRef(busy);
-  useEffect(() => {
-    busyRef.current = busy;
-  }, [busy]);
   useEffect(() => {
     onBusy(busy);
     if (busy) onHeaderHiddenChange(false);
@@ -55,12 +53,6 @@ export function ConversationView({
   useEffect(() => {
     onMessages(conversation.id, messages);
   }, [conversation.id, messages, onMessages]);
-  useEffect(
-    () => () => {
-      if (busyRef.current) void stop();
-    },
-    [stop],
-  );
   useEffect(() => {
     if (atBottom && scroll.current) {
       scroll.current.scrollTop = scroll.current.scrollHeight;
@@ -103,12 +95,11 @@ export function ConversationView({
     (text: string, submission?: FormSubmission) => {
       const value = text.trim();
       if (!value || busy || value.length > 4000) return;
-      clearError();
       setInput('');
       setAtBottom(true);
       void sendMessage(value, submission);
     },
-    [busy, clearError, sendMessage],
+    [busy, sendMessage],
   );
 
   // 抬手方向决定页头隐藏；输入聚焦或到顶强制显示
@@ -236,19 +227,8 @@ export function ConversationView({
           )}
           {error && (
             <div className={styles.error} role="alert">
-              <p>
-                {error.message === 'Failed to fetch'
-                  ? '网络连接中断，请检查网络后重试。'
-                  : error.message}
-              </p>
-              <Button
-                onClick={() => {
-                  clearError();
-                  void regenerate();
-                }}
-              >
-                重试
-              </Button>
+              <p>{error.message}</p>
+              <Button onClick={() => void regenerate()}>重试</Button>
             </div>
           )}
         </div>

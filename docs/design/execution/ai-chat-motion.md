@@ -37,7 +37,7 @@
 
 ```sh
 DESIGN_BASE_URL=http://localhost:3107 sh scripts/design-checks/ai-chat-motion.sh
-DESIGN_BASE_URL=http://localhost:3107 sh scripts/design-checks/ai-chat.sh
+DESIGN_BASE_URL=http://localhost:3107 node scripts/design-checks/ai-chat-api.mjs
 ```
 
 动效专项记录实际 CSS / WAAPI 时间线，暂停并采集运动帧；使用 Page.captureScreenshot 原始CDP捕获，避免高层截图稳定化改变动画状态。产物位于 `evidence/ai-chat-motion/`。普通回归在减少动态效果下检查终态，不能单独证明动效存在。
