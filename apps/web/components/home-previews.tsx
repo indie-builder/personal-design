@@ -9,7 +9,7 @@ import { BookSpines } from './book-spines';
 import styles from './home-view.module.css';
 
 export type Preview = { src: string; alt: string; videoSrc?: string };
-export type ToolPreviewItem = { name: string; category: string; icon: string | null };
+export type ToolPreviewItem = { name: string; icon: string | null };
 
 export function PreviewImage({ src, alt, priority = false }: Preview & { priority?: boolean }) {
   const [failed, setFailed] = useState(false);

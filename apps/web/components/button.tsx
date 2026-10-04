@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from 'react';
 import { clsx } from 'clsx';
 import styles from './button.module.css';
 
-export type ButtonVariant = 'default' | 'primary' | 'ghost' | 'subtle';
+type ButtonVariant = 'default' | 'primary' | 'ghost' | 'subtle';
 export function buttonClassName({
   variant = 'default',
   icon = false,

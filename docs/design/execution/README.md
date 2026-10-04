@@ -45,6 +45,12 @@
 
 保持现有视觉、帧率与预取策略的计算／绘制／生命周期优化，见 [性能与等价性验证](home-performance.md)。
 
+## Loop X 删除测试复扫
+
+2026-10-04 基于 `d3c07ff` 的复扫移除首页无用布局预览数据、工具目录单调用透传层、无人使用的 Interface 字段与导出，并退役历史截图修补入口。工具页 JSX 与 CSS 逐项保持等价；保留共享导航、搜索、媒体、聊天及同步 Module 的实际职责。两次审查后的候选、保留理由、复现命令及限制见 [loopx-deletion-audit-2026-10-04.json](evidence/loopx-deletion-audit-2026-10-04.json)。
+
+类型、lint、格式、38项单测、生产构建、11条静态路由和5项 portfolio API 均通过。当前会话未提供 Codex 内置浏览器，本轮未重跑交互及视觉验收；HTTP内容与源码等价检查不替代浏览器验收。
+
 ## 第二轮模块接口收缩
 
 第二轮（2026-10-04）移除旧图鉴路由／post／zoom兼容链、无消费的详情动画标记与视觉模式、冗余产品字段和音效；灵感媒体直接提供 `previewSrc`，分类只统计一次；聊天使用 `text` 与唯一 `Conversation.memory`，每段对话共享一个主题 Provider。v2 存储独立初始化，旧 v1 记录不读取、不迁移、不覆盖。结果见 [module-depth-2026-10-04.json](evidence/module-depth-2026-10-04.json)。

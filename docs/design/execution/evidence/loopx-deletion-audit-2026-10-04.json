@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-04",
+  "baseCommit": "d3c07ff",
+  "goal": "personal-design-goal",
+  "method": "codebase-design deletion test: remove a module only when complexity disappears rather than spreading to callers",
+  "changes": [
+    "Remove unused layoutPreviews computation and HomeView input; preserve BookPreview categories",
+    "Move the single-consumer ToolsDirectory JSX and CSS into the tool page, deleting its duplicate data interface",
+    "Remove unused CategoryTabs className/count inputs and ToolPreviewItem.category projection",
+    "Make unused ButtonVariant, BrowseContext, CarouselMedia, EXIT_DURATION, avatarCount, submissionSchema, tool catalog types/data and fileNonEmpty exports private",
+    "Remove unused layout package subpath exports while retaining catalog content and root upstream source metadata",
+    "Retire unused v2-capture-corrections entry without changing historical captures"
+  ],
+  "integration": {
+    "latestMainMerged": true,
+    "preserved": ["PR #31 content updates", "PR #32 dependency upgrades", "PR #33 simplification", "PR #34 chat model and route removal"],
+    "alreadyOnMain": ["useVisiblePlay unused state removal", "run-all missing-suite filter removal", "LineId removal"],
+    "rejectedAfterMerge": "memorySchema must remain exported because the current chat hook consumes it"
+  },
+  "checks": {
+    "frozenLockfileInstall": "passed",
+    "workspaceTypecheck": "passed after production build regenerated stale route types",
+    "lint": "passed",
+    "formatCheck": "passed",
+    "unitTests": {"passed": 38, "failed": 0},
+    "productionBuild": "passed; subsequent CarouselMedia edit affects TypeScript export visibility only and web typecheck/lint passed",
+    "baseUrl": "https://personal-design.localhost:1355",
+    "staticRoutes": {"passed": 11, "failed": 0},
+    "portfolioApi": {"passed": 5, "failed": 0},
+    "serverRenderedContent": {"toolCategories": 20, "toolLinks": 127, "homeToolPreviews": 4, "unusedLayoutPropAbsent": true},
+    "toolPageEquivalence": "JSX differs only in data variable and indentation; CSS rules retained verbatim in original order",
+    "independentRescan": "Frontend and packages/scripts reviewed again after merging current main; final remaining unused CarouselMedia export removed and typechecked"
+  },
+  "commands": [
+    "pnpm install --frozen-lockfile",
+    "pnpm build",
+    "pnpm typecheck",
+    "pnpm lint",
+    "pnpm format:check",
+    "pnpm test",
+    "pnpm start",
+    "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://personal-design.localhost:1355 node scripts/verify-design-routes.mjs",
+    "NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\" DESIGN_BASE_URL=https://personal-design.localhost:1355 pnpm test:portfolio-api"
+  ],
+  "retained": [
+    "useCatParam, CollectionSearch and WorkspaceLink centralize URL, input/focus and exit navigation behavior",
+    "useMediaStatus, MotionVideo and lightbox/visibility modules centralize loading, recovery and playback policy",
+    "Chat session, transcript and OpenUI adapters retain real state and rendering responsibilities",
+    "Source adapters, synchronization recovery and local media fallback protect actual content consistency",
+    "Historical browser scripts with unique assertions require migration before removal"
+  ],
+  "limitations": [
+    "Codex built-in browser is not exposed in this session; browser interaction and visual checks were not rerun",
+    "run-all browser suites were not executed because they launch standalone Chromium, outside the repository's allowed agent browser interface",
+    "HTTP content and source equivalence checks do not establish visual or animation acceptance",
+    "AI schema export visibility changed only; no live-model or fixture-provider API run in this audit"
+  ],
+  "convergence": "No further evidence-backed deletion candidates remain in the reviewed application, package interfaces and scripts; this is not a claim of globally optimal architecture"
+}

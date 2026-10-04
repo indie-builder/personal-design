@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import avatars from './avatars.json';
 
-export const avatarCount = avatars.length;
+const avatarCount = avatars.length;
 const maleAvatars = avatars.filter((avatar) => avatar.gender === 'male');
 export function isMaleAvatar(id?: number) {
   return maleAvatars.some((avatar) => avatar.id === id);
@@ -81,7 +81,7 @@ export const memorySchema = z.object({
   summary: z.string().min(1).max(12000),
   throughId: z.string().min(1).max(100),
 });
-export const submissionSchema = z.object({
+const submissionSchema = z.object({
   formName: z.string().max(200).optional(),
   formState: z
     .record(z.string(), z.json())

@@ -9,7 +9,7 @@ import { useMediaStatus } from '@/lib/use-media-status';
 import { MotionVideo } from './motion-video';
 import { LightboxProvider, useLightbox } from './lifeline/lightbox';
 
-export interface CarouselMedia {
+interface CarouselMedia {
   id: string;
   type: 'image' | 'video';
   src: string;

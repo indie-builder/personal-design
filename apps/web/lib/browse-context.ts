@@ -1,5 +1,5 @@
 export type BrowseEntry = { href: string; title: string };
-export type BrowseContext = { href: string; entries: BrowseEntry[] };
+type BrowseContext = { href: string; entries: BrowseEntry[] };
 export type FilterableBrowseEntry = BrowseEntry & {
   category: string;
   search?: string[];
