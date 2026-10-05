@@ -378,7 +378,7 @@ Tabs／Accordion／Chips控件文字13px；表格数据13px、表头12px，单�
 2. **状态正确**：退出结束后到达正确上级，保留查询、滚动与焦点；键盘／减少动态效果不创建空间过渡；取消、快速反向操作及超时后没有残留替身、隐藏标题、锁定状态或错误路由。
 3. **视觉连续**：实看完整进入与退出或检查关键帧，确认方向、合拢／收回关系、接续和清理；不能用最终URL、标题可见或动画调用次数代替视觉验收。工具不可用时明确标为未验收，不宣称该门槛已通过。
 
-页面回退运行 `sh scripts/design-checks/back-motion.sh`，综合动效行为运行 `sh scripts/design-checks/workspace-navigation.sh`，回退稳定性运行 `sh scripts/design-checks/back-stability.sh`。新增同类入口须扩展对应回归，不仅复用组件名称。
+上述门槛的浏览器回归通过 `pnpm check:browser` 执行，检查项登记于 [current-checks.json](scripts/design-checks/current-checks.json)；此前的 back-motion、workspace-navigation、back-stability legacy 驱动已于 2026-10 退役，历史记录见 git 历史。新增同类入口须扩展对应回归，不仅复用组件名称。
 
 首选 CSS transition / keyframes；动态位置衔接使用原生 Web Animations API，零动画库。仅声明实际过渡属性，禁止 transition:all。常规运动使用 transform / opacity；现有开册层宽高插值是局部实现例外，需要实测性能，不能据此允许全站动画布局尺寸。
 

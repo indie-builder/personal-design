@@ -58,7 +58,7 @@ node scripts/design-checks/v2-muse.mjs
 
 结论仅限当前捕获：未复现持续 native spinner；没有证据说明全局 reduced-motion 规则造成该问题，不为无法复现的残影修改全局/媒体 UI。早期加载环可作为捕获时机问题保留历史记录，不将它改写为已经定位的 CSS 缺陷。
 
-复现诊断脚本：`DESIGN_BASE_URL=http://localhost:3001 node scripts/design-checks/v2-muse-spinner.mjs`。脚本记录 UA 控件状态及截图哈希，不写截图文件；以生产预览避免开发工具图标造成无关像素差异。原始临时诊断图是 `/tmp/muse-spinner-no-preference.png` 与 `/tmp/muse-spinner-reduce.png`，不作为可移植验收依赖。
+复现诊断脚本 `v2-muse-spinner.mjs` 已于 2026-10 退役移除，历史记录见 git 历史；当时命令为 `DESIGN_BASE_URL=http://localhost:3001 node scripts/design-checks/v2-muse-spinner.mjs`，记录 UA 控件状态及截图哈希，不写截图文件，以生产预览避免开发工具图标造成无关像素差异。原始临时诊断图是 `/tmp/muse-spinner-no-preference.png` 与 `/tmp/muse-spinner-reduce.png`，不作为可移植验收依赖。
 
 ## 独立评审修复：视频首屏播放控件
 

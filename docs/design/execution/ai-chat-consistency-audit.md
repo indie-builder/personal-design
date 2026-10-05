@@ -22,7 +22,7 @@
 
 ## 确定性样例覆盖
 
-`scripts/design-checks/fixtures/ai-chat-components.mjs` 使用官方 examples 加补充样例，生成10组回答；不请求模型。生成时逐组用官方 parser 检查错误／未解析引用，并检查样例中的定义名覆盖全部 registry。
+确定性样例使用官方 examples 加补充样例生成10组回答，不请求模型；生成 fixture 已于 2026-10 随 legacy 驱动退役。生成时逐组用官方 parser 检查错误／未解析引用，并检查样例中的定义名覆盖全部 registry。
 
 | 回答索引（从0开始） | 引用的官方定义 |
 | --- | --- |
@@ -41,20 +41,14 @@
 
 ## 浏览器复现与证据
 
-先启动独立 localhost 测试站，再运行：
-
-```sh
-EGO_TASK_SPACE=<active> DESIGN_BASE_URL=http://localhost:<端口> CATALOG_ASSERT=1 sh scripts/design-checks/ai-chat-catalog.sh
-```
-
-脚本拒绝覆盖含用户记录的 origin，导入固定组件会话并回放全部10组。检查320px浅色、390px深色、1440px浅色的页面横向溢出、渲染错误、文字字号是否落在语义尺寸集合、可测按钮的44px最小高度及Switch的44×44px区域；在第2／5／6／7／8／9组保存截图。
+目录回放由 legacy ego-browser 驱动执行，该驱动及配套 fixture 已于 2026-10 退役，历史记录见 git 历史；当时脚本拒绝覆盖含用户记录的 origin，导入固定组件会话并回放全部10组，检查320px浅色、390px深色、1440px浅色的页面横向溢出、渲染错误、文字字号是否落在语义尺寸集合、可测按钮的44px最小高度及Switch的44×44px区域，并在第2／5／6／7／8／9组保存截图。
 
 当前 [result.json](evidence/ai-chat-catalog/result.json) 记录三组视口均无页面横向溢出、渲染错误、尺寸集合外文字或不足44px的被测按钮，Switch均为44×44px；截图在同目录。该自动检查验证字号集合，不能代替逐角色检查，也不自动点击每个控件。
 
-状态回归：紧接目录回放运行 `EGO_TASK_SPACE=<active> sh scripts/design-checks/ai-chat-catalog-states.sh`。[states.json](evidence/ai-chat-catalog/states.json) 记录开关切换、OptionCard键盘焦点、12px校验提示、无需悬停的代码复制入口、智能体选择／创建／导航、画廊变量继承、明暗Modal打开及Escape关闭均通过。截图等待有限入场动画结束，不以中间帧判断布局。
+状态回归当时紧接目录回放运行。[states.json](evidence/ai-chat-catalog/states.json) 记录开关切换、OptionCard键盘焦点、12px校验提示、无需悬停的代码复制入口、智能体选择／创建／导航、画廊变量继承、明暗Modal打开及Escape关闭均通过。截图等待有限入场动画结束，不以中间帧判断布局。
 
 本轮重跑移动编辑回归也通过原生日期、选择、逐项修改／撤销／确认与刷新保存。生产构建、类型检查、定向lint与字体检测通过。未验证每个图表的每个提示、所有禁用／焦点组合或真机键盘；82定义覆盖不等于82项独立交互全部组合验证。既有业务流程见 [AI 问答执行文档](ai-chat.md)。
 
-创建页遮挡定向回归：`EGO_TASK_SPACE=<active> DESIGN_BASE_URL=http://localhost:<端口> sh scripts/design-checks/ai-chat-create-layer.sh`；[create-layer.json](evidence/ai-chat-catalog/create-layer.json) 记录320浅色／390深色／1440浅色中，标题与返回按钮实际命中测试通过、标题15px、创建页始终在手机容器内。
+创建页遮挡定向回归见 [create-layer.json](evidence/ai-chat-catalog/create-layer.json) 记录320浅色／390深色／1440浅色中，标题与返回按钮实际命中测试通过、标题15px、创建页始终在手机容器内。
 
 最终独立视觉复核完成。普通Callout与TextCallout的左边框实测均为1px，记录在 [callout-width.json](evidence/ai-chat-catalog/callout-width.json)。复核结论限定本次整体尺寸、组件视觉和已列出的状态范围。
