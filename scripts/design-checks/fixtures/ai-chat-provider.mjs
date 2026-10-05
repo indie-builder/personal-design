@@ -21,12 +21,16 @@ createServer(async(req,res)=>{
  const isAnalytics=data.messages.some(m=>m.role==='system'&&m.content?.includes('星辰科技'));
  const hasToolResult=data.messages.some(m=>m.role==='tool');
  const analyticsAnswer='root = Stack([card]);\ncard = Card([CardHeader("在职员工总数"), TextContent("全公司在职 528 人（截至快照日，在职口径）。")]);';
- if(isAnalytics&&!hasToolResult){
+ const progressCase=isAnalytics&&data.messages.some(m=>m.role==='user'&&m.content?.includes('步骤状态验收'));
+ const called=data.messages.filter(m=>m.role==='assistant').flatMap(m=>m.tool_calls??[]).map(call=>call.function?.name);
+ const nextTool=!hasToolResult?'get_context':progressCase&&!called.includes('describe_cube')?'describe_cube':progressCase&&!called.includes('query_cube')?'query_cube':null;
+ if(isAnalytics&&nextTool){
   res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache'});
   const chunk=(delta,finish_reason=null)=>res.write(`data: ${JSON.stringify({id:'mock',object:'chat.completion.chunk',created:1,model:'glm-5.3-flash',choices:[{index:0,delta,finish_reason}]})}\n\n`);
+  const args=nextTool==='get_context'?{}:nextTool==='describe_cube'?{name:'workforce'}:{cube:'workforce',measures:['headcount'],dimensions:[]};
   chunk({role:'assistant',content:''});
-  chunk({content:'我先读取业务口径，再查询在职人数。'});
-  chunk({tool_calls:[{index:0,id:'call_analytics',type:'function',function:{name:'get_context',arguments:'{}'}}]});
+  if(!hasToolResult)chunk({content:'我先读取业务口径，再查询在职人数。'});
+  chunk({tool_calls:[{index:0,id:`call_${nextTool}`,type:'function',function:{name:nextTool,arguments:JSON.stringify(args)}}]});
   chunk({},'tool_calls');
   res.end('data: [DONE]\n\n');
   return;

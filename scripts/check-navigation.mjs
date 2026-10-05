@@ -82,7 +82,9 @@ export function checkNavigation(root = repositoryRoot) {
     }
   const utilities = [
     'scripts/design-checks/run-http.mjs',
+    'scripts/design-checks/run-chat.mjs',
     'scripts/design-checks/fixtures/ai-chat-provider.mjs',
+    'scripts/design-checks/fixtures/analytics-mcp.mjs',
   ];
   const allowed = new Set([
     registry,

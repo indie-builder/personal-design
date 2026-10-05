@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "localSkills": {
+    "harness-code-check": "Project-owned skill; preserve its entity without an upstream lock entry."
+  },
+  "excludedSkills": {
+    "next-dev-loop": "Explicitly removed by the user; keep absent from entities, Claude links, and lock entries."
+  }
+}

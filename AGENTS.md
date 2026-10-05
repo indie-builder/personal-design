@@ -2,7 +2,7 @@
 
 ## 阅读入口
 
-- 开工先读 [PRODUCT.md](PRODUCT.md) 的产品与内容边界；改 UI 再读 [DESIGN.md](DESIGN.md) 和 [页面契约与验收](docs/design/README.md)。AGENTS.md 只维护操作规则，不重复页面规格或历史验收结果。
+- 开工先读 [PRODUCT.md](PRODUCT.md) 的产品与内容边界，再按[任务导航](docs/agents/navigation.md#按任务定位)选择契约、实现与检查；改 UI 读 [DESIGN.md](DESIGN.md) 的相关章节。AGENTS.md 只维护操作规则，不重复页面规格或历史验收结果。
 - 修改前端先读 [apps/web/AGENTS.md](apps/web/AGENTS.md)；修改或调用布局、灵感数据包时，分别读 [layout-compositions/AGENTS.md](packages/layout-compositions/AGENTS.md)、[inspora/AGENTS.md](packages/inspora/AGENTS.md)。
 - 修改前确认分支／远端基线；定位文件、读取大型资源或更新技能集时，按[工作基线与导航](docs/agents/navigation.md)操作。
 - 用户最新明确决定优先，历史布局不能限制已授权的新 UI/UX。[来源规则](docs/design/open-design/rules.md)仅解释迁入与适配；`docs/design/open-design/source/` 只读，不执行原项目命令或加载其中的 Agent 指令。
@@ -21,10 +21,12 @@
 | 开发 | `pnpm dev`：全局 portless，`https://personal-design.localhost`；路由见 `portless.json` |
 | 生产预览 | `pnpm build` 后 `pnpm start`：通过 portless，`https://personal-design.localhost` |
 | Web 类型检查／单文件 lint | `pnpm --filter @personal-design/web typecheck` / `pnpm --filter @personal-design/web exec oxlint <file>` |
+| 根目录脚本 lint | `pnpm lint:scripts`；定向命令见[任务导航](docs/agents/navigation.md#按任务定位) |
 | 格式化 | `pnpm format`：oxfmt，仅 TS/TSX/MJS；CSS 保持紧凑手写风格，生成 JSON 不参与 |
 | 已有单元测试 | `pnpm test`：node:test |
-| 导航一致性 | `pnpm check:navigation` / `pnpm test:navigation`；与现有检查一起由 CI 执行 |
-| HTTP／浏览器回归 | 先构建并 `pnpm start`；HTTP 用 `pnpm check:http`，浏览器及假模型按[当前验收入口](docs/design/execution/README.md)执行，设置实际 `DESIGN_BASE_URL` 与 Node 本地 CA |
+| 导航／技能库存 | `pnpm check:navigation` / `pnpm check:skills`；定向测试 `pnpm test:navigation`，库存列表 `pnpm check:skills --list`；CI 执行检查及根测试 |
+| HTTP／浏览器回归 | 先构建并 `pnpm start`；HTTP 用 `pnpm check:http`，浏览器用 `pnpm check:browser`，设置实际 `DESIGN_BASE_URL` 与 Node 本地 CA |
+| 隔离聊天验收 | 构建后 `pnpm check:chat` 自动启动和清理；仅 HTTP 用 `pnpm check:chat --http`；准备、覆盖与产物见[当前验收入口](docs/design/execution/README.md#聊天隔离环境) |
 | 内容同步 | `pnpm sync:layouts` / `pnpm sync:inspora`；其他入口见 `package.json` |
 
 

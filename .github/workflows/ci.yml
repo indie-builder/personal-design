@@ -25,8 +25,8 @@ jobs:
         env:
           COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
 
-      - name: Navigation contracts
-        run: pnpm check:navigation && pnpm test:navigation
+      - name: Agent environment contracts
+        run: pnpm check:navigation && pnpm check:skills
 
       - name: Typecheck
         run: pnpm -r typecheck
@@ -42,3 +42,20 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Isolated chat acceptance
+        run: |
+          npm install --global portless@0.15.7
+          pnpm exec playwright install --with-deps chromium
+          pnpm check:chat
+
+      - name: Chat acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: chat-acceptance
+          path: |
+            .impeccable/review/chat-checks/*.log
+            .impeccable/review/chat-checks/*.json
+            .impeccable/review/chat-checks/*.png
+          if-no-files-found: ignore

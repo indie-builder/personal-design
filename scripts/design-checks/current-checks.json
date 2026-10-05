@@ -65,6 +65,11 @@
       ]
     },
     {
+      "id": "playwright-chat-analytics",
+      "file": "scripts/design-checks/chat-analytics.mjs",
+      "exports": []
+    },
+    {
       "id": "home-performance",
       "file": "scripts/design-checks/home-performance.browser.mjs",
       "exports": [

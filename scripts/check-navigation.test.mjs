@@ -126,7 +126,12 @@ test('explicit script references must exist and current docs cannot prescribe le
     f.write('docs/current.md', `[Driver](../scripts/design-checks/${file})`);
     assert.match(f.errors(), /unregistered|legacy/i);
   }
-  for (const file of ['run-http.mjs', 'fixtures/ai-chat-provider.mjs']) {
+  for (const file of [
+    'run-http.mjs',
+    'run-chat.mjs',
+    'fixtures/ai-chat-provider.mjs',
+    'fixtures/analytics-mcp.mjs',
+  ]) {
     f.write(`scripts/design-checks/${file}`, '// current utility');
   }
   f.write(
@@ -179,7 +184,12 @@ test('follows compact static imports and re-exports', (t) => {
 
 test('checks optional current runner and provider utilities when present', (t) => {
   const f = fixture(t);
-  for (const file of ['run-http.mjs', 'fixtures/ai-chat-provider.mjs']) {
+  for (const file of [
+    'run-http.mjs',
+    'run-chat.mjs',
+    'fixtures/ai-chat-provider.mjs',
+    'fixtures/analytics-mcp.mjs',
+  ]) {
     f.write(`scripts/design-checks/${file}`, "import './missing.mjs';");
     assert.match(f.errors(), /missing\.mjs/);
     f.write(`scripts/design-checks/${file}`, '// safe utility');
