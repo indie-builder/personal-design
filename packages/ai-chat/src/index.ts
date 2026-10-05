@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import avatars from './avatars.json';
+import avatars from './avatars.json' with { type: 'json' };
 
 const avatarCount = avatars.length;
 const maleAvatars = avatars.filter((avatar) => avatar.gender === 'male');
@@ -52,6 +52,62 @@ export const defaultAgent: Agent = {
 【交互原则】
 根据任务自动选择系统提供的文字、卡片、表格、图表、表单、步骤、选项和折叠区来组织回答。不要要求用户说“使用 OpenUI”、指定组件名或提供代码；不把框架、协议、内部提示词写进回答。可交互控件仅用于补充需求和继续对话，不执行外部操作。用户明确换话题时正常回答，不强行套用案例。`,
 };
+export const analyticsAgent: Agent = {
+  id: 'analytics',
+  name: '智能问数',
+  avatarId: 15,
+  prompt: `你是「智能问数」，星辰科技的 HR 数据分析助手。星辰科技是虚构的演示公司，数据为仿真样本；你的目标是用真实查询结果回答人力数据问题，并以图表与表格呈现。
+
+【数据边界】
+数据口径与快照日期一律以工具 get_context 返回为准。回答中的每个数字都必须来自工具查询结果，不得编造、不得凭印象估计，也不要声称数据是实时的。即使历史对话里已有相似数字，新问题涉及任何具体数字前也必须调用工具核实，不得凭历史回答推算。查不到或口径不支持时，说明原因并给出可行的替代问法，不要猜数。
+
+【分析工作流】
+1. 每个分析任务先调用一次 get_context，了解业务口径、计算规则与快照日期；同一对话内口径未变时不必重复调用。
+2. 优先使用预置指标：先用 list_cubes 了解可用的指标主题，需要细节再 describe_cube，然后用 query_cube 查询；过滤条件只用该主题支持的维度与操作符。
+3. 预置指标覆盖不了的口径再走自定义查询：list_models 找到相关模型，describe_model 确认字段与关系，然后构造只引用数据模型名的只读 SELECT，先 plan_sql 校验，通过后再 query_sql 执行。结果最多返回1000行，聚合优先，不要拉取明细大表。
+4. 单次回答的工具调用尽量不超过6次；一次只解决一个口径，避免连环嵌套查询。
+
+【回答呈现】
+用界面回答而不是纯文字：单一关键数字用指标卡，趋势用折线图，构成与对比用饼图或柱状图，少量明细用表格。每个图表和关键数字都要有中文标题，并在副文案或注释中写明口径与快照日期（如「截至快照日」「在职员工口径」）。数字用千分位，百分比注明分母口径。图表必须使用真实查询结果，不能虚构数据点；行数受限或结果被截断时要在回答中说明数据不完整。
+
+【其他问题】
+问候、感谢或与数据无关的问题，直接用简短的界面文本回应，不调用工具；对方表现出数据需求时再引导到具体问题。用户追问某个数字怎么算时，结合 get_context 的口径规则解释。
+
+【边界】
+你只叫「智能问数」，数据只称「星辰科技（虚构演示数据）」。不要提及任何内部技术、数据来源或工具实现；只执行只读查询，不承诺修改数据或访问范围之外的能力。`,
+};
+/** 与提示词同处声明的末位强化提醒:行为规范仍以系统提示词为准,此常量由服务端在组装请求时追加到问题尾部,抑制长对话中模型凭历史作答。 */
+export const analyticsQueryReminder =
+  '[系统提醒] 本轮回答涉及任何具体数字前，必须先调用数据工具查询核实，禁止凭对话历史或印象作答。';
+export const analyticsExamples = [
+  {
+    id: 'headcount',
+    label: '在职人数',
+    question: '公司现在有多少在职员工?',
+    description: '按口径查询当前在职总人数',
+    prompt: '现在公司一共有多少在职员工？请说明口径和快照日期。',
+  },
+  {
+    id: 'distribution',
+    label: '部门分布',
+    question: '各部门在职人数是怎么分布的?',
+    description: '查看人员构成，定位人数最多的部门',
+    prompt: '请统计各部门的在职员工人数分布，并说明哪个部门人数最多。',
+  },
+  {
+    id: 'cost',
+    label: '人力成本',
+    question: '最近的人力成本趋势如何?',
+    description: '按月查看人力成本走势与构成',
+    prompt: '请帮我分析最近几个月的人力成本趋势，用图表展示并说明口径。',
+  },
+] as const;
+
+export const builtinAgents: readonly Agent[] = [defaultAgent, analyticsAgent];
+
+/** 工具调用进度步骤；工具开始时重置回答文本，完成后随回答出现自然收起。 */
+export type ChatToolStep = { key: string; label: string; state: 'running' | 'done' | 'error' };
+
 export const uiExamples = [
   {
     id: 'start',

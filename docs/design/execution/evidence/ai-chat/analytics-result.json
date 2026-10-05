@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "checks": [
+    "analytics session declares exactly the eight controlled tools, the authoritative prompt replaces the client copy, and the question carries the query reminder",
+    "tool_status lines precede content and pre-tool text is discarded",
+    "degraded data client result reaches the model without failing the request",
+    "analytics answer renders with the current official schema",
+    "non-analytics agents keep zero tools and their own prompt"
+  ]
+}

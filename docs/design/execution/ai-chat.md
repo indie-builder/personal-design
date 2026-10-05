@@ -16,6 +16,8 @@
 - 每次请求用 `SessionManager.inMemory()` 恢复已验证的历史与摘要，只将最新用户输入送进 `session.prompt()`；结束或中止即 dispose。没有跨实例全局 Map，适合 Vercel 冷启动。
 - 关闭主机文件／终端工具、扩展、技能及项目上下文发现；只做问答，不开放官方 coding 示例中的主机操作能力。
 - Pi `text_delta` 桥接为 OpenAI NDJSON；前端 `usePiChat` 用官方 `openAIReadableStreamAdapter` 解析。应用不使用 AI SDK；OpenUI 将其声明为仅供 vercelAIAdapter 使用的可选 peer dependency，锁文件已清除未使用的 AI SDK 及专属依赖链。
+- 内置智能体按服务端固定能力表启用工具：`analytics` 使用包内权威提示词（覆盖客户端传入内容）并注册 8 个受控数据工具（[analytics-tools.ts](../../../apps/web/lib/analytics-tools.ts)），经 [analytics-mcp.ts](../../../apps/web/lib/analytics-mcp.ts) 用 `@earendil-works/pi-mcp` 连接远端 MCP Streamable HTTP（Bearer 认证、无状态、每请求新建客户端并在结束时关闭）；工具结果序列化为文本，超过 20000 字符截断并注明数据不完整，单工具 30 秒超时、单次回答 12 次调用上限。`ANALYTICS_MCP_TOKEN` 缺失时工具返回不可用提示由模型转述，请求不失败。
+- 工具执行经 `tool_execution_start/end` 事件以裸 `tool_status` NDJSON 行（与 OpenAI chunk 并列，官方适配器静默跳过）驱动前端查询步骤条；工具执行前与执行期间的文本由服务端缓冲、首个工具开始时丢弃，仅末次工具后的文本进入结构校验；未触发工具的纯文本回答在 prompt 结束时一次性放行。前端收到工具开始即重置本地文本，与服务端对称。问数请求在最后一条用户消息尾部由服务端追加查询提醒（不写入会话历史），抑制长对话中模型凭历史直接作答的倾向。
 - 流式文本首片段立即提交，后续按32ms窗口合并界面更新；完成、错误或停止时补齐尾部内容，卸载取消待执行回调。完整历史的本机写入按500ms窗口合并；结束、停止、页面隐藏或卸载时刷新待保存快照。非生成期的智能体与表单修改即时保存；读取失败不覆盖旧数据，写入失败保留现有错误提示。
 - 输入检查角色、字段长度、消息数量、512KB体积及 Origin。上游错误不透出密钥或原始异常。
 - 超过16条或24000字符时，用 Pi `completeSimple` 合并早期摘要，保留最近6条原文。摘要最多1500字，新摘要经 `x-ai-memory` 响应头回传，仅保存到 Conversation.memory。摘要失败不丢弃原始会话。
@@ -60,9 +62,19 @@
 
 数据口径：50项任务，完成45／进行4／阻塞1；对照完成30／逾期12／交接18小时，试用逾期4／交接7小时。完成率90%，对照60%，提升30个百分点；14天累计趋势与总数一致。样本不代表用户的真实业务成果。
 
+### 智能问数
+
+第二个内置智能体分析虚构公司「星辰科技」的仿真 HR 数据（演示样本，非真实业务数据）。提示词约定工作流：每个分析任务先读取业务口径与快照日期；预置指标主题能回答的优先按主题查询；复杂口径先确认模型字段、构造只读 SELECT 并先校验再执行；单次回答工具调用尽量不超过 6 次，聚合优先，不拉取明细大表。每个数字注明口径与快照日期，查不到时解释原因并给出替代问法，不编造数字、不声称实时。界面呈现遵循官方组件契约，图表必须使用真实查询结果，结果受限或截断时说明数据不完整。问候与数据无关的问题直接文本回应，不调用工具。
+
+查询期间在等待区显示工具步骤（运行／完成／失败），回答开始后收起。欢迎区示例为在职人数、部门分布与人力成本趋势三个入口。
+
+工具与数据边界：8 个只读工具（读取口径、模型与指标主题浏览、SQL 校验与执行、指标主题查询）由服务端白名单注册，远端服务负责语义校验与只读执行，最多返回 1000 行；不提供自然语言转 SQL 的服务端能力，不开放写操作，访客可见处不出现数据来源站点与技术词。
+
 ## 配置
 
 本地服务端在 `apps/web/.env.local` 配置 `ZHIPU_API_KEY`。`ZHIPU_MODEL` 默认 `glm-5.3-flash`，`ZHIPU_BASE_URL` 默认 `https://open.bigmodel.cn/api/coding/paas/v4`，默认值以 [pi-chat.ts](../../../apps/web/lib/pi-chat.ts) 为准。密钥仅由服务端读取，本地密钥文件保持 Git 忽略与600权限；部署环境通过服务端环境变量配置。部署与远端变量是否已就绪需单独核验，不由历史记录推定。
+
+智能问数另需 `ANALYTICS_MCP_URL`（默认远端数据服务地址，以 [analytics-mcp.ts](../../../apps/web/lib/analytics-mcp.ts) 为准）与 `ANALYTICS_MCP_TOKEN`（Bearer 令牌）。令牌仅服务端读取；缺失时智能问数工具返回不可用提示，不影响其他智能体。
 
 ## 实现入口
 
@@ -70,6 +82,7 @@
 - 本机存储：[use-saved-chat.ts](../../../apps/web/components/ai-chat/use-saved-chat.ts) 读取、校验并初始化v2记录，[chat-persistence.ts](../../../apps/web/lib/chat-persistence.ts) 合并写入与刷新快照。
 - 流式接收：[use-pi-chat.ts](../../../apps/web/lib/use-pi-chat.ts)、[chat-stream.ts](../../../apps/web/lib/chat-stream.ts)；服务端：[API route.ts](../../../apps/web/app/api/ai-chat/route.ts)、[pi-chat.ts](../../../apps/web/lib/pi-chat.ts)。
 - 会话模型与内置案例：[包 API](../../../packages/ai-chat/src/index.ts)；移动组件：[ai-chat-mobile-library.tsx](../../../apps/web/components/ai-chat-mobile-library.tsx)；首页：[ai-chat-preview.tsx](../../../apps/web/components/ai-chat-preview.tsx)。
+- 智能问数工具桥接：[analytics-mcp.ts](../../../apps/web/lib/analytics-mcp.ts)、[analytics-tools.ts](../../../apps/web/lib/analytics-tools.ts)；检查：`pnpm check:http chat-analytics`，证据 `evidence/ai-chat/analytics-result.json`。
 
 ## 阅读、提交与首页预览契约
 

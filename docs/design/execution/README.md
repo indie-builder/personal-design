@@ -38,6 +38,7 @@ pnpm check:http
 | 预渲染路由 HTTP 状态与 main 地标 | [verify-design-routes.mjs](../../../scripts/verify-design-routes.mjs) | 读取本次生产构建的 manifest；写入 `evidence/routes.json` |
 | portfolio 公共投影、分页、搜索、错误语义 | [portfolio-api.test.mjs](../../../scripts/portfolio-api.test.mjs) | 生产服务；结果在终端，不代替浏览器交互 |
 | 聊天流协议、摘要、错误、中止、输入边界 | [ai-chat-api.mjs](../../../scripts/design-checks/ai-chat-api.mjs) | 下述隔离假模型环境；显式运行 `pnpm check:http chat-api`，写入 `evidence/ai-chat/api-result.json` |
+| 智能问数工具声明、tool_status 协议、工具前文本丢弃与降级 | [ai-chat-analytics-api.mjs](../../../scripts/design-checks/ai-chat-analytics-api.mjs) | 同上隔离假模型环境（未配置数据服务令牌）；显式运行 `pnpm check:http chat-analytics`，写入 `evidence/ai-chat/analytics-result.json` |
 
 ## 可选的 tab／CDP 适配接口
 

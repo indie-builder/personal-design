@@ -21,6 +21,11 @@
       "id": "chat-api",
       "file": "scripts/design-checks/ai-chat-api.mjs",
       "origin": "https://upgrade-check.personal-design.localhost"
+    },
+    {
+      "id": "chat-analytics",
+      "file": "scripts/design-checks/ai-chat-analytics-api.mjs",
+      "origin": "https://upgrade-check.personal-design.localhost"
     }
   ],
   "browser": [
