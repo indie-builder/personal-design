@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import {
+  analyticsAgent,
   defaultAgent,
   isMaleAvatar,
   randomAvatarId,
@@ -12,22 +13,30 @@ import {
 import { createChatPersistence } from '@/lib/chat-persistence';
 
 const STORAGE_KEY = 'personal-design:ai-chat:v2';
-export const emptyStore: SavedChat = { agents: [defaultAgent], conversations: [] };
+export const emptyStore: SavedChat = {
+  agents: [defaultAgent, analyticsAgent],
+  conversations: [],
+};
 
-/** 补齐默认智能体，并把非男生头像的记录重新随机分配。 */
+/** 补齐内置智能体并强制其资料为包内最新版，再把非男生头像的记录重新随机分配。 */
 function normalize(initial: SavedChat): SavedChat {
-  const agents = initial.agents.some((item) => item.id === defaultAgent.id)
-    ? initial.agents
-    : [defaultAgent, ...initial.agents];
+  const builtinIds = new Set([defaultAgent.id, analyticsAgent.id]);
+  const stored = new Map(initial.agents.map((item) => [item.id, item]));
+  const customAgents = initial.agents.filter((item) => !builtinIds.has(item.id));
   return {
     ...initial,
-    agents: agents.map((item) => ({
-      ...item,
-      ...(item.id === defaultAgent.id
-        ? { name: defaultAgent.name, prompt: defaultAgent.prompt }
-        : {}),
-      avatarId: isMaleAvatar(item.avatarId) ? item.avatarId : randomAvatarId(),
-    })),
+    agents: [...[defaultAgent, analyticsAgent], ...customAgents].map((item) => {
+      const saved = stored.get(item.id);
+      return {
+        ...item,
+        avatarId:
+          item.id === analyticsAgent.id
+            ? analyticsAgent.avatarId
+            : isMaleAvatar(saved?.avatarId)
+              ? saved!.avatarId
+              : randomAvatarId(),
+      };
+    }),
   };
 }
 

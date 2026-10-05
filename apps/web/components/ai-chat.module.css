@@ -127,10 +127,17 @@
 .waitDots i:nth-child(2) { animation-delay:120ms; }
 .waitDots i:nth-child(3) { animation-delay:240ms; }
 @keyframes waiting { 0%,80%,100% { opacity:.35; } 40% { opacity:1; } }
+.toolSteps { display:flex; flex-direction:column; gap:6px; margin:0; }
+.toolStep { display:flex; align-items:center; gap:8px; margin:0; font-size:var(--chat-body-size); color:var(--color-ink-soft); }
+.toolStepMark { display:inline-flex; align-items:center; justify-content:center; width:12px; flex:none; }
+.toolStep[data-state='running'] .toolStepMark::before { content:''; width:4px; height:4px; border-radius:50%; background:currentColor; animation:waiting 900ms ease-in-out infinite; }
+.toolStep[data-state='done'] .toolStepMark::before { content:'✓'; font-size:11px; }
+.toolStep[data-state='error'] { color:var(--color-ink); }
+.toolStep[data-state='error'] .toolStepMark::before { content:'✕'; font-size:11px; }
 .page[data-motion-paused] *,.page[data-motion-paused] .drawer::backdrop { animation:none !important; transition:none !important; }
-:global(html[data-input="keyboard"]) .waitDots i,:global(html[data-input="keyboard"]) .composer button svg { animation:none; }
+:global(html[data-input="keyboard"]) .waitDots i,:global(html[data-input="keyboard"]) .toolStep[data-state='running'] .toolStepMark::before,:global(html[data-input="keyboard"]) .composer button svg { animation:none; }
 :global(html[data-input="keyboard"]) .drawer::backdrop { transition:none; }
-@media(prefers-reduced-motion:reduce) { .waitDots i,.composer button svg { animation:none; } .agentPopover,.drawer,.drawer .navigation,.drawer::backdrop,.userMessage[data-arriving],.assistantMessage[data-arriving] { transition:none; } }
+@media(prefers-reduced-motion:reduce) { .waitDots i,.toolStep[data-state='running'] .toolStepMark::before,.composer button svg { animation:none; } .agentPopover,.drawer,.drawer .navigation,.drawer::backdrop,.userMessage[data-arriving],.assistantMessage[data-arriving] { transition:none; } }
 
 .header[data-hidden] { transform:translateY(-100%); opacity:0; pointer-events:none; }
 :global(html[data-input="keyboard"]) .header,:global(html[data-input="keyboard"]) .composerPanel,:global(html[data-input="keyboard"]) .toBottom { transition:none; }

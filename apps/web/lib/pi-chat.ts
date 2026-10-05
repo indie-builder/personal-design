@@ -1,6 +1,7 @@
 import 'server-only';
 import { modelMessageContent, type ChatMessage } from '@personal-design/ai-chat';
 import type { Message } from '@earendil-works/pi-ai';
+import type { ToolDefinition } from '@earendil-works/pi-coding-agent';
 
 export async function createPiRuntime() {
   const { ModelRuntime } = await import('@earendil-works/pi-coding-agent');
@@ -42,6 +43,7 @@ export async function createChatSession(
   provider: Awaited<ReturnType<typeof createPiRuntime>>,
   system: string,
   history: ChatMessage[],
+  options?: { tools?: ToolDefinition[] },
 ) {
   const { createAgentSession, DefaultResourceLoader, SessionManager, SettingsManager } =
     await import('@earendil-works/pi-coding-agent');
@@ -86,12 +88,15 @@ export async function createChatSession(
           };
     sessionManager.appendMessage(message);
   }
+  const analyticsTools = options?.tools;
   const { session } = await createAgentSession({
     modelRuntime: provider.runtime,
     model: provider.model,
     thinkingLevel: 'off',
+    // options.tools 优先于 noTools 生效；提供工具时按名单激活,内置工具保持关闭。
     noTools: 'all',
-    tools: [],
+    tools: analyticsTools?.map((tool) => tool.name),
+    customTools: analyticsTools,
     resourceLoader,
     sessionManager,
     settingsManager,

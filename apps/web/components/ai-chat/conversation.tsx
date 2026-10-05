@@ -9,7 +9,12 @@ import type {
   Conversation,
   FormSubmission,
 } from '@personal-design/ai-chat';
-import { defaultAgent, uiExamples } from '@personal-design/ai-chat';
+import {
+  analyticsAgent,
+  analyticsExamples,
+  defaultAgent,
+  uiExamples,
+} from '@personal-design/ai-chat';
 import { ThemeProvider } from '@openuidev/react-ui';
 import { answerLightTheme, answerDarkTheme } from '@/lib/ai-chat-ui-theme';
 import { usePiChat } from '@/lib/use-pi-chat';
@@ -31,11 +36,16 @@ export function ConversationView({
   onBusy: (busy: boolean) => void;
   onHeaderHiddenChange: (hidden: boolean) => void;
 }) {
-  const { transcript, sendMessage, status, error, stop, regenerate, updateUiState } = usePiChat(
-    conversation,
-    agent,
-  );
+  const { transcript, sendMessage, status, error, stop, regenerate, updateUiState, toolSteps } =
+    usePiChat(conversation, agent);
   const { messages } = transcript;
+  // 内置智能体各有专属欢迎示例；自建智能体不套用通用示例。
+  const examples =
+    agent.id === analyticsAgent.id
+      ? analyticsExamples
+      : agent.id === defaultAgent.id
+        ? uiExamples
+        : [];
   const [mode, setMode] = useState<'light' | 'dark'>('light');
   useEffect(() => {
     const sync = () =>
@@ -120,13 +130,16 @@ export function ConversationView({
       setAtBottom(true);
       void sendMessage(value, submission);
     },
-    [busy, sendMessage],
+    [busy, sendMessage, setInput, setAtBottom],
   );
 
   // 抬手方向决定页头隐藏；输入聚焦或到顶强制显示
   const markUserScroll = () => {
     scrollGesture.current.userUntil = performance.now() + 1200;
   };
+  // 查询步骤条在回答文本尚未开始时显示；工具执行期间最后一条消息还是用户问题。
+  const lastMessage = messages.at(-1);
+  const answerStarted = lastMessage?.role === 'assistant' && !!lastMessage.text;
 
   return (
     <section className={styles.thread} aria-label="对话">
@@ -167,15 +180,21 @@ export function ConversationView({
             {!messages.length && (
               <div className={styles.welcome}>
                 <h2>
-                  {agent.id === defaultAgent.id ? '找到适合团队的协作方式' : '今天想聊些什么？'}
+                  {agent.id === defaultAgent.id
+                    ? '找到适合团队的协作方式'
+                    : agent.id === analyticsAgent.id
+                      ? '问问星辰科技的人力数据'
+                      : '今天想聊些什么？'}
                 </h2>
                 <p>
                   {agent.id === defaultAgent.id
                     ? '从选方案到安排试用，一起把需求理清楚。'
-                    : '说说你的需求，我们一起理清思路。'}
+                    : agent.id === analyticsAgent.id
+                      ? '人数、成本与趋势，用真实查询结果回答。'
+                      : '说说你的需求，我们一起理清思路。'}
                 </p>
                 <div className={styles.suggestions} aria-label="示例问题">
-                  {uiExamples.map((example) => (
+                  {examples.map((example) => (
                     <Button
                       key={example.id}
                       variant="default"
@@ -239,6 +258,16 @@ export function ConversationView({
                 </article>
               );
             })}
+            {busy && toolSteps.length > 0 && !answerStarted && (
+              <div className={styles.toolSteps} role="status" aria-label="查询进度">
+                {toolSteps.map((step) => (
+                  <p key={step.key} className={styles.toolStep} data-state={step.state}>
+                    <span className={styles.toolStepMark} aria-hidden="true" />
+                    {step.label}
+                  </p>
+                ))}
+              </div>
+            )}
             {busy && (
               <p className={styles.progress} role="status" data-generation-status>
                 <span className={styles.waitDots} aria-hidden="true">

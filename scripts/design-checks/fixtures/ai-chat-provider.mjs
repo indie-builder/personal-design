@@ -17,7 +17,22 @@ createServer(async(req,res)=>{
  if(last.includes('触发服务错误')){res.writeHead(429,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Test rate limit'}}));return;}
  const summarizing=data.messages.some(m=>m.content?.includes('你是对话记忆整理器'));
  if(summarizing&&last.includes('触发摘要失败')&&!summaryFailed){summaryFailed=true;res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Test summary failure'}}));return;}
- const output=summarizing?summary
+ // 智能问数：第一轮先输出工具前文本再调用工具（服务端必须丢弃工具前文本），第二轮带工具结果回最终界面。
+ const isAnalytics=data.messages.some(m=>m.role==='system'&&m.content?.includes('星辰科技'));
+ const hasToolResult=data.messages.some(m=>m.role==='tool');
+ const analyticsAnswer='root = Stack([card]);\ncard = Card([CardHeader("在职员工总数"), TextContent("全公司在职 528 人（截至快照日，在职口径）。")]);';
+ if(isAnalytics&&!hasToolResult){
+  res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache'});
+  const chunk=(delta,finish_reason=null)=>res.write(`data: ${JSON.stringify({id:'mock',object:'chat.completion.chunk',created:1,model:'glm-5.3-flash',choices:[{index:0,delta,finish_reason}]})}\n\n`);
+  chunk({role:'assistant',content:''});
+  chunk({content:'我先读取业务口径，再查询在职人数。'});
+  chunk({tool_calls:[{index:0,id:'call_analytics',type:'function',function:{name:'get_context',arguments:'{}'}}]});
+  chunk({},'tool_calls');
+  res.end('data: [DONE]\n\n');
+  return;
+ }
+ const output=hasToolResult&&isAnalytics?analyticsAnswer
+  :summarizing?summary
   :last.includes('修正刚才的界面结构')?'root = Stack([card, next]);'
   :last.includes('触发结构修复')?basic+'\nnext = Button("继续", Action([@ToAssistant("继续方案")]));'
   :last.includes('主题图表验收')?themeChart
