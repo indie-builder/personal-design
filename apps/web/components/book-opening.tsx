@@ -35,6 +35,7 @@ export function BookOpening({ book, onDone }: { book: OpeningBook; onDone: () =>
       if (stopped) return;
       stopped = true;
       cancelAnimationFrame(frame);
+      animations.forEach((animation) => animation.finish());
       reveal();
       onDone();
     };
