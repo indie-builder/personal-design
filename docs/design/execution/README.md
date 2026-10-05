@@ -6,7 +6,7 @@
 
 从仓库根目录执行 `pnpm build`，再执行 `pnpm start`。切换开发／生产模式前先停止当前服务；主工作区及 worktree 都使用启动日志给出的 Portless URL。将实际 URL 设为 `DESIGN_BASE_URL`，Node HTTP 检查另外设置 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"`。
 
-浏览器验收保持工具中立：可使用 Playwright、CDP 或当前环境可用的浏览器工具，按检查所需能力选择。现行检查登记在 [current-checks.json](../../../scripts/design-checks/current-checks.json)。`pnpm check:navigation` 核对现行文档链接、脚本路径及导出函数；`pnpm test:navigation` 验证这项检查自身的失败分支。CI 同时执行两者及原有类型、lint、格式、单元测试和构建。
+浏览器验收保持工具中立：可使用 Playwright、CDP 或当前环境可用的浏览器工具，按检查所需能力选择。现行检查登记在 [current-checks.json](../../../scripts/design-checks/current-checks.json)。`pnpm check:navigation` 核对现行文档链接、脚本路径及导出函数；自身的失败分支测试纳入 `pnpm test`，也可用 `pnpm test:navigation` 定向执行。CI 另检查技能库存、Web 与根脚本 lint、类型、格式和构建，并在构建后运行下述隔离聊天验收。
 
 ## 浏览器回归子集
 
@@ -78,11 +78,23 @@ if (!result.passed) throw new Error(JSON.stringify(result.issues));
 
 ## 聊天隔离环境
 
-1. 停止普通预览。启动现有[假模型夹具](../../../scripts/design-checks/fixtures/ai-chat-provider.mjs)：`node scripts/design-checks/fixtures/ai-chat-provider.mjs`，监听本机 3907。
-2. 在另一个终端从根目录启动 `ZHIPU_API_KEY=test-only ZHIPU_BASE_URL=http://127.0.0.1:3907/v1 pnpm start`。这使用步骤一之前已完成的生产构建。
-3. 用启动日志中的应用端口注册 `portless alias upgrade-check.personal-design <应用端口>`。用 `portless list` 查看测试路由，将 `DESIGN_BASE_URL` 设为其完整 HTTPS URL（代理非443端口时保留端口），设置本地 CA 后运行 `pnpm check:http chat-api`。域名必须是 `upgrade-check.personal-design.localhost`。
-4. 使用所选浏览器打开这个隔离域名，再通过兼容适配器运行聊天生命周期函数。脚本会暂时替换 v1/v2 会话存储，并在 `finally` 中恢复快照；使用专用测试 origin，不能把“会恢复”描述成“不触碰存储”。浏览器或进程异常退出时可能无法恢复。
-5. 完成后停止本轮启动的假模型与测试预览，执行 `portless alias --remove upgrade-check.personal-design` 移除测试 alias，再以正常环境运行 `pnpm start`。不把测试环境留作普通预览。
+从根目录执行：
+
+```sh
+pnpm build
+pnpm exec playwright install chromium # 本机已有 Chromium 可跳过；Linux CI 加 --with-deps
+pnpm check:chat
+# 仅后端协议、摘要与降级检查，无需浏览器：
+pnpm check:chat --http
+```
+
+[run-chat.mjs](../../../scripts/design-checks/run-chat.mjs) 自动创建独立 Portless 状态目录，分配代理端口和 HTTPS CA，再通过根目录 `pnpm start` 启动生产预览、注册 `upgrade-check.personal-design.localhost` alias。它覆盖继承的模型与数据服务地址和凭据：HTTP 阶段显式清空 `ANALYTICS_MCP_TOKEN`，执行 `chat-api` 与 `chat-analytics`；浏览器阶段使用 `test-only` 令牌连接[本地假 MCP](../../../scripts/design-checks/fixtures/analytics-mcp.mjs)和[假模型](../../../scripts/design-checks/fixtures/ai-chat-provider.mjs)，执行 [chat-analytics.mjs](../../../scripts/design-checks/chat-analytics.mjs)。后者在独立 Chromium context 中观察查询进度的运行／完成／失败、回答开始后收起，以及停止后恢复输入；不拦截响应流。夹具使用本机 3907／3908，端口被占用时保留现有进程并报错。
+
+命令自动设置本轮 `DESIGN_BASE_URL`、`PORTFOLIO_API_BASE` 与 `NODE_EXTRA_CA_CERTS`，关闭 hosts 同步；Portless 0.15.7 启动预览仍检查系统信任，脚本仅在测试状态目录写 CA 指纹标记，让 Node 使用本轮 CA、Chromium 独立 context 接受测试证书，避免修改系统信任库。正常预览使用的代理与路由不参与本轮清理。命令阶段和就绪探测都有截止时间；成功、失败或 SIGINT／SIGTERM 后清理自己启动的进程组（包含 Portless 分离的应用组）和测试路由，清理完成前继续接收信号。被强制终止或主机退出时清理可能无法执行，按本轮日志核对进程。
+
+结果、启动日志与步骤截图位于 `.impeccable/review/chat-checks/`，总结果为 `result.json`，浏览器结果为 `analytics-browser-result.json`；HTTP 结果另见上表证据路径。任一步失败返回非零退出码，先读同次日志定位。CI 上传顶层日志、JSON 和 PNG；Portless 状态目录含 CA 私钥，不上传或分享。
+
+这是确定性协议与行为验收，真实模型和远端 MCP 的可用性、业务准确性仍需单独验证。若执行可选的 `verifyChatLifecycle(tab, cdp)`，应复用同样的隔离配置，在专用 origin 运行；它暂时替换 v1/v2 会话存储，并在 `finally` 恢复，浏览器或进程异常退出时可能无法恢复。
 
 ## 覆盖缺口与历史入口
 

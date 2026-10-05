@@ -26,7 +26,7 @@ pnpm dev
 
 首次运行会自动启动 HTTPS 代理并信任本地证书；macOS/Linux 绑定 443 端口时可能要求 sudo 密码。生产预览先运行 `pnpm build`，再运行 `pnpm start`；两种模式共用同一域名，切换前用 Ctrl+C 停止当前服务。Git worktree 自动使用独立子域名，以启动日志中的 URL 为准。
 
-当前验收统一从[验收入口](docs/design/execution/README.md)选择：`pnpm check:http` 运行 HTTP／内容 API，`pnpm check:browser` 运行现有 Playwright 浏览器套件，其他交互检查可用当前环境的浏览器工具。用 `DESIGN_BASE_URL` 指定启动日志中的实际 Portless URL；Node.js 检查通过 `NODE_EXTRA_CA_CERTS="$HOME/.portless/ca.pem"` 信任本地 CA。`pnpm check:navigation` 校验现行入口和链接；历史检查结果不代表当前代码已验收。
+当前验收统一从[验收入口](docs/design/execution/README.md)选择：`pnpm check:http` 运行 HTTP／内容 API，`pnpm check:browser` 运行现有 Playwright 浏览器套件，其他交互检查可用当前环境的浏览器工具。用 `DESIGN_BASE_URL` 指定启动日志中的实际 Portless URL；Node.js 检查通过 `NODE_EXTRA_CA_CERTS` 信任当前代理状态目录的 `ca.pem`（默认 `~/.portless/ca.pem`）。聊天用 `pnpm check:chat` 自动启动假模型与数据服务、隔离预览并清理，准备及结果见[聊天隔离环境](docs/design/execution/README.md#聊天隔离环境)。`pnpm check:navigation` 校验现行入口和链接，`pnpm check:skills` 校验技能库存及代理链接；历史检查结果不代表当前代码已验收。
 
 ## 项目结构
 
@@ -41,7 +41,8 @@ pnpm dev
 ```bash
 pnpm build                       # 生产构建
 pnpm start                       # 通过 Portless 启动本地生产预览
-pnpm lint                        # 代码检查
+pnpm lint                        # Web 与根目录脚本检查
+pnpm check:skills --list          # 按来源列出并校验技能库存
 pnpm typecheck                   # 类型检查
 pnpm test                        # 单元测试
 pnpm format:check                # 格式检查

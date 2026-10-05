@@ -1,6 +1,6 @@
 # Web frontend instructions
 
-先读根 [AGENTS.md](../../AGENTS.md)，再按 [DESIGN.md](../../DESIGN.md) 与 [页面契约](../../docs/design/README.md) 修改；页面规格不在此重复。视觉数值与获准例外以 DESIGN.md 为准，来源文件及历史报告不覆盖现行标准。
+先读根 [AGENTS.md](../../AGENTS.md)，再按[任务导航](../../docs/agents/navigation.md#按任务定位)选择实现、契约章节与检查；改视觉／交互时读 [DESIGN.md](../../DESIGN.md) 和[页面契约](../../docs/design/README.md)相关章节。视觉数值与获准例外以 DESIGN.md 为准，来源文件及历史报告不覆盖现行标准。
 
 ## 实现
 

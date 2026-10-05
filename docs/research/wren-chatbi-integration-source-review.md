@@ -2,6 +2,8 @@
 
 核验日期：**2026-10-05**。本轮核对官方文档、GitHub 源码、npm/PyPI 发布元数据、当前应用和已安装 Pi SDK；未安装依赖、运行服务、调用模型或读取业务数据，未修改应用代码。仓库基线为 `main` / `2ba8359`，开始研究时工作区干净，`git fetch origin` 后与 `origin/main` 一致。结论是选型与工作量估算，尚未实施。
 
+> 当前实现：远端 MCP 接入已于 2026-10-05 合并 [PR #44](https://github.com/indie-builder/personal-design/pull/44)（`2eeadf2`）。现在修改智能问数时，从 [AI 问答运行链路](../design/execution/ai-chat.md#运行链路)与[配置](../design/execution/ai-chat.md#配置)进入；工具注册和桥接见 [analytics-tools.ts](../../apps/web/lib/analytics-tools.ts)、[analytics-mcp.ts](../../apps/web/lib/analytics-mcp.ts)。下文保留实施前的选型快照，SDK／WASM 建议不代表当前应用架构。
+
 ## 结论
 
 **可以保留 Pi Harness 与 OpenUI，只使用 Wren 的语义层和执行能力；MCP 不是前提。** 当前更值得验证的是 `wrenai` Python SDK 或官方 WASM npm 包，而不是迁入旧 WrenAI 的 Docker 聊天应用。官方 MCP 的 `query_cube` 内部也只是调用公开的 `wren_core.cube_query_to_sql`，再走 engine 执行，证明这个能力没有绑定 MCP 协议。[Python engine](https://github.com/Canner/WrenAI/blob/wren-v0.15.0/core/wren/src/wren/engine.py)、[MCP adapter](https://github.com/Canner/WrenAI/blob/wren-v0.15.0/core/wren/src/wren/mcp_server.py)
