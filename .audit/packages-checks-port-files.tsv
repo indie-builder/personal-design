@@ -1,0 +1,44 @@
+original_file	decision	intent	evidence
+packages/ai-chat/scripts/sync-avatars.mjs	被超越	WebP与manifest原子写已在packages/ai-chat/scripts/sync-avatars.ts:115-132的Effect step与.part/rename覆盖	packages/ai-chat/scripts/sync-avatars.ts:115;packages/ai-chat/scripts/sync-avatars.ts:132
+packages/inspora/scripts/db.mjs	移植	withTransaction已由main覆盖；具名upsert与默认值归一化补入db.ts	packages/inspora/scripts/db.ts:76;packages/inspora/scripts/db.ts:145
+packages/inspora/scripts/source-bestx.mjs	移植	事务已覆盖；来源描述表、stopOnKnown和对象upsert补入source-bestx.ts	packages/inspora/scripts/source-bestx.ts:282
+packages/inspora/scripts/source-collectui.test.mjs	移植	当前为source-collectui.test.ts；函数写入失败mock适配，全部原断言保留	packages/inspora/scripts/source-collectui.test.ts:137
+packages/inspora/scripts/source-inspora.mjs	移植	事务和资源管理已覆盖；对象upsert与tweetIdOf复用补入source-inspora.ts	packages/inspora/scripts/source-inspora.ts:462
+packages/inspora/scripts/sync-source.mjs	移植	stopOnKnown与collectFeed调用补入sync-source.ts	packages/inspora/scripts/sync-source.ts:3
+packages/inspora/scripts/sync.mjs	移植	回填事务已覆盖；tweetIdOf复用补入sync.ts	packages/inspora/scripts/sync.ts:70
+packages/inspora/src/dedup.test.mjs	移植	保留db.ts导入，原对象种子和所有去重断言移植	packages/inspora/src/dedup.test.mjs:17
+packages/layout-compositions/scripts/sync.mjs	被超越	sync.ts:133-155的writeWebp与download.ts的downloadTarball覆盖原子写及中断清理	packages/layout-compositions/scripts/sync.ts:133;packages/layout-compositions/scripts/download.ts:14
+scripts/check-navigation.mjs	移植	doc-utils共享路径校验，utilities从登记表读取	scripts/check-navigation.mjs
+scripts/check-navigation.test.mjs	移植	共享testFixture，utilities夹具适配，原断言保留	scripts/check-navigation.test.mjs
+scripts/check-skills.mjs	移植	doc-utils共享文本与相对路径校验	scripts/check-skills.mjs
+scripts/check-skills.test.mjs	移植	共享testFixture，原断言保留	scripts/check-skills.test.mjs
+scripts/design-checks/ai-chat-analytics-api.mjs	移植	chat-client共享请求和流协议，harness写证据	scripts/design-checks/ai-chat-analytics-api.mjs
+scripts/design-checks/ai-chat-api.mjs	移植	chat-client共享请求和NDJSON输出，原协议断言保留	scripts/design-checks/ai-chat-api.mjs
+scripts/design-checks/chat-analytics.mjs	移植	harness管理浏览器与证据，隔离origin与进度断言保留	scripts/design-checks/chat-analytics.mjs
+scripts/design-checks/chat-client.mjs	移植	共享隔离origin检查、请求、reset、输出与流解析	scripts/design-checks/chat-client.mjs
+scripts/design-checks/chat-lifecycle.browser.mjs	移植	共享button与CDP evaluate	scripts/design-checks/chat-lifecycle.browser.mjs
+scripts/design-checks/current-checks.json	移植	regression排序与utilities登记；保留main新增检查及layout-first-paint	scripts/design-checks/current-checks.json
+scripts/design-checks/current-layouts.browser.mjs	移植	共享button与阅读状态等待	scripts/design-checks/current-layouts.browser.mjs
+scripts/design-checks/current-site.browser.mjs	移植	共享button与CDP evaluate	scripts/design-checks/current-site.browser.mjs
+scripts/design-checks/harness.cjs	移植	统一URL、浏览器释放、pageerror、证据与阅读状态辅助函数	scripts/design-checks/harness.cjs
+scripts/design-checks/home-performance.browser.mjs	移植	共享CDP evaluate	scripts/design-checks/home-performance.browser.mjs
+scripts/design-checks/home.mjs	移植	共享浏览器、URL、settle与证据，首页行为断言保留	scripts/design-checks/home.mjs
+scripts/design-checks/journeys.mjs	移植	共享浏览器与画册状态等待，两条完整旅程保留	scripts/design-checks/journeys.mjs
+scripts/design-checks/layouts-check.mjs	移植	共享浏览器、pageerror、状态和证据，布局行为断言保留	scripts/design-checks/layouts-check.mjs
+scripts/design-checks/layouts-states.mjs	移植	共享浏览器、pageerror与证据，故障恢复断言保留	scripts/design-checks/layouts-states.mjs
+scripts/design-checks/muse-behavior.mjs	移植	共享浏览器与visit	scripts/design-checks/muse-behavior.mjs
+scripts/design-checks/muse-errors.browser.mjs	移植	共享CDP原始响应模式	scripts/design-checks/muse-errors.browser.mjs
+scripts/design-checks/muse-recovery.mjs	移植	共享浏览器与visit，故障恢复断言保留	scripts/design-checks/muse-recovery.mjs
+scripts/design-checks/personal-sites.mjs	移植	共享浏览器与URL	scripts/design-checks/personal-sites.mjs
+scripts/design-checks/run-all.mjs	移植	统一runner；保留main13子进程与6动效检查	scripts/design-checks/run-all.mjs
+scripts/design-checks/run-all.test.mjs	移植	共享夹具与清单派生断言适配13项；保留main模块缺失失败断言	scripts/design-checks/run-all.test.mjs
+scripts/design-checks/run-http.mjs	移植	统一runner、origin与环境变量传递	scripts/design-checks/run-http.mjs
+scripts/design-checks/runner.mjs	移植	登记表派生清单、origin边界校验、子进程失败聚合	scripts/design-checks/runner.mjs
+scripts/design-checks/shallow-navigation.browser.mjs	移植	共享button	scripts/design-checks/shallow-navigation.browser.mjs
+scripts/design-checks/shared-autoplay.cjs	移植	共享浏览器和URL，自动播放断言保留	scripts/design-checks/shared-autoplay.cjs
+scripts/design-checks/shared-browser.cjs	移植	共享浏览器与pageerror，灯箱及404断言保留	scripts/design-checks/shared-browser.cjs
+scripts/design-checks/word-arcade-preview.browser.mjs	移植	共享CDP evaluate	scripts/design-checks/word-arcade-preview.browser.mjs
+scripts/design-checks/word-arcade.browser.mjs	移植	共享button与CDP原始响应模式	scripts/design-checks/word-arcade.browser.mjs
+scripts/lib/doc-utils.mjs	移植	文本及相对路径校验共用	scripts/lib/doc-utils.mjs
+scripts/test-fixture.mjs	移植	测试目录写入和清理共用	scripts/test-fixture.mjs
+scripts/verify-design.mjs	移植	共享浏览器与证据，主题、键盘、reflow断言保留	scripts/verify-design.mjs

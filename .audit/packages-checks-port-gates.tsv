@@ -1,0 +1,15 @@
+command	exit	key_output	evidence
+pnpm install --frozen-lockfile	0	Scope all 9 workspace projects; Lockfile is up to date	.impeccable/review/pr2/install.log
+pnpm typecheck	0	5同步包与apps/web的tsc --noEmit全部Done	.impeccable/review/pr2/typecheck.log
+pnpm lint	0	Web与根脚本oxlint --deny-warnings均通过	.impeccable/review/pr2/lint.log
+pnpm test	0	tests 199; pass 199; fail 0	.impeccable/review/pr2/test.log
+pnpm check:navigation	0	Navigation checks passed.	.impeccable/review/pr2/check-navigation.log
+pnpm check:skills	0	71 locked, 1 local, 72 entities, 72 Claude links	.impeccable/review/pr2/check-skills.log
+pnpm build	0	Compiled successfully; Generating static pages 16/16	.impeccable/review/pr2/build.log
+pnpm check:chat	0	chat-api、chat-analytics、analytics progress browser PASS	.impeccable/review/pr2/check-chat.log
+pnpm start	0	根portless生产预览; Local http://localhost:4145; 验收后清理本轮进程与路由	.impeccable/review/pr2/start.log;.impeccable/review/pr2/runtime.json
+DESIGN_BASE_URL=http://localhost:4145 pnpm check:http	0	11 routes failed=[]; API tests 5 pass 5 fail 0	.impeccable/review/pr2/check-http.log
+DESIGN_BASE_URL=http://localhost:4145 pnpm check:browser	0	ALL 19 SUITES PASSED; 无跳过	.impeccable/review/pr2/check-browser.log
+pnpm format	0	Finished on 115 files; 后续pnpm format:check全部符合格式	.impeccable/review/pr2/format.log
+node --test packages/inspora/scripts/source-nullable.test.ts（修复前）	1	tests 19 pass 0 fail 19; discovered/inserted 0与预期1不符; known边界插入旧作品	.impeccable/review/pr2/source-compat-red.log
+node --test packages/inspora/scripts/source-nullable.test.ts（修复后）	0	tests 19 pass 19 fail 0; 已知推文停止且无旧作品写入	.impeccable/review/pr2/source-compat-green.log

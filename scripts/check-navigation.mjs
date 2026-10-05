@@ -1,10 +1,10 @@
 import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { text, relativePath } from './lib/doc-utils.mjs';
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const registry = 'scripts/design-checks/current-checks.json';
-const text = (value) => typeof value === 'string' && value.trim().length > 0;
 const confined = (root, file) =>
   !relative(root, file).split(/[\\/]/).includes('..') && !isAbsolute(relative(root, file));
 const withoutComments = (source) =>
@@ -18,13 +18,7 @@ export function checkNavigation(root = repositoryRoot) {
   const errors = [];
   const fail = (context, message) => errors.push(`${context}: ${message}`);
   function target(file, context, base = root, regular = true, strict = false) {
-    if (
-      !text(file) ||
-      isAbsolute(file) ||
-      /^[A-Za-z]:/.test(file) ||
-      file.includes('\\') ||
-      (strict && file.split('/').includes('..'))
-    ) {
+    if (!relativePath(file, strict)) {
       fail(context, `invalid repository-relative path ${JSON.stringify(file)}`);
       return null;
     }
@@ -51,8 +45,8 @@ export function checkNavigation(root = repositoryRoot) {
   } catch (error) {
     return [`${registry}: cannot read manifest JSON (${error.message})`];
   }
-  if (!manifest || !['documents', 'http', 'browser'].every((key) => Array.isArray(manifest[key]))) {
-    return [`${registry}: manifest requires documents, http and browser arrays`];
+  if (!manifest || !['documents', 'http', 'browser', 'utilities'].every((key) => Array.isArray(manifest[key]))) {
+    return [`${registry}: manifest requires documents, http, browser and utilities arrays`];
   }
   const documents = [],
     checks = [],
@@ -80,12 +74,8 @@ export function checkNavigation(root = repositoryRoot) {
       const full = target(entry.file, entry.id, root, true, true);
       if (full) checks.push({ ...entry, full, lane });
     }
-  const utilities = [
-    'scripts/design-checks/run-http.mjs',
-    'scripts/design-checks/run-chat.mjs',
-    'scripts/design-checks/fixtures/ai-chat-provider.mjs',
-    'scripts/design-checks/fixtures/analytics-mcp.mjs',
-  ];
+  const utilities = manifest.utilities.filter((file) => relativePath(file, true));
+  if (utilities.length !== manifest.utilities.length) fail('utilities', 'invalid repository-relative path');
   const allowed = new Set([
     registry,
     ...utilities,

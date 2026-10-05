@@ -27,6 +27,7 @@ import {
   type InsporaPost,
 } from './sync-source.ts';
 import { withTransaction, database, databaseError, type Db } from './db.ts';
+import { tweetIdOf } from './source-bestx.ts';
 import { download, extOf, defaultRetrySchedule } from './download.ts';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -393,45 +394,21 @@ export function syncInspora({
             withTransaction(db, () => {
               for (const item of feed) {
                 const isNew = !stmts.hasPost.get(item.id);
-                stmts.upsertPost.run(
-                  item.id,
-                  item.slug,
-                  item.title,
-                  item.creator?.name ?? null,
-                  null, // creator_url 只有详情页有
-                  null, // creator_avatar 下载阶段回填
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  item.createdAt,
-                  null,
-                  item.isFeatured ? 1 : 0,
-                  null, // raw_json 等详情补全
-                  null, // enriched_at
-                  new Date().toISOString(),
-                  'inspora',
-                  null, // tweet_id 详情补全时从 source_url 提取
-                );
+                stmts.upsertPost({
+                  id: item.id,
+                  slug: item.slug,
+                  title: item.title,
+                  creatorName: item.creator?.name,
+                  createdAt: item.createdAt,
+                  isFeatured: item.isFeatured,
+                });
                 for (const [pos, media] of (item.media ?? []).entries()) {
-                  stmts.upsertMedia.run(
-                    media.id,
-                    item.id,
-                    media.position ?? pos,
-                    media.type,
-                    media.url,
-                    media.posterUrl ?? null,
-                    media.width ?? null,
-                    media.height ?? null,
-                    media.sizeBytes ?? null,
-                    media.alt ?? null,
-                    null,
-                    null,
-                    null,
-                    JSON.stringify(media),
-                  );
+                  stmts.upsertMedia({
+                    ...media,
+                    postId: item.id,
+                    position: media.position ?? pos,
+                    raw: media,
+                  });
                 }
                 if (isNew) newPosts++;
               }
@@ -473,47 +450,25 @@ export function syncInspora({
             if (!detail)
               return yield* Effect.fail(new InsporaError({ message: '详情对象提取失败' }));
             yield* database(() => {
-              stmts.upsertPost.run(
-                postId,
-                detail.slug ?? slug,
-                detail.title ?? '',
-                detail.creator?.name ?? null,
-                detail.creator?.url ?? null,
-                null,
-                detail.description ?? null,
-                detail.category ?? null,
-                detail.industries ? JSON.stringify(detail.industries) : null,
-                detail.colors ? JSON.stringify(detail.colors) : null,
-                detail.styles ? JSON.stringify(detail.styles) : null,
-                detail.sourceUrl ?? null,
-                detail.createdAt,
-                detail.publishedAt ?? null,
-                detail.isFeatured ? 1 : 0,
-                JSON.stringify(detail),
-                new Date().toISOString(),
-                new Date().toISOString(),
-                'inspora',
-                // source_url 多为 X 原帖链接，提取推文 id 供跨源去重
-                detail.sourceUrl?.match(/\/status\/(\d+)/)?.[1] ?? null,
-              );
+              stmts.upsertPost({
+                ...detail,
+                id: postId,
+                slug: detail.slug ?? slug,
+                title: detail.title ?? '',
+                creatorName: detail.creator?.name,
+                creatorUrl: detail.creator?.url,
+                raw: detail,
+                enrichedAt: new Date().toISOString(),
+                tweetId: tweetIdOf(detail.sourceUrl),
+              });
               // 详情里的 media 字段更全（sizeBytes / mimeType），覆盖一次
               for (const [pos, media] of (detail.media ?? []).entries()) {
-                stmts.upsertMedia.run(
-                  media.id,
+                stmts.upsertMedia({
+                  ...media,
                   postId,
-                  media.position ?? pos,
-                  media.type,
-                  media.url,
-                  media.posterUrl ?? null,
-                  media.width ?? null,
-                  media.height ?? null,
-                  media.sizeBytes ?? null,
-                  media.alt ?? null,
-                  null,
-                  null,
-                  null,
-                  JSON.stringify(media),
-                );
+                  position: media.position ?? pos,
+                  raw: media,
+                });
               }
             });
             enriched++;

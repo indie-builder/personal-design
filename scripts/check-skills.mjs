@@ -6,8 +6,9 @@ import {
   realpathSync,
   statSync,
 } from 'node:fs';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { text, relativePath } from './lib/doc-utils.mjs';
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const lockPath = 'skills-lock.json';
@@ -15,13 +16,9 @@ const policyPath = 'scripts/skills-policy.json';
 const entityRoot = '.agents/skills';
 const claudeRoot = '.claude/skills';
 const object = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-const text = (value) => typeof value === 'string' && value.trim().length > 0;
 const skillName = (value) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
 const sourcePath = (value) =>
-  text(value) &&
-  !isAbsolute(value) &&
-  !/^[A-Za-z]:/.test(value) &&
-  !value.includes('\\') &&
+  relativePath(value, true) &&
   value.split('/').every((part) => part && part !== '.' && part !== '..') &&
   (value === 'SKILL.md' || value.endsWith('/SKILL.md'));
 

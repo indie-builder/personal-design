@@ -1,16 +1,11 @@
 import assert from 'node:assert/strict';
-import { chromium } from 'playwright';
+import { baseUrl, withBrowser } from './harness.cjs';
 
 // 个人网站页行为回归：对齐 docs/design/README.md 契约——宣传片可视静音循环、
 // 点击与空格／Enter 切换播放、reduced-motion 不自动播放但手动播放可用、
 // 失败给出重试、「打开网站」外链新标签。此前四个产品中唯一无浏览器回归的表面。
-const base = (process.env.DESIGN_BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
-const browser = await chromium.launch();
-try {
-  // 常规偏好：可视自动播放，aria 与提示同步，空格／Enter 可暂停／恢复。
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
+const base = baseUrl();
+await withBrowser(async ({ page, browser, errors }) => {
   await page.goto(`${base}/products/personal-sites`, { waitUntil: 'domcontentloaded' });
   const video = page.locator('section[aria-label="个人网站动态展示"] video');
   await video.waitFor();
@@ -82,6 +77,4 @@ try {
   await fail.getByRole('status').waitFor({ state: 'detached', timeout: 20000 });
   await fail.close();
   console.log('PASS promo failure status with reload recovery');
-} finally {
-  await browser.close();
-}
+}, { pageOptions: { viewport: { width: 1440, height: 900 } } });

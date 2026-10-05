@@ -150,10 +150,17 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
         return r.height > 0 && r.bottom > 80 && r.top < innerHeight - 80;
       });
       if (!chosen) chosen = cells[0];
-      chosen.scrollIntoView({ block: 'center', behavior: 'instant' });
-      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      const r = chosen.getBoundingClientRect();
-      return { id: chosen.id, href: chosen.getAttribute('href'), path: chosen.pathname, x: r.x + r.width / 2, y: r.y + Math.min(r.height / 2, 100), scrollY: Math.round(window.scrollY) };
+      const started = performance.now();
+      while (performance.now() - started < 2000) {
+        chosen.scrollIntoView({ block: 'center', behavior: 'instant' });
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        const r = chosen.getBoundingClientRect();
+        const x = r.x + r.width / 2;
+        const y = r.y + Math.min(r.height / 2, 100);
+        if (chosen.contains(document.elementFromPoint(x, y)))
+          return { id: chosen.id, href: chosen.getAttribute('href'), path: chosen.pathname, x, y, scrollY: Math.round(window.scrollY) };
+      }
+      throw new Error('Grid card did not settle at a clickable point');
     })()`);
   const navLinks = () =>
     evaluate(`(() => {

@@ -1,17 +1,9 @@
-import { chromium } from 'playwright';
+import { baseUrl, withBrowser, go as visit } from './harness.cjs';
 import assert from 'node:assert/strict';
 
-const base = process.env.DESIGN_BASE_URL ?? 'http://localhost:3000';
-const browser = await chromium.launch();
-try {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  const go = async (path) => {
-    await page.goto(new URL(path, base).href, { waitUntil: 'domcontentloaded' });
-    // Development builds expose SSR controls before hydration finishes.
-    await page.waitForTimeout(1800);
-  };
+const base = baseUrl();
+await withBrowser(async ({ page, errors }) => {
+  const go = (path) => visit(page, base, path, 1800);
 
   await go('/products/muse');
   const search = page.getByRole('searchbox');
@@ -70,6 +62,4 @@ try {
   }
   console.log('PASS detail long-title overflow at 1440/1024/390/320');
   console.log('pageerrors', JSON.stringify(errors));
-} finally {
-  await browser.close();
-}
+}, { pageOptions: { viewport: { width: 1440, height: 900 } } });

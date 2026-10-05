@@ -1,3 +1,4 @@
+import { button as buttons } from './harness.cjs';
 // With a compatible production preview tab adapter:
 // const { verifyShallowNavigation } = await import('file:///ABSOLUTE_REPO/scripts/design-checks/shallow-navigation.browser.mjs');
 // await verifyShallowNavigation(tab, await tab.capabilities.get('cdp'), await browser.capabilities.get('viewport'));
@@ -10,7 +11,7 @@ export async function verifyShallowNavigation(tab, cdp, viewport) {
   const screenshots = [];
   const directory = new URL('../../.impeccable/review/shallow-modules/', import.meta.url);
   await mkdir(directory, { recursive: true });
-  const button = name => tab.playwright.getByRole('button', { name, exact: true });
+  const button = buttons(tab.playwright);
   const back = () => tab.playwright.getByRole('link', { name: '返回灵感集', exact: true });
   const search = () => tab.playwright.getByRole('searchbox');
   await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });

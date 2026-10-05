@@ -1,20 +1,18 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
+import { symlinkSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import test from 'node:test';
 import { checkNavigation } from './check-navigation.mjs';
+import { testFixture } from './test-fixture.mjs';
+const utilities = JSON.parse(readFileSync(new URL('./design-checks/current-checks.json', import.meta.url))).utilities;
 
 const manifestPath = 'scripts/design-checks/current-checks.json';
 function fixture(t) {
-  const root = mkdtempSync(join(tmpdir(), 'navigation-'));
-  t.after(() => rmSync(root, { recursive: true, force: true }));
-  const write = (file, text) => {
-    mkdirSync(dirname(join(root, file)), { recursive: true });
-    writeFileSync(join(root, file), text);
-  };
+  const { root, write } = testFixture(t, 'navigation-');
   const manifest = {
     documents: ['AGENTS.md', 'docs/current.md'],
+    utilities,
     http: [{ id: 'http', file: 'scripts/design-checks/http.mjs' }],
     browser: [{ id: 'browser', file: 'scripts/design-checks/browser.mjs', exports: ['verify'] }],
   };
@@ -66,7 +64,8 @@ test('reports malformed JSON and invalid manifest fields', (t) => {
     { documents: [], http: [{ id: 1, file: 'x' }], browser: [] },
     { documents: [], http: [], browser: [{ id: 'x', file: 'x', exports: [12] }] },
   ]) {
-    f.write(manifestPath, JSON.stringify(invalid));
+    f.write(manifestPath, JSON.stringify(invalid && typeof invalid === 'object' && !Array.isArray(invalid)
+      ? { utilities: [], ...invalid } : invalid));
     assert.notEqual(f.errors(), '', JSON.stringify(invalid));
   }
 });
@@ -126,14 +125,7 @@ test('explicit script references must exist and current docs cannot prescribe le
     f.write('docs/current.md', `[Driver](../scripts/design-checks/${file})`);
     assert.match(f.errors(), /unregistered|legacy/i);
   }
-  for (const file of [
-    'run-http.mjs',
-    'run-chat.mjs',
-    'fixtures/ai-chat-provider.mjs',
-    'fixtures/analytics-mcp.mjs',
-  ]) {
-    f.write(`scripts/design-checks/${file}`, '// current utility');
-  }
+  for (const file of utilities) f.write(file, '// current utility');
   f.write(
     'docs/current.md',
     '`node scripts/design-checks/run-http.mjs`\n`scripts/design-checks/fixtures/ai-chat-provider.mjs`',
@@ -184,15 +176,10 @@ test('follows compact static imports and re-exports', (t) => {
 
 test('checks optional current runner and provider utilities when present', (t) => {
   const f = fixture(t);
-  for (const file of [
-    'run-http.mjs',
-    'run-chat.mjs',
-    'fixtures/ai-chat-provider.mjs',
-    'fixtures/analytics-mcp.mjs',
-  ]) {
-    f.write(`scripts/design-checks/${file}`, "import './missing.mjs';");
+  for (const file of utilities) {
+    f.write(file, "import './missing.mjs';");
     assert.match(f.errors(), /missing\.mjs/);
-    f.write(`scripts/design-checks/${file}`, '// safe utility');
+    f.write(file, '// safe utility');
     assert.deepEqual(checkNavigation(f.root), []);
   }
 });

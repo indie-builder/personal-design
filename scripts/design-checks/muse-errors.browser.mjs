@@ -1,9 +1,9 @@
+import { cdpEvaluate } from './harness.cjs';
 // Import this module, then await verifyMuseErrors(tab, cdp) with compatible adapters.
 // Failures: HTTP/network/malformed/empty pages, stale filter errors, missing retry, lost append listener.
 export async function verifyMuseErrors(tab, cdp) {
   const base = new URL(await tab.url()).origin;
-  const evaluate = (expression) =>
-    cdp.send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
+  const evaluate = (expression) => cdpEvaluate(cdp, expression, { exception: 'ignore', raw: true });
   const check = (ok, message) => {
     if (!ok) throw new Error(message);
   };

@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+import { baseUrl, withBrowser, go as visit } from './harness.cjs';
 import assert from 'node:assert/strict';
 import { listPosts } from '../../packages/inspora/src/index.ts';
 
@@ -6,20 +6,9 @@ import { listPosts } from '../../packages/inspora/src/index.ts';
 // 「没有找到匹配的灵感」并可一键清除、q 在 URL 保留、分类切换写入 cat、
 // 接近末端滚动自动追加（无手动加载按钮）、长关键词窄屏无溢出、
 // 详情媒体 15 秒超时给出「媒体暂时无法加载」并可重试、始终保留原媒体入口。
-const base = process.env.DESIGN_BASE_URL ?? 'http://localhost:3000';
-const browser = await chromium.launch();
-try {
-  const page = await browser.newPage({
-    viewport: { width: 390, height: 844 },
-    reducedMotion: 'reduce',
-    colorScheme: 'dark',
-  });
-  const errors = [];
-  page.on('pageerror', (error) => errors.push(error.message));
-  const go = async (path) => {
-    await page.goto(new URL(path, base).href, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(1400);
-  };
+const base = baseUrl();
+await withBrowser(async ({ page, errors }) => {
+  const go = (path) => visit(page, base, path, 1400);
 
   // 无效分类 + 关键词：空结果说明、q 保留、清除筛选后回全部。
   await go('/products/muse?cat=invalid-category&q=dashboard');
@@ -80,6 +69,4 @@ try {
   console.log('PASS 15-second stalled-media timeout/retry/original-media recovery controls');
 
   assert(errors.length === 0, `页面报错：${errors.join(' | ')}`);
-} finally {
-  await browser.close();
-}
+}, { pageOptions: { viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', colorScheme: 'dark' } });

@@ -14,28 +14,17 @@ test('三源相同原作只显示一份，详情、导航、分类计数一致�
   await copyFile(new URL('./index.ts', import.meta.url), path.join(root, 'src/index.ts'));
   const { db, stmts } = openDatabase(path.join(root, 'inspora.db'));
   const add = (id, source, tweetId, category = 'Motion', date = '2026-09-30T06:00:00Z') =>
-    stmts.upsertPost.run(
+    stmts.upsertPost({
       id,
-      id,
-      id,
-      null,
-      null,
-      null,
-      null,
+      slug: id,
+      title: id,
       category,
-      null,
-      null,
-      null,
-      tweetId ? `https://x.com/author/status/${tweetId}` : null,
-      date,
-      null,
-      0,
-      null,
-      null,
-      '2026-09-30T06:00:00Z',
       source,
       tweetId,
-    );
+      sourceUrl: tweetId ? `https://x.com/author/status/${tweetId}` : null,
+      createdAt: date,
+      syncedAt: '2026-09-30T06:00:00Z',
+    });
   add('inspora-original', 'inspora', '1');
   add('x-original', 'bestx', '1', 'hidden');
   add('c-original', 'collectui', '1', 'hidden');

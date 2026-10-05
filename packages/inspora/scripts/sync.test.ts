@@ -17,7 +17,8 @@ test('同步入口保留 0/1/2 退出码、单源隔离与 DB 释放', async () 
       const sources = `import {Data,Effect} from ${JSON.stringify(effect)};
 class SourceError extends Data.TaggedError('ProbeSource') {}
 export const syncBestx = ({source = 'bestx'}) => ${JSON.stringify(mode)} === 'failure' && source === 'bestx' ? Effect.fail(new SourceError({message:'fixture failure'})) : Effect.succeed({discovered:0,inserted:0});
-export const syncInspora = () => Effect.succeed({newPosts:0});`;
+export const syncInspora = () => Effect.succeed({newPosts:0});
+export const tweetIdOf = (url) => /\\/status\\/(\\d+)/.exec(url ?? '')?.[1] ?? null;`;
       const bootstrap = `import {registerHooks} from 'node:module';
 registerHooks({load(url,context,next){
   if (url === ${JSON.stringify(new URL('./db.ts', import.meta.url).href)}) {

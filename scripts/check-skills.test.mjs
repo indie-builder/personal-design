@@ -3,20 +3,17 @@ import {
   chmodSync,
   lstatSync,
   mkdirSync,
-  mkdtempSync,
   readFileSync,
   readdirSync,
   readlinkSync,
-  rmSync,
   symlinkSync,
-  writeFileSync,
 } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { checkSkills } from './check-skills.mjs';
+import { testFixture } from './test-fixture.mjs';
 
 const script = fileURLToPath(new URL('./check-skills.mjs', import.meta.url));
 const lockPath = 'skills-lock.json';
@@ -25,13 +22,7 @@ const entityPath = (name) => `.agents/skills/${name}`;
 const linkPath = (name) => `.claude/skills/${name}`;
 
 function fixture(t) {
-  const root = mkdtempSync(join(tmpdir(), 'skills-'));
-  t.after(() => rmSync(root, { recursive: true, force: true }));
-  const write = (file, text) => {
-    mkdirSync(dirname(join(root, file)), { recursive: true });
-    writeFileSync(join(root, file), text);
-  };
-  const remove = (file) => rmSync(join(root, file), { recursive: true, force: true });
+  const { root, write, remove } = testFixture(t, 'skills-');
   const link = (name, target = `../../.agents/skills/${name}`) => {
     mkdirSync(join(root, '.claude/skills'), { recursive: true });
     symlinkSync(target, join(root, linkPath(name)));

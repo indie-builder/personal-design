@@ -1,14 +1,7 @@
 // Use a production homepage and a compatible CDP session.
 // These checks only exercise scrolling/rendering; they do not mutate game state.
-const evaluate = async (cdp, expression) => {
-  const r = await cdp.send(
-    'Runtime.evaluate',
-    { expression, awaitPromise: true, returnByValue: true },
-    { timeoutMs: 10000 },
-  );
-  if (r.exceptionDetails) throw Error(JSON.stringify(r.exceptionDetails));
-  return r.result.value;
-};
+import { cdpEvaluate } from './harness.cjs';
+const evaluate = (cdp, expression) => cdpEvaluate(cdp, expression, { timeoutMs: 10000 });
 export async function verifyTimelineBounds(cdp) {
   const result = await evaluate(
     cdp,
