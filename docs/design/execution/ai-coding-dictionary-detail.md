@@ -63,6 +63,6 @@ Next Cache Components 的 Activity 会保留路由 DOM，因此词典在 useLayo
 
 ### 2026-09-26 搜索控件验收
 
-当时命令为 `DESIGN_BASE_URL=http://localhost:3001 sh scripts/design-checks/dictionary-search.sh`，截图保存到 `/tmp/dictionary-search/`。记录称1440px亮色、1280px暗色、390px亮色与320px暗色下的搜索、清除、无结果、Tab、斜杠、Esc、详情打开与焦点返回通过；小屏同时启用减少动态效果。构建、Web类型检查与diff检查通过。
+该次由已于 2026-10 退役的 legacy 搜索脚本验收，截图保存到 `/tmp/dictionary-search/`。记录称1440px亮色、1280px暗色、390px亮色与320px暗色下的搜索、清除、无结果、Tab、斜杠、Esc、详情打开与焦点返回通过；小屏同时启用减少动态效果。构建、Web类型检查与diff检查通过。
 
 该次只检查搜索区域及关联详情路径，不代表全站逐页视觉或动画验收。当时没有运行 `run-all.mjs`；这是该次覆盖范围的限制。当前可通过 `pnpm check:browser` 执行既有 Playwright 回归子集，入口及额外专项见验收索引。
