@@ -292,19 +292,19 @@ export function ConversationView({
         className={styles.composerArea}
         data-hidden={composerHidden || undefined}
       >
-        {!atBottom && (
-          <Button
-            icon
-            className={styles.toBottom}
-            aria-label="回到最新消息"
-            onClick={() => {
-              onHeaderHiddenChange(false);
-              setAtBottom(true);
-            }}
-          >
-            <ArrowDown size={20} strokeWidth={1.6} />
-          </Button>
-        )}
+        <Button
+          icon
+          className={styles.toBottom}
+          aria-label="回到最新消息"
+          data-hidden={atBottom || undefined}
+          inert={atBottom}
+          onClick={() => {
+            onHeaderHiddenChange(false);
+            setAtBottom(true);
+          }}
+        >
+          <ArrowDown size={20} strokeWidth={1.6} />
+        </Button>
         <div
           className={styles.composerPanel}
           data-composer-panel=""
