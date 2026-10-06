@@ -98,6 +98,27 @@
       ]
     },
     {
+      "id": "route-motion",
+      "file": "scripts/design-checks/route-motion.browser.mjs",
+      "exports": [
+        "verifyRouteMotion"
+      ]
+    },
+    {
+      "id": "lightbox-motion",
+      "file": "scripts/design-checks/lightbox-motion.browser.mjs",
+      "exports": [
+        "verifyLightboxMotion"
+      ]
+    },
+    {
+      "id": "book-opening-performance",
+      "file": "scripts/design-checks/book-opening-performance.mjs",
+      "exports": [
+        "verifyBookOpeningPerformance"
+      ]
+    },
+    {
       "id": "playwright-run-all",
       "file": "scripts/design-checks/run-all.mjs",
       "exports": []

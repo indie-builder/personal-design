@@ -41,7 +41,7 @@ function fixture(t) {
     delete env.PORTFOLIO_API_BASE;
     const result = spawnSync(process.execPath, [runner], {
       cwd: root,
-      env: { ...env, ...overrides },
+      env: { ...env, DESIGN_RUN_ALL_FIXTURE: '1', ...overrides },
       encoding: 'utf8',
       timeout: 15000,
     });
@@ -102,4 +102,10 @@ test('rejects invalid origins before starting any suite', (t) => {
     assert.notEqual(result.status, 0, base);
     assert.deepEqual(result.children, [], base);
   }
+});
+
+test('fails outside fixture mode when a registered motion module is missing', (t) => {
+  const result = fixture(t)({ DESIGN_RUN_ALL_FIXTURE: '' });
+  assert.notEqual(result.status, 0, result.stderr);
+  assert.match(result.stderr, /registered module not found/);
 });
