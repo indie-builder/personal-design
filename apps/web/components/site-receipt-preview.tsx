@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { Check, Printer } from 'lucide-react';
 import { careerReceipt, personalSite } from '@personal-design/personal-sites';
+import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 import styles from './site-receipt-preview.module.css';
 
 /** Adapted from personal-sites/components/about-print.tsx: same 2.4s stepped paper feed. */
@@ -15,7 +16,7 @@ export function SiteReceiptPreview() {
     const element = ref.current;
     if (!element) return;
     let visible = false;
-    const update = () => setRunning(visible && !document.hidden);
+    const update = () => setRunning(visible && !document.hidden && !instantMotion());
     const observer = new IntersectionObserver(
       ([entry]) => {
         visible = !!entry?.isIntersecting && entry.intersectionRatio >= 0.3;
@@ -25,9 +26,11 @@ export function SiteReceiptPreview() {
     );
     observer.observe(element);
     document.addEventListener('visibilitychange', update);
+    const stopPolicy = observeMotionPolicy(update);
     return () => {
       observer.disconnect();
       document.removeEventListener('visibilitychange', update);
+      stopPolicy();
     };
   }, []);
 

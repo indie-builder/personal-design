@@ -29,9 +29,10 @@
 .future .rule { background:none; border-top:1px dashed var(--color-hairline-strong); }
 .future .node { width:7px; height:7px; background:var(--color-paper); border:1px solid var(--color-ink-soft); }
 .future .rule::after { display:none; }
-.footer { margin-top:auto; padding:32px var(--gutter) 24px; display:flex; justify-content:flex-end; }
+.footer { margin-top:auto; padding:32px var(--gutter) 24px; display:flex; justify-content:flex-end; animation:softIn 200ms var(--ease-out); }
 .controls { display:flex; align-items:center; gap:4px; }
-.mediaError { height:100%; display:flex; align-items:center; justify-content:center; gap:8px; flex-direction:column; font-size:12px; color:var(--color-ink-soft); }
+.mediaError { height:100%; display:flex; align-items:center; justify-content:center; gap:8px; flex-direction:column; font-size:12px; color:var(--color-ink-soft); animation:softIn 200ms var(--ease-out); }
+@keyframes softIn { from { opacity:0; } }
 .empty { margin:94px var(--gutter); color:var(--color-ink-soft); }
 @media(min-width:1440px) { .home { --column:420px; } .preview { height:220px; } }
 @media(max-width:1100px) { .home { --gutter:24px; --column:340px; } .viewport { --timeline-start:30px; } .project { margin-right:40px; } }
