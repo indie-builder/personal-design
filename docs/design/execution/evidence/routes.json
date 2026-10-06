@@ -3,24 +3,6 @@
   "failed": [],
   "results": [
     {
-      "route": "/icon.png",
-      "status": 200,
-      "kind": "asset",
-      "hasMain": false
-    },
-    {
-      "route": "/_not-found",
-      "status": 404,
-      "kind": "page",
-      "hasMain": true
-    },
-    {
-      "route": "/products/ai-coding-dictionary",
-      "status": 200,
-      "kind": "page",
-      "hasMain": true
-    },
-    {
       "route": "/",
       "status": 200,
       "kind": "page",
@@ -33,7 +15,25 @@
       "hasMain": true
     },
     {
+      "route": "/icon.png",
+      "status": 200,
+      "kind": "asset",
+      "hasMain": false
+    },
+    {
+      "route": "/_not-found",
+      "status": 404,
+      "kind": "page",
+      "hasMain": true
+    },
+    {
       "route": "/products/design-engineer-tools",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true
+    },
+    {
+      "route": "/products/ai-coding-dictionary",
       "status": 200,
       "kind": "page",
       "hasMain": true
@@ -45,7 +45,7 @@
       "hasMain": false
     },
     {
-      "route": "/products/word-arcade",
+      "route": "/products/muse",
       "status": 200,
       "kind": "page",
       "hasMain": true
@@ -57,13 +57,13 @@
       "hasMain": true
     },
     {
-      "route": "/products/muse",
+      "route": "/products/layout-compositions",
       "status": 200,
       "kind": "page",
       "hasMain": true
     },
     {
-      "route": "/products/layout-compositions",
+      "route": "/products/word-arcade",
       "status": 200,
       "kind": "page",
       "hasMain": true
