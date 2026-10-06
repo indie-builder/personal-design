@@ -1,12 +1,18 @@
 .video { display:block; width:100%; height:auto; max-height:78dvh; aspect-ratio:16/9; background:var(--color-plate); border-radius:var(--radius-media); }
-.status { margin:12px 0 0; font-size:13px; color:var(--color-ink-soft); line-height:1.75; }
+.status { margin:12px 0 0; font-size:13px; color:var(--color-ink-soft); line-height:1.75; animation:softIn 180ms var(--ease-out); }
 .status { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+@keyframes softIn { from { opacity:0; } }
 
 .video { cursor:pointer; }
 .video:focus-visible { outline:2px solid var(--color-ink); outline-offset:4px; }
 
 .media { position:relative; }
 .playHint { position:absolute; right:16px; bottom:16px; display:flex; align-items:center; gap:6px; padding:8px 12px; border-radius:var(--radius-pill); background:var(--color-paper); color:var(--color-ink); font-size:12px; pointer-events:none; opacity:0; transition:opacity 140ms; }
+.media[data-loading=true] .playHint { opacity:1; }
+.spinner { width:13px; height:13px; flex:none; border-radius:50%; border:1.6px solid var(--color-hairline-strong); border-top-color:var(--color-ink); animation:spin 700ms linear infinite; }
+@keyframes spin { to { transform:rotate(1turn); } }
+.playHint svg { animation:hintIcon 140ms var(--ease-out); }
+@keyframes hintIcon { from { opacity:.4; transform:scale(.85); } }
 .media[data-playing=false] .playHint,.media:focus-within .playHint { opacity:1; }
 @media(hover:hover) { .media:hover .playHint { opacity:1; } }
-@media(prefers-reduced-motion:reduce) { .playHint { transition:none; } }
+@media(prefers-reduced-motion:reduce) { .playHint { transition:none; } .playHint svg,.status { animation:none; } .spinner { animation:none; } }
