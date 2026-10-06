@@ -7,7 +7,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "sync": "node scripts/sync.mjs",
+    "sync": "node scripts/sync.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
