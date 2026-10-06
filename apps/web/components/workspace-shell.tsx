@@ -25,7 +25,7 @@ const WorkspaceBackContext = createContext<Dispatch<SetStateAction<BackAction | 
   null,
 );
 const WorkspaceNavigationContext = createContext<
-  ((href: string, scroll?: boolean) => boolean | void) | null
+  ((href: string, scroll?: boolean, direction?: string) => boolean | void) | null
 >(null);
 
 /** Keep Next's native link behavior (prefetch, modifier clicks, drag cancellation). */
@@ -34,12 +34,13 @@ export function WorkspaceLink({
   ...props
 }: Omit<ComponentProps<typeof Link>, 'href' | 'onNavigate'> & { href: string }) {
   const navigate = useContext(WorkspaceNavigationContext);
+  const direction = (props as Record<string, unknown>)['data-direction'] as string | undefined;
   return (
     <Link
       {...props}
       href={href}
       onNavigate={(event) => {
-        if (navigate?.(href, props.scroll)) event.preventDefault();
+        if (navigate?.(href, props.scroll, direction)) event.preventDefault();
       }}
     />
   );
@@ -63,6 +64,8 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const navigation = useRef<{
     destination: string;
     productHref: string;
+    sibling: boolean;
+    direction?: string;
     floating: HTMLElement | null;
     target: HTMLElement | null;
     animations: Animation[];
@@ -78,16 +81,22 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const isChat = currentProduct?.slug === 'ai-chat';
   const isLanding = isHome || pathname === currentProduct?.href;
 
-  function navigate(href: string, scroll?: boolean) {
+  function navigate(href: string, scroll?: boolean, direction?: string) {
     const destination = href.split('?')[0]!;
     if (navigation.current?.exit && navigation.current.destination === destination) return true;
     navigation.current?.cleanup();
     const productHref = isHome ? href : currentProduct?.href;
     const returning = !isHome && (destination === '/' || destination === currentProduct?.href);
+    // 同产品详情→详情（上一件／下一件）与返回列表共用成对过渡；产品标题不变，跳过飞行标题。
+    const sibling =
+      !isHome &&
+      !returning &&
+      !!currentProduct &&
+      destination.startsWith(`${currentProduct.href}/`);
     if (
       destination === pathname ||
       !productHref ||
-      !(isHome || returning) ||
+      !(isHome || returning || sibling) ||
       !products.some((product) => product.href === productHref) ||
       instantMotion()
     )
@@ -96,9 +105,11 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     const surface = shell.current!;
     surface.dataset.routeMotion = 'true';
 
-    const source = shell.current?.querySelector<HTMLElement>(
-      isHome ? `a[href="${productHref}"] h2` : '[data-workspace-title]',
-    );
+    const source = sibling
+      ? null
+      : shell.current?.querySelector<HTMLElement>(
+          isHome ? `a[href="${productHref}"] h2` : '[data-workspace-title]',
+        );
     const floating = source?.cloneNode(true) as HTMLElement | undefined;
     if (source && floating) {
       const rect = source.getBoundingClientRect();
@@ -125,6 +136,8 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     const pending = {
       destination,
       productHref,
+      sibling,
+      direction,
       floating: floating ?? null,
       target: null as HTMLElement | null,
       animations: [] as Animation[],
@@ -145,12 +158,17 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     // Restore the real content if the target route fails to commit.
     const timer = setTimeout(pending.cleanup, 8000);
     navigation.current = pending;
-    if (returning) {
+    if (returning || sibling) {
       router.prefetch(href);
       pending.exit = playExit(
         shell.current?.querySelector('#workspace-content') ?? null,
         () => router.push(href, { scroll }),
-        undefined,
+        sibling && direction === 'next'
+          ? [
+              { opacity: 1, transform: 'none' },
+              { opacity: 0, transform: 'translateX(-28px) scale(.98)' },
+            ]
+          : undefined,
         { hold: true },
       );
       return true;
@@ -171,7 +189,9 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     const floating = pending.floating;
     const from = floating?.getBoundingClientRect();
     const to = target?.getBoundingClientRect();
-    const distance = pathname === '/' ? -28 : 28;
+    // 相邻导航按行进方向进入：上一件自左、下一件自右；返回沿用产品进入方向。
+    let distance = 28;
+    if ((pending.sibling && pending.direction === 'previous') || pathname === '/') distance = -28;
     const contentAnimation = shell.current?.querySelector('#workspace-content')?.animate(
       [
         { opacity: 0.15, transform: `translateX(${distance}px) scale(.985)` },
@@ -180,6 +200,14 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
       { duration: 360, easing: 'cubic-bezier(.23,1,.32,1)' },
     );
     if (contentAnimation) pending.animations.push(contentAnimation);
+    if (pending.sibling) {
+      // 同产品切换标题不动，内容独自接续；后台标签页不驱动 finished，用超时兜底。
+      const timeout = setTimeout(pending.cleanup, 500);
+      void contentAnimation
+        ?.finished.then(pending.cleanup, pending.cleanup)
+        .finally(() => clearTimeout(timeout));
+      return;
+    }
     if (!target || !floating || !from || !to) {
       pending.cleanup();
       return;
