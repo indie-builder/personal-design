@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, type CSSProperties } from 'react';
-import { instantMotion, observeMotionPolicy } from '@/lib/motion';
+import { EASE_BOOK_OPENING, instantMotion, observeMotionPolicy } from '@/lib/motion';
 import styles from './book-opening.module.css';
 
 export interface OpeningBook {
@@ -43,7 +43,7 @@ export function BookOpening({ book, onDone }: { book: OpeningBook; onDone: () =>
       const animation = element.animate(frames, {
         duration,
         fill: 'forwards',
-        easing: 'cubic-bezier(.4,0,.2,1)',
+        easing: EASE_BOOK_OPENING,
       });
       animations.push(animation);
       return animation.finished;

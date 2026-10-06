@@ -1,5 +1,5 @@
 .video { display:block; width:100%; height:auto; max-height:78dvh; aspect-ratio:16/9; background:var(--color-plate); border-radius:var(--radius-media); }
-.status { margin:12px 0 0; font-size:13px; color:var(--color-ink-soft); line-height:1.75; animation:softIn 180ms var(--ease-out); }
+.status { margin:12px 0 0; font-size:13px; color:var(--color-ink-soft); line-height:1.75; animation:softIn var(--dur-settle) var(--ease-out); }
 .status { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
 @keyframes softIn { from { opacity:0; } }
 

@@ -1,5 +1,14 @@
 import { useEffect, useRef, type RefObject } from 'react';
 
+// WAAPI easing strings cannot reference CSS var(); these constants are the single TS
+// source. Entries naming a globals.css token are dual-sourced — keep values in sync.
+export const EASE_OUT = 'cubic-bezier(.23,1,.32,1)'; // mirrors --ease-out
+export const EASE_EXIT = 'cubic-bezier(.4,0,.8,.6)'; // exit acceleration curve
+export const EASE_CHAT_SCREEN = 'cubic-bezier(.32,.72,0,1)'; // mirrors --ease-chat-screen
+export const EASE_BOOK_OPENING = 'cubic-bezier(.4,0,.2,1)'; // cover alignment
+export const EASE_ARCADE_LETTER_EXIT = 'cubic-bezier(.3,0,.8,1)'; // arcade knock-fly
+export const EASE_TRAVEL = 'cubic-bezier(.45,0,.2,1)'; // mirrors --ease-travel: book extract, book preview reveal, timeline walker
+
 /** Call in interaction handlers: repeated keyboard actions never wait on motion. */
 export function instantMotion() {
   return (
@@ -47,7 +56,7 @@ export function playExit(
   }
   const animation = element.animate(frames, {
     duration,
-    easing: options.easing ?? 'cubic-bezier(.4,0,.8,.6)',
+    easing: options.easing ?? EASE_EXIT,
     fill: 'forwards',
   });
   let settled = false;

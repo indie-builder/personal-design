@@ -10,7 +10,7 @@ import {
   type ChatTranscript,
   type Conversation,
 } from '@personal-design/ai-chat';
-import { instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
+import { EASE_CHAT_SCREEN, instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
 import { Button, buttonClassName } from './button';
 import { AgentCreationScreen } from './ai-chat/agent-creation';
 import { ConversationView } from './ai-chat/conversation';
@@ -114,7 +114,7 @@ export function AiChat() {
     if (panel === 'create' && editor && !instantMotion() && !document.hidden) {
       creationEntry.current = editor.animate(
         [{ transform: 'translateX(100%)' }, { transform: 'translateX(0)' }],
-        { duration: 240, easing: 'cubic-bezier(.32,.72,0,1)' },
+        { duration: 240, easing: EASE_CHAT_SCREEN },
       );
     }
     return () => {
@@ -153,7 +153,7 @@ export function AiChat() {
       editor,
       commit,
       [{ transform }, { transform: 'translateX(100%)' }],
-      { duration: 180, hold: true, easing: 'cubic-bezier(.32,.72,0,1)' },
+      { duration: 180, hold: true, easing: EASE_CHAT_SCREEN },
     );
   }
 

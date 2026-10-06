@@ -15,7 +15,7 @@ import {
   type SetStateAction,
 } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
+import { EASE_OUT, instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
 import { products } from '@/lib/products';
 import { ThemeToggle } from './theme-toggle';
 import styles from './workspace-shell.module.css';
@@ -197,7 +197,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
         { opacity: 0.15, transform: `translateX(${distance}px) scale(.985)` },
         { opacity: 1, transform: 'none' },
       ],
-      { duration: 360, easing: 'cubic-bezier(.23,1,.32,1)' },
+      { duration: 360, easing: EASE_OUT },
     );
     if (contentAnimation) pending.animations.push(contentAnimation);
     if (pending.sibling) {
@@ -225,7 +225,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
           transform: `translate(${to.left - from.left}px, ${to.top - from.top}px) scale(${to.width / from.width}, ${to.height / from.height})`,
         },
       ],
-      { duration: 360, easing: 'cubic-bezier(.23,1,.32,1)', fill: 'forwards' },
+      { duration: 360, easing: EASE_OUT, fill: 'forwards' },
     );
     pending.animations.push(animation);
     // Hidden tabs can suspend animation timelines; never leave the real heading hidden.

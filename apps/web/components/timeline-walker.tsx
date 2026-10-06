@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { instantMotion, observeMotionPolicy } from '@/lib/motion';
+import { EASE_TRAVEL, instantMotion, observeMotionPolicy } from '@/lib/motion';
 import styles from './timeline-walker.module.css';
 
 /** Reused with the owner's authorization from joeypescatore.com; follows the timeline's vertical rhythm. */
@@ -76,7 +76,7 @@ export function TimelineWalker({
       arrival = 3000 + count * 3000;
       const duration = arrival + 4000;
       const axis = 47 - element!.clientHeight;
-      const easing = 'cubic-bezier(.45,0,.2,1)';
+      const easing = EASE_TRAVEL;
       const frame = (at: number, x: number, y: number) => ({
         offset: at / duration,
         transform: `translate(${x}px,${y}px)`,

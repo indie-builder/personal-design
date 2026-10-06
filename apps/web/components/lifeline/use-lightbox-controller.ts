@@ -211,7 +211,7 @@ export function useLightboxController() {
     return () => frames.forEach(cancelAnimationFrame);
   }, [active, expanded, instant]);
 
-  // 锁背景滚动；body 挂标记（暂停灵感墙 marquee）。
+  // 锁背景滚动；body 标记当前唯一消费者是 detail-tools 的方向键仲裁。
   useEffect(() => {
     if (!isOpen) return;
     const previousOverflow = document.body.style.overflow;

@@ -30,7 +30,11 @@
   --radius-xl: 12px;
   --radius-2xl: 16px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-chat-screen: cubic-bezier(.32,.72,0,1);
+  --ease-travel: cubic-bezier(.45,0,.2,1);
   --dur-fast: 150ms;
+  /* 状态与表面过渡的中间档，用于页面返回退场等。 */
+  --dur-settle: 180ms;
   --dur-base: 200ms;
   --dur-enter: 200ms;
   --dur-exit: 140ms;
