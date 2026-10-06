@@ -114,10 +114,39 @@ export function LayoutBookshelf({ categories, items }: Props) {
       if (event.key !== 'Escape' || !extracted.current) return;
       event.preventDefault();
       extracted.current = null;
-      setExtracting(-1);
-      requestAnimationFrame(() =>
-        document.getElementById(`book-${lastBook.current}`)?.focus({ preventScroll: true }),
-      );
+      const spine = document.getElementById(`book-${lastBook.current}`);
+      let settled = false;
+      const settle = () => {
+        if (settled) return;
+        settled = true;
+        setExtracting(-1);
+        requestAnimationFrame(() =>
+          document.getElementById(`book-${lastBook.current}`)?.focus({ preventScroll: true }),
+        );
+      };
+      // Captured flight position lets the spine and its travelling cover glide home together.
+      const flying = spine && !instantMotion() ? getComputedStyle(spine).transform : 'none';
+      if (!spine || !flying || flying === 'none') {
+        settle();
+        return;
+      }
+      spine.getAnimations().forEach((a) => a.cancel());
+      // After the extract animation stops, the resting transform is the hover state the
+      // pointer often still occupies; ending there avoids a second jump on settle.
+      const rest = getComputedStyle(spine).transform;
+      spine.animate([{ transform: flying }, { transform: rest === 'none' ? 'none' : rest }], {
+        duration: 180,
+        easing: 'cubic-bezier(.23,1,.32,1)',
+      });
+      const cover = spine.querySelector<HTMLElement>('[data-book-cover]');
+      if (cover) {
+        // Cancel and inline fade in one tick lets the transition start from the animated
+        // opacity; the inline value survives until the next extract animation replaces it.
+        cover.getAnimations().forEach((a) => a.cancel());
+        cover.style.transition = 'opacity 180ms ease-out';
+        cover.style.opacity = '0';
+      }
+      setTimeout(settle, 300);
     };
     window.addEventListener('keydown', cancel);
     return () => window.removeEventListener('keydown', cancel);

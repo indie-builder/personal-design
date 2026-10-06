@@ -17,6 +17,12 @@
 .matchList { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 40px; }
 .matchList button { display:flex; align-items:center; justify-content:space-between; text-align:left; gap:16px; padding:16px 0; border:0; border-bottom:1px solid var(--color-hairline); background:none; color:var(--color-ink); cursor:pointer; }
 .matchList small { display:block; margin-top:4px; font-size:12px; color:var(--color-ink-soft); }
+.matchList button > span { text-decoration:underline; text-decoration-color:transparent; transition:text-decoration-color 150ms ease; }
+.matchList button > svg { color:var(--color-ink-soft); transition:transform 150ms var(--ease-out),color 150ms ease; }
+@media (hover:hover) and (pointer:fine) {
+  .matchList button:hover > span { text-decoration-color:currentColor; }
+  .matchList button:hover > svg { transform:translateX(3px); color:var(--color-ink); }
+}
 .reader { margin:12px auto 0; max-width:1160px; outline:none; }
 .readerHeading { display:flex; justify-content:space-between; align-items:center; margin:0 56px 24px; }
 .readerHeading h2 { font-size:20px; font-weight:500; }
@@ -50,7 +56,6 @@
 @keyframes turn-forward { to { transform:rotateY(-180deg); } }
 @keyframes turn-backward { to { transform:rotateY(180deg); } }
 @keyframes paper-shade { 0%,100% { opacity:0; } 50% { opacity:.3; } }
-@keyframes open-book { from { opacity:.3; transform:translateY(22px) rotateX(8deg) scale(.96); } to { opacity:1; transform:none; } }
 .shelf[data-preview] { width:100%; margin:0; padding:0 18px; border-bottom-width:4px; align-self:center; }
 .shelf[data-preview] .books { min-height:185px; gap:3px; }
 .shelf[data-preview] .spine { height:calc(var(--book-height)*.46); padding:12px 2px 8px; cursor:inherit; }
