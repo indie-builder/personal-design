@@ -203,8 +203,8 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     if (pending.sibling) {
       // 同产品切换标题不动，内容独自接续；后台标签页不驱动 finished，用超时兜底。
       const timeout = setTimeout(pending.cleanup, 500);
-      void contentAnimation
-        ?.finished.then(pending.cleanup, pending.cleanup)
+      void contentAnimation?.finished
+        .then(pending.cleanup, pending.cleanup)
         .finally(() => clearTimeout(timeout));
       return;
     }
