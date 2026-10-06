@@ -89,8 +89,6 @@ export function WordArcade() {
         lastStatus = key;
         setStatus(next);
       }
-      area.dataset.gameState = game.state;
-      area.dataset.score = String(game.score);
     };
     const paint = () => {
       const quiet = instantMotion();
@@ -99,7 +97,6 @@ export function WordArcade() {
         const el = letters[i]!;
         el.style.transform = `translate(${b.x - b.homeX + (b.w - b.homeW) / 2}px, ${b.y - b.homeY + (b.h - b.homeH) / 2}px) rotate(${b.rotation}rad) scale(${b.scale})`;
         el.style.opacity = b.alive ? '1' : '0';
-        el.dataset.gameTarget = String(b.alive && b.active);
         if (quiet || (b.alive && knocked.has(i))) {
           el.getAnimations().forEach((a) => a.cancel());
           knocked.delete(i);
@@ -367,7 +364,6 @@ export function WordArcade() {
       disposed = true;
       cancelAnimationFrame(frame);
       engine.current = null;
-      area.dataset.gameState = 'inactive';
       keys.clear();
       size.disconnect();
       theme.disconnect();
@@ -463,11 +459,11 @@ export function WordArcade() {
       >
         <canvas ref={canvas} className={styles.canvas} aria-hidden="true" />
         <div className={styles.hud} aria-hidden="true">
-          <span>第 {status.level + 1} 关</span>
-          <span>剩余 {status.remaining} 字</span>
-          <span>得分 {String(status.score).padStart(4, '0')}</span>
+          <span key={`level-${status.level}`}>第 {status.level + 1} 关</span>
+          <span key={`remaining-${status.remaining}`}>剩余 {status.remaining} 字</span>
+          <span key={`score-${status.score}`}>得分 {String(status.score).padStart(4, '0')}</span>
           {kind !== 'snake' && (
-            <span>
+            <span key={`lives-${status.lives}`}>
               {'♥'.repeat(status.lives)}
               {'♡'.repeat(3 - status.lives)}
             </span>
