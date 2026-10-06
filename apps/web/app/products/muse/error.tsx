@@ -1,19 +1,9 @@
 'use client';
 
-import { PageError } from '@/components/page-error';
+import { createProductError } from '@/lib/product-error';
 
-export default function MuseError({
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
-  return (
-    <PageError
-      reset={reset}
-      title="灵感暂时无法打开"
-      href="/products/muse"
-      returnLabel="返回灵感集"
-    />
-  );
-}
+export default createProductError({
+  title: '灵感暂时无法打开',
+  href: '/products/muse',
+  returnLabel: '返回灵感集',
+});

@@ -99,7 +99,7 @@
 - 支持停止、重新生成、失败重试、格式错误提示及一次结构自动修正。等待提示仅生成期间显示；结束后消息底部出现复制按钮，最新回答同时显示重新生成按钮，均为44px中性圆形触控按钮，复制渲染后的正文并反馈成功／失败。生成期间禁用会话／智能体切换，防止回复串入其他会话。离开页面中止正在生成的回答。
 - 导航抽屉使用原生 dialog；创建页是聊天容器内部的独立 section，原聊天保持挂载作为退场底层，并在创建页活动期间 inert、对辅助技术隐藏。创建页不自动弹出键盘，名称回车进入提示词，返回／Esc 回到列表并保留本次草稿，成功后清空草稿；输入正文可独立滚动，手机键盘出现时按 visualViewport 保持提交区可见。抽屉支持 Esc 和焦点回归；深色主题复用现有主题机制。桌面 Enter 发送、Shift+Enter 换行，触摸端 Enter 保留换行；输入法组合期间不误发送。
 
-实现：[ai-chat.tsx](../../apps/web/components/ai-chat.tsx)、[ai-chat-ui.tsx](../../apps/web/components/ai-chat-ui.tsx)、[use-saved-chat.ts](../../apps/web/components/ai-chat/use-saved-chat.ts)、[chat-persistence.ts](../../apps/web/lib/chat-persistence.ts)、[use-pi-chat.ts](../../apps/web/lib/use-pi-chat.ts)、[chat-stream.ts](../../apps/web/lib/chat-stream.ts)、[API route.ts](../../apps/web/app/api/ai-chat/route.ts)、[内容与会话模型](../../packages/ai-chat/src/index.ts)。配置见 [AI 问答](execution/ai-chat.md)，当前检查见 [验收索引](execution/README.md)；82项官方定义的源码审查、10组回放覆盖及验证边界见 [历史一致性审查](execution/ai-chat-consistency-audit.md)。
+实现：[ai-chat.tsx](../../apps/web/components/ai-chat.tsx)、[ai-chat-ui.tsx](../../apps/web/components/ai-chat-ui.tsx)、[use-saved-chat.ts](../../apps/web/components/ai-chat/use-saved-chat.ts)、[chat-stream.ts](../../apps/web/lib/chat-stream.ts)、[use-pi-chat.ts](../../apps/web/lib/use-pi-chat.ts)、[chat-stream.ts](../../apps/web/lib/chat-stream.ts)、[API route.ts](../../apps/web/app/api/ai-chat/route.ts)、[内容与会话模型](../../packages/ai-chat/src/index.ts)。配置见 [AI 问答](execution/ai-chat.md)，当前检查见 [验收索引](execution/README.md)；82项官方定义的源码审查、10组回放覆盖及验证边界见 [历史一致性审查](execution/ai-chat-consistency-audit.md)。
 
 ### 文字游乐场 `/products/word-arcade`
 
