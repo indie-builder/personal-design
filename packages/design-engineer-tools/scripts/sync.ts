@@ -139,17 +139,20 @@ function syncIcons(categories: ReturnType<typeof parseCatalog>) {
 
 const program = Effect.scoped(
   Effect.gen(function* () {
-    const html = yield* Effect.tryPromise({
-      try: async (signal) => {
-        const response = await fetch(sourceUrl, {
-          signal,
-          headers: { 'user-agent': 'personal-design-sync/1.0 (+https://designengineer.tools/)' },
-        });
-        if (!response.ok) throw new Error(`目录请求失败: HTTP ${response.status}`);
-        return response.text();
-      },
-      catch: (cause) => new SyncStepError({ step: 'fetch:catalog', cause }),
-    });
+    const html = yield* Effect.retry(
+      Effect.tryPromise({
+        try: async (signal) => {
+          const response = await fetch(sourceUrl, {
+            signal: AbortSignal.any([signal, AbortSignal.timeout(30_000)]),
+            headers: { 'user-agent': 'personal-design-sync/1.0 (+https://designengineer.tools/)' },
+          });
+          if (!response.ok) throw new Error(`目录请求失败: HTTP ${response.status}`);
+          return response.text();
+        },
+        catch: (cause) => new SyncStepError({ step: 'fetch:catalog', cause }),
+      }),
+      retrySchedule,
+    );
     const categories = parseCatalog(html);
     const total = categories.reduce((count, category) => count + category.tools.length, 0);
     if (categories.length < 10 || total < 100) {
