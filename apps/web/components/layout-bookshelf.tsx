@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { categoryLabel } from '@/lib/category-label';
-import { instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
+import { EASE_EXIT, EASE_OUT, instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
 import { CollectionSearch } from './collection-search';
 import { matchesSearch } from '@/lib/browse-context';
 import { paramsHref } from '@/lib/site-url';
@@ -49,6 +49,9 @@ export function LayoutBookshelf({ categories, items }: Props) {
   const shelfScroll = useRef(0);
   const closing = useRef<ReturnType<typeof playExit> | null>(null);
   const shelfReturn = useRef<{ index: number; y: number } | null>(null);
+  // Esc must still win the two-frame settle window of an opening book; clearing this
+  // makes the late frame bail instead of committing the open.
+  const settlePending = useRef(false);
   const previousActive = useRef(active);
   const [isClosing, setIsClosing] = useState(false);
   function update(values: Record<string, string>, push = false) {
@@ -60,6 +63,7 @@ export function LayoutBookshelf({ categories, items }: Props) {
   }
   function open(name: string, id = '') {
     if (opening || extracting !== -1) return;
+    settlePending.current = false;
     let committed = false;
     const commitOpen = () => {
       if (committed) return;
@@ -67,7 +71,19 @@ export function LayoutBookshelf({ categories, items }: Props) {
       update({ cat: name, page: id }, true);
     };
     shelfScroll.current = window.scrollY;
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({
+      top: 0,
+      behavior: instantMotion() || document.hidden ? 'instant' : 'smooth',
+    });
+    // Smooth scrolls outlive policy switches and Esc; the first instant jump cancels the
+    // pending frame and a second one after two frames pins it (a synchronous double jump
+    // is overridden back by the pending frame).
+    const pinScroll = () => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' })),
+      );
+    };
     lastBook.current = categories.findIndex((c) => c.name === name);
     const index = lastBook.current;
     shelfReturn.current = { index, y: shelfScroll.current };
@@ -80,19 +96,33 @@ export function LayoutBookshelf({ categories, items }: Props) {
       extracted.current = null;
       setExtracting(-1);
       if (skip || instantMotion() || document.hidden) {
+        pinScroll();
         commitOpen();
         return;
       }
-      const rect = (element.querySelector('[data-book-cover]') ?? element).getBoundingClientRect();
-      const [color, ink] = bindings[index % bindings.length]!;
-      setOpening({
-        index,
-        title: categoryLabel(name),
-        color,
-        ink,
-        rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
-        reveal: commitOpen,
-      });
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      // Measure the cover rect only after the scroll settles; a pending frame clears the
+      // flag and Esc wins the two-frame window by clearing it first.
+      settlePending.current = true;
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          if (!settlePending.current) return;
+          settlePending.current = false;
+          window.scrollTo({ top: 0, behavior: 'instant' });
+          const rect = (
+            element.querySelector('[data-book-cover]') ?? element
+          ).getBoundingClientRect();
+          const [color, ink] = bindings[index % bindings.length]!;
+          setOpening({
+            index,
+            title: categoryLabel(name),
+            color,
+            ink,
+            rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+            reveal: commitOpen,
+          });
+        }),
+      );
     };
     element.style.setProperty('--extract-from', getComputedStyle(element).transform);
     setExtracting(index);
@@ -111,9 +141,17 @@ export function LayoutBookshelf({ categories, items }: Props) {
   }, [extracting]);
   useEffect(() => {
     const cancel = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || !extracted.current) return;
+      if (event.key !== 'Escape') return;
+      if (!extracted.current && !settlePending.current) return;
       event.preventDefault();
+      settlePending.current = false;
+      if (!extracted.current) return;
       extracted.current = null;
+      // Cancel and pin the shelf scroll so the glide home plays in a stable viewport.
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' })),
+      );
       const spine = document.getElementById(`book-${lastBook.current}`);
       let settled = false;
       const settle = () => {
@@ -136,7 +174,7 @@ export function LayoutBookshelf({ categories, items }: Props) {
       const rest = getComputedStyle(spine).transform;
       spine.animate([{ transform: flying }, { transform: rest === 'none' ? 'none' : rest }], {
         duration: 180,
-        easing: 'cubic-bezier(.23,1,.32,1)',
+        easing: EASE_OUT,
       });
       const cover = spine.querySelector<HTMLElement>('[data-book-cover]');
       if (cover) {
@@ -183,7 +221,7 @@ export function LayoutBookshelf({ categories, items }: Props) {
     if (left) left.style.transformOrigin = 'right center';
     const fold = left?.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(180deg)' }], {
       duration: 260,
-      easing: 'cubic-bezier(.4,0,.8,.6)',
+      easing: EASE_EXIT,
       fill: 'forwards',
     });
     setIsClosing(true);

@@ -10,7 +10,7 @@ import {
 } from '@personal-design/word-arcade';
 import { Pause, RotateCcw } from 'lucide-react';
 import { Button } from './button';
-import { instantMotion } from '@/lib/motion';
+import { EASE_ARCADE_LETTER_EXIT, instantMotion } from '@/lib/motion';
 import { drawArcade } from './word-arcade-draw';
 import styles from './word-arcade.module.css';
 
@@ -92,7 +92,12 @@ export function WordArcade() {
     };
     const paint = () => {
       const quiet = instantMotion();
-      for (const el of punctuation) el.style.opacity = game.state === 'idle' ? '1' : '0';
+      // Set inside paint() so preference changes repaint with the right transition; quiet clears it.
+      const punctuationFade = quiet ? '' : 'opacity var(--dur-fast) var(--ease-out)';
+      for (const el of punctuation) {
+        el.style.transition = punctuationFade;
+        el.style.opacity = game.state === 'idle' ? '1' : '0';
+      }
       game.bricks.forEach((b, i) => {
         const el = letters[i]!;
         el.style.transform = `translate(${b.x - b.homeX + (b.w - b.homeW) / 2}px, ${b.y - b.homeY + (b.h - b.homeH) / 2}px) rotate(${b.rotation}rad) scale(${b.scale})`;
@@ -119,7 +124,7 @@ export function WordArcade() {
                   opacity: 0,
                 },
               ],
-              { duration: rising ? 450 : 700, easing: 'cubic-bezier(.3,0,.8,1)' },
+              { duration: rising ? 450 : 700, easing: EASE_ARCADE_LETTER_EXIT },
             );
           }
         }

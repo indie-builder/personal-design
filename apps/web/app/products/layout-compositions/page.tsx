@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import styles from './page.module.css';
 import { LightboxProvider } from '@/components/lifeline/lightbox';
 import {
   catalog,
@@ -43,7 +44,7 @@ export default function LayoutCompositionsPage({
           按当前筛选输出跨页图片，不会在预渲染外壳里重复一份空参数渲染。 */}
       <Suspense
         fallback={
-          <p className="p-6 text-ink-soft" role="status">
+          <p role="status" className={`p-6 text-ink-soft ${styles.fade}`}>
             正在加载布局图鉴…
           </p>
         }

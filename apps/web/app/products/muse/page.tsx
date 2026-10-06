@@ -21,7 +21,7 @@ export default function MusePage({
             首屏只由请求时分叉输出（服务端按当前筛选，设计契约） */}
         <Suspense
           fallback={
-            <p role="status" className="py-8 text-ink-soft">
+            <p role="status" className={`py-8 text-ink-soft ${styles.fade}`}>
               正在准备灵感列表…
             </p>
           }

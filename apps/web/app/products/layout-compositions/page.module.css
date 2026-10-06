@@ -1,0 +1,2 @@
+.fade { animation:softIn var(--dur-base) var(--ease-out) both; }
+@keyframes softIn { from { opacity:0 } }

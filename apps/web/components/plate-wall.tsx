@@ -348,7 +348,7 @@ export function PlateWall({
       style={restoration ? { minHeight: restoration.height } : undefined}
     >
       {restoration && !restoration.ready ? (
-        <p className={styles.restoring} role="status">
+        <p className={`${styles.restoring} ${styles.fade}`} role="status">
           正在恢复浏览位置…
         </p>
       ) : null}
@@ -366,8 +366,21 @@ export function PlateWall({
         </div>
       </div>
       <div className={styles.results}>
-        <p role="status">
-          {stale ? (loadError ? '暂时无法更新结果' : '正在更新灵感…') : `${moreTotal} 件灵感`}
+        {/* 三层常驻同格交叉淡变；aria-hidden 同步保证 status 只播报当前态 */}
+        <p
+          role="status"
+          className={styles.status}
+          data-status={!stale ? 'ready' : loadError ? 'error' : 'updating'}
+        >
+          <span data-layer="ready" aria-hidden={stale}>
+            {moreTotal} 件灵感
+          </span>
+          <span data-layer="updating" aria-hidden={!stale || loadError}>
+            正在更新灵感…
+          </span>
+          <span data-layer="error" aria-hidden={!stale || !loadError}>
+            暂时无法更新结果
+          </span>
         </p>
         {query || active !== '全部' ? (
           <Button variant="ghost" onClick={clear}>
@@ -376,7 +389,7 @@ export function PlateWall({
         ) : null}
       </div>
       {loadError ? (
-        <div className={styles.results} role="alert">
+        <div className={`${styles.results} ${styles.fade}`} role="alert">
           <p>灵感加载失败，请重试。</p>
           <Button
             variant="ghost"
@@ -390,7 +403,7 @@ export function PlateWall({
         </div>
       ) : null}
       {listed.length === 0 && !loadError && !stale ? (
-        <div className={styles.empty}>
+        <div className={`${styles.empty} ${styles.fade}`}>
           <h2>{query || active !== '全部' ? '没有找到匹配的灵感' : '还没有收录内容'}</h2>
           <p>
             {query || active !== '全部'

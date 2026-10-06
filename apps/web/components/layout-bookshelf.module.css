@@ -3,8 +3,8 @@
 .collectionName { color:var(--color-ink-soft); font-size:14px; }
 .shelf { max-width:1040px; margin:90px auto 0; padding:0 64px; border-bottom:8px solid var(--color-hairline-strong); box-shadow:0 14px 18px -16px #0008; }
 .books { display:flex; align-items:flex-end; justify-content:center; gap:7px; min-height:390px; perspective:1200px; }
-.spine { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:space-between; flex:0 1 var(--book-width); width:var(--book-width); height:var(--book-height); padding:26px 8px 18px; border:0; border-radius:3px 5px 2px 2px; color:var(--binding-ink); background:var(--binding); box-shadow:inset 3px 0 5px #fff3,inset -5px 0 6px #0002,4px 1px 5px #0002; transform-origin:50% 100%; transition:transform 260ms cubic-bezier(.23,1,.32,1),opacity 160ms; cursor:pointer; }
-.spine::after { content:''; position:absolute; inset:0; pointer-events:none; border-left:1px solid #ffffff30; border-right:2px solid #00000018; border-radius:inherit; }
+.spine { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:space-between; flex:0 1 var(--book-width); width:var(--book-width); height:var(--book-height); padding:26px 8px 18px; border:0; border-radius:3px 5px 2px 2px; color:var(--binding-ink); background:var(--binding); box-shadow:inset 3px 0 5px #fff3,inset -5px 0 6px #0002,4px 1px 5px #0002; transform-origin:50% 100%; transition:transform 260ms var(--ease-out),opacity 160ms; cursor:pointer; }
+.spine::after { content:''; position:absolute; inset:0; pointer-events:none; border-left:1px solid #ffffff30; border-right:2px solid #00000018; border-radius:inherit; transition:box-shadow var(--dur-fast) ease; }
 .spine:disabled { opacity:.22; cursor:default; }
 .spineTitle { writing-mode:vertical-rl; font-size:22px; font-weight:500; line-height:1.35; letter-spacing:0; }
 .spineBottom { display:flex; flex-direction:column; align-items:center; gap:12px; font-size:13px; font-variant-numeric:tabular-nums; }
@@ -24,7 +24,7 @@
   .matchList button:hover > svg { transform:translateX(3px); color:var(--color-ink); }
 }
 .reader { margin:12px auto 0; max-width:1160px; outline:none; }
-.readerHeading { display:flex; justify-content:space-between; align-items:center; margin:0 56px 24px; }
+.readerHeading { display:flex; justify-content:space-between; align-items:center; margin:0 56px 24px; transition:opacity var(--dur-fast) var(--ease-out); }
 .readerHeading h2 { font-size:20px; font-weight:500; }
 
 .bookStage { position:relative; padding:6px 56px 12px; perspective:2200px; touch-action:pan-y; }
@@ -64,8 +64,7 @@
 .shelf[data-preview] .spineBottom>span { display:none; }
 @media (max-width:900px) { .library { padding:20px 24px 48px; } .shelf { padding:0 24px; } .spineTitle { font-size:19px; } .spread { min-height:280px; } }
 @media (max-width:600px) { .library { padding:16px 20px 40px; } .shelf { margin-top:60px; padding:0 4px; } .books { gap:4px; min-height:290px; } .spine { height:calc(var(--book-height)*.72); padding:18px 2px 12px; } .spineTitle { font-size:16px; } .spineBottom>span { display:none; } .matchList { grid-template-columns:1fr; } .readerHeading { margin:0 32px 20px; } .bookStage { padding:4px 32px 8px; } .spread { min-height:0; max-height:none; aspect-ratio:1.25; } .page,.face { padding:8px 8px 6px; } }
-@media (prefers-reduced-motion:reduce) { .spine,.reader,.leaf,.face::after { animation:none; transition:none; transform:none; } }
-:global(html[data-input='keyboard']) .reader { animation:none; }
+@media (prefers-reduced-motion:reduce) { .spine,.leaf,.face::after { animation:none; transition:none; transform:none; } }
 
 .library[data-filtered] .shelf { margin-top:36px; }
 .library[data-filtered] .books { min-height:240px; }
@@ -85,16 +84,18 @@
 .library[data-opening="5"] .spine:nth-child(6) { visibility:hidden; }
 .library[data-opening="6"] .spine:nth-child(7) { visibility:hidden; }
 .library[data-opening="7"] .spine:nth-child(8) { visibility:hidden; }
-.library[aria-busy="true"] .reader { pointer-events:none; animation:none; }
+.library[aria-busy="true"] .reader { pointer-events:none; }
 
 .library[aria-busy="true"] .left { opacity:0; transform-origin:right center; backface-visibility:hidden; }
 .library[aria-busy="true"] .readerHeading, .library[aria-busy="true"] .pageFooter { opacity:0; }
 
 /* Same hinged solid and extraction path as the homepage preview. */
 .books:has([data-extracting]) { transform-style:preserve-3d; }
-.spine[data-extracting] { --pull-x:-56px; z-index:8; transform-style:preserve-3d; transform-origin:50% 100%; transition:none; animation:shelf-book-extract 1680ms cubic-bezier(.45,0,.2,1) both; }
+.spine[data-extracting] { --pull-x:-56px; z-index:8; transform-style:preserve-3d; transform-origin:50% 100%; transition:none; animation:shelf-book-extract 1680ms var(--ease-travel) both; }
 .spine[data-extracting]:nth-child(7) { --pull-x:-110px; }
 .spine[data-extracting]:nth-child(8) { --pull-x:-150px; }
+/* Ring marks the pulled book as the smooth scroll lands; on ::after it stays additive to the spine's shadow stack and its transition:none. */
+.spine[data-extracting]::after { box-shadow:0 0 0 3px color-mix(in srgb,var(--color-ink) 35%,transparent); }
 .spine[data-extracting] > [data-book-cover] { position:absolute; top:0; left:100%; width:220px; height:100%; box-sizing:border-box; padding:44px 28px; display:flex; flex-direction:column; gap:32px; align-items:center; justify-content:center; text-align:center; font:500 28px/1.5 var(--font-sans); color:var(--binding-ink); background:var(--binding); border:1px solid color-mix(in srgb,var(--binding-ink) 22%,transparent); border-radius:0 4px 4px 0; box-shadow:inset -3px 0 #f5f1e7,inset 0 0 0 7px var(--binding),inset 0 0 0 8px color-mix(in srgb,var(--binding-ink) 22%,transparent); transform-origin:0 50%; transform:rotateY(90deg); backface-visibility:hidden; animation:shelf-cover-extract 1680ms ease both; }
 .spine[data-extracting] > [data-book-cover] small { font-size:12px; font-weight:400; }
 @keyframes shelf-book-extract {
@@ -108,4 +109,4 @@
 .pagePicker option { background:var(--color-paper); color:var(--color-ink); }
 .pagePicker:focus-visible { outline:2px solid var(--color-ink); outline-offset:3px; }
 
-.pageFooter { display:flex; justify-content:center; flex-shrink:0; --color-ink:#38362e; --color-ink-soft:#625c50; --color-subtle:#e5dfd0; }
+.pageFooter { display:flex; justify-content:center; flex-shrink:0; transition:opacity var(--dur-fast) var(--ease-out); --color-ink:#38362e; --color-ink-soft:#625c50; --color-subtle:#e5dfd0; }

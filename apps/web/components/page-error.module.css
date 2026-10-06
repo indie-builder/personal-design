@@ -1,4 +1,5 @@
-.page { max-width:640px; min-height:min(600px, var(--workspace-height)); margin-inline:auto; padding:64px 24px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:16px; }
+.page { max-width:640px; min-height:min(600px, var(--workspace-height)); margin-inline:auto; padding:64px 24px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:16px; animation:softIn var(--dur-base) var(--ease-out) both; }
 .page h1 { font-size:24px; font-weight:500; line-height:1.35; }
 .page p { max-width:48ch; color:var(--color-ink-soft); font-size:14px; line-height:1.75; }
 .actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; }
+@keyframes softIn { from { opacity:0 } }
