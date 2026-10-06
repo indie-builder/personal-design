@@ -12,7 +12,7 @@
 .generatedUi :global(.lucide) { width:var(--answer-icon-size); height:var(--answer-icon-size); stroke-width:1.6; flex-shrink:0; }
 .generatedUi :global(.openui-icon-tag) { width:24px; height:24px; border:0; border-radius:0; background:transparent; color:var(--color-ink-soft); }
 .generatedUi :global(.openui-radio-group),.generatedUi :global(.openui-checkbox-group) { gap:0; border-top:1px solid var(--color-hairline); border-bottom:1px solid var(--color-hairline); }
-.generatedUi :global(.openui-radio-item-container),.generatedUi :global(.openui-checkbox-item-container) { min-height:var(--answer-control-height); padding:6px 4px; align-items:center; gap:8px; border:0; border-radius:0; background:transparent; cursor:pointer; }
+.generatedUi :global(.openui-radio-item-container),.generatedUi :global(.openui-checkbox-item-container) { min-height:var(--answer-control-height); padding:6px 4px; align-items:center; gap:8px; border:0; border-radius:0; background:transparent; cursor:pointer; transition:background-color 150ms ease; }
 .generatedUi :global(.openui-radio-item-container) + :global(.openui-radio-item-container),.generatedUi :global(.openui-checkbox-item-container) + :global(.openui-checkbox-item-container) { border-top:1px solid var(--color-hairline); }
 .generatedUi :global(.openui-radio-item-label),.generatedUi :global(.openui-checkbox-item-label) { font-size:var(--answer-body-size); font-weight:450; line-height:1.5; color:var(--color-ink); }
 .generatedUi :global(.openui-radio-item-description),.generatedUi :global(.openui-checkbox-item-description) { margin-top:2px; font-size:var(--answer-caption-size); line-height:1.5; color:var(--color-ink-soft); }
@@ -29,7 +29,7 @@
 .generatedUi :global(.openui-option-cards__grid) { grid-template-columns:minmax(0,1fr); gap:8px; }
 .generatedUi :global(.openui-option-card) { min-height:var(--answer-control-height); padding:10px; border-radius:var(--answer-field-radius); box-shadow:none; }
 .generatedUi :global(.openui-tabs-list) { width:100%; gap:4px; padding:2px; border-radius:var(--answer-field-radius); background:var(--color-plate); }
-.generatedUi :global(.openui-tabs-trigger) { min-height:var(--answer-control-height); flex:1 0 auto; justify-content:center; padding:8px 12px; border-radius:8px; font-size:var(--answer-input-size); line-height:20px; }
+.generatedUi :global(.openui-tabs-trigger) { min-height:var(--answer-control-height); flex:1 0 auto; justify-content:center; padding:8px 12px; border-radius:8px; font-size:var(--answer-input-size); line-height:20px; transition:background-color 150ms ease,color 150ms ease; }
 .generatedUi :global(.openui-tabs-trigger)[aria-selected="true"] { background:var(--color-paper); color:var(--color-ink); }
 .generatedUi :global(.openui-tabs-indicator) { display:none; }
 .generatedUi :global(.openui-accordion) { border:0; background:transparent; }
@@ -58,9 +58,11 @@
 .editableItem summary { list-style:none; display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:var(--answer-control-height); padding:8px 0; cursor:pointer; font-size:var(--answer-body-size); font-weight:500; }
 .editableItem summary::-webkit-details-marker { display:none; }
 .editableItem summary > span { min-width:0; overflow-wrap:anywhere; }
+.editableItem summary svg { transition:transform 160ms var(--ease-out); }
 .editableItem[open] summary svg { transform:rotate(180deg); }
 .editableFields { padding:0 0 18px; }
-.mobileEditActions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:8px; margin-top:12px; }
+.mobileEditActions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:8px; margin-top:12px; animation:softIn 180ms var(--ease-out); }
+@keyframes softIn { from { opacity:0; } }
 .mobileEditActions button { min-height:var(--answer-control-height); }
 .muted { color:var(--color-ink-soft); font-size:var(--answer-label-size); }
 :global(html[data-theme="dark"]) .mobileControl { color-scheme:dark; }
@@ -87,7 +89,7 @@
 .generatedUi :global(.openui-switch-item-container) { min-height:44px; align-items:center; padding:2px 0; border-bottom:1px solid var(--color-hairline); }
 /* Keep a real 44px switch button; draw only the small track and moving thumb. */
 .generatedUi :global(.openui-switch-item-root) { width:44px; height:44px; min-width:44px; flex:none; padding:0; margin:0; border:0; background:transparent; }
-.generatedUi :global(.openui-switch-item-root)::before { content:""; position:absolute; left:8px; top:13px; width:28px; height:18px; border-radius:9px; background:var(--color-control-border); }
+.generatedUi :global(.openui-switch-item-root)::before { content:""; position:absolute; left:8px; top:13px; width:28px; height:18px; border-radius:9px; background:var(--color-control-border); transition:background-color 150ms ease; }
 .generatedUi :global(.openui-switch-item-root)[data-state="checked"]::before { background:var(--color-ink); }
 .generatedUi :global(.openui-switch-item-thumb) { width:12px; height:12px; left:11px; top:22px; transform:translateY(-50%); background:var(--color-paper); }
 .generatedUi :global(.openui-switch-item-thumb)[data-state="checked"] { transform:translateY(-50%) translateX(10px); }
