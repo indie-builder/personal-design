@@ -1,7 +1,6 @@
 'use client';
 
 import { Suspense, useMemo } from 'react';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowLeft, MoveLeft, MoveRight } from 'lucide-react';
 import { DetailKeyboardNav } from './detail-tools';
@@ -79,7 +78,7 @@ function Navigation({
         </WorkspaceLink>
         <div className={styles.adjacent}>
           {prev ? (
-            <Link
+            <WorkspaceLink
               href={href(prev)}
               data-direction="previous"
               title={prev.title}
@@ -88,7 +87,7 @@ function Navigation({
             >
               <MoveLeft size={24} strokeWidth={1.5} aria-hidden />
               <span>上一件</span>
-            </Link>
+            </WorkspaceLink>
           ) : (
             <button type="button" className={styles.textControl} disabled aria-label="已是第一件">
               <MoveLeft size={24} strokeWidth={1.5} aria-hidden />
@@ -96,7 +95,7 @@ function Navigation({
             </button>
           )}
           {next ? (
-            <Link
+            <WorkspaceLink
               href={href(next)}
               data-direction="next"
               title={next.title}
@@ -105,7 +104,7 @@ function Navigation({
             >
               <span>下一件</span>
               <MoveRight size={24} strokeWidth={1.5} aria-hidden />
-            </Link>
+            </WorkspaceLink>
           ) : (
             <button type="button" className={styles.textControl} disabled aria-label="已是最后一件">
               <span>下一件</span>
