@@ -142,7 +142,19 @@ export function TaichiAvatar() {
         );
     }
     travel.onfinish = () => setPlaying(false);
-    const stop = () => setPlaying(false);
+    const stop = () => {
+      // An interrupted show fades from wherever it stands; only a finished one is already invisible.
+      const stage = actor.current?.parentElement;
+      if (!stage || instantMotion()) {
+        setPlaying(false);
+        return;
+      }
+      stage
+        .animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: 'ease-out' })
+        .finished.then(() => setPlaying(false))
+        .catch(() => setPlaying(false));
+      setTimeout(() => setPlaying(false), 280);
+    };
     const key = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();

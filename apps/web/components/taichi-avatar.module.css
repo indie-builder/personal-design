@@ -1,5 +1,7 @@
 .root { position:relative; flex-shrink:0; }
-.trigger { display:grid; place-items:center; width:44px; height:44px; padding:6px; border:0; border-radius:50%; background:transparent; cursor:pointer; }
+.trigger { display:grid; place-items:center; width:44px; height:44px; padding:6px; border:0; border-radius:50%; background:transparent; cursor:pointer; transition:background-color var(--dur-fast) ease,transform 100ms var(--ease-out); }
+.trigger:active { transform:scale(.96); }
+:global(html[data-input='keyboard']) .trigger:active { transform:none; }
 .trigger img { display:block; width:32px; height:32px; border-radius:50%; }
 .trigger:focus-visible { outline:2px solid var(--color-ink); outline-offset:3px; }
 .trigger[aria-disabled='true'] { cursor:default; }
@@ -20,3 +22,4 @@
 .trouser { stroke:var(--color-ink); stroke-width:19; }
 .hand { fill:#f5eee3; stroke:#202020; }
 .shoe { fill:var(--color-paper); }
+@media(prefers-reduced-motion:reduce) { .trigger { transition:none; } .trigger:active { transform:none; } }
