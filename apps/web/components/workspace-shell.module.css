@@ -1,15 +1,19 @@
 .shell { min-height:100dvh; }
 .header { max-width:1440px; margin:0 auto; min-height:88px; padding:20px 48px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
-.brand { padding:0; border:0; background:none; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:10px; min-height:44px; color:var(--color-ink); font-size:17px; font-weight:600; line-height:1.3; text-decoration:none; }
+.brand { padding:0; border:0; background:none; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:10px; min-height:44px; color:var(--color-ink); font-size:17px; font-weight:600; line-height:1.3; text-decoration:none; transition:transform 100ms var(--ease-out); }
 .innerHeader { min-height:72px; padding-block:12px; }
 .backIcon { flex-shrink:0; color:var(--color-ink-soft); transition:transform 140ms ease-out,color 140ms ease; }
 @media(hover:hover) and (pointer:fine) {
   .brand:hover .backIcon { color:var(--color-ink); transform:translateX(-2px); }
 }
 .brand:focus-visible .backIcon { color:var(--color-ink); }
+.brand:active { transform:scale(.96); }
+:global(html[data-input='keyboard']) .brand:active { transform:none; }
 @media(prefers-reduced-motion:reduce) {
   .backIcon { transition:none; }
+  .brand { transition:none; }
   .brand:hover .backIcon { transform:none; }
+  .brand:active { transform:none; }
 }
 .content { outline:none; min-width:0; }
 .skip { position:fixed; z-index:1000; top:8px; left:20px; transform:translateY(-160%); padding:10px 16px; background:var(--color-ink); color:var(--color-paper); border-radius:4px; }
