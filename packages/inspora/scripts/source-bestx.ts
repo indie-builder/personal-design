@@ -297,10 +297,10 @@ export function syncBestx({
       });
       const table = collectui ? 'collectui_posts' : 'bestdesignsonx';
       const rows = yield* Effect.tryPromise({
-        try: async () => {
+        try: async (signal) => {
           const res = await fetch(`${SUPABASE_URL}${table}?${params}`, {
             headers,
-            signal: AbortSignal.timeout(30000),
+            signal: AbortSignal.any([signal, AbortSignal.timeout(30000)]),
           });
           if (!res.ok) {
             throw new BestxError({

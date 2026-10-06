@@ -53,6 +53,44 @@ test('传输中断不落半截目标文件，临时文件被清理', async () =>
   );
 });
 
+test('Effect 取消中断底层传输，不发布目标文件', async () => {
+  // 停滞响应：发一个 chunk 后保持连接，模拟慢源。取消后底层 fetch 必须真正断开。
+  const dir = await mkdtemp(path.join(tmpdir(), 'download-cancel-'));
+  const target = path.join(dir, 'media.bin');
+  const server = createServer((_req, res) => {
+    res.writeHead(200, { 'content-type': 'application/octet-stream' });
+    res.write('partial');
+  });
+  let responseClosed = false;
+  server.on('request', (_req, res) => res.on('close', () => (responseClosed = true)));
+  await new Promise<void>((resolve) => {
+    server.listen({ port: 0, host: '127.0.0.1' }, () => resolve());
+  });
+  const url = `http://127.0.0.1:${(server.address() as { port: number }).port}/file`;
+  try {
+    const controller = new AbortController();
+    const run = Effect.runPromiseExit(download(url, target, immediateRetry), {
+      signal: controller.signal,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    controller.abort();
+    const exit = await run;
+    assert.equal(exit._tag, 'Failure');
+    if (exit._tag === 'Failure') assert.equal(exit.cause.reasons[0]?._tag, 'Interrupt');
+    // 连接真正断开（底层 fetch 被 abort，而非仅 fiber 放弃等待）
+    const deadline = Date.now() + 5000;
+    while (!responseClosed && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    assert.ok(responseClosed, '底层连接未随取消断开');
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    // 被取消的下载不得发布目标文件，也不留半截临时文件
+    assert.deepEqual(await readdir(dir), []);
+  } finally {
+    server.close();
+  }
+});
+
 test('已存在的非空文件跳过下载', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'download-'));
   const target = path.join(dir, 'c.webp');

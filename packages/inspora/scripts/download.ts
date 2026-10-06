@@ -50,16 +50,36 @@ const fileOperation = <A>(url: string, run: () => Promise<A>) =>
   });
 
 const attempt = (url: string, tmpPath: string, absPath: string) =>
-  Effect.tryPromise({
-    try: async () => {
-      const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
-      if (!res.ok || !res.body)
-        throw new DownloadError({ url, cause: new Error(`HTTP ${res.status}`) });
-      await pipeline(Readable.fromWeb(res.body), createWriteStream(tmpPath));
-      await rename(tmpPath, absPath);
-    },
-    catch: (cause) => downloadError(url, cause),
-  });
+  Effect.scoped(
+    Effect.gen(function* () {
+      // 传输与 fiber 中断联动：释放时 abort 底层请求、等它退出并清理 .part，
+      // 被取消的下载绝不发布目标文件（rename 在作用域内、取消后不会执行）。
+      const transfer = yield* Effect.acquireRelease(
+        Effect.sync(() => {
+          const controller = new AbortController();
+          const done = (async () => {
+            const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(30_000)]);
+            const res = await fetch(url, { signal });
+            if (!res.ok || !res.body)
+              throw new DownloadError({ url, cause: new Error(`HTTP ${res.status}`) });
+            await pipeline(Readable.fromWeb(res.body), createWriteStream(tmpPath), { signal });
+          })();
+          return { controller, done };
+        }),
+        ({ controller, done }) =>
+          Effect.promise(async () => {
+            controller.abort();
+            await Promise.allSettled([done]);
+            await rm(tmpPath, { force: true });
+          }),
+      );
+      yield* Effect.tryPromise({
+        try: () => transfer.done,
+        catch: (cause) => downloadError(url, cause),
+      });
+      yield* fileOperation(url, () => rename(tmpPath, absPath));
+    }),
+  );
 
 export function download(
   url: string,
@@ -70,12 +90,8 @@ export function download(
     if (yield* Effect.promise(() => fileNonEmpty(absPath))) return 'skipped' as const;
     yield* fileOperation(url, () => mkdir(path.dirname(absPath), { recursive: true }));
     // 写临时文件、成功后原子改名：中断不会留下半截目标文件被下次运行误判为已下载。
-    const tmpPath = `${absPath}.part`;
-    yield* attempt(url, tmpPath, absPath).pipe(
-      // 每次失败（含最终失败）先清掉半截临时文件，再按 schedule 重试
-      Effect.tapError(() => fileOperation(url, () => rm(tmpPath, { force: true }))),
-      Effect.retry(schedule),
-    );
+    // 每次尝试自带清理（失败/中断/成功路径由 attempt 的 release 统一负责），再按 schedule 重试。
+    yield* attempt(url, `${absPath}.part`, absPath).pipe(Effect.retry(schedule));
     return 'downloaded' as const;
   });
 }
