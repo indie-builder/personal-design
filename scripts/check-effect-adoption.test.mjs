@@ -64,10 +64,17 @@ test('同步入口均指向 .ts', () => {
   }
 });
 
-test('脚本内每个 fetch 都带超时或中断信号', () => {
+test('脚本内每个 fetch 都带超时或中断信号，且所在文件有重试覆盖', () => {
   for (const pkg of migratedPackages) {
     for (const { name, text } of readScripts(pkg)) {
-      for (const match of text.matchAll(/fetch\(/g)) {
+      const fetches = [...text.matchAll(/fetch\(/g)];
+      if (fetches.length === 0) continue;
+      assert.match(
+        text,
+        /Effect\.retry|Schedule\./,
+        `${pkg}/${name} 含 fetch 但无 Effect.retry/Schedule 重试覆盖`,
+      );
+      for (const match of fetches) {
         const call = text.slice(match.index ?? 0, (match.index ?? 0) + 400);
         assert.match(
           call,
