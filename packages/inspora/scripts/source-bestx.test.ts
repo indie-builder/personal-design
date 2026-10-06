@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { tweetIdOf, deriveTitle, mapBestxPost } from './source-bestx.mjs';
+import { Effect } from 'effect';
+import { tweetIdOf, deriveTitle, mapBestxPost, syncBestx } from './source-bestx.ts';
+import { openDatabase } from './db.ts';
 
 test('从 post_url 提取推文 id，无法提取时返回 null', () => {
   assert.equal(tweetIdOf('/vikingmute/status/2098773990495916513'), '2098773990495916513');
@@ -39,7 +41,7 @@ test('photo 行映射为 image，链接与宽高来自 CDN 字段', () => {
         height: '679',
       },
     ],
-  });
+  })!;
   assert.equal(post.id, 'bestx-2098458045827232119');
   assert.equal(post.slug, 'x-2098458045827232119');
   assert.equal(post.tweetId, '2098458045827232119');
@@ -89,7 +91,7 @@ test('video 与 animated_gif 都按视频处理，封面作 poster', () => {
       },
       { type: 'unknown', foo: 'bar' },
     ],
-  });
+  })!;
   assert.deepEqual(
     post.media.map((m) => [m.type, m.url, m.posterUrl]),
     [
@@ -115,7 +117,21 @@ test('无法提取推文 id 或时间的行被丢弃；说明只在多于标题�
     post_url: '/a/status/2',
     tweet_text: '标题\n第二行说明',
     time: '2026-09-11T17:06:00+00:00',
-  });
+  })!;
   assert.equal(post.title, '标题');
   assert.equal(post.description, '标题\n第二行说明');
+});
+
+test('REST 请求断言是 Die 且不重试', async (t) => {
+  const connection = openDatabase(':memory:');
+  t.after(() => connection.db.close());
+  let attempts = 0;
+  t.mock.method(globalThis, 'fetch', async () => {
+    attempts++;
+    throw new assert.AssertionError({ message: 'request bug' });
+  });
+  const exit = await Effect.runPromiseExit(syncBestx(connection));
+  assert.equal(exit._tag, 'Failure');
+  if (exit._tag === 'Failure') assert.equal(exit.cause.reasons[0]?._tag, 'Die');
+  assert.equal(attempts, 1);
 });

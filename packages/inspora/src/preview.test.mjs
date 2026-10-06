@@ -4,7 +4,7 @@ import { copyFile, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { openDatabase } from '../scripts/db.mjs';
+import { openDatabase } from '../scripts/db.ts';
 
 test('列表与详情直接提供安全的媒体预览，保留完整播放地址及本地回退', async (t) => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'inspora-preview-'));

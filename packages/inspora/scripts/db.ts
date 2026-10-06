@@ -5,8 +5,29 @@
  * - bestx / collectui 的媒体文件不下载（热链公开 CDN），local_* 保持 NULL。
  */
 import { DatabaseSync, type StatementSync } from 'node:sqlite';
+import { Data, Effect } from 'effect';
 
 export type Db = ReturnType<typeof openDatabase>;
+
+export class DatabaseError extends Data.TaggedError('Database')<{
+  readonly message: string;
+  readonly cause: unknown;
+}> {}
+
+export function databaseError(cause: unknown): DatabaseError {
+  if (!(cause instanceof Error) || !('errcode' in cause) || typeof cause.errcode !== 'number')
+    throw cause;
+  const base = cause.errcode & 0xff;
+  // SQLITE_ERROR, INTERNAL, MISUSE, and RANGE identify defects in our fixed SQL or its bindings.
+  if (![3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 18, 19, 23, 26].includes(base)) throw cause;
+  return new DatabaseError({ message: cause.message, cause });
+}
+
+export const database = <A>(run: () => A) =>
+  Effect.try({
+    try: () => run(),
+    catch: (cause) => databaseError(cause),
+  });
 
 /**
  * 唯一的事务边界：此前 BEGIN/COMMIT/ROLLBACK 三连在三个文件各写一份。

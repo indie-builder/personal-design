@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createServer, type RequestListener } from 'node:http';
-import { mkdtemp, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { Effect, Schedule } from 'effect';
@@ -64,6 +64,48 @@ test('已存在的非空文件跳过下载', async () => {
     async (url) => {
       assert.equal(await Effect.runPromise(download(url, target, immediateRetry)), 'skipped');
       assert.equal(await readFile(target, 'utf8'), 'existing');
+    },
+  );
+});
+
+test('下载请求断言是 Die 且不重试', async (t) => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'download-defect-'));
+  let attempts = 0;
+  t.mock.method(globalThis, 'fetch', async () => {
+    attempts++;
+    throw new assert.AssertionError({ message: 'download bug' });
+  });
+  const exit = await Effect.runPromiseExit(
+    download('https://example.com/a', path.join(dir, 'a'), immediateRetry),
+  );
+  assert.equal(exit._tag, 'Failure');
+  if (exit._tag === 'Failure') assert.equal(exit.cause.reasons[0]?._tag, 'Die');
+  assert.equal(attempts, 1);
+});
+
+test('目录创建失败进入 Fail，改名失败清理临时文件并尝试三次', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'download-files-'));
+  const blocked = path.join(dir, 'blocked');
+  await writeFile(blocked, 'file');
+  const failedMkdir = await Effect.runPromiseExit(
+    download('https://example.com/a', path.join(blocked, 'a'), immediateRetry),
+  );
+  assert.equal(failedMkdir._tag, 'Failure');
+  if (failedMkdir._tag === 'Failure') assert.equal(failedMkdir.cause.reasons[0]?._tag, 'Fail');
+  const target = path.join(dir, 'target');
+  let attempts = 0;
+  await withServer(
+    async (_req, res) => {
+      attempts++;
+      await mkdir(target, { recursive: true });
+      res.end('media');
+    },
+    async (url) => {
+      const exit = await Effect.runPromiseExit(download(url, target, immediateRetry));
+      assert.equal(exit._tag, 'Failure');
+      if (exit._tag === 'Failure') assert.equal(exit.cause.reasons[0]?._tag, 'Fail');
+      assert.equal(attempts, 3);
+      assert.deepEqual((await readdir(dir)).sort(), ['blocked', 'target']);
     },
   );
 });

@@ -24,14 +24,41 @@ async function fileNonEmpty(p: string) {
   }
 }
 
-const attempt = (url: string, tmpPath: string) =>
+function downloadError(url: string, cause: unknown): DownloadError {
+  if (cause instanceof DownloadError) return cause;
+  if (
+    !(cause instanceof Error) ||
+    cause.name === 'AssertionError' ||
+    cause instanceof ReferenceError ||
+    cause instanceof RangeError ||
+    cause instanceof SyntaxError ||
+    (cause instanceof TypeError &&
+      cause.message !== 'fetch failed' &&
+      !('code' in cause && cause.code === 'ERR_INVALID_URL'))
+  )
+    throw cause;
+  const code = 'code' in cause ? String(cause.code) : '';
+  if (code.startsWith('ERR_') && !['ERR_INVALID_URL', 'ERR_STREAM_PREMATURE_CLOSE'].includes(code))
+    throw cause;
+  return new DownloadError({ url, cause });
+}
+
+const fileOperation = <A>(url: string, run: () => Promise<A>) =>
+  Effect.tryPromise({
+    try: () => run(),
+    catch: (cause) => downloadError(url, cause),
+  });
+
+const attempt = (url: string, tmpPath: string, absPath: string) =>
   Effect.tryPromise({
     try: async () => {
       const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
-      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok || !res.body)
+        throw new DownloadError({ url, cause: new Error(`HTTP ${res.status}`) });
       await pipeline(Readable.fromWeb(res.body), createWriteStream(tmpPath));
+      await rename(tmpPath, absPath);
     },
-    catch: (cause) => new DownloadError({ url, cause }),
+    catch: (cause) => downloadError(url, cause),
   });
 
 export function download(
@@ -41,15 +68,14 @@ export function download(
 ) {
   return Effect.gen(function* () {
     if (yield* Effect.promise(() => fileNonEmpty(absPath))) return 'skipped' as const;
-    yield* Effect.promise(() => mkdir(path.dirname(absPath), { recursive: true }));
+    yield* fileOperation(url, () => mkdir(path.dirname(absPath), { recursive: true }));
     // 写临时文件、成功后原子改名：中断不会留下半截目标文件被下次运行误判为已下载。
     const tmpPath = `${absPath}.part`;
-    yield* attempt(url, tmpPath).pipe(
+    yield* attempt(url, tmpPath, absPath).pipe(
       // 每次失败（含最终失败）先清掉半截临时文件，再按 schedule 重试
-      Effect.tapError(() => Effect.promise(() => rm(tmpPath, { force: true }))),
+      Effect.tapError(() => fileOperation(url, () => rm(tmpPath, { force: true }))),
       Effect.retry(schedule),
     );
-    yield* Effect.promise(() => rename(tmpPath, absPath));
     return 'downloaded' as const;
   });
 }

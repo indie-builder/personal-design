@@ -1,6 +1,6 @@
 /**
  * inspora 数据包查询 API —— web 端只通过这里取数，不直接读 DB、不手拼路径。
- * 数据由 `scripts/sync.mjs` 生成：inspora.db（SQLite）+ apps/web/public/inspora/（海报/缩略图/头像）。
+ * 数据由 `scripts/sync.ts` 生成：inspora.db（SQLite）+ apps/web/public/inspora/（海报/缩略图/头像）。
  * 大图与视频热链原站（media.inspora.design），本地文件存在时优先用本地副本。
  */
 import { DatabaseSync } from 'node:sqlite';
