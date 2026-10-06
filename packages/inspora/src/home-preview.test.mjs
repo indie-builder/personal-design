@@ -4,7 +4,7 @@ import { copyFile, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { openDatabase } from '../scripts/db.mjs';
+import { openDatabase } from '../scripts/db.ts';
 
 // Original homepage selection is the oracle, including duplicate video entries.
 function originalPreviews(posts, limit = 3) {

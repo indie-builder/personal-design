@@ -4,9 +4,48 @@
  *   多源指向同一原作时读取侧仅显示一份（见 src/index.ts）。
  * - bestx / collectui 的媒体文件不下载（热链公开 CDN），local_* 保持 NULL。
  */
-import { DatabaseSync } from 'node:sqlite';
+import { DatabaseSync, type StatementSync } from 'node:sqlite';
+import { Data, Effect } from 'effect';
 
-export function openDatabase(dbPath) {
+export type Db = ReturnType<typeof openDatabase>;
+
+export class DatabaseError extends Data.TaggedError('Database')<{
+  readonly message: string;
+  readonly cause: unknown;
+}> {}
+
+export function databaseError(cause: unknown): DatabaseError {
+  if (!(cause instanceof Error) || !('errcode' in cause) || typeof cause.errcode !== 'number')
+    throw cause;
+  const base = cause.errcode & 0xff;
+  // SQLITE_ERROR, INTERNAL, MISUSE, and RANGE identify defects in our fixed SQL or its bindings.
+  if (![3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 18, 19, 23, 26].includes(base)) throw cause;
+  return new DatabaseError({ message: cause.message, cause });
+}
+
+export const database = <A>(run: () => A) =>
+  Effect.try({
+    try: () => run(),
+    catch: (cause) => databaseError(cause),
+  });
+
+/**
+ * 唯一的事务边界：此前 BEGIN/COMMIT/ROLLBACK 三连在三个文件各写一份。
+ * body 内允许 await（node:sqlite 同步执行，事务跨 await 与迁移前行为一致）。
+ */
+export async function withTransaction<A>(db: DatabaseSync, body: () => A | Promise<A>): Promise<A> {
+  db.exec('BEGIN');
+  try {
+    const result = await body();
+    db.exec('COMMIT');
+    return result;
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
+}
+
+export function openDatabase(dbPath: string) {
   const db = new DatabaseSync(dbPath);
   db.exec(`
     CREATE TABLE IF NOT EXISTS posts (
@@ -56,14 +95,24 @@ export function openDatabase(dbPath) {
     db
       .prepare('PRAGMA table_info(posts)')
       .all()
-      .map((column) => column.name),
+      .map((column) => (column as { name: string }).name),
   );
   if (!columns.has('source'))
     db.exec("ALTER TABLE posts ADD COLUMN source TEXT NOT NULL DEFAULT 'inspora'");
   if (!columns.has('tweet_id')) db.exec('ALTER TABLE posts ADD COLUMN tweet_id TEXT');
   db.exec('CREATE INDEX IF NOT EXISTS idx_posts_tweet ON posts(tweet_id)');
 
-  const stmts = {
+  const stmts: {
+    hasPost: StatementSync;
+    needsEnrich: StatementSync;
+    upsertPost: StatementSync;
+    upsertMedia: StatementSync;
+    mediaNeedingDownload: StatementSync;
+    updateMediaPaths: StatementSync;
+    creatorsNeedingAvatar: StatementSync;
+    updateAvatar: StatementSync;
+    knownTweetIds: (source: string) => string[];
+  } = {
     hasPost: db.prepare('SELECT 1 FROM posts WHERE id = ?'),
     needsEnrich: db.prepare(
       "SELECT slug FROM posts WHERE enriched_at IS NULL AND source = 'inspora'",
@@ -130,11 +179,11 @@ export function openDatabase(dbPath) {
     updateAvatar: db.prepare(
       "UPDATE posts SET creator_avatar = ? WHERE creator_name = ? AND source = 'inspora'",
     ),
-    knownTweetIds: (source) =>
+    knownTweetIds: (source: string) =>
       db
         .prepare('SELECT tweet_id FROM posts WHERE source = ? AND tweet_id IS NOT NULL')
         .all(source)
-        .map((row) => row.tweet_id),
+        .map((row) => (row as { tweet_id: string }).tweet_id),
   };
   return { db, stmts };
 }

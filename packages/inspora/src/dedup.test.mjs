@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { registerHooks } from 'node:module';
-import { openDatabase } from '../scripts/db.mjs';
+import { openDatabase } from '../scripts/db.ts';
 
 test('三源相同原作只显示一份，详情、导航、分类计数一致；同源重复也只显示一份', async (t) => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'inspora-dedup-'));

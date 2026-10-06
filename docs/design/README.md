@@ -68,7 +68,7 @@
 - 每个分类使用与网格间距对齐的浅色线框，分类内部不再额外分隔；首页预览复用四个跨分类的 favicon 工具格。
 - 不搬运目标工具网站内容；同步失败保留上一次成功目录。
 
-实现：[工具页](../../apps/web/app/products/design-engineer-tools/page.tsx)、[页面样式](../../apps/web/app/products/design-engineer-tools/page.module.css)、[sync.mjs](../../packages/design-engineer-tools/scripts/sync.mjs)。
+实现：[工具页](../../apps/web/app/products/design-engineer-tools/page.tsx)、[页面样式](../../apps/web/app/products/design-engineer-tools/page.module.css)、[sync.ts](../../packages/design-engineer-tools/scripts/sync.ts)。
 
 ### AI Coding 词典 `/products/ai-coding-dictionary`
 

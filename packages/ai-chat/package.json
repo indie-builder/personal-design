@@ -7,12 +7,17 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@effect/platform-node": "4.0.1",
+    "effect": "4.0.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "sharp": "^0.35.5"
+    "@types/node": "24.19.1",
+    "sharp": "^0.35.5",
+    "typescript": "7.0.2"
   },
   "scripts": {
-    "sync:avatars": "node scripts/sync-avatars.mjs"
+    "sync:avatars": "node scripts/sync-avatars.ts",
+    "typecheck": "tsc --noEmit"
   }
 }

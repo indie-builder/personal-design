@@ -7,11 +7,15 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "sync": "node scripts/sync.mjs",
+    "sync": "node scripts/sync.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "24.19.1",
     "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "@effect/platform-node": "4.0.1",
+    "effect": "4.0.1"
   }
 }
