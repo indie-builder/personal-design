@@ -10,10 +10,10 @@ import {
   type SavedChat,
 } from '@personal-design/ai-chat';
 
-import { createChatPersistence } from '@/lib/chat-persistence';
+import { createChatPersistence } from '@/lib/chat-stream';
 
 const STORAGE_KEY = 'personal-design:ai-chat:v2';
-export const emptyStore: SavedChat = {
+const emptyStore: SavedChat = {
   agents: [defaultAgent, analyticsAgent],
   conversations: [],
 };

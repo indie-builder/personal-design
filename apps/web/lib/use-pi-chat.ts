@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { EventType, openAIReadableStreamAdapter } from '@openuidev/react-headless';
 import { createChatStream } from './chat-stream';
+import { readToolStatus } from './chat-tools';
 import {
   memorySchema,
   messageSchema,
@@ -54,6 +55,19 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
       const boundary = history.findIndex((m) => m.id === memory?.throughId);
       if (boundary < 0) memory = undefined;
       commit({ messages: history, memory });
+      let failure: Error | undefined;
+      const finishStream = () => {
+        stream.current?.flush();
+        stream.current?.cancel();
+        stream.current = null;
+        if (controller.current === requestController) controller.current = null;
+        if (mounted.current) {
+          if (failure && !requestController.signal.aborted) {
+            setError(failure);
+            setStatus('error');
+          } else setStatus('ready');
+        }
+      };
       try {
         const response = await fetch('/api/ai-chat', {
           method: 'POST',
@@ -96,67 +110,20 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
           });
         };
         startStream();
-        // 工具状态行与 OpenUI 内容并列在同一 NDJSON 流里;tee 出一路独立解析,
-        // 与服务端约定对称:收到工具开始即重置本地文本。
+        // 与服务端对称，工具开始即重置回答；状态支路不阻塞 OpenUI 解析。
         const [forAdapter, forStatus] = response.body!.tee();
-        let stepSeq = 0;
-        let runningKey: string | null = null;
-        const readToolStatus = async () => {
-          const reader = forStatus.getReader();
-          const decoder = new TextDecoder();
-          let buffer = '';
-          try {
-            while (true) {
-              const { value, done } = await reader.read();
-              if (done) break;
-              buffer += decoder.decode(value, { stream: true });
-              for (
-                let newline = buffer.indexOf('\n');
-                newline >= 0;
-                newline = buffer.indexOf('\n')
-              ) {
-                const line = buffer.slice(0, newline).trim();
-                buffer = buffer.slice(newline + 1);
-                if (!line) continue;
-                let event: {
-                  type?: string;
-                  name?: string;
-                  label?: string;
-                  phase?: string;
-                  isError?: boolean;
-                };
-                try {
-                  event = JSON.parse(line);
-                } catch {
-                  continue;
-                }
-                if (event.type !== 'tool_status' || !event.name || !mounted.current) continue;
-                if (event.phase === 'start') {
-                  runningKey = `${event.name}-${++stepSeq}`;
-                  const key = runningKey;
-                  setToolSteps((steps) => [
-                    ...steps,
-                    { key, label: event.label || event.name!, state: 'running' },
-                  ]);
-                  startStream();
-                } else if (event.phase === 'end' && runningKey) {
-                  // updater 在渲染时才执行,须快照 key,不能读可变的 runningKey。
-                  const key = runningKey;
-                  const state = event.isError ? 'error' : 'done';
-                  setToolSteps((steps) =>
-                    steps.map((step) => (step.key === key ? { ...step, state } : step)),
-                  );
-                  runningKey = null;
-                }
-              }
-            }
-          } catch {
-            // 状态支路中断不影响主解析;分支会随响应体取消而结束。
-          } finally {
-            reader.releaseLock();
-          }
-        };
-        void readToolStatus();
+        void readToolStatus(forStatus, {
+          active: () => mounted.current,
+          onStart: (step) => {
+            setToolSteps((steps) => [...steps, step]);
+            startStream();
+          },
+          onEnd: (key, state) => {
+            setToolSteps((steps) =>
+              steps.map((step) => (step.key === key ? { ...step, state } : step)),
+            );
+          },
+        });
         for await (const event of openAIReadableStreamAdapter().parse(new Response(forAdapter))) {
           if (requestController.signal.aborted) break;
           if (event.type === EventType.TEXT_MESSAGE_CONTENT) {
@@ -166,25 +133,13 @@ export function usePiChat(conversation: Conversation, agent: Agent) {
         }
         if (!requestController.signal.aborted && (!finished || !text.trim()))
           throw new Error('回答中断，请重试。');
-        stream.current?.flush();
-        if (mounted.current) setStatus('ready');
       } catch (cause) {
-        stream.current?.flush();
-        if (mounted.current) {
-          if (requestController.signal.aborted) setStatus('ready');
-          else {
-            setError(
-              cause instanceof Error && /[\u4e00-\u9fff]/u.test(cause.message)
-                ? cause
-                : new Error('问答服务暂时不可用，请重试。'),
-            );
-            setStatus('error');
-          }
-        }
+        failure =
+          cause instanceof Error && /[\u4e00-\u9fff]/u.test(cause.message)
+            ? cause
+            : new Error('问答服务暂时不可用，请重试。');
       } finally {
-        stream.current?.cancel();
-        stream.current = null;
-        if (controller.current === requestController) controller.current = null;
+        finishStream();
       }
     },
     [agent, commit],

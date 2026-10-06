@@ -79,7 +79,7 @@
 ## 实现入口
 
 - 聊天外壳与消息：[ai-chat.tsx](../../../apps/web/components/ai-chat.tsx)、[conversation.tsx](../../../apps/web/components/ai-chat/conversation.tsx)、[ai-chat-ui.tsx](../../../apps/web/components/ai-chat-ui.tsx)。
-- 本机存储：[use-saved-chat.ts](../../../apps/web/components/ai-chat/use-saved-chat.ts) 读取、校验并初始化v2记录，[chat-persistence.ts](../../../apps/web/lib/chat-persistence.ts) 合并写入与刷新快照。
+- 本机存储：[use-saved-chat.ts](../../../apps/web/components/ai-chat/use-saved-chat.ts) 读取、校验并初始化v2记录，[chat-stream.ts](../../../apps/web/lib/chat-stream.ts) 合并写入与刷新快照。
 - 流式接收：[use-pi-chat.ts](../../../apps/web/lib/use-pi-chat.ts)、[chat-stream.ts](../../../apps/web/lib/chat-stream.ts)；服务端：[API route.ts](../../../apps/web/app/api/ai-chat/route.ts)、[pi-chat.ts](../../../apps/web/lib/pi-chat.ts)。
 - 会话模型与内置案例：[包 API](../../../packages/ai-chat/src/index.ts)；移动组件：[ai-chat-mobile-library.tsx](../../../apps/web/components/ai-chat-mobile-library.tsx)；首页：[ai-chat-preview.tsx](../../../apps/web/components/ai-chat-preview.tsx)。
 - 智能问数工具桥接：[analytics-mcp.ts](../../../apps/web/lib/analytics-mcp.ts)、[analytics-tools.ts](../../../apps/web/lib/analytics-tools.ts)；协议与步骤状态检查：`pnpm check:chat`，准备、结果与覆盖边界见[聊天隔离环境](README.md#聊天隔离环境)。

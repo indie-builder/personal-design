@@ -1,7 +1,13 @@
 import { products } from '@/lib/products';
 import { categoryLabel } from '@/lib/category-label';
 import { matchesSearch } from '@/lib/browse-context';
-import { filterMuseItems, museTabs } from '@/lib/muse-catalog';
+import {
+  museMediaOf,
+  musePage,
+  musePreviewOf,
+  museThumbnailOf,
+  museTabs,
+} from '@/lib/muse-catalog';
 import {
   catalog,
   categories,
@@ -75,7 +81,7 @@ export async function GET(request: Request, context: { params: Promise<{ path?: 
         summary: product.tagline,
         description: product.description,
         date: product.date,
-        dateLabel: product.dateLabel ?? (product.slug === 'personal-sites' ? '收录' : '上线'),
+        dateLabel: product.dateLabel,
         cover: absolute(product.cover),
       })),
     });
@@ -120,47 +126,23 @@ export async function GET(request: Request, context: { params: Promise<{ path?: 
             author: post.creatorName ?? '',
             text: post.description ?? '',
             sourceURL: post.sourceUrl ?? '',
-            thumbnail: absolute(post.media[0]?.poster ?? post.media[0]?.thumb),
-            media: post.media
-              .filter((media) => media.src)
-              .map((media) => ({
-                id: media.id,
-                kind: media.type,
-                url: absolute(media.src),
-                poster: absolute(media.poster ?? media.thumb),
-                width: media.width ?? 4,
-                height: media.height ?? 3,
-              })),
+            thumbnail: absolute(museThumbnailOf(post)),
+            media: museMediaOf(post).map((media) => ({
+              id: media.id,
+              kind: media.type,
+              url: absolute(media.src),
+              poster: absolute(media.poster),
+              width: media.width ?? 4,
+              height: media.height ?? 3,
+            })),
           },
         });
       }
       if (path.length !== 1) return missing();
-      const filtered = filterMuseItems({ q, category: cat || '全部' });
+      const page = musePage({ q, category: cat || '全部', offset, limit });
       return ok({
-        total: filtered.length,
-        hasMore: offset + limit < filtered.length,
-        items: filtered.slice(offset, offset + limit).map((item) => ({
-          id: item.key,
-          title: item.name,
-          category: categoryLabel(item.category),
-          topic: '',
-          author: item.lead ?? '',
-          text: '',
-          sourceURL: '',
-          thumbnail: absolute(item.poster || item.src),
-          media: item.src
-            ? [
-                {
-                  id: item.key,
-                  kind: item.kind,
-                  url: absolute(item.kind === 'image' ? item.fullSrc || item.src : item.src),
-                  poster: absolute(item.poster),
-                  width: item.width,
-                  height: item.height,
-                },
-              ]
-            : [],
-        })),
+        ...page,
+        items: page.items.map((item) => musePreviewOf(item, absolute)),
         categories: museTabs.map((c) => ({
           id: c.name,
           name: categoryLabel(c.name),

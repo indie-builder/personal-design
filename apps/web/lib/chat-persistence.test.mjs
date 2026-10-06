@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createChatPersistence } from './chat-persistence.ts';
+import { createChatPersistence } from './chat-stream.ts';
 
 // Failure modes: lost trailing deltas, stale timer overwrites, indefinite debounce,
 // missing lifecycle flushes, writes after disposal and repeated storage errors.

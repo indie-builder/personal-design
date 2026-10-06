@@ -14,7 +14,7 @@ export interface Product {
   /** 上线日期（ISO），首页时间轴按它排序 */
   date: string;
   /** 日期性质只供 API 使用；首页时间轴仅显示 date，不显示任何日期后缀 */
-  dateLabel?: string;
+  dateLabel: string;
   href: string;
   /** 首页卡片封面图（public 下路径） */
   cover: string;
@@ -71,4 +71,9 @@ export const products: Product[] = [
     href: '/products/ai-chat',
     cover: '',
   },
-].sort((a, b) => a.date.localeCompare(b.date));
+]
+  .map((product) => ({
+    dateLabel: product.slug === 'personal-sites' ? '收录' : '上线',
+    ...product,
+  }))
+  .sort((a, b) => a.date.localeCompare(b.date));

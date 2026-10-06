@@ -17,7 +17,7 @@ const DEFAULT_MCP_URL = 'https://wrenai-hr-mcp.vercel.app/mcp';
 const TOOL_TIMEOUT_MS = 30_000;
 const TOOL_TEXT_LIMIT = 20_000;
 
-export interface AnalyticsToolCallResult {
+interface AnalyticsToolCallResult {
   text: string;
   isError: boolean;
 }

@@ -6,6 +6,17 @@ export type FilterableBrowseEntry = BrowseEntry & {
 };
 
 const filterNames = ['cat', 'q'] as const;
+const BROWSE_WINDOW = 240;
+
+export function windowed<T extends { href: string }>(entries: T[], currentHref: string): T[] {
+  const index = entries.findIndex((entry) => entry.href === currentHref);
+  // 同步后索引快照可能暂时缺少当前条目，回退也必须限制 RSC 负载。
+  if (index < 0) return entries.slice(0, BROWSE_WINDOW);
+  const size = BROWSE_WINDOW * 2 + 1;
+  if (entries.length <= size) return entries;
+  const start = Math.max(0, Math.min(index - BROWSE_WINDOW, entries.length - size));
+  return entries.slice(start, start + size);
+}
 
 export function matchesSearch(query: string, fields: (string | undefined)[]): boolean {
   return fields
@@ -15,27 +26,24 @@ export function matchesSearch(query: string, fields: (string | undefined)[]): bo
     .includes(query.trim().toLocaleLowerCase());
 }
 
-/** Carry the actual filters in native links, including open-in-new-tab and history. */
-export function browseHref(href: string, listHref: string): string {
+function filterParams(listHref: string, params = new URLSearchParams()) {
   const source = new URLSearchParams(listHref.split('?')[1] ?? '');
-  const params = new URLSearchParams({ browse: '2' });
   for (const name of filterNames) {
     const value = source.get(name);
     if (value) params.set(name, value);
   }
-  return `${href}?${params}`;
+  return params;
+}
+
+/** Carry the actual filters in native links, including open-in-new-tab and history. */
+export function browseHref(href: string, listHref: string): string {
+  return `${href}?${filterParams(listHref, new URLSearchParams({ browse: '2' }))}`;
 }
 
 /** Keep scroll/focus memories separate for each filter, without copying the catalog. */
 export function browseMemoryKey(storageKey: string, listHref: string): string {
-  const [path, query = ''] = listHref.split('?');
-  const source = new URLSearchParams(query);
-  const params = new URLSearchParams();
-  for (const name of filterNames) {
-    const value = source.get(name);
-    if (value) params.set(name, value);
-  }
-  return `${storageKey}:${path}${params.size ? `?${params}` : ''}`;
+  const params = filterParams(listHref);
+  return `${storageKey}:${listHref.split('?')[0]}${params.size ? `?${params}` : ''}`;
 }
 
 /** Resolve shareable trails from current data, independently of session storage. */

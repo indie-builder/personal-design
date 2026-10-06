@@ -1,30 +1,22 @@
 import { defaultLightTheme, type Theme } from '@openuidev/react-ui';
 
-// Map every official typography token to the answer surface's shared semantic scale.
+const roles: Record<string, string> = {
+  Code: 'caption',
+  Heading: 'heading',
+  NumbersHeading: 'metric',
+  Label: 'label',
+};
+const weights: Record<string, number> = { heading: 600, metric: 550, label: 500 };
+
 const typography = Object.fromEntries(
   Object.keys(defaultLightTheme)
     .filter((key) => /^text(Body|Heading|Label|Numbers|Code)/.test(key))
     .map((key) => {
       if (key.endsWith('LetterSpacing')) return [key, '0'];
-      const role = key.startsWith('textCode')
-        ? 'caption'
-        : key.startsWith('textHeading')
-          ? 'heading'
-          : key.startsWith('textNumbersHeading')
-            ? 'metric'
-            : key.startsWith('textLabel')
-              ? 'label'
-              : key.includes('Xs')
-                ? 'caption'
-                : 'body';
+      const group = key.match(/^text(Code|Heading|NumbersHeading|Label)/)?.[1] ?? '';
+      const role = roles[group] ?? (key.includes('Xs') ? 'caption' : 'body');
       const weight =
-        role === 'heading'
-          ? 600
-          : role === 'metric' || key.includes('Heavy')
-            ? 550
-            : role === 'label'
-              ? 500
-              : 400;
+        weights[role === 'heading' ? role : key.includes('Heavy') ? 'metric' : role] ?? 400;
       return [
         key,
         `${weight} var(--answer-${role}-size)/${role === 'body' ? 1.65 : 1.5} ${key.startsWith('textCode') ? 'var(--openui-font-code)' : 'var(--font-sans)'}`,
