@@ -361,6 +361,7 @@ Tabs／Accordion／Chips控件文字13px；表格数据13px、表头12px，单�
 | AI 问答导航 | 面板在固定裁切区内向右滑入220ms、向左退出180ms；遮罩同步淡变，不越出手机框 |
 | AI 问答创建页 | 框内从右进入240ms，返回从当前位置向右退出180ms，退出后提交状态并恢复焦点 |
 | AI 问答消息反馈 | 新消息首次出现180ms；不重播历史或每个流式片段。发送／停止与复制图标140ms，复制结果文字150ms淡入；等待点仅生成中循环 |
+| 主题切换 | 不新增全局颜色过渡，保留既有控件局部颜色过渡（如按钮 150ms）；仅主题切换图标保留旋转200ms（ease-out）与图标交叉淡变160ms；键盘与减少动态效果即时 |
 
 这些时长记录已选定的指针效果，不作为所有输入方式必须播放的时长。体验验收以以下状态矩阵为准；是否缩短指针展示时长另作设计决策，不能因“数字符合表格”就认定体验通过。
 
@@ -384,7 +385,7 @@ Tabs／Accordion／Chips控件文字13px；表格数据13px、表头12px，单�
 
 上述门槛的浏览器回归通过 `pnpm check:browser` 执行，检查项登记于 [current-checks.json](scripts/design-checks/current-checks.json)；此前的 back-motion、workspace-navigation、back-stability legacy 驱动已于 2026-10 退役，历史记录见 git 历史。新增同类入口须扩展对应回归，不仅复用组件名称。
 
-首选 CSS transition / keyframes；动态位置衔接使用原生 Web Animations API，零动画库。仅声明实际过渡属性，禁止 transition:all。常规运动使用 transform / opacity；现有开册层宽高插值是局部实现例外，需要实测性能，不能据此允许全站动画布局尺寸。
+首选 CSS transition / keyframes；动态位置衔接使用原生 Web Animations API，零动画库。仅声明实际过渡属性，禁止 transition:all。常规运动使用 transform / opacity；现有开册层宽高插值是局部实现例外，需要实测性能，不能据此允许全站动画布局尺寸。词典图谱右下角收起式搜索入口展开时的 width 过渡（44px → min(280px, calc(100vw - 40px))，.3s，见 [adapt.css](apps/web/public/ai-coding-atlas/adapt.css)）同属既有实现的局部例外：小面积一次性展开，键盘与减少动态效果即时归零，同样不能推广为全站动画布局尺寸的依据。
 
 首页顶部数字／符号雨是用户指定的局部背景例外：12px等宽字符、16px行距、与视口等宽的自适应画布，高50vh（320–720px），仅底部渐隐，左右铺满；字符使用 ink-soft、提亮使用 ink，亮／暗主题透明度 .32／.24，鼠标44px范围提亮。约90ms更新一次，沿用动效策略，离屏、后台、键盘及减少动态效果停止；仅首页挂载，不捕获点击。
 
