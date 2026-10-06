@@ -7,6 +7,7 @@
 .previous { left: 16px; }
 .next { right: 16px; }
 .caption { position: absolute; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; line-height: 1.75; }
-.status { position: absolute; top: 72px; left: 16px; right: 16px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; font-size: 13px; line-height: 1.75; color: #fafafa; }
+.status { position: absolute; top: 72px; left: 16px; right: 16px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; font-size: 13px; line-height: 1.75; color: #fafafa; animation: statusIn 200ms var(--ease-out); }
+@keyframes statusIn { from { opacity: 0; } }
 .status span { background: #202020; padding: 4px 8px; border-radius: 4px; }
 @media (max-width: 639px) { .previous, .next { display: none; } }
