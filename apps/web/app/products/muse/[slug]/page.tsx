@@ -3,12 +3,14 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
-import { getPostBySlug } from '@personal-design/inspora';
-import { museBrowseEntries, museMediaOf } from '@/lib/muse-catalog';
+import { getPostBySlug, listPostRefs } from '@personal-design/inspora';
+import { museBrowseEntries, museMediaOf } from '@/lib/muse-detail';
 import { BrowseNavigation } from '@/components/browse-navigation';
 import { categoryLabel } from '@/lib/category-label';
 import { MuseMediaCarousel } from '@/components/inspora-media-carousel';
 import styles from './page.module.css';
+
+const postRefs = listPostRefs();
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -42,7 +44,7 @@ async function Detail({ params }: PageProps) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  const navigation = museBrowseEntries(post);
+  const navigation = museBrowseEntries(post, postRefs);
   const media = museMediaOf(post);
 
   const listHref = post.category

@@ -1,13 +1,8 @@
 import { products } from '@/lib/products';
 import { categoryLabel } from '@/lib/category-label';
 import { matchesSearch } from '@/lib/browse-context';
-import {
-  museMediaOf,
-  musePage,
-  musePreviewOf,
-  museThumbnailOf,
-  museTabs,
-} from '@/lib/muse-catalog';
+import { musePage, musePreviewOf, museTabs } from '@/lib/muse-catalog';
+import { museMediaOf, museThumbnailOf } from '@/lib/muse-detail';
 import {
   catalog,
   categories,

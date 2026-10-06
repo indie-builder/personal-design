@@ -1,34 +1,10 @@
 import type { PlateWallItem } from '@/components/plate-wall';
-import {
-  listPosts,
-  listPostRefs,
-  type InsporaPost,
-  type InsporaMedia,
-} from '@personal-design/inspora';
-import { matchesSearch, windowed, type FilterableBrowseEntry } from '@/lib/browse-context';
+import { listPosts } from '@personal-design/inspora';
+import { matchesSearch } from '@/lib/browse-context';
 import { categoryLabel } from '@/lib/category-label';
+import { museThumbnailOf, museKeywords } from '@/lib/muse-detail';
 
 export const MUSE_BATCH = 24;
-
-const posterOf = (media: InsporaMedia) => media.poster ?? media.thumb;
-export const museThumbnailOf = (post: Pick<InsporaPost, 'media'>) =>
-  post.media[0] && posterOf(post.media[0]);
-export const museKeywords = (post: Pick<InsporaPost, 'category' | 'industries' | 'styles'>) =>
-  [post.category, ...post.industries, ...post.styles].filter(Boolean).join(' ');
-
-export function museMediaOf(post: Pick<InsporaPost, 'title' | 'media'>) {
-  return post.media
-    .filter((media) => media.src)
-    .map((media, index) => ({
-      id: media.id,
-      type: media.type,
-      src: media.src ?? '',
-      poster: posterOf(media),
-      width: media.width,
-      height: media.height,
-      alt: post.media.length > 1 ? `${post.title} · 第 ${index + 1} 件` : post.title,
-    }));
-}
 
 // 只把客户端需要的字段传下去，控制 RSC 负载。
 export const museItems: PlateWallItem[] = listPosts().map((post) => {
@@ -113,26 +89,5 @@ export function musePreviewOf(
           },
         ]
       : [],
-  };
-}
-
-const postRefs = listPostRefs();
-const browseEntries: FilterableBrowseEntry[] = postRefs.map((entry) => ({
-  href: `/products/muse/${entry.slug}`,
-  title: entry.title,
-  category: entry.category ?? '未分类',
-  search: [entry.creatorName ?? '', museKeywords(entry), categoryLabel(entry.category ?? '未分类')],
-}));
-export function museBrowseEntries(post: Pick<InsporaPost, 'slug' | 'category'>) {
-  const currentHref = `/products/muse/${post.slug}`;
-  return {
-    currentHref,
-    browseEntries: windowed(browseEntries, currentHref),
-    entries: windowed(
-      postRefs
-        .filter((entry) => !post.category || entry.category === post.category)
-        .map((entry) => ({ href: `/products/muse/${entry.slug}`, title: entry.title })),
-      currentHref,
-    ),
   };
 }
