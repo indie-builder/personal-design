@@ -7,7 +7,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "sync": "node scripts/sync.mjs",
+    "sync": "node scripts/sync.ts",
     "render:promo": "node scripts/render-promo.mjs",
     "typecheck": "tsc --noEmit"
   },
@@ -20,5 +20,9 @@
     "remotion": "4.0.533",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@effect/platform-node": "4.0.1",
+    "effect": "4.0.1"
   }
 }
