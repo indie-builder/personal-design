@@ -50,7 +50,7 @@
 
 - 恢复最初的静态作品网格，分类为中文下划线标签，数量集中在结果区；支持搜索，无放映机、旋钮或放映台。
 - 首批24件，接近末端自动追加；图片与视频共存，视频可视时静音动态预览、离屏暂停。
-- 每件作品是原生链接，进入 `/products/muse/[slug]` 详情；分类及浏览上下文随链接传递，返回恢复分类、已加载数量、位置与焦点。
+- 每件作品是原生链接，进入 `/products/muse/[slug]` 详情；进入详情与相邻导航同制成对过渡，原页先退场再由详情自右接续，键盘与减少动态效果即时；分类及浏览上下文随链接传递，返回恢复分类、已加载数量、位置与焦点。
 - 作品详情通过原生链接进入；q保留搜索关键词，post参数不再触发跳转。
 
 实现：[plate-wall.tsx](../../apps/web/components/plate-wall.tsx)、[category-tabs.tsx](../../apps/web/components/category-tabs.tsx)、[muse-catalog.ts](../../apps/web/lib/muse-catalog.ts)。

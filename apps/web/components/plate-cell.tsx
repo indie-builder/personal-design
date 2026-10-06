@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MotionVideo } from './motion-video';
+import { WorkspaceLink } from './workspace-shell';
 import type { PlateWallItem } from './plate-wall';
 import styles from './plate-wall.module.css';
 
@@ -54,14 +54,16 @@ export function PlateCell({
       clearTimeout(timer);
     };
   }, [ready, failed]);
+  // data-direction="next" 与详情「下一件」共用成对过渡语义：网格左移退场，详情自右进入。
   return (
-    <Link
+    <WorkspaceLink
       ref={cellRef}
       id={`muse-${item.key}`}
       href={href}
       prefetch={false}
       onPointerEnter={prefetch}
       onFocus={prefetch}
+      data-direction="next"
       className={styles.cell}
       onClick={() => onNavigate(item.key)}
     >
@@ -111,6 +113,6 @@ export function PlateCell({
           {item.lead ? <span className={styles.meta}>{item.lead}</span> : null}
         </figcaption>
       </figure>
-    </Link>
+    </WorkspaceLink>
   );
 }
