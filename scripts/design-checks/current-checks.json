@@ -119,6 +119,27 @@
       ]
     },
     {
+      "id": "preview-loops",
+      "file": "scripts/design-checks/preview-loops.browser.mjs",
+      "exports": [
+        "verifyPreviewLoops"
+      ]
+    },
+    {
+      "id": "timeline-motion",
+      "file": "scripts/design-checks/timeline-motion.browser.mjs",
+      "exports": [
+        "verifyTimelineMotion"
+      ]
+    },
+    {
+      "id": "taichi-motion",
+      "file": "scripts/design-checks/taichi-motion.browser.mjs",
+      "exports": [
+        "verifyTaichiMotion"
+      ]
+    },
+    {
       "id": "playwright-run-all",
       "file": "scripts/design-checks/run-all.mjs",
       "exports": []

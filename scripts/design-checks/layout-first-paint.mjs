@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 
-// Against a production build: node scripts/design-checks/layout-first-paint.mjs http://localhost:3100
-const url = new URL('/products/layout-compositions', process.argv[2] || 'http://localhost:3100');
+// Against a production build: DESIGN_BASE_URL=... node scripts/design-checks/layout-first-paint.mjs
+const base = process.env.DESIGN_BASE_URL || process.argv[2] || 'http://localhost:3100';
+const url = new URL('/products/layout-compositions', base);
 url.search = new URLSearchParams({ cat: '平面、出版与广告', page: '136' }).toString();
 const response = await fetch(url, { signal: AbortSignal.timeout(30000) });
 assert.equal(response.status, 200);

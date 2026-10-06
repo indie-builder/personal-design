@@ -26,6 +26,7 @@ const suites = [
   'home.mjs',
   'layouts-check.mjs',
   'layouts-states.mjs',
+  'layout-first-paint.mjs',
   'muse-behavior.mjs',
   'muse-recovery.mjs',
   'shared-browser.cjs',
@@ -37,6 +38,9 @@ const motionChecks = [
   ['route-motion.browser.mjs', 'verifyRouteMotion'],
   ['lightbox-motion.browser.mjs', 'verifyLightboxMotion'],
   ['book-opening-performance.mjs', 'verifyBookOpeningPerformance'],
+  ['preview-loops.browser.mjs', 'verifyPreviewLoops'],
+  ['timeline-motion.browser.mjs', 'verifyTimelineMotion'],
+  ['taichi-motion.browser.mjs', 'verifyTaichiMotion'],
 ];
 const failed = [];
 for (const suite of suites) {

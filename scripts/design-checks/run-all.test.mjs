@@ -12,6 +12,7 @@ const suites = [
   'home.mjs',
   'layouts-check.mjs',
   'layouts-states.mjs',
+  'layout-first-paint.mjs',
   'muse-behavior.mjs',
   'muse-recovery.mjs',
   'shared-browser.cjs',
@@ -56,7 +57,7 @@ function fixture(t) {
 
 function assertChildren(result, origin) {
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.children.length, 12);
+  assert.equal(result.children.length, 13);
   for (const child of result.children) {
     assert.deepEqual(child, { design: origin, portfolio: origin });
   }

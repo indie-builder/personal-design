@@ -69,9 +69,12 @@ if (!result.passed) throw new Error(JSON.stringify(result.issues));
 | 书架、画册、放大 | [current-layouts.browser.mjs](../../../scripts/design-checks/current-layouts.browser.mjs)：`verifyCurrentLayouts(tab, cdp, viewport)` | 当前书架／画册状态、页码、放大、旧链接与焦点 |
 | 筛选与返回现场 | [shallow-navigation.browser.mjs](../../../scripts/design-checks/shallow-navigation.browser.mjs)：`verifyShallowNavigation(tab, cdp, viewport)` | 1440／1280／390／320px、键盘、减少动态效果、站内与原生返回；截图写入 `.impeccable/review/shallow-modules/` |
 | 灵感加载故障 | [muse-errors.browser.mjs](../../../scripts/design-checks/muse-errors.browser.mjs)：`verifyMuseErrors(tab, cdp)` | 网络／HTTP／格式／空页故障、重试、筛选变化与继续追加 |
-| 路由成对过渡 | [route-motion.browser.mjs](../../../scripts/design-checks/route-motion.browser.mjs)：`verifyRouteMotion(tab, cdp, viewport)` | 网格→详情／相邻导航／返回的退场先于提交、方向关键帧、键盘与减少动态即时、快速反向清理；断言与限制见[动效回归](motion-checks.md) |
+| 路由成对过渡 | [route-motion.browser.mjs](../../../scripts/design-checks/route-motion.browser.mjs)：`verifyRouteMotion(tab, cdp, viewport)` | 网格→详情／相邻导航／返回的退场先于提交、方向关键帧、深滚动恢复、原生后退、修饰键放行、限速追加落定、键盘与减少动态即时 |
 | 灯箱 FLIP 与滑动 | [lightbox-motion.browser.mjs](../../../scripts/design-checks/lightbox-motion.browser.mjs)：`verifyLightboxMotion(tab, cdp, viewport)` | 打开／关闭 FLIP 关键帧、翻页后失效路径、触摸跟手与回弹、鼠标拖拽排除、减少动态即时 |
-| 开册序列性能 | [book-opening-performance.mjs](../../../scripts/design-checks/book-opening-performance.mjs)：`verifyBookOpeningPerformance(tab, cdp, viewport)` | 抽书＋对齐＋翻开序列帧采样（长帧阈值）、键盘／减少动态即时路径；实测数字见[动效回归](motion-checks.md) |
+| 开册序列性能 | [book-opening-performance.mjs](../../../scripts/design-checks/book-opening-performance.mjs)：`verifyBookOpeningPerformance(tab, cdp, viewport)` | 抽书＋对齐＋翻开序列帧采样（长帧阈值）、键盘／减少动态即时路径 |
+| 循环预览 | [preview-loops.browser.mjs](../../../scripts/design-checks/preview-loops.browser.mjs)：`verifyPreviewLoops(tab, cdp, viewport)` | 书籍队列／小票／AI 问答预览的可视推进、离屏冻结续播、键盘与减少动态静态、封面拦截不挂周期 |
+| 时间轴漫步者 | [timeline-motion.browser.mjs](../../../scripts/design-checks/timeline-motion.browser.mjs)：`verifyTimelineMotion(tab, cdp, viewport)` | 单一时钟契约、步态与 date-bump、离屏暂停恢复、快进完成态、即时策略静止 |
+| 头像彩蛋 | [taichi-motion.browser.mjs](../../../scripts/design-checks/taichi-motion.browser.mjs)：`verifyTaichiMotion(tab, cdp, viewport)` | 9.2s 共享时钟、不捕获输入、Esc 即时收起、策略切换收割、减少动态静态姿态 |
 | 聊天生命周期 | [chat-lifecycle.browser.mjs](../../../scripts/design-checks/chat-lifecycle.browser.mjs)：`verifyChatLifecycle(tab, cdp)` | 假模型隔离 origin；错误后继续、停止、离页中止、摘要、存储版本与图表主题 |
 | 首页性能与预览 | [home-performance.browser.mjs](../../../scripts/design-checks/home-performance.browser.mjs)：`verifyTimelineBounds(cdp)`、`verifyDictionaryReuse(cdp)` | 时间轴边界；先使词典预览可见并等待 Canvas 就绪，再检查实例复用。`verifyPreviewPixels(cdp)` 另需[像素等价性夹具](home-performance.md#复现) |
 | 五款文字游戏 | [word-arcade.browser.mjs](../../../scripts/design-checks/word-arcade.browser.mjs)：`verifyWordArcade(tab, cdp)` | 进入游戏页后运行；真实得分、暂停、重置；附加对齐／重开／中断函数的前置状态见文件注释及[记录](word-arcade.md) |
@@ -103,6 +106,6 @@ pnpm check:chat --http
 
 [历史交付索引](history.md)及各日期报告保留旧命令和历史结果。复用时需核对脚本依赖、Portless 地址、测试 origin 和当前页面契约；脚本未登记或旧断言失效表示尚需核验或适配，不限制浏览器工具选择。
 
-尚未按当前契约完整验证的覆盖：聊天完整六轮案例及官方组件压力／移动输入／只读／提交回放，真实模型端到端流程，灵感媒体性能与画册首屏服务端输出测量，以及头像彩蛋动效的关键帧。路由动效、灯箱 FLIP 与开册序列性能已由[动效回归](motion-checks.md)覆盖（2026-10-06）。可使用现有脚本、Playwright、CDP 或其他可用浏览器工具补齐，必要时适配旧场景。现有基础检查只覆盖其中部分行为；不能用其通过替代这些专项。性能检查的版本化媒体前置条件继续有效。
+尚未按当前契约完整验证的覆盖：聊天完整六轮案例及官方组件压力／移动输入／只读／提交回放，真实模型端到端流程，以及真机触摸与读屏播报。路由动效（含深滚动／原生后退／修饰键／限速追加）、灯箱 FLIP、开册序列性能、三个循环预览、时间轴漫步者、头像彩蛋、布局跨页 SSR 首屏与灵感 SSR／缓存／分片（后者需版本化媒体前置，见[动效回归](motion-checks.md)）均已覆盖（2026-10-06）。可使用现有脚本、Playwright、CDP 或其他可用浏览器工具补齐，必要时适配旧场景。现有基础检查只覆盖其中部分行为；不能用其通过替代这些专项。性能检查的版本化媒体前置条件继续有效。
 
 历史已知问题包括 390px 深色词典 iframe 曾恢复成浅色；见[当时记录](history.md#第二轮模块接口收缩)。重跑时如仍出现，应保留失败而不是引用历史通过。真实触摸设备和逐帧视觉连续性也需独立证据。

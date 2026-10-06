@@ -18,11 +18,11 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
     if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
     return result.result.value;
   };
-  const mouseClick = async (x, y) => {
+  const mouseClick = async (x, y, modifiers = 0) => {
     for (const type of ['mousePressed', 'mouseReleased'])
       await cdp.send(
         'Input.dispatchMouseEvent',
-        { type, x, y, button: 'left', clickCount: 1 },
+        { type, x, y, button: 'left', clickCount: 1, modifiers },
         { timeoutMs: 5000 },
       );
   };
@@ -41,6 +41,7 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
     let signature = null;
     let stable = 0;
     window.__routeMotionLog = null;
+    window.__routeMotionStop = null;
     const sample = () => {
       const content = document.getElementById('workspace-content');
       const anims = content ? content.getAnimations().map((a) => ({
@@ -62,7 +63,7 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
       if (next !== signature) { log.push(frame); signature = next; }
       const settled = frame.url !== startUrl && !frame.routeMotion && !frame.travelTitles && frame.anims.length === 0;
       stable = settled ? stable + 1 : 0;
-      if (stable >= 3 || performance.now() - start > 6000) { window.__routeMotionLog = log; return; }
+      if (stable >= 3 || window.__routeMotionStop || performance.now() - start > 6000) { window.__routeMotionLog = log; return; }
       requestAnimationFrame(sample);
     };
     requestAnimationFrame(sample);
@@ -170,6 +171,60 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
         keyboardNext: document.documentElement.dataset.detailNext || null,
       };
     })()`);
+  const GRID_STATE = `(() => {
+    const ids = [...document.querySelectorAll('section[aria-label="灵感浏览"] a[id^="muse-"]')].map((a) => a.id);
+    const section = document.querySelector('section[aria-label="灵感浏览"]');
+    const status = document.querySelector('p[data-status]');
+    const active = document.activeElement;
+    return {
+      url: location.pathname + location.search,
+      cells: ids.length,
+      unique: new Set(ids).size,
+      busy: section ? section.getAttribute('aria-busy') === 'true' : null,
+      status: status ? status.getAttribute('data-status') : null,
+      scrollY: Math.round(window.scrollY),
+      activeInside: !!(active && active.closest && active.closest('section[aria-label="灵感浏览"]')),
+    };
+  })()`;
+  const waitFor = async (expression, predicate, { timeoutMs = 6000, intervalMs = 100 } = {}) => {
+    const startedAt = Date.now();
+    let state = await evaluate(expression);
+    while (!predicate(state) && Date.now() - startedAt < timeoutMs) {
+      await evaluate(`new Promise((resolve) => setTimeout(resolve, ${intervalMs}))`);
+      state = await evaluate(expression);
+    }
+    return state;
+  };
+  const cellInView = () =>
+    evaluate(`(() => {
+      const cells = [...document.querySelectorAll('section[aria-label="灵感浏览"] a[id^="muse-"]')];
+      let chosen = cells.find((a) => {
+        const r = a.getBoundingClientRect();
+        return r.height > 0 && r.bottom > 100 && r.top < innerHeight - 100;
+      });
+      if (!chosen) chosen = cells[0];
+      chosen.scrollIntoView({ block: 'center', behavior: 'instant' });
+      const r = chosen.getBoundingClientRect();
+      return { id: chosen.id, path: chosen.pathname, x: r.x + r.width / 2, y: r.y + Math.min(r.height / 2, 100), scrollY: Math.round(window.scrollY) };
+    })()`);
+  const scrollForBatches = async (factor, maxSteps) => {
+    let state = await evaluate(GRID_STATE);
+    const target = state.cells * factor;
+    for (let step = 0; step < maxSteps && (state.cells < target || state.scrollY < 2000); step += 1) {
+      const before = state.cells;
+      await evaluate(`window.scrollTo(0, Math.max(2000, ${state.scrollY} + 1600))`);
+      state = await waitFor(GRID_STATE, (next) => next.cells > before, { timeoutMs: 3000 });
+      if (state.cells <= before) break;
+    }
+    return state;
+  };
+  const openGrid = async () => {
+    await tab.goto(base + '/products/muse');
+    await tab.playwright
+      .locator('section[aria-label="灵感浏览"] a[id^="muse-"]')
+      .first()
+      .waitFor({ state: 'visible', timeoutMs: 20000 });
+  };
 
   try {
     await cdp.send('Emulation.setEmulatedMedia', {
@@ -235,6 +290,29 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
       checks.push(`back to grid: exit then re-entry, scroll ${cell.scrollY}→${returned.scrollY}, focus ${returned.activeId}`);
     } else issues.push('详情页缺少「返回灵感集」链接，未覆盖返回恢复');
 
+    let deep = await scrollForBatches(3, 10);
+    const deepBefore = deep.cells;
+    const deepCell = await cellInView();
+    frames = await runScenario(() => mouseClick(deepCell.x, deepCell.y));
+    expect(sawExit(frames, gridUrl, -1), '深滚动→详情：原表面仍应有 180ms 退场（末帧 translateX(-28px)）');
+    expect(exitBeforeCommit(frames, gridUrl), '深滚动→详情：退场期间 URL 不得提前切换');
+    expect(settledClean(frames, deepCell.path), '深滚动→详情：结束后无动效残留');
+    const deepBack = (await navLinks()).back;
+    if (deepBack) {
+      frames = await runScenario(() => mouseClick(deepBack.x, deepBack.y));
+      expect(settledClean(frames, gridUrl), '深滚动返回：结束后无 travelTitle 或动效残留');
+      deep = await waitFor(
+        GRID_STATE,
+        (s) => !s.busy && s.status === 'ready' && s.cells >= deepBefore,
+        { timeoutMs: 8000 },
+      );
+      expect(!deep.busy && deep.status === 'ready', `深滚动返回：浏览状态应就绪（status=${deep.status}，busy=${deep.busy}）`);
+      expect(Math.abs(deep.scrollY - deepCell.scrollY) <= 80, `深滚动返回：滚动应恢复到 ${deepCell.scrollY}，实际 ${deep.scrollY}`);
+      expect(deep.cells >= deepBefore, `深滚动返回：卡片数应不低于离开前 ${deepBefore}，实际 ${deep.cells}`);
+      expect(deep.cells === deep.unique, `深滚动返回：不得重复追加卡片（唯一 ${deep.unique}/${deep.cells}）`);
+      checks.push(`deep scroll: exit on original surface, ${deepBefore}→${deep.cells} cells, scroll ${deepCell.scrollY}→${deep.scrollY}`);
+    } else issues.push('深滚动：详情页缺少返回链接，未覆盖深滚动恢复');
+
     await evaluate('document.activeElement && document.activeElement.blur()');
     let focused = await evaluate('document.activeElement ? document.activeElement.id || document.activeElement.tagName : null');
     let tabs = 0;
@@ -258,7 +336,15 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
       '键盘 Enter：路由切换前不得创建任何空间动画',
     );
     expect(frames.every((f) => !f.routeMotion && !f.travelTitles), '键盘 Enter：不得出现 data-route-motion 或 travelTitle');
-    expect(settledClean(frames, keyCell.path), '键盘 Enter：应即时切换到目标详情');
+    const enterArrived = await waitFor(
+      'location.pathname + location.search',
+      (url) => url.startsWith(keyCell.path),
+      { timeoutMs: 6000 },
+    );
+    expect(
+      !!enterArrived && enterArrived.startsWith(keyCell.path),
+      `键盘 Enter：应即时切换到目标详情（${enterArrived}）`,
+    );
     checks.push(`keyboard Enter${tabs ? ` after ${tabs} Tabs` : ''}: instant navigation, no motion artifacts`);
 
     const keyboardTarget = await evaluate(
@@ -317,6 +403,107 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
     expect(reversed.gridTitleVisible && reversed.hitInsideContent, '快速反向：网格标题可见且无透明阻挡层');
     checks.push('rapid reverse: entry cancelled, return committed, no leftovers');
 
+    await openGrid();
+    const nativeGridUrl = await evaluate('location.pathname + location.search');
+    const nativeCell = await pickCell();
+    await mouseClick(nativeCell.x, nativeCell.y);
+    await evaluate(
+      `new Promise((resolve) => { const started = performance.now(); const poll = () => (location.pathname !== '/products/muse' || performance.now() - started > 4000) ? resolve() : requestAnimationFrame(poll); poll(); })`,
+    );
+    await evaluate(
+      `new Promise((resolve) => { const started = performance.now(); const poll = () => { const content = document.getElementById('workspace-content'); ((content && !content.getAnimations().length) || performance.now() - started > 3000) ? resolve() : requestAnimationFrame(poll); }; poll(); })`,
+    );
+    frames = await runScenario(() =>
+      Promise.race([
+        Promise.resolve(tab.back()).catch(() => undefined),
+        evaluate(`new Promise((resolve) => setTimeout(resolve, 6000))`),
+      ]),
+    );
+    expect(frames.every((f) => (f.anims ?? []).length === 0), '原生后退：popstate 不得产生任何表面动画');
+    expect(frames.every((f) => !f.routeMotion && !f.travelTitles), '原生后退：无 data-route-motion 或 travelTitle 残留');
+    expect(settledClean(frames, gridUrl), '原生后退：应回到网格并稳定');
+    const native = await waitFor(GRID_STATE, (s) => !s.busy && s.status === 'ready', { timeoutMs: 6000 });
+    expect(native.url === nativeGridUrl, `原生后退：网格 URL 应恢复为 ${nativeGridUrl}，实际 ${native.url}`);
+    expect(Math.abs(native.scrollY - nativeCell.scrollY) <= 80, `原生后退：滚动应恢复到 ${nativeCell.scrollY}，实际 ${native.scrollY}`);
+    expect(native.activeInside, '原生后退：网格内应存在恢复的焦点');
+    checks.push(`native back: no motion frames, url kept, scroll ${nativeCell.scrollY}→${native.scrollY}, focus in grid`);
+
+    const modCell = await pickCell();
+    // CDP Input modifiers 位掩码：Ctrl=2、Meta=4；macOS 以 Meta 开新标签，其余平台用 Ctrl。
+    const modMask = process.platform === 'darwin' ? 4 : 2;
+    frames = await runScenario(async () => {
+      await mouseClick(modCell.x, modCell.y, modMask);
+      await evaluate(`new Promise((resolve) => setTimeout(resolve, 800))`);
+      await evaluate('window.__routeMotionStop = 1');
+    });
+    expect(frames.every((f) => (f.anims ?? []).length === 0), '修饰键点击：不得启动退场动画');
+    expect(frames.every((f) => !f.routeMotion && !f.travelTitles), '修饰键点击：无 data-route-motion 或 travelTitle');
+    const modUrl = await evaluate('location.pathname + location.search');
+    expect(modUrl === nativeGridUrl, `修饰键点击：当前页 URL 应保持 ${nativeGridUrl}，实际 ${modUrl}`);
+    checks.push(`modifier click (mask ${modMask}): page unchanged, navigation left to browser default`);
+
+    await openGrid();
+    const held = await scrollForBatches(3, 10);
+    const heldBefore = held.cells;
+    let heldCell = null;
+    try {
+      await cdp.send('Network.enable', {}, { timeoutMs: 5000 });
+      await cdp.send(
+        'Network.emulateNetworkConditions',
+        { offline: false, latency: 1400, downloadThroughput: 2 * 1024 * 1024, uploadThroughput: 768 * 1024 },
+        { timeoutMs: 5000 },
+      );
+      await evaluate(`window.scrollTo(0, Math.round(window.scrollY) + 1600)`);
+      await evaluate(`new Promise((resolve) => setTimeout(resolve, 250))`);
+      heldCell = await cellInView();
+      frames = await runScenario(() => mouseClick(heldCell.x, heldCell.y));
+      expect(exitBeforeCommit(frames, gridUrl), '限速追加→详情：退场期间 URL 不得提前切换');
+      expect(settledClean(frames, heldCell.path), '限速追加→详情：结束后无动效残留');
+      await evaluate(`new Promise((resolve) => setTimeout(resolve, 800))`);
+    } finally {
+      try {
+        await cdp.send(
+          'Network.emulateNetworkConditions',
+          { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 },
+          { timeoutMs: 5000 },
+        );
+        await cdp.send('Network.disable', {}, { timeoutMs: 5000 });
+      } catch {
+        // 尽力恢复网络；失败也已在上方收集断言，不掩盖原始结果。
+      }
+    }
+    // Throttled in-flight requests can still be settling here; poll for the back link.
+    const heldBack = await waitFor(
+      `(() => {
+        const nav = document.querySelector('nav[aria-label="作品导航"]');
+        const el = nav?.querySelector('a:not([data-direction])') || nav?.querySelector('a');
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { x: r.x + r.width / 2, y: r.y + r.height / 2, href: el.getAttribute('href'), path: el.pathname };
+      })()`,
+      (back) => !!back,
+      { timeoutMs: 8000 },
+    );
+    if (heldBack) {
+      frames = await runScenario(() => mouseClick(heldBack.x, heldBack.y));
+      expect(settledClean(frames, gridUrl), '限速追加返回：结束后无动效残留');
+      const restored = await waitFor(
+        GRID_STATE,
+        (s) => !s.busy && s.status === 'ready' && s.cells >= heldBefore,
+        { timeoutMs: 6000 },
+      );
+      expect(!restored.busy && restored.status === 'ready', `限速追加返回：状态行应回到 ready 而非卡在更新（status=${restored.status}，busy=${restored.busy}）`);
+      expect(restored.cells === restored.unique, `限速追加返回：不得重复追加卡片（唯一 ${restored.unique}/${restored.cells}）`);
+      expect(restored.cells <= heldBefore + 48, `限速追加返回：卡片数不得异常翻倍（${heldBefore}→${restored.cells}）`);
+      expect(Math.abs(restored.scrollY - heldCell.scrollY) <= 80, `限速追加返回：滚动应恢复到 ${heldCell.scrollY}，实际 ${restored.scrollY}`);
+      const regrowBase = restored.cells;
+      await evaluate(`window.scrollTo(0, Math.round(window.scrollY) + 2400)`);
+      const regrown = await waitFor(GRID_STATE, (s) => s.cells > regrowBase, { timeoutMs: 5000 });
+      expect(regrown.cells > regrowBase, `限速追加返回：sentinel 应能再次触发追加（${regrowBase}→${regrown.cells}）`);
+      expect(regrown.cells === regrown.unique, `限速追加返回：再次追加不得重复卡片（唯一 ${regrown.unique}/${regrown.cells}）`);
+      checks.push(`network hold: ${heldBefore}→${restored.cells}→${regrown.cells} cells, unique ids, status ready`);
+    } else issues.push('限速追加：详情页缺少返回链接，未覆盖返回恢复');
+
     await cdp.send('Emulation.setEmulatedMedia', {
       features: [{ name: 'prefers-reduced-motion', value: 'reduce' }],
     });
@@ -331,7 +518,17 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
       frames.every((f) => f.anims.length === 0 && !f.routeMotion && !f.travelTitles),
       '减少动态效果：指针点击不得创建空间动画',
     );
-    expect(settledClean(frames, reducedCell.path), '减少动态效果：应即时切换到目标详情');
+    // Instant navigation means no animation before the switch; arrival itself is polled,
+    // since suite load can commit the route after the recorder window closes.
+    const reducedArrived = await waitFor(
+      'location.pathname + location.search',
+      (url) => url.startsWith(reducedCell.path),
+      { timeoutMs: 6000 },
+    );
+    expect(
+      !!reducedArrived && reducedArrived.startsWith(reducedCell.path),
+      `减少动态效果：应即时切换到目标详情（${reducedArrived}）`,
+    );
     checks.push('reduced motion pointer: instant navigation, no motion artifacts');
 
     return { passed: issues.length === 0, base, checks, issues };

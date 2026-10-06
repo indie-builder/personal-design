@@ -3,10 +3,10 @@
   "failed": [],
   "results": [
     {
-      "route": "/",
+      "route": "/icon.png",
       "status": 200,
-      "kind": "page",
-      "hasMain": true
+      "kind": "asset",
+      "hasMain": false
     },
     {
       "route": "/_not-found",
@@ -15,7 +15,37 @@
       "hasMain": true
     },
     {
+      "route": "/products/ai-coding-dictionary",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true
+    },
+    {
+      "route": "/",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true
+    },
+    {
+      "route": "/products/ai-chat",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true
+    },
+    {
       "route": "/products/design-engineer-tools",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true
+    },
+    {
+      "route": "/robots.txt",
+      "status": 200,
+      "kind": "asset",
+      "hasMain": false
+    },
+    {
+      "route": "/products/word-arcade",
       "status": 200,
       "kind": "page",
       "hasMain": true
@@ -34,36 +64,6 @@
     },
     {
       "route": "/products/layout-compositions",
-      "status": 200,
-      "kind": "page",
-      "hasMain": true
-    },
-    {
-      "route": "/robots.txt",
-      "status": 200,
-      "kind": "asset",
-      "hasMain": false
-    },
-    {
-      "route": "/icon.png",
-      "status": 200,
-      "kind": "asset",
-      "hasMain": false
-    },
-    {
-      "route": "/products/ai-coding-dictionary",
-      "status": 200,
-      "kind": "page",
-      "hasMain": true
-    },
-    {
-      "route": "/products/ai-chat",
-      "status": 200,
-      "kind": "page",
-      "hasMain": true
-    },
-    {
-      "route": "/products/word-arcade",
       "status": 200,
       "kind": "page",
       "hasMain": true
