@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
-import { ArrowUpRight } from 'lucide-react';
 import { toolCategories } from '@personal-design/design-engineer-tools';
 import { categoryLabel } from '@/lib/category-label';
+import { ToolIcon } from './tool-icon';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -27,14 +26,7 @@ export default function DesignEngineerToolsPage() {
                 {category.tools.map((tool) => (
                   <li key={tool.url}>
                     <a href={tool.url} target="_blank" rel="noopener noreferrer">
-                      <span
-                        className={styles.icon}
-                        data-fallback={!tool.icon || undefined}
-                        aria-hidden="true"
-                      >
-                        {tool.icon && <Image src={tool.icon} alt="" width={16} height={16} />}
-                        <ArrowUpRight size={16} strokeWidth={2} />
-                      </span>
+                      <ToolIcon icon={tool.icon} />
                       <span>{tool.name}</span>
                     </a>
                   </li>
