@@ -1,3 +1,4 @@
+import { button as buttons, cdpEvaluate } from './harness.cjs';
 // Compatible browser tab adapter; production preview uses fixtures/ai-chat-provider.mjs on :3907.
 // const { verifyChatLifecycle } = await import('file:///ABSOLUTE_REPO/scripts/design-checks/chat-lifecycle.browser.mjs');
 // await verifyChatLifecycle(tab, await tab.capabilities.get('cdp'));
@@ -8,12 +9,8 @@ export async function verifyChatLifecycle(tab, cdp) {
   const key = 'personal-design:ai-chat:v2';
   const legacyKey = 'personal-design:ai-chat:v1';
   const check = (ok, message) => { if (!ok) throw new Error(message); };
-  const evaluate = async expression => {
-    const value = await cdp.send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true }, { timeoutMs: 15000 });
-    check(!value.exceptionDetails, value.exceptionDetails?.text || 'Browser evaluation failed');
-    return value.result?.value;
-  };
-  const button = name => tab.playwright.getByRole('button', { name, exact: true });
+  const evaluate = (expression) => cdpEvaluate(cdp, expression, { timeoutMs: 15000, exception: 'text' });
+  const button = buttons(tab.playwright);
   const error = () => tab.playwright.getByRole('region', { name: '对话', exact: true }).getByRole('alert');
   const wait = (locator, state = 'visible') => locator.waitFor({ state, timeoutMs: 10000 });
   const send = async text => {

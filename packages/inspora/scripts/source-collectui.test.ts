@@ -134,11 +134,9 @@ test('Collect UI 后续分页失败时不写半批；单次事务失败回滚作
         db,
         stmts: {
           ...stmts,
-          upsertMedia: {
-            run() {
-              throw Error('write failed');
-            },
-          } as unknown as typeof stmts.upsertMedia,
+          upsertMedia() {
+            throw Error('write failed');
+          },
         },
         source: 'collectui',
         pageSleepMs: 0,

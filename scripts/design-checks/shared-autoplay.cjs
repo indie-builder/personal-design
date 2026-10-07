@@ -3,13 +3,12 @@
 // 离开视口暂停、回到视口恢复；reduced-motion 下不自动播放。
 // 旧版对本仓已删除的 use-autoplay-video 钩子做 vm 静态断言，现行为集中在
 // MotionVideo（motion-video.tsx），改为真实浏览器行为断言。
-const { chromium }=require('playwright');
+const { baseUrl, withBrowser }=require('./harness.cjs');
 const assert=require('node:assert/strict');
-const baseURL = process.env.DESIGN_BASE_URL || 'http://localhost:3000';
+const baseURL = baseUrl();
 const target = (path) => new URL(path, baseURL).href;
-(async()=>{const b=await chromium.launch();try {
+withBrowser(async ({ browser:b, page }) => {
 // 常规偏好：首个视频格可视时自动播放，滚离暂停，滚回恢复。
-const page=await b.newPage({viewport:{width:1440,height:900}});
 await page.goto(target('/products/muse'),{waitUntil:'domcontentloaded'});
 const firstVideo=page.locator('a[id^="muse-"] video').first();
 await firstVideo.waitFor({timeout:20000});
@@ -44,5 +43,4 @@ assert.ok(
 );
 await rm.close();
 console.log('PASS autoplay: reduced motion stays paused');
-} finally { await b.close(); }
-})().catch(e=>{console.error(e);process.exit(1)});
+}, { pageOptions: {viewport:{width:1440,height:900}} }).catch(e=>{console.error(e);process.exit(1)});

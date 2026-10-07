@@ -1,3 +1,4 @@
+import { button as buttons, cdpEvaluate } from './harness.cjs';
 // Run with a compatible production tab adapter and CDP session:
 // const { verifyWordArcade } = await import('file:///ABSOLUTE_REPO/scripts/design-checks/word-arcade.browser.mjs');
 // await verifyWordArcade(tab, await tab.capabilities.get('cdp'));
@@ -5,13 +6,11 @@
 export async function verifyWordArcade(tab, cdp) {
   const results = [];
   const expect = (condition, message) => { if (!condition) throw new Error(message); };
-  const button = name => tab.playwright.getByRole('button', { name, exact: true });
+  const button = buttons(tab.playwright);
   const state = () => tab.playwright.evaluate(() => ({ ...document.querySelector('[data-arcade-stage]').dataset }));
   // Keyboard activates native controls; a DOM pointer event supplies aim coordinates.
   // This avoids the in-app panel's screen/CSS coordinate offset during browser QA.
-  const move = (x, y) => cdp.send('Runtime.evaluate', {
-    expression: `document.querySelector('[data-arcade-stage]').dispatchEvent(new PointerEvent('pointermove',{bubbles:true,pointerType:'mouse',clientX:${x},clientY:${y}}))`,
-  });
+  const move = (x, y) => cdpEvaluate(cdp, `document.querySelector('[data-arcade-stage]').dispatchEvent(new PointerEvent('pointermove',{bubbles:true,pointerType:'mouse',clientX:${x},clientY:${y}}))`, { parameters: {}, exception: 'ignore', raw: true });
   const changedScore = () => tab.playwright.locator('[data-arcade-stage]:not([data-score="0"])').waitFor({state:'visible',timeoutMs:15000});
   for (const name of ['打砖块','贪吃蛇','文字射击','飞字打靶','文字跑酷']) {
     await button(name).press('Enter');
@@ -21,10 +20,7 @@ export async function verifyWordArcade(tab, cdp) {
     if (name === '飞字打靶') {
       await tab.playwright.locator('[data-game-target="true"]').first().waitFor({state:'visible',timeoutMs:4000});
       // Read moving geometry in the same browser frame; locator serialization can lag an active target.
-      const geometry = await cdp.send('Runtime.evaluate', {
-        expression: '(()=>{const e=document.querySelector("[data-game-target=true]");const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()',
-        returnByValue: true,
-      });
+      const geometry = await cdpEvaluate(cdp, '(()=>{const e=document.querySelector("[data-game-target=true]");const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()', { parameters: { returnByValue: true }, exception: 'ignore', raw: true });
       const target = geometry.result.value;
       await move(target.x, target.y);
       await tab.playwright.getByRole('region',{name:'飞字打靶游戏区域',exact:true}).press('Space');
@@ -77,7 +73,7 @@ export async function verifyRestartHeadline(tab) {
 export async function verifyPointerCancel(tab, cdp) {
   const state = await tab.playwright.locator('[data-arcade-stage]').getAttribute('data-game-state');
   if (state !== 'playing') throw new Error('Start a game before testing pointer interruption');
-  await cdp.send('Runtime.evaluate', { expression:'document.querySelector("[data-arcade-stage]").dispatchEvent(new PointerEvent("pointercancel",{bubbles:true,pointerType:"touch"}))' });
+  await cdpEvaluate(cdp, 'document.querySelector("[data-arcade-stage]").dispatchEvent(new PointerEvent("pointercancel",{bubbles:true,pointerType:"touch"}))', { parameters: {}, exception: 'ignore', raw: true });
   const after = await tab.playwright.locator('[data-arcade-stage]').getAttribute('data-game-state');
   if (after !== 'paused') throw new Error(`Interrupted touch keeps running: ${after}`);
   return { state:after };
@@ -87,7 +83,7 @@ export async function verifyPointerCancel(tab, cdp) {
 // letter geometry and sends normal input events; never edits score, lives or engine state.
 export async function startVisiblePlaythrough(cdp, kind) {
   if (!['breakout', 'runner'].includes(kind)) throw new Error('Unsupported visual controller');
-  return cdp.send('Runtime.evaluate', { expression: `(() => {
+  return cdpEvaluate(cdp, `(() => {
     const kind=${JSON.stringify(kind)};
     const area=document.querySelector('[data-arcade-stage]'), canvas=area.querySelector('canvas');
     if(area.dataset.game!==kind||area.dataset.gameState!=='playing')throw Error('Start the requested game first');
@@ -124,5 +120,5 @@ export async function startVisiblePlaythrough(cdp, kind) {
         }
       }
     },50);
-  })()` });
+  })()`, { parameters: {}, exception: 'ignore', raw: true });
 }

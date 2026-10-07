@@ -1,3 +1,4 @@
+import { button as buttons, cdpEvaluate } from './harness.cjs';
 // Pass a compatible production tab, CDP session and viewport adapter.
 // await verifyCurrentSite(tab, await tab.capabilities.get('cdp'), await browser.capabilities.get('viewport'));
 import assert from 'node:assert/strict';
@@ -6,12 +7,8 @@ import { verifyTimelineBounds } from './home-performance.browser.mjs';
 export async function verifyCurrentSite(tab, cdp, viewport) {
   const base = new URL(await tab.url()).origin, checks = [], issues = [];
   const ui = tab.playwright;
-  const button = name => ui.getByRole('button', { name, exact: true });
-  const evaluate = async expression => {
-    const result = await cdp.send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true }, { timeoutMs: 35000 });
-    if (result.exceptionDetails) throw Error(JSON.stringify(result.exceptionDetails));
-    return result.result.value;
-  };
+  const button = buttons(ui);
+  const evaluate = (expression) => cdpEvaluate(cdp, expression, { timeoutMs: 35000 });
   const until = (condition, timeout = 10000) => evaluate(`new Promise((resolve,reject)=>{
     const started=performance.now();function tick(){if(${condition})return resolve(true);
     if(performance.now()-started>${timeout})return reject(Error(${JSON.stringify(condition)}));requestAnimationFrame(tick)}tick();})`);

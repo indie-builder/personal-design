@@ -11,11 +11,13 @@
   "http": [
     {
       "id": "routes",
-      "file": "scripts/verify-design-routes.mjs"
+      "file": "scripts/verify-design-routes.mjs",
+      "regression": 2
     },
     {
       "id": "portfolio",
-      "file": "scripts/portfolio-api.test.mjs"
+      "file": "scripts/portfolio-api.test.mjs",
+      "regression": 3
     },
     {
       "id": "chat-api",
@@ -147,47 +149,56 @@
     {
       "id": "playwright-home",
       "file": "scripts/design-checks/home.mjs",
-      "exports": []
+      "exports": [],
+      "regression": 4
     },
     {
       "id": "playwright-layouts-check",
       "file": "scripts/design-checks/layouts-check.mjs",
-      "exports": []
+      "exports": [],
+      "regression": 5
     },
     {
       "id": "playwright-layouts-states",
       "file": "scripts/design-checks/layouts-states.mjs",
-      "exports": []
+      "exports": [],
+      "regression": 6
     },
     {
       "id": "playwright-muse-behavior",
       "file": "scripts/design-checks/muse-behavior.mjs",
-      "exports": []
+      "exports": [],
+      "regression": 8
     },
     {
       "id": "playwright-muse-recovery",
       "file": "scripts/design-checks/muse-recovery.mjs",
-      "exports": []
+      "exports": [],
+      "regression": 9
     },
     {
       "id": "playwright-shared-browser",
       "file": "scripts/design-checks/shared-browser.cjs",
-      "exports": []
+      "exports": [],
+      "regression": 10
     },
     {
       "id": "playwright-shared-autoplay",
       "file": "scripts/design-checks/shared-autoplay.cjs",
-      "exports": []
+      "exports": [],
+      "regression": 11
     },
     {
       "id": "playwright-journeys",
       "file": "scripts/design-checks/journeys.mjs",
-      "exports": []
+      "exports": [],
+      "regression": 12
     },
     {
       "id": "playwright-personal-sites",
       "file": "scripts/design-checks/personal-sites.mjs",
-      "exports": []
+      "exports": [],
+      "regression": 13
     },
     {
       "id": "playwright-muse-performance",
@@ -197,12 +208,20 @@
     {
       "id": "playwright-layout-first-paint",
       "file": "scripts/design-checks/layout-first-paint.mjs",
-      "exports": []
+      "exports": [],
+      "regression": 7
     },
     {
       "id": "playwright-foundation",
       "file": "scripts/verify-design.mjs",
-      "exports": []
+      "exports": [],
+      "regression": 1
     }
+  ],
+  "utilities": [
+    "scripts/design-checks/run-http.mjs",
+    "scripts/design-checks/run-chat.mjs",
+    "scripts/design-checks/fixtures/ai-chat-provider.mjs",
+    "scripts/design-checks/fixtures/analytics-mcp.mjs"
   ]
 }

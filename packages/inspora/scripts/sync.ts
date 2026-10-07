@@ -20,7 +20,7 @@ import { Data, Effect, Result } from 'effect';
 import { NodeRuntime } from '@effect/platform-node';
 import { openDatabase, withTransaction, database, databaseError, type Db } from './db.ts';
 import { syncInspora } from './source-inspora.ts';
-import { syncBestx } from './source-bestx.ts';
+import { syncBestx, tweetIdOf } from './source-bestx.ts';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -67,7 +67,7 @@ function backfillTweetIds(db: Db['db']) {
       try: () =>
         withTransaction(db, () => {
           for (const row of rows) {
-            const tweetId = row.source_url.match(/\/status\/(\d+)/)?.[1];
+            const tweetId = tweetIdOf(row.source_url);
             if (tweetId) update.run(tweetId, row.id);
           }
         }),

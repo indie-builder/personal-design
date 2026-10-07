@@ -1,5 +1,8 @@
 import { Data, Effect } from 'effect';
 
+export const stopOnKnown = <Key>(known: ReadonlySet<Key>, key: Key, full = false) =>
+  !full && known.has(key);
+
 export class FeedError extends Data.TaggedError('Feed')<{
   readonly message: string;
   readonly cause?: unknown;
@@ -74,7 +77,7 @@ export function collectFeed<A extends { id: string }, E, R>(
         if (!Array.isArray(data.items))
           return yield* Effect.fail(new FeedError({ message: `${category}: 列表数据无效` }));
         for (const item of data.items) {
-          if (!full && knownIds.has(item.id)) {
+          if (stopOnKnown(knownIds, item.id, full)) {
             complete = true;
             break;
           }

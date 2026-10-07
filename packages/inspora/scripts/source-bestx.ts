@@ -15,6 +15,7 @@
 import { Data, Effect } from 'effect';
 import { defaultRetrySchedule } from './download.ts';
 import { withTransaction, database, databaseError, type Db } from './db.ts';
+import { stopOnKnown } from './sync-source.ts';
 
 export class BestxError extends Data.TaggedError('Bestx')<{
   readonly message: string;
@@ -105,6 +106,20 @@ interface MappedPost {
   isFeatured: boolean;
   raw: { entries?: CollectuiRow[]; [key: string]: unknown };
   media: MappedMedia[];
+}
+
+interface MappedCollectuiPost extends MappedPost {
+  styles: string[];
+  raw: { entries: CollectuiRow[] };
+  media: [MappedMedia, ...MappedMedia[]];
+}
+
+interface SourceDescriptor<Post extends MappedPost> {
+  table: string;
+  order: string;
+  fields: string;
+  mapRow: (row: BestxRow & CollectuiRow) => Post | null;
+  merge: (previous: Post | undefined, item: Post) => Post;
 }
 
 const SUPABASE_URL = 'https://tuzpqmdnxvlzwqthgseg.supabase.co/rest/v1/';
@@ -214,12 +229,12 @@ export function mapBestxPost(row: BestxRow): MappedPost | null {
     },
     media: (row.media ?? [])
       .map((entry, position) => mapMedia(entry, tweetId, position))
-      .filter(Boolean) as MappedMedia[],
+      .filter((media) => media !== null),
   };
 }
 
 /** Collect UI 同一原作的每件媒体占一行，复用推文键与标题规则，媒体保持 CDN 热链。 */
-export function mapCollectuiPost(row: CollectuiRow): MappedPost | null {
+export function mapCollectuiPost(row: CollectuiRow): MappedCollectuiPost | null {
   const tweetId = tweetIdOf(row.source_url);
   const createdAt = isoOf(row.created_at);
   if (!tweetId || !createdAt || !row.media_url || !['image', 'video'].includes(row.media_type))
@@ -264,6 +279,30 @@ export function mapCollectuiPost(row: CollectuiRow): MappedPost | null {
   };
 }
 
+const sources = {
+  bestx: {
+    table: 'bestdesignsonx',
+    order: 'published_at.desc.nullslast',
+    fields: FIELDS,
+    mapRow: mapBestxPost,
+    merge: (previous: MappedPost | undefined, item: MappedPost) => previous ?? item,
+  } satisfies SourceDescriptor<MappedPost>,
+  collectui: {
+    table: 'collectui_posts',
+    order: 'created_at.desc,id.desc',
+    fields: '*,designer:designer_x_profile_id(*)',
+    mapRow: mapCollectuiPost,
+    merge(previous: MappedCollectuiPost | undefined, item: MappedCollectuiPost) {
+      if (!previous) return item;
+      previous.raw.entries.push(...item.raw.entries);
+      if (!previous.media.some((media) => media.url === item.media[0].url))
+        previous.media.push(...item.media);
+      previous.styles = [...new Set([...previous.styles, ...item.styles])];
+      return previous;
+    },
+  } satisfies SourceDescriptor<MappedCollectuiPost>,
+};
+
 /**
  * 增量（默认）：published_at 倒序翻到已入库 tweet_id 即停；
  * `--full`：翻完全表并 upsert。两态都是完整发现后事务写入。
@@ -276,29 +315,47 @@ export function syncBestx({
   pageSize = 120,
   pageSleepMs = 250,
 }: Db & { full?: boolean; source?: string; pageSize?: number; pageSleepMs?: number }) {
+  const options = { db, stmts, full, pageSize, pageSleepMs };
+  if (source === 'bestx') return syncPublicSource(sources.bestx, { ...options, source });
+  if (source === 'collectui') return syncPublicSource(sources.collectui, { ...options, source });
+  return Effect.fail(new BestxError({ message: `未知公开来源: ${source}` }));
+}
+
+function syncPublicSource<Post extends MappedPost>(
+  descriptor: SourceDescriptor<Post>,
+  {
+    db,
+    stmts,
+    full,
+    source,
+    pageSize,
+    pageSleepMs,
+  }: Db & {
+    full: boolean;
+    source: 'bestx' | 'collectui';
+    pageSize: number;
+    pageSleepMs: number;
+  },
+) {
   return Effect.gen(function* () {
-    if (!['bestx', 'collectui'].includes(source))
-      return yield* Effect.fail(new BestxError({ message: `未知公开来源: ${source}` }));
-    const collectui = source === 'collectui';
     const known = new Set(yield* database(() => stmts.knownTweetIds(source)));
     const headers = { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` };
-    const items = new Map<string, MappedPost>(); // tweetId → 映射结果（同推文重复行保留先见的）
+    const items = new Map<string, Post>(); // tweetId → 映射结果（同推文重复行保留先见的）
     let complete = false;
     let page = 0;
     while (!complete) {
       const params = new URLSearchParams({
-        select: collectui ? '*,designer:designer_x_profile_id(*)' : FIELDS,
+        select: descriptor.fields,
         status: 'eq.Published',
         // 不过滤 published_at：站点列表同样展示没有发布时间的存量行，
         // 它们经 nullslast 落在排序尾部，由 --full 收进，日常增量从头部即停
-        order: collectui ? 'created_at.desc,id.desc' : 'published_at.desc.nullslast',
+        order: descriptor.order,
         offset: String(page * pageSize),
         limit: String(pageSize),
       });
-      const table = collectui ? 'collectui_posts' : 'bestdesignsonx';
       const rows = yield* Effect.tryPromise({
         try: async (signal) => {
-          const res = await fetch(`${SUPABASE_URL}${table}?${params}`, {
+          const res = await fetch(`${SUPABASE_URL}${descriptor.table}?${params}`, {
             headers,
             signal: AbortSignal.any([signal, AbortSignal.timeout(30000)]),
           });
@@ -309,6 +366,7 @@ export function syncBestx({
           }
           const rows: unknown = await res.json();
           if (!Array.isArray(rows)) throw new BestxError({ message: `${source} 列表数据无效` });
+          // 保留既有 REST 接口类型边界，输入接受规则由 mapper 定义。
           return rows as (BestxRow & CollectuiRow)[];
         },
         catch: (cause) => {
@@ -325,19 +383,13 @@ export function syncBestx({
         },
       }).pipe(Effect.retry(defaultRetrySchedule));
       for (const row of rows) {
-        const item = collectui ? mapCollectuiPost(row) : mapBestxPost(row);
+        const item = descriptor.mapRow(row);
         if (!item) continue;
-        if (!full && known.has(item.tweetId)) {
+        if (stopOnKnown(known, item.tweetId, full)) {
           complete = true;
           break;
         }
-        const previous = items.get(item.tweetId);
-        if (collectui && previous) {
-          previous.raw.entries!.push(row);
-          if (!previous.media.some((media) => media.url === item.media[0]!.url))
-            previous.media.push(...item.media);
-          previous.styles = [...new Set([...previous.styles!, ...item.styles!])];
-        } else if (!previous) items.set(item.tweetId, item);
+        items.set(item.tweetId, descriptor.merge(items.get(item.tweetId), item));
       }
       page++;
       if (rows.length < pageSize) complete = true;
@@ -352,46 +404,10 @@ export function syncBestx({
         withTransaction(db, () => {
           for (const item of items.values()) {
             const isNew = !stmts.hasPost.get(item.id);
-            stmts.upsertPost.run(
-              item.id,
-              item.slug,
-              item.title,
-              item.creatorName,
-              item.creatorUrl,
-              item.creatorAvatar,
-              item.description,
-              item.category,
-              null,
-              null,
-              item.styles ? JSON.stringify(item.styles) : null,
-              item.sourceUrl,
-              item.createdAt,
-              item.publishedAt,
-              item.isFeatured ? 1 : 0,
-              JSON.stringify(item.raw),
-              now, // 公开 REST 源无详情补全阶段，入库即视为已补全
-              now,
-              source,
-              item.tweetId,
-            );
+            stmts.upsertPost({ ...item, raw: item.raw, enrichedAt: now, syncedAt: now, source });
             item.media.sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
             for (const [position, media] of item.media.entries()) {
-              stmts.upsertMedia.run(
-                media.id,
-                item.id,
-                position,
-                media.type,
-                media.url,
-                media.posterUrl,
-                media.width,
-                media.height,
-                null,
-                null,
-                null,
-                null,
-                null,
-                JSON.stringify(media.raw),
-              );
+              stmts.upsertMedia({ ...media, postId: item.id, position });
             }
             if (isNew) inserted++;
           }

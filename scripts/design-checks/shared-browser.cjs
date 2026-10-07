@@ -3,13 +3,11 @@
 // 背景滚动锁、焦点约束（Tab 环不逃逸、初始与关闭后焦点落点）、组内方向键
 // 翻图同步计数、Esc 关闭；404 提供清晰首页出口。 muse 集合与布局画册的
 // 专属入口行为分别由 muse-behavior / layouts-* 脚本覆盖，此处不重复。
-const { chromium }=require('playwright');
+const { baseUrl, withBrowser }=require('./harness.cjs');
 const assert=require('node:assert/strict');
-const baseURL = process.env.DESIGN_BASE_URL || 'http://localhost:3000';
+const baseURL = baseUrl();
 const target = (path) => new URL(path, baseURL).href;
-(async()=>{const b=await chromium.launch();try {
-const p=await b.newPage({viewport:{width:1440,height:900}});
-const errors=[];p.on('pageerror',(e)=>errors.push(e.message));
+withBrowser(async ({page:p,errors}) => {
 
 // 灯箱：滚动锁、焦点环、组内方向键、Esc 与焦点回归（用多媒体详情的组入口）。
 await p.goto(target('/products/muse/product-comps'),{waitUntil:'domcontentloaded'});
@@ -39,5 +37,4 @@ assert.equal(await p.getByRole('link',{name:'回到首页'}).getAttribute('href'
 
 assert.equal(errors.length,0,`页面报错：${errors.join(' | ')}`);
 console.log('PASS shared browser: lightbox scroll lock/focus wrap/group arrows/Esc focus return; true 404 with home exit');
-} finally { await b.close(); }
-})().catch(e=>{console.error(e);process.exit(1)});
+}, { pageOptions: {viewport:{width:1440,height:900}} }).catch(e=>{console.error(e);process.exit(1)});

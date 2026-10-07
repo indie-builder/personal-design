@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import { designOrigin, regressionSuites, runSuites } from './runner.mjs';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -8,32 +8,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 // Motion checks below are the injected tab/cdp modules from docs/design/execution/README.md;
 // the Playwright adapter wraps a headless page to that documented interface.
 const here = dirname(fileURLToPath(import.meta.url));
-const base = new URL(process.env.DESIGN_BASE_URL ?? 'https://personal-design.localhost');
-if (
-  !['http:', 'https:'].includes(base.protocol) ||
-  base.pathname !== '/' ||
-  base.search ||
-  base.hash ||
-  base.username ||
-  base.password
-) {
-  throw new Error('DESIGN_BASE_URL must be an HTTP(S) origin. Use the Portless startup URL.');
-}
-const suites = [
-  '../verify-design.mjs',
-  '../verify-design-routes.mjs',
-  '../portfolio-api.test.mjs',
-  'home.mjs',
-  'layouts-check.mjs',
-  'layouts-states.mjs',
-  'layout-first-paint.mjs',
-  'muse-behavior.mjs',
-  'muse-recovery.mjs',
-  'shared-browser.cjs',
-  'shared-autoplay.cjs',
-  'journeys.mjs',
-  'personal-sites.mjs',
-];
+const base = designOrigin();
+const suites = regressionSuites;
 const motionChecks = [
   ['route-motion.browser.mjs', 'verifyRouteMotion'],
   ['lightbox-motion.browser.mjs', 'verifyLightboxMotion'],
@@ -42,26 +18,10 @@ const motionChecks = [
   ['timeline-motion.browser.mjs', 'verifyTimelineMotion'],
   ['taichi-motion.browser.mjs', 'verifyTaichiMotion'],
 ];
-const failed = [];
-for (const suite of suites) {
-  const startedAt = Date.now();
-  const exit = await new Promise((resolve) => {
-    const child = spawn(process.execPath, [join(here, suite)], {
-      stdio: ['ignore', 'inherit', 'inherit'],
-      env: { ...process.env, DESIGN_BASE_URL: base.origin, PORTFOLIO_API_BASE: base.origin },
-    });
-    child.once('error', (error) => {
-      console.error(error.message);
-      resolve(1);
-    });
-    child.once('exit', (code) => resolve(code ?? 1));
-  });
-  const seconds = ((Date.now() - startedAt) / 1000).toFixed(1);
-  console.log(
-    `\n=== ${suite.split('/').pop()} ${exit === 0 ? 'PASS' : `FAIL (exit ${exit})`} ${seconds}s ===\n`,
-  );
-  if (exit !== 0) failed.push(suite);
-}
+const label = (suite) => suite.file.replace(/^scripts\/design-checks\//, '').replace(/^scripts\//, '../');
+const failed = (await runSuites(suites, base, (suite, code, seconds) => {
+  console.log(`\n=== ${suite.file.split('/').pop()} ${code === 0 ? 'PASS' : `FAIL (exit ${code})`} ${seconds}s ===\n`);
+}, { cwd: process.cwd(), stdio: ['ignore', 'inherit', 'inherit'] })).map(label);
 
 const wrapLocator = (locator) => ({
   waitFor: ({ state, timeoutMs } = {}) => locator.waitFor({ state, timeout: timeoutMs }),

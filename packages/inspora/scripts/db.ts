@@ -4,10 +4,50 @@
  *   多源指向同一原作时读取侧仅显示一份（见 src/index.ts）。
  * - bestx / collectui 的媒体文件不下载（热链公开 CDN），local_* 保持 NULL。
  */
-import { DatabaseSync, type StatementSync } from 'node:sqlite';
+import { DatabaseSync, type SQLInputValue } from 'node:sqlite';
 import { Data, Effect } from 'effect';
 
 export type Db = ReturnType<typeof openDatabase>;
+
+export interface PostRecord {
+  id: string;
+  slug: string;
+  title: string;
+  creatorName?: string | null;
+  creatorUrl?: string | null;
+  creatorAvatar?: string | null;
+  description?: string | null;
+  category?: string | null;
+  industries?: readonly string[] | null;
+  colors?: readonly string[] | null;
+  styles?: readonly string[] | null;
+  sourceUrl?: string | null;
+  createdAt: string;
+  publishedAt?: string | null;
+  isFeatured?: boolean;
+  raw?: unknown;
+  enrichedAt?: string | null;
+  syncedAt?: string | null;
+  source?: 'inspora' | 'bestx' | 'collectui' | null;
+  tweetId?: string | null;
+}
+
+export interface MediaRecord {
+  id: string;
+  postId: string;
+  position: number;
+  type: string;
+  url: string;
+  posterUrl?: string | null;
+  width?: number | null;
+  height?: number | null;
+  sizeBytes?: number | null;
+  alt?: string | null;
+  localPath?: string | null;
+  localPosterPath?: string | null;
+  localThumbPath?: string | null;
+  raw?: unknown;
+}
 
 export class DatabaseError extends Data.TaggedError('Database')<{
   readonly message: string;
@@ -102,26 +142,31 @@ export function openDatabase(dbPath: string) {
   if (!columns.has('tweet_id')) db.exec('ALTER TABLE posts ADD COLUMN tweet_id TEXT');
   db.exec('CREATE INDEX IF NOT EXISTS idx_posts_tweet ON posts(tweet_id)');
 
-  const stmts: {
-    hasPost: StatementSync;
-    needsEnrich: StatementSync;
-    upsertPost: StatementSync;
-    upsertMedia: StatementSync;
-    mediaNeedingDownload: StatementSync;
-    updateMediaPaths: StatementSync;
-    creatorsNeedingAvatar: StatementSync;
-    updateAvatar: StatementSync;
-    knownTweetIds: (source: string) => string[];
-  } = {
+  const upsert = <Record>(
+    sql: string,
+    normalize: (record: Record) => { [key: string]: SQLInputValue | undefined },
+  ) => {
+    const statement = db.prepare(sql);
+    const keys = [...sql.matchAll(/\$(\w+)/g)].map((match) => match[1]!);
+    return (record: Record) => {
+      const values = normalize(record);
+      return statement.run(Object.fromEntries(keys.map((key) => [key, values[key] ?? null])));
+    };
+  };
+  const json = (value: unknown) => (value == null ? null : JSON.stringify(value));
+  const stmts = {
     hasPost: db.prepare('SELECT 1 FROM posts WHERE id = ?'),
     needsEnrich: db.prepare(
       "SELECT slug FROM posts WHERE enriched_at IS NULL AND source = 'inspora'",
     ),
-    upsertPost: db.prepare(`
+    upsertPost: upsert<PostRecord>(
+      `
       INSERT INTO posts (id, slug, title, creator_name, creator_url, creator_avatar,
         description, category, industries, colors, styles, source_url,
         created_at, published_at, is_featured, raw_json, enriched_at, synced_at, source, tweet_id)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES ($id, $slug, $title, $creatorName, $creatorUrl, $creatorAvatar,
+        $description, $category, $industries, $colors, $styles, $sourceUrl,
+        $createdAt, $publishedAt, $isFeatured, $raw, $enrichedAt, $syncedAt, $source, $tweetId)
       ON CONFLICT(id) DO UPDATE SET
         slug=excluded.slug, title=excluded.title,
         creator_name=excluded.creator_name, creator_url=excluded.creator_url,
@@ -140,11 +185,24 @@ export function openDatabase(dbPath: string) {
         synced_at=excluded.synced_at,
         source=excluded.source,
         tweet_id=COALESCE(excluded.tweet_id, posts.tweet_id)
-    `),
-    upsertMedia: db.prepare(`
+    `,
+      (post) => ({
+        ...post,
+        industries: json(post.industries),
+        colors: json(post.colors),
+        styles: json(post.styles),
+        isFeatured: post.isFeatured ? 1 : 0,
+        raw: json(post.raw),
+        syncedAt: post.syncedAt ?? new Date().toISOString(),
+        source: post.source ?? 'inspora',
+      }),
+    ),
+    upsertMedia: upsert<MediaRecord>(
+      `
       INSERT INTO media (id, post_id, position, type, url, poster_url, width, height,
         size_bytes, alt, local_path, local_poster_path, local_thumb_path, raw_json)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES ($id, $postId, $position, $type, $url, $posterUrl, $width, $height,
+        $sizeBytes, $alt, $localPath, $localPosterPath, $localThumbPath, $raw)
       ON CONFLICT(id) DO UPDATE SET
         post_id=excluded.post_id, position=excluded.position, type=excluded.type,
         url=excluded.url, poster_url=excluded.poster_url,
@@ -155,7 +213,9 @@ export function openDatabase(dbPath: string) {
         local_poster_path=COALESCE(media.local_poster_path, excluded.local_poster_path),
         local_thumb_path=COALESCE(media.local_thumb_path, excluded.local_thumb_path),
         raw_json=excluded.raw_json
-    `),
+    `,
+      (media) => ({ ...media, raw: json(media.raw) }),
+    ),
     // 大图/视频不再下载（热链原站，见包 README/AGENTS.md）；只补本地的海报与缩略图
     mediaNeedingDownload: db.prepare(`
       SELECT media.id, media.type, media.url, media.poster_url, media.local_path,
