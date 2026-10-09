@@ -127,7 +127,7 @@ export async function verifyChatLifecycle(tab, cdp) {
       const rendered = await evaluate(`document.documentElement.dataset.theme=${JSON.stringify(theme)};
         new Promise((resolve,reject)=>{const end=Date.now()+5000;const check=()=>{
           const answer=[...document.querySelectorAll('[data-answer-body]')].at(-1);
-          const bars=[...(answer?.querySelectorAll('.openui-chart-container svg .recharts-bar-rectangle path[fill]')||[])].filter(el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>0;});
+          const bars=[...(answer?.querySelectorAll('.openui-bar-chart-container svg path.openui-bar-chart-bar[fill]')||[])].filter(el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>0;});
           const fills=bars.map(el=>getComputedStyle(el).fill);
           const styles=document.querySelectorAll('style[data-openui-theme]').length;
           if(fills.length===2&&fills.every(fill=>${JSON.stringify(palette)}.includes(fill))&&styles===1)return resolve({fills,styles});

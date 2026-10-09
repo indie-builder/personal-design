@@ -98,8 +98,8 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const frames = [];
       const start = performance.now();
       while (performance.now() - start < 1700) {
-        const stage = root.querySelector('div[class*="__stage"]');
-        const actor = root.querySelector('div[class*="__actor"]');
+        const stage = root.querySelector('div[class*="__stage"],div[class$="_stage"]');
+        const actor = root.querySelector('div[class*="__actor"],div[class$="_actor"]');
         const anims = actor ? actor.getAnimations({ subtree: true }) : [];
         const cts = anims.map((a) => Number(a.currentTime)).filter((n) => !Number.isNaN(n));
         const hit = stage ? document.elementFromPoint(${first.px}, ${first.py}) : null;
@@ -159,7 +159,7 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       window.__taichiEsc = [];
       const start = performance.now();
       const sample = () => {
-        const stage = root.querySelector('div[class*="__stage"]');
+        const stage = root.querySelector('div[class*="__stage"],div[class$="_stage"]');
         window.__taichiEsc.push({ t: Math.round(performance.now() - start), stage: !!stage });
         if (stage) requestAnimationFrame(sample);
       };
@@ -171,7 +171,7 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const button = document.querySelector('${TRIGGER}');
       const root = button.closest('div');
       const frames = window.__taichiEsc ?? [];
-      const stage = root.querySelector('div[class*="__stage"]');
+      const stage = root.querySelector('div[class*="__stage"],div[class$="_stage"]');
       const running = [root, ...root.querySelectorAll('*')]
         .flatMap((el) => el.getAnimations())
         .filter((a) => a.playState === 'running').length;
@@ -204,7 +204,7 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const start = performance.now();
       let goneAt = null;
       while (performance.now() - start < 900) {
-        if (!root.querySelector('div[class*="__stage"]')) {
+        if (!root.querySelector('div[class*="__stage"],div[class$="_stage"]')) {
           goneAt = Math.round(performance.now() - start);
           break;
         }
@@ -231,8 +231,8 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const button = document.querySelector('${TRIGGER}');
       const root = button.closest('div');
       await new Promise((resolve) => setTimeout(resolve, 350));
-      const stage = root.querySelector('div[class*="__stage"]');
-      const actor = root.querySelector('div[class*="__actor"]');
+      const stage = root.querySelector('div[class*="__stage"],div[class$="_stage"]');
+      const actor = root.querySelector('div[class*="__actor"],div[class$="_actor"]');
       const anims = actor ? actor.getAnimations({ subtree: true }) : [];
       const travel = anims[0];
       const keys = travel && travel.effect ? travel.effect.getKeyframes() : [];
@@ -265,7 +265,7 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const button = document.querySelector('${TRIGGER}');
       const root = button.closest('div');
       return {
-        stage: !!root.querySelector('div[class*="__stage"]'),
+        stage: !!root.querySelector('div[class*="__stage"],div[class$="_stage"]'),
         label: button.getAttribute('aria-label'),
       };
     })()`);
