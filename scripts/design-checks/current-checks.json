@@ -1,7 +1,9 @@
 {
   "documents": [
     "AGENTS.md",
+    "CONTRIBUTING.md",
     "README.md",
+    "README.zh-CN.md",
     "PRODUCT.md",
     "apps/web/AGENTS.md",
     "docs/agents/navigation.md",
