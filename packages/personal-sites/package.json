@@ -12,17 +12,17 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@remotion/cli": "4.0.533",
+    "@remotion/cli": "4.0.534",
     "@types/node": "24.19.1",
     "@types/react": "19.3.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "remotion": "4.0.533",
+    "remotion": "4.0.534",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@effect/platform-node": "4.0.1",
-    "effect": "4.0.1"
+    "@effect/platform-node": "4.0.2",
+    "effect": "4.0.2"
   }
 }

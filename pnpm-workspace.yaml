@@ -3,11 +3,11 @@ packages:
   - packages/*
 
 overrides:
-  '@remotion/cli@4.0.533>minimist': 1.2.8
-  '@remotion/cli@4.0.533>semver': 7.8.5
-  '@remotion/studio@4.0.533>semver': 7.8.5
-  '@remotion/studio-server@4.0.533>semver': 7.8.5
-  '@remotion/bundler@4.0.533>esbuild': 0.28.2
+  '@remotion/cli@4.0.534>minimist': 1.2.8
+  '@remotion/cli@4.0.534>semver': 7.8.5
+  '@remotion/studio@4.0.534>semver': 7.8.5
+  '@remotion/studio-server@4.0.534>semver': 7.8.5
+  '@remotion/bundler@4.0.534>esbuild': 0.28.2
 
 allowBuilds:
   '@google/genai': false
@@ -26,7 +26,7 @@ minimumReleaseAgeExclude:
   - '@earendil-works/pi-mcp@1.0.3'
   - '@earendil-works/pi-telemetry@1.0.3'
   - '@earendil-works/pi-tui@1.0.3'
-  - lucide-react@1.52.0
+  - lucide-react@1.52.0 || 1.53.0
   - mdast-util-to-markdown@2.2.0
   - '@remotion/bundler@4.0.533'
   - '@remotion/captions@4.0.533'
@@ -58,3 +58,8 @@ minimumReleaseAgeExclude:
   - '@remotion/web-renderer@4.0.533'
   - '@remotion/zod-types@4.0.533'
   - remotion@4.0.533
+  - '@effect/platform-node-shared@4.0.2'
+  - '@effect/platform-node@4.0.2'
+  - effect@4.0.2
+  - playwright-core@1.64.0
+  - playwright@1.64.0

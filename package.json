@@ -2,7 +2,7 @@
   "name": "personal-design",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@12.9.1",
+  "packageManager": "pnpm@12.10.1",
   "engines": {
     "node": "24.x"
   },
@@ -30,7 +30,7 @@
     "sync:ai-chat-avatars": "pnpm --filter @personal-design/ai-chat sync:avatars"
   },
   "devDependencies": {
-    "oxfmt": "^0.71.0",
-    "playwright": "1.63.0"
+    "oxfmt": "^0.72.0",
+    "playwright": "1.64.0"
   }
 }
