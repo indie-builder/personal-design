@@ -8,6 +8,8 @@ overrides:
   '@remotion/studio@4.0.534>semver': 7.8.5
   '@remotion/studio-server@4.0.534>semver': 7.8.5
   '@remotion/bundler@4.0.534>esbuild': 0.28.2
+  'rehype-katex>katex': 0.19.0
+  'micromark-extension-math>katex': 0.19.0
 
 allowBuilds:
   '@google/genai': false
@@ -17,49 +19,7 @@ allowBuilds:
   protobufjs: false
   unrs-resolver: true
 
+minimumReleaseAgeExcludePrune: true
+
 minimumReleaseAgeExclude:
-  - '@earendil-works/chord@1.0.3'
-  - '@earendil-works/pi-agent-core@1.0.3'
-  - '@earendil-works/pi-ai@1.0.3'
-  - '@earendil-works/pi-codemode@1.0.3'
-  - '@earendil-works/pi-coding-agent@1.0.3'
-  - '@earendil-works/pi-mcp@1.0.3'
-  - '@earendil-works/pi-telemetry@1.0.3'
-  - '@earendil-works/pi-tui@1.0.3'
-  - lucide-react@1.52.0 || 1.53.0
-  - mdast-util-to-markdown@2.2.0
-  - '@remotion/bundler@4.0.533'
-  - '@remotion/captions@4.0.533'
-  - '@remotion/cli@4.0.533'
-  - '@remotion/codemods@4.0.533'
-  - '@remotion/compositor-darwin-arm64@4.0.533'
-  - '@remotion/compositor-darwin-x64@4.0.533'
-  - '@remotion/compositor-linux-arm64-gnu@4.0.533'
-  - '@remotion/compositor-linux-arm64-musl@4.0.533'
-  - '@remotion/compositor-linux-x64-gnu@4.0.533'
-  - '@remotion/compositor-linux-x64-musl@4.0.533'
-  - '@remotion/compositor-win32-x64-msvc@4.0.533'
-  - '@remotion/elevenlabs@4.0.533'
-  - '@remotion/licensing@4.0.533'
-  - '@remotion/media-parser@4.0.533'
-  - '@remotion/media-utils@4.0.533'
-  - '@remotion/media@4.0.533'
-  - '@remotion/openai-whisper@4.0.533'
-  - '@remotion/paths@4.0.533'
-  - '@remotion/player@4.0.533'
-  - '@remotion/renderer@4.0.533'
-  - '@remotion/sdk@4.0.533'
-  - '@remotion/streaming@4.0.533'
-  - '@remotion/studio-protocol@4.0.533'
-  - '@remotion/studio-server@4.0.533'
-  - '@remotion/studio-shared@4.0.533'
-  - '@remotion/studio@4.0.533'
-  - '@remotion/timeline-utils@4.0.533'
-  - '@remotion/web-renderer@4.0.533'
-  - '@remotion/zod-types@4.0.533'
-  - remotion@4.0.533
-  - '@effect/platform-node-shared@4.0.2'
-  - '@effect/platform-node@4.0.2'
-  - effect@4.0.2
-  - playwright-core@1.64.0
-  - playwright@1.64.0
+  - lucide-react@1.54.0

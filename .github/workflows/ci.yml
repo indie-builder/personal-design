@@ -14,7 +14,7 @@ jobs:
       - name: Enable corepack (pnpm 版本由 packageManager 字段锁定)
         run: corepack enable
 
-      - uses: actions/setup-node@v7.0.0
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           check-latest: true
@@ -51,7 +51,7 @@ jobs:
 
       - name: Chat acceptance evidence
         if: always()
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: chat-acceptance
           path: |
