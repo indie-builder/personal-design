@@ -4,6 +4,12 @@
     "harness-code-check": "Project-owned skill; preserve its entity without an upstream lock entry."
   },
   "excludedSkills": {
-    "next-dev-loop": "Explicitly removed by the user; keep absent from entities, Claude links, and lock entries."
+    "next-dev-loop": "Explicitly removed by the user; keep absent from entities, Claude links, and lock entries.",
+    "ponytail": "Superseded by the user-level ponytail plugin; keep project copies absent from entities, Claude links, and lock entries.",
+    "ponytail-audit": "Superseded by the user-level ponytail plugin; keep project copies absent from entities, Claude links, and lock entries.",
+    "ponytail-debt": "Superseded by the user-level ponytail plugin; keep project copies absent from entities, Claude links, and lock entries.",
+    "ponytail-gain": "Superseded by the user-level ponytail plugin; keep project copies absent from entities, Claude links, and lock entries.",
+    "ponytail-help": "Superseded by the user-level ponytail plugin; keep project copies absent from entities, Claude links, and lock entries.",
+    "ponytail-review": "Superseded by the user-level ponytail plugin; keep project copies absent from entities, Claude links, and lock entries."
   }
 }
