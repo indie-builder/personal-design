@@ -22,4 +22,5 @@ allowBuilds:
 minimumReleaseAgeExcludePrune: true
 
 minimumReleaseAgeExclude:
-  - lucide-react@1.54.0
+  - lucide-react@1.55.0
+  - '@types/node@24.19.2'
