@@ -135,11 +135,18 @@ test('cards never parse secondary media', async (t) => {
   add('post', [{}, { type: 'video', raw: 'secondary-media-must-not-be-parsed' }]);
   const expected = originalCards(api.listPosts());
   const parse = JSON.parse;
-  t.mock.method(JSON, 'parse', (value, ...args) => {
-    assert.notEqual(value, 'secondary-media-must-not-be-parsed');
+  const parsed = [];
+  const mock = t.mock.method(JSON, 'parse', (value, ...args) => {
+    parsed.push(value);
     return parse(value, ...args);
   });
-  assert.deepEqual(api.listPostCards(), expected);
+  try {
+    assert.deepEqual(api.listPostCards(), expected);
+  } finally {
+    mock.mock.restore();
+  }
+  // 在 mock 外断言：生产 try/catch 会吞掉 mock 内抛出的断言错误
+  assert.ok(!parsed.includes('secondary-media-must-not-be-parsed'));
 });
 
 test('all repository cards exactly match the full-post projection', async (t) => {
