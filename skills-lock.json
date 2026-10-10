@@ -13,6 +13,12 @@
       "skillPath": "skills/engineering/ask-matt/SKILL.md",
       "computedHash": "d1c5b4151720e96135154bd593ac4986a1030a2bc81e2aaf129f8b11224af9a9"
     },
+    "better-readme": {
+      "source": "tommy0103/better-readme-skill",
+      "sourceType": "github",
+      "skillPath": "skills/better-readme/SKILL.md",
+      "computedHash": "c969ecaca264e462a9a05d2d47117c2be955ee12c774fe6fe5cd7729698d70b1"
+    },
     "canvas-design": {
       "source": "anthropics/skills",
       "sourceType": "github",
