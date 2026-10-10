@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { cache, Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { ArrowUpRight } from 'lucide-react';
 import { getPostBySlug, listPostRefs } from '@personal-design/inspora';
@@ -11,6 +11,7 @@ import { MuseMediaCarousel } from '@/components/inspora-media-carousel';
 import styles from './page.module.css';
 
 const postRefs = listPostRefs();
+const getPost = cache(getPostBySlug);
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -18,7 +19,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = getPost(slug);
   if (!post) return {};
   return {
     title: `${post.title} · 灵感集`,
@@ -41,7 +42,7 @@ export default function MuseDetailPage({ params }: PageProps) {
 
 async function Detail({ params }: PageProps) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = getPost(slug);
   if (!post) notFound();
 
   const navigation = museBrowseEntries(post, postRefs);

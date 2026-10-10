@@ -328,6 +328,47 @@ export function listPostRefs(): InsporaPostRef[] {
   }));
 }
 
+export interface InsporaPostCard extends InsporaPostRef {
+  createdAt: string;
+  media: InsporaMedia[];
+  mediaCount: number;
+}
+
+/** 网格只转换首媒体，计数仍包含全部媒体；无媒体的作品也保留。 */
+export function listPostCards(): InsporaPostCard[] {
+  const rows = conn()
+    .prepare(
+      `SELECT posts.slug, posts.title, posts.creator_name, posts.category,
+        posts.industries, posts.styles, posts.created_at, media.*,
+        (SELECT COUNT(*) FROM media WHERE post_id = posts.id) AS media_count
+      FROM posts LEFT JOIN media ON media.rowid = (
+        SELECT rowid FROM media WHERE post_id = posts.id ORDER BY position LIMIT 1
+      )
+      WHERE ${VISIBLE_POSTS} ORDER BY posts.created_at DESC`,
+    )
+    .all() as unknown as (MediaRow & {
+    slug: string;
+    title: string;
+    creator_name: string | null;
+    category: string | null;
+    industries: string | null;
+    styles: string | null;
+    created_at: string;
+    media_count: number;
+  })[];
+  return rows.map((row) => ({
+    slug: row.slug,
+    title: row.title,
+    creatorName: row.creator_name,
+    category: row.category,
+    industries: parseJsonArray(row.industries),
+    styles: parseJsonArray(row.styles),
+    createdAt: row.created_at,
+    media: row.media_count ? [toMedia(row)] : [],
+    mediaCount: row.media_count,
+  }));
+}
+
 export function getPostBySlug(slug: string): InsporaPost | undefined {
   const row = conn()
     .prepare(`SELECT ${POST_COLUMNS} FROM posts WHERE slug = ? AND ${VISIBLE_POSTS}`)
