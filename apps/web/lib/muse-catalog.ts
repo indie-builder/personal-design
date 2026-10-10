@@ -1,5 +1,5 @@
 import type { PlateWallItem } from '@/components/plate-wall';
-import { listPosts } from '@personal-design/inspora';
+import { listPostCards } from '@personal-design/inspora';
 import { matchesSearch } from '@/lib/browse-context';
 import { categoryLabel } from '@/lib/category-label';
 import { museThumbnailOf, museKeywords } from '@/lib/muse-detail';
@@ -7,7 +7,7 @@ import { museThumbnailOf, museKeywords } from '@/lib/muse-detail';
 export const MUSE_BATCH = 24;
 
 // 只把客户端需要的字段传下去，控制 RSC 负载。
-export const museItems: PlateWallItem[] = listPosts().map((post) => {
+export const museItems: PlateWallItem[] = listPostCards().map((post) => {
   const first = post.media[0];
   const src = first?.type === 'video' ? first.previewSrc : (first?.thumb ?? first?.src);
   return {
@@ -23,7 +23,7 @@ export const museItems: PlateWallItem[] = listPosts().map((post) => {
     fullSrc: first?.type === 'image' ? (first.src ?? first.thumb ?? undefined) : undefined,
     width: first?.width ?? 4,
     height: first?.height ?? 3,
-    mediaCount: post.media.length,
+    mediaCount: post.mediaCount,
     keywords: museKeywords(post),
   };
 });

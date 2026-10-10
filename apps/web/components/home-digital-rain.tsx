@@ -56,6 +56,7 @@ export function HomeDigitalRain() {
         column.cells.forEach((cell, row) => {
           const alpha = cell.alpha * column.brightness;
           context!.globalAlpha = Math.max(alpha, cell.glow);
+          if (context!.globalAlpha === 0) return;
           context!.fillStyle = cell.glow > alpha ? glowColor : color;
           context!.fillText(cell.glyph, index * spacing, row * 16);
         });

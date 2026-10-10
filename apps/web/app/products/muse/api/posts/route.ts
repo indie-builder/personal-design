@@ -10,5 +10,8 @@ export async function GET(request: NextRequest) {
     offset: Math.max(0, Number(params.get('offset')) || 0),
     limit: Math.min(240, Math.max(1, Number(params.get('limit')) || MUSE_BATCH)),
   });
-  return Response.json({ total, items });
+  return Response.json(
+    { total, items },
+    { headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' } },
+  );
 }
