@@ -1,0 +1,2 @@
+$ node scripts/check-skills.mjs
+Skill checks passed: 67 locked, 1 local, 68 entities, 68 Claude links.

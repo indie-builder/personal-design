@@ -1,0 +1,29 @@
+[
+  {
+    "mode": "light-1440",
+    "draws": 4859,
+    "zero": 0,
+    "playing": "true",
+    "width": 1440
+  },
+  {
+    "mode": "keyboard",
+    "draws": 9673,
+    "zero": 0,
+    "playing": "false"
+  },
+  {
+    "mode": "reduced-1280",
+    "draws": 9673,
+    "zero": 0,
+    "playing": "false",
+    "width": 1280
+  },
+  {
+    "mode": "reduced-390",
+    "draws": 10252,
+    "zero": 0,
+    "width": 390,
+    "overflow": false
+  }
+]

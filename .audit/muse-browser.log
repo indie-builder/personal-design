@@ -1,0 +1,182 @@
+$ node scripts/design-checks/run-all.mjs
+PASS theme follows OS initially and dynamically
+PASS manual theme persists and overrides OS
+PASS theme storage syncs across tabs and invalid value falls back to OS
+PASS keyboard skip link reaches main content
+PASS reflow 320px /
+PASS reflow 320px /products/muse
+PASS reflow 320px /products/layout-compositions
+PASS reflow 320px /products/muse/file-management-dashboard
+PASS reflow 320px /products/layout-compositions?cat=构图逻辑&page=001
+PASS reflow 320px /missing-page
+PASS reflow 720px /
+PASS reflow 720px /products/muse
+PASS reflow 720px /products/layout-compositions
+PASS reflow 720px /products/muse/file-management-dashboard
+PASS reflow 720px /products/layout-compositions?cat=构图逻辑&page=001
+PASS reflow 720px /missing-page
+PASS theme works when localStorage is unavailable
+
+=== verify-design.mjs PASS 2.1s ===
+
+{"total":11,"failed":[]}
+
+=== verify-design-routes.mjs PASS 0.1s ===
+
+✔ portfolio is complete and public (33.837625ms)
+✔ layouts paginate, filter, search and resolve corrected media (45.303459ms)
+✔ muse detail includes all media without raw provider payloads (8.710625ms)
+✔ tools and site use their public package data (3.205084ms)
+✔ invalid pagination and missing resources return explicit errors (15.560125ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 109.265417
+
+=== portfolio-api.test.mjs PASS 0.1s ===
+
+Homepage behavior checks passed. Evidence: docs/design/execution/evidence/home-behavior.json
+
+=== home.mjs PASS 6.6s ===
+
+{
+  "baseURL": "https://personal-design.localhost:1355",
+  "checks": {
+    "shelf": {
+      "books": 8
+    },
+    "prewarm": {
+      "flippedTo": "第7至8页",
+      "prewarmedBeforeClick": true
+    },
+    "escExits": "zoom→page, reader→spine focus restored",
+    "narrow": "390px shelf and reader without page overflow"
+  },
+  "pageErrors": [],
+  "passed": true
+}
+
+=== layouts-check.mjs PASS 13.4s ===
+
+{
+  "baseURL": "https://personal-design.localhost:1355",
+  "checks": {
+    "retiredRoutes": "001, 063 and 999 return true 404",
+    "missingPage": "cat/page=063 lands on its page without zoom dialog",
+    "directPage": "cat/page opens the reader directly; retired zoom is ignored",
+    "hdFallback": "stalled HD falls back to thumb with retry, recovers after release",
+    "reducedMotion": "Esc returns to shelf instantly"
+  },
+  "pageErrors": [],
+  "passed": true
+}
+
+=== layouts-states.mjs PASS 13.5s ===
+
+PASS: 当前跨页的两张图片在 HTML 中直接输出并立即加载
+
+=== layout-first-paint.mjs PASS 0.1s ===
+
+PASS search empty/URL reload/clear/detail-return /products/muse/c-2104134991429226998?browse=2&q=dashboard
+PASS multi carousel Home/End/bounds/local arrow advance without navigation
+PASS native video controls and first/last navigation boundaries
+PASS detail long-title overflow at 1440/1024/390/320
+pageerrors []
+
+=== muse-behavior.mjs PASS 21.6s ===
+
+PASS invalid category recovery/q preserved/category/scroll append
+PASS 15-second stalled-media timeout/retry/original-media recovery controls
+
+=== muse-recovery.mjs PASS 19.6s ===
+
+PASS shared browser: lightbox scroll lock/focus wrap/group arrows/Esc focus return; true 404 with home exit
+
+=== shared-browser.cjs PASS 1.8s ===
+
+PASS autoplay: visible autoplay, offscreen pause, return resume
+PASS autoplay: reduced motion stays paused
+
+=== shared-autoplay.cjs PASS 3.7s ===
+
+PASS [
+  'home → muse → query → detail with source link → return restores query',
+  'home → layouts → open book → album flip → zoom as detail → Esc layering → back to home'
+]
+
+=== journeys.mjs PASS 1.4s ===
+
+PASS promo autoplay/aria sync, Space pause, Enter resume, external site link
+PASS reduced-motion no autoplay, manual play works
+PASS promo failure status with reload recovery
+
+=== personal-sites.mjs PASS 2.9s ===
+
+
+=== route-motion.browser.mjs PASS 21.1s ===
+
+  - grid→detail pointer: 180ms exit -28px before commit, 360ms entry from +28px (4 frames)
+  - next sibling: exit -28px, entry from right
+  - previous sibling: default exit +28px, entry from left
+  - back to grid: exit then re-entry, scroll 298→298, focus muse-footer-section
+  - deep scroll: exit on original surface, 72→72 cells, scroll 2831→2831
+  - keyboard Enter after 1 Tabs: instant navigation, no motion artifacts
+  - keyboard arrow: instant adjacent navigation
+  - rapid reverse: entry cancelled, return committed, no leftovers
+  - native back: no motion frames, url kept, scroll 298→298, focus in grid
+  - modifier click (mask 4): page unchanged, navigation left to browser default
+  - network hold: 72→72→96 cells, unique ids, status ready
+  - reduced motion pointer: instant navigation, no motion artifacts
+
+=== lightbox-motion.browser.mjs PASS 22.7s ===
+
+  - multi-image detail found, lightbox counter 1 / 3
+  - pointer open: FLIP start from trigger rect, 200ms expand transition
+  - pointer close: 140ms return to re-measured trigger, unmount and focus restore
+  - paged close: counter 1 / 3→2 / 3, scale(0.97) fade-out
+  - swipe flip: translate3d follows pointer, counter 1 / 3→2 / 3
+  - swipe bounce: 150ms spring back below threshold, counter unchanged
+  - mouse drag: no swipe translation
+  - reduced motion: instant open/close, transition none, Esc focus restore
+
+=== book-opening-performance.mjs PASS 5.3s ===
+
+  - pointer opening: 2883ms, avg 16.7ms, p95 18ms, max 21ms, long 0/174
+  - keyboard opening: picker at 34ms, no opening layer
+  - reduced-motion opening: picker at 21ms, no opening layer
+
+=== preview-loops.browser.mjs PASS 41.1s ===
+
+  - book visible: queue advanced through 影视构图 -> 网页与 UI
+  - book offscreen: frozen at 网页与 UI 1267ms, resumed and advanced to 构图
+  - book keyboard: queue stopped on 构图, no advance in 7s
+  - book reduced motion: keyframes absent, queue static
+  - receipt visible: 10s cycle advancing 67 -> 650ms
+  - receipt offscreen: paused and clock frozen
+  - receipt keyboard: animation none, full receipt shown
+  - receipt reduced motion: static complete receipt
+  - receipt cover blocked: data-ready=false, no cycle attached
+  - chat visible: 8s loop running, opacity/transform only, samples change
+  - chat offscreen: paused, samples frozen
+  - chat keyboard: static completed state, no animations
+  - chat reduced motion: static completed state
+
+=== timeline-motion.browser.mjs PASS 11.8s ===
+
+  - pointer route: crawl+stand+look-flip+gait+jump+date-bump across 374 frames, x→420
+  - offscreen pause/resume: frozen at 6233ms, continued to 6566ms without replay
+  - completion: 28000ms route exits with data-complete, hidden, no running animations
+  - keyboard: trusted keydown keeps walker hidden, clocks frozen, no date bump
+  - reduced motion: walker hidden via media query, clocks frozen, no date bump
+
+=== taichi-motion.browser.mjs PASS 6.7s ===
+
+  - pointer play: 10 animations share the 9.2s clock, stage pointer-events none, hit-through intact
+  - Esc collapse: keyboard path unmounts immediately, no leftover animations
+  - instant-policy cut: stage unmounted 28ms after trusted keydown, sequence cut short
+  - reduced motion: single 1000ms static-pose fade, auto-dismissed
+ALL 19 SUITES PASSED (see acceptance index for remaining coverage)

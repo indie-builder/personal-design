@@ -1,0 +1,2 @@
+$ node scripts/check-navigation.mjs
+Navigation checks passed.

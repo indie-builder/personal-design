@@ -1,0 +1,42 @@
+{
+  "cardsCompared": 9703,
+  "results": [
+    {
+      "query": "",
+      "total": 9703,
+      "items": 24,
+      "cacheControl": "public, max-age=60, stale-while-revalidate=300"
+    },
+    {
+      "query": "offset=24",
+      "total": 9703,
+      "items": 24,
+      "cacheControl": "public, max-age=60, stale-while-revalidate=300"
+    },
+    {
+      "query": "limit=3&q=dashboard",
+      "total": 81,
+      "items": 3,
+      "cacheControl": "public, max-age=60, stale-while-revalidate=300"
+    },
+    {
+      "query": "cat=Illustration&limit=4",
+      "total": 24,
+      "items": 4,
+      "cacheControl": "public, max-age=60, stale-while-revalidate=300"
+    },
+    {
+      "query": "q=zzzz-no-match-928",
+      "total": 0,
+      "items": 0,
+      "cacheControl": "public, max-age=60, stale-while-revalidate=300"
+    },
+    {
+      "query": "q=dashboard&offset=3&limit=2",
+      "total": 81,
+      "items": 2,
+      "cacheControl": "public, max-age=60, stale-while-revalidate=300"
+    }
+  ],
+  "detailStatus": 200
+}
