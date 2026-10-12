@@ -1,0 +1,4 @@
+what	why	evidence	result
+hold @effect/platform-node at 4.0.2	4.0.3 peer-requires effect ^4.0.3, not yet published	npm view peerDependencies + effect dist-tags latest=4.0.2	defer until effect 4.0.3 ships
+upgrade lucide-react 1.54.0->1.55.0	user pref: latest stable	npm view time 1.55.0=2026-10-10T06:12Z	manifest edited, lock updated
+upgrade @types/node 24.19.1->24.19.2	latest 24.x, Node pinned to 24.x by user	npm view dist-tags old-version=24.19.2	6 manifests edited, lock updated

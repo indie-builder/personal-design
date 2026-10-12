@@ -1,0 +1,13 @@
+$ portless --script start
+
+portless
+
+  personal-design  https://personal-design.localhost:1355
+
+[personal-design] $ next start
+[personal-design] ▲ Next.js 16.4.0
+[personal-design] - Local:         http://localhost:4041
+[personal-design] - Network:       http://192.168.71.40:4041
+[personal-design] ✓ Ready in 77ms
+[personal-design] ✓ Running next.config.ts took 20ms
+[personal-design] killed by SIGTERM

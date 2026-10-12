@@ -1,0 +1,19 @@
+$ node scripts/design-checks/run-http.mjs
+HTTP checks: routes, portfolio at https://personal-design.localhost:1355
+{"total":11,"failed":[]}
+routes: PASS
+✔ portfolio is complete and public (113.061334ms)
+✔ layouts paginate, filter, search and resolve corrected media (49.152208ms)
+✔ muse detail includes all media without raw provider payloads (8.117917ms)
+✔ tools and site use their public package data (4.122708ms)
+✔ invalid pagination and missing resources return explicit errors (12.459125ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 189.643875
+portfolio: PASS
+Selected HTTP checks passed. Browser and visual acceptance are separate.

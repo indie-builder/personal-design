@@ -1,0 +1,43 @@
+✖ cards preserve visibility, order, missing media, full counts and search metadata (20.806584ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 246.4115
+
+✖ failing tests:
+
+test at ../../../../../private/var/folders/9x/881dvsns4wv1dk0990m32_xm0000gn/T/muse-card-mutation-T39Rvr/src/cards.test.mjs:57:1
+✖ cards preserve visibility, order, missing media, full counts and search metadata (20.806584ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    [
+      {
+        category: null,
+        createdAt: '2026-10-10',
+        creatorName: null,
+  ...
+        ],
+  +     mediaCount: 1,
+  -     mediaCount: 3,
+        slug: 'sparse',
+        styles: [
+          'minimal'
+        ],
+        title: 'sparse'
+  
+      at TestContext.<anonymous> (file:///private/var/folders/9x/881dvsns4wv1dk0990m32_xm0000gn/T/muse-card-mutation-T39Rvr/src/cards.test.mjs:69:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { slug: 'empty', title: 'empty', creatorName: null, category: null, industries: [Array], styles: [], createdAt: '2026-10-10', media: [], mediaCount: 0 }, { slug: 'sparse', title: 'sparse', creatorName: '', category: '', industries: [], styles: [Array], createdAt: '2026-10-10', media: [Array], mediaCount: 1 }, { slug: 'original', title: 'original', creatorName: null, category: 'Web', industries: [], styles: [], createdAt: '2026-10-10', media: [Array], mediaCount: 1 }, { slug: 'a-visible', title: 'a-visible', creatorName: null, category: null, industries: [], styles: [], createdAt: '2026-10-10', media: [Array], mediaCount: 1 }, { slug: 'older', title: 'older', creatorName: null, category: null, industries: [], styles: [], createdAt: '2026-10-01', media: [Array], mediaCount: 1 } ],
+    expected: [ { slug: 'empty', title: 'empty', creatorName: null, category: null, industries: [Array], styles: [], createdAt: '2026-10-10', media: [], mediaCount: 0 }, { slug: 'sparse', title: 'sparse', creatorName: '', category: '', industries: [], styles: [Array], createdAt: '2026-10-10', media: [Array], mediaCount: 3 }, { slug: 'original', title: 'original', creatorName: null, category: 'Web', industries: [], styles: [], createdAt: '2026-10-10', media: [Array], mediaCount: 1 }, { slug: 'a-visible', title: 'a-visible', creatorName: null, category: null, industries: [], styles: [], createdAt: '2026-10-10', media: [Array], mediaCount: 1 }, { slug: 'older', title: 'older', creatorName: null, category: null, industries: [], styles: [], createdAt: '2026-10-01', media: [Array], mediaCount: 1 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

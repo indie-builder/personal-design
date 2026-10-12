@@ -1,0 +1,3 @@
+$ pnpm --filter @personal-design/web lint && pnpm lint:scripts
+$ oxlint --deny-warnings .
+$ apps/web/node_modules/.bin/oxlint --deny-warnings scripts

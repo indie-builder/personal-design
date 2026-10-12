@@ -1,0 +1,4 @@
+$ node scripts/design-checks/run-chat.mjs
+聊天隔离验收：https://upgrade-check.personal-design.localhost:63988；日志：/Users/xbjt/Documents/myself/personal-design/.impeccable/review/chat-checks
+聊天隔离验收：https://upgrade-check.personal-design.localhost:63988；日志：/Users/xbjt/Documents/myself/personal-design/.impeccable/review/chat-checks
+PASS：chat-api、chat-analytics、analytics progress browser。结果：/Users/xbjt/Documents/myself/personal-design/.impeccable/review/chat-checks/result.json

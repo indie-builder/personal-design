@@ -1,0 +1,13 @@
+✔ cards preserve visibility, order, missing media, full counts and search metadata (19.302167ms)
+✔ cards preserve local URLs, empty strings, video preview and fallback rules (11.113667ms)
+✔ cards never parse secondary media (8.347541ms)
+✔ all repository cards exactly match the full-post projection (209.2135ms)
+ℹ Compared every field of 9703 visible cards against listPosts
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 435.669084

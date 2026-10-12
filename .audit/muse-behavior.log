@@ -1,0 +1,5 @@
+PASS search empty/URL reload/clear/detail-return /products/muse/c-2104134991429226998?browse=2&q=dashboard
+PASS multi carousel Home/End/bounds/local arrow advance without navigation
+PASS native video controls and first/last navigation boundaries
+PASS detail long-title overflow at 1440/1024/390/320
+pageerrors []
