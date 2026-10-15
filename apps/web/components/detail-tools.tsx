@@ -1,7 +1,7 @@
 'use client';
 
 import { useLayoutEffect } from 'react';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter } from 'next/navigation';
 
 // 常驻单例翻页监听：page 组件只把翻页目标写进 <html> dataset（useLayoutEffect，
 // paint 前就绪），keydown 在模块级只注册一次——详情→详情导航的过渡窗口内监听不卸，
@@ -38,10 +38,10 @@ function ensureNavListener() {
     const { detailPrev, detailNext } = document.documentElement.dataset;
     if (event.key === 'ArrowLeft' && detailPrev) {
       event.preventDefault();
-      navRouter?.history.push(detailPrev);
+      navRouter?.push(detailPrev);
     } else if (event.key === 'ArrowRight' && detailNext) {
       event.preventDefault();
-      navRouter?.history.push(detailNext);
+      navRouter?.push(detailNext);
     }
   });
 }

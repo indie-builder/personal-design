@@ -1,9 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { timelineAvatarUrl } from '@personal-design/personal-sites';
 import { instantMotion, observeMotionPolicy } from '@/lib/motion';
-import { Img } from './img';
 import styles from './taichi-avatar.module.css';
 
 // Angles are shoulder, elbow, hip and knee joints; all poses share one clock.
@@ -184,7 +184,7 @@ export function TaichiAvatar() {
         }}
         title="来一段太极"
       >
-        <Img src={timelineAvatarUrl} width={32} height={32} alt="" priority />
+        <Image src={timelineAvatarUrl} width={32} height={32} alt="" priority />
       </button>
       {playing && (
         <div className={styles.stage} aria-hidden="true">

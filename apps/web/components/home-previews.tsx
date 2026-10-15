@@ -1,10 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, ImageOff } from 'lucide-react';
 import { instantMotion, useVisiblePlay } from '@/lib/motion';
 import { shuffleBooks } from '@/lib/book-shuffle';
-import { Img } from './img';
 import { BookSpines } from './book-spines';
 import styles from './home-view.module.css';
 
@@ -21,7 +21,7 @@ export function PreviewImage({ src, alt, priority = false }: Preview & { priorit
           <span>预览暂不可用</span>
         </div>
       ) : (
-        <Img
+        <Image
           src={src}
           alt={alt}
           fill
@@ -171,7 +171,7 @@ export function ToolPreview({ tools }: { tools: ToolPreviewItem[] }) {
       {tools.map((tool, index) => (
         <span key={tool.name} data-active={index === active || undefined}>
           <i>
-            {tool.icon && <Img src={tool.icon} alt="" width={16} height={16} />}
+            {tool.icon && <Image src={tool.icon} alt="" width={16} height={16} />}
             <ArrowUpRight size={16} strokeWidth={1.6} />
           </i>
           <b>{tool.name}</b>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Link, useRouter } from '@tanstack/react-router';
+import Link from 'next/link';
 import { TaichiAvatar } from './taichi-avatar';
 import { ArrowLeft } from 'lucide-react';
 import {
@@ -14,7 +14,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react';
-import { splitHref, usePathname } from '@/lib/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { EASE_OUT, instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
 import { products } from '@/lib/products';
 import { ThemeToggle } from './theme-toggle';
@@ -28,33 +28,19 @@ const WorkspaceNavigationContext = createContext<
   ((href: string, scroll?: boolean, direction?: string) => boolean | void) | null
 >(null);
 
-/**
- * 既有公共契约是字符串 href（含动态段与查询串）；
- * 拆出查询串交给 Link 的 search，具体路径由路由按 pathname 匹配（如 /products/muse/<slug>）。
- * scroll/prefetch 是 Next Link 时代的既有调用面，映射到 TanStack 的等价选项。
- */
+/** Keep Next's native link behavior (prefetch, modifier clicks, drag cancellation). */
 export function WorkspaceLink({
   href,
-  scroll,
-  prefetch,
-  onClick,
   ...props
-}: Omit<ComponentProps<'a'>, 'href'> & { href: string; scroll?: boolean; prefetch?: boolean }) {
+}: Omit<ComponentProps<typeof Link>, 'href' | 'onNavigate'> & { href: string }) {
   const navigate = useContext(WorkspaceNavigationContext);
   const direction = (props as Record<string, unknown>)['data-direction'] as string | undefined;
-  const { to, search } = splitHref(href);
   return (
     <Link
       {...props}
-      to={to}
-      search={search}
-      // Next 默认在视口/悬停时预取；这里取较轻的 intent（悬停/聚焦），网格单元已有显式控制
-      preload={prefetch === false ? false : 'intent'}
-      resetScroll={scroll !== false}
-      onClick={(event) => {
-        onClick?.(event);
-        // navigate 返回 true 表示成对过渡已接管导航，阻止 Link 默认跳转
-        if (!event.defaultPrevented && navigate?.(href, scroll, direction)) event.preventDefault();
+      href={href}
+      onNavigate={(event) => {
+        if (navigate?.(href, props.scroll, direction)) event.preventDefault();
       }}
     />
   );
@@ -173,12 +159,10 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     const timer = setTimeout(pending.cleanup, 8000);
     navigation.current = pending;
     if (returning || sibling) {
-      const { to, search } = splitHref(href);
-      // 预热目标路由的 loader，失败不阻断过渡
-      void router.preloadRoute({ to, search }).catch(() => {});
+      router.prefetch(href);
       pending.exit = playExit(
         shell.current?.querySelector('#workspace-content') ?? null,
-        () => router.navigate({ to, search, resetScroll: scroll !== false }),
+        () => router.push(href, { scroll }),
         sibling && direction === 'next'
           ? [
               { opacity: 1, transform: 'none' },

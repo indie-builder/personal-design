@@ -1,4 +1,4 @@
-import '@tanstack/react-start/server-only';
+import 'server-only';
 import { Type, type TSchema } from 'typebox';
 import { defineTool, type ToolDefinition } from '@earendil-works/pi-coding-agent';
 import type { AnalyticsMcpClient } from './analytics-mcp';

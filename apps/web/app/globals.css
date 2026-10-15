@@ -3,13 +3,7 @@
 @import '@openuidev/react-ui/layered/styles/index.css';
 @custom-variant dark (&:where(html[data-theme='dark'] *));
 
-/* Albert Sans 可变字体：原 next/font/local 迁移为显式 @font-face（public/fonts 下，根路由 preload）；家族名经 --font-albert-sans 保持 @theme 引用契约 */
-@font-face {
-  font-family: 'Albert Sans';
-  src: url('/fonts/AlbertSans-VariableFont_wght.woff2') format('woff2');
-  font-weight: 100 900;
-  font-display: swap;
-}
+/* Albert Sans 由 next/font/local 接管（app/layout.tsx），家族名经 --font-albert-sans 注入 */
 
 /* Source roles: OpenDesign tokens.css. Adaptations live in execution/contract.md. */
 @theme {
@@ -49,7 +43,6 @@
 }
 
 :root {
-  --font-albert-sans: 'Albert Sans';
   --control-height: 44px;
   --control-icon-size: 18px;
   --control-icon-stroke: 1.6;

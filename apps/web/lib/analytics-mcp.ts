@@ -1,4 +1,4 @@
-import '@tanstack/react-start/server-only';
+import 'server-only';
 import { Data, Effect } from 'effect';
 
 export class AnalyticsConnectionError extends Data.TaggedError('AnalyticsConnectionError')<{
