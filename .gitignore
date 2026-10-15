@@ -1,16 +1,10 @@
 node_modules/
 .next/
-.output/
-.nitro/
-.tanstack/
 out/
 dist/
 *.tsbuildinfo
 
 .DS_Store
-
-# Nitro 打包后 inspora/layout-compositions 以 chunk 位置解析 public 目录，构建期补的软链（见 apps/web/vite.config.ts）
-apps/web/apps/
 
 # 旧项目残留文件的本地备份，不入库
 .legacy-backup/

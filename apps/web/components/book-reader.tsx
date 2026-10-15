@@ -1,12 +1,12 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { categoryLabel } from '@/lib/category-label';
 import { useLightbox } from './lifeline/lightbox';
 import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 import { Button } from './button';
-import { Img } from './img';
 import styles from './layout-bookshelf.module.css';
 import type { BookPage } from './layout-bookshelf';
 
@@ -255,11 +255,12 @@ function PageContent({ item, number }: { item?: BookPage; number: number }) {
         }}
       >
         {item.thumb && !failed ? (
-          <Img
+          <Image
             src={item.thumb}
             alt={item.name}
             fill
-            priority
+            unoptimized
+            loading="eager"
             fetchPriority="high"
             sizes="(max-width: 640px) 44vw, 440px"
             draggable={false}

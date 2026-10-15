@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useSearchParams } from '@/lib/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { categoryLabel } from '@/lib/category-label';
 import { EASE_EXIT, EASE_OUT, instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
