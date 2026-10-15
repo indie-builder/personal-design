@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from '@/lib/navigation';
 import { browseHref, browseMemoryKey, matchesSearch } from '@/lib/browse-context';
 import { paramsHref } from '@/lib/site-url';
 import { categoryLabel } from '@/lib/category-label';
