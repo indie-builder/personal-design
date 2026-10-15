@@ -35,6 +35,12 @@ function serverDataAssets(): Plugin {
       if (existsSync(dbSource)) {
         copyFileSync(dbSource, resolve(ssrDir, '../inspora.db'));
       }
+      // nf3 追踪的 sharp 副本缺 dist 入口，会遮蔽 apps/web 内的完整安装；SSR chunk 对
+      // sharp 是外部导入，删掉副本后 Node 沿 .output → apps/web/node_modules 找到真身
+      rmSync(resolve(import.meta.dirname, '.output/server/node_modules/sharp'), {
+        recursive: true,
+        force: true,
+      });
       // chunk 深度比源码包深一层：PUBLIC_DIR 解析到 apps/web/apps/web/public，补软链指回
       // 真实 public（apps/web/apps/ 已加入 .gitignore）
       const fakePublicDir = resolve(import.meta.dirname, 'apps/web');
@@ -78,7 +84,9 @@ export default defineConfig({
         },
       },
       // pi-coding-agent 运行时会 createRequire 解析 quickjs-wasm 等资产且自带依赖树，
-      // 保持 server 外置（对应 next.config 的 serverExternalPackages），由 nf3 追踪进产物
+      // 保持 server 外置（对应 next.config 的 serverExternalPackages），由 nf3 追踪进产物。
+      // sharp 保持默认外置导入；其 nf3 追踪副本不完整（缺 dist 入口），由
+      // serverDataAssets 在构建后删除该副本，运行时沿目录树解析 apps/web 内的完整安装
       traceDeps: ['@earendil-works/pi-coding-agent', '@earendil-works/pi-ai'],
       modules: [
         {

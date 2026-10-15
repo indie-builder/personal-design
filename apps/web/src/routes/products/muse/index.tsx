@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { Await, createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { PlateWall } from '@/components/plate-wall';
 import { createProductError } from '@/lib/product-error';
@@ -16,7 +16,11 @@ export const Route = createFileRoute('/products/muse/')({
     q: search.q,
     cat: search.cat,
   }),
-  loader: ({ deps }) => getMuseWindow({ data: { q: deps.q, category: deps.cat } }),
+  // 外壳先行的流式分叉，对齐原 PPR「外壳预渲染 + searchParams 请求时分叉」语义：
+  // loader 立即返回，网格数据以 deferred promise 交给 <Await>，在服务端流式补齐真实内容
+  loader: ({ deps }) => ({
+    museWindow: getMuseWindow({ data: { q: deps.q, category: deps.cat } }),
+  }),
   head: pageHead(
     '灵感集 · 图像、界面与动效',
     '浏览图像、界面与动效，发现值得参考的设计与创作者，直接访问作品出处。',
@@ -45,13 +49,27 @@ const getMuseWindow = createServerFn({ method: 'GET' })
   });
 
 function MusePage() {
-  const { tabs, items, total, batchSize } = Route.useLoaderData();
+  const { museWindow } = Route.useLoaderData();
   return (
     <main className={styles.page}>
       <div>
-        {/* 原 searchParams 进 Suspense 的请求时分叉已摊平：loader 在 SSR 时按当前筛选取
-            首窗（外壳预渲染改为整页 SSR），本段不做流式 defer */}
-        <PlateWall categories={tabs} items={items} total={total} batchSize={batchSize} />
+        <Await
+          promise={museWindow}
+          fallback={
+            <p role="status" className={`py-8 text-ink-soft ${styles.fade}`}>
+              正在准备灵感列表…
+            </p>
+          }
+        >
+          {(muse) => (
+            <PlateWall
+              categories={muse.tabs}
+              items={muse.items}
+              total={muse.total}
+              batchSize={muse.batchSize}
+            />
+          )}
+        </Await>
       </div>
     </main>
   );
