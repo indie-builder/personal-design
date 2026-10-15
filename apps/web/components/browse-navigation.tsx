@@ -1,7 +1,7 @@
 'use client';
 
-import { Suspense, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useMemo } from 'react';
+import { useSearchParams } from '@/lib/navigation';
 import { ArrowLeft, MoveLeft, MoveRight } from 'lucide-react';
 import { DetailKeyboardNav } from './detail-tools';
 import {
@@ -23,11 +23,9 @@ type Props = {
 };
 
 export function BrowseNavigation(props: Props) {
-  return (
-    <Suspense fallback={<Navigation {...props} />}>
-      <ContextNavigation {...props} />
-    </Suspense>
-  );
+  // 原 Suspense 只为圈定 Next 静态渲染下 useSearchParams 的挂起分叉；
+  // TanStack SSR 时查询串已知，直接渲染带上下文的导航。
+  return <ContextNavigation {...props} />;
 }
 
 function ContextNavigation(props: Props) {

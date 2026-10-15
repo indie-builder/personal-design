@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import { useRef, useState } from 'react';
 import { Check, Printer } from 'lucide-react';
 import { careerReceipt, personalSite } from '@personal-design/personal-sites';
 import { useVisiblePlay } from '@/lib/motion';
+import { Img } from './img';
 import styles from './site-receipt-preview.module.css';
 
 /** Adapted from personal-sites/components/about-print.tsx: same 2.4s stepped paper feed. */
@@ -23,7 +23,7 @@ export function SiteReceiptPreview() {
       aria-hidden="true"
     >
       <div className={styles.homepage}>
-        <Image
+        <Img
           src={personalSite.cover}
           alt=""
           fill
