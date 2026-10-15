@@ -8,9 +8,8 @@ import styles from './layout-compositions.module.css';
 
 // catalog 的图片地址探测（hasImage→node:fs）只能在服务端执行；客户端只拿映射好的图鉴条目
 const getLayoutCatalog = createServerFn({ method: 'GET' }).handler(async () => {
-  const { catalog, categories, hasImage, imageUrl, thumbnailUrl } = await import(
-    '@personal-design/layout-compositions'
-  );
+  const { catalog, categories, hasImage, imageUrl, thumbnailUrl } =
+    await import('@personal-design/layout-compositions');
   // 只把客户端需要的字段传下去，控制负载（原 RSC 时代的注释约定保持不变）
   const items = catalog.map((item) => ({
     id: item.id,

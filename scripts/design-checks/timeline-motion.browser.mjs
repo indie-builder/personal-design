@@ -149,6 +149,17 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
     await waitWalker();
     const ready = await evaluate(WAIT_ROUTE);
     expect(ready, '低视口下漫步者路线动画应已创建（组件挂载且未启动）');
+    // 批量共享页面时，路由滚动恢复会把时间轴的横向滚动还原到上一检查离开的位置，
+    // 漫步者可能被横向裁剪而保持暂停（IO 不可见）。把它滚进视口并等运行态到达——
+    // 那是指针段全部断言的前提；键盘／减少动态段各自需要静止态，不做此等待
+    await evaluate(`(async () => {
+      const scene = document.querySelector('[data-timeline-walker]');
+      scene?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
+      const started = performance.now();
+      while (performance.now() - started < 6000 && scene?.dataset.running !== 'true')
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      return scene?.dataset.running ?? null;
+    })()`);
     await evaluate(INSTALL_RECORDER);
     await viewport.set({ width: 1440, height: 900 });
     const walk = await evaluate(HARVEST);

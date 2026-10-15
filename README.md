@@ -8,13 +8,13 @@ A personal design collection. The homepage lists the work on a timeline ordered 
 
 | Product | What you can do |
 | --- | --- |
-| [Layout Compositions](apps/web/app/products/layout-compositions) | Browse 350 typographic layout studies across 8 categories and themes; search, page through the two-page album, and click any image to zoom. |
-| [Muse](apps/web/app/products/muse) | Browse images and videos by Chinese category or keyword; more works load as you scroll, with details, authors, and links to the originals. |
-| [Design Engineer Tools](apps/web/app/products/design-engineer-tools) | Browse design-engineering tools by category and open each one on its original site. |
-| [Personal Sites](apps/web/app/products/personal-sites) | Watch a 36-second promo video, then open the independently deployed personal website. |
-| [AI Coding Dictionary](apps/web/app/products/ai-coding-dictionary) | Explore terminology in a searchable knowledge graph and read the Chinese and English text side by side, paragraph by paragraph. |
-| [AI Chat](apps/web/app/products/ai-chat) | Pick or create an agent and converse in text, tables, charts, and interactive cards; conversations are kept in your browser. |
-| [Word Arcade](apps/web/app/products/word-arcade) | Play five local mini-games that use headline text as their target; switch games, pause, and restart at any time. |
+| [Layout Compositions](apps/web/src/routes/products/layout-compositions.tsx) | Browse 350 typographic layout studies across 8 categories and themes; search, page through the two-page album, and click any image to zoom. |
+| [Muse](apps/web/src/routes/products/muse) | Browse images and videos by Chinese category or keyword; more works load as you scroll, with details, authors, and links to the originals. |
+| [Design Engineer Tools](apps/web/src/routes/products/design-engineer-tools.tsx) | Browse design-engineering tools by category and open each one on its original site. |
+| [Personal Sites](apps/web/src/routes/products/personal-sites.tsx) | Watch a 36-second promo video, then open the independently deployed personal website. |
+| [AI Coding Dictionary](apps/web/src/routes/products/ai-coding-dictionary.tsx) | Explore terminology in a searchable knowledge graph and read the Chinese and English text side by side, paragraph by paragraph. |
+| [AI Chat](apps/web/src/routes/products/ai-chat.tsx) | Pick or create an agent and converse in text, tables, charts, and interactive cards; conversations are kept in your browser. |
+| [Word Arcade](apps/web/src/routes/products/word-arcade.tsx) | Play five local mini-games that use headline text as their target; switch games, pause, and restart at any time. |
 
 ## Run locally
 

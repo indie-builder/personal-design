@@ -18,12 +18,3 @@
 - 进入、退出和高频反馈分别处理。按 DESIGN.md 的成对动效规则验证：站内返回必须原页面先退场再切换，不能以目标页入场替代；新增返回／关闭入口同步扩展回归。
 - 分别报告行为、状态和视觉验收结果，站内返回与浏览器原生后退分别记录；缺少视觉证据不得声称全部通过。
 
-<!-- BEGIN:nextjs-agent-rules -->
-
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->

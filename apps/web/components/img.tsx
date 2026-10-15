@@ -38,7 +38,8 @@ export function Img({
 }: ImgProps) {
   // 固定尺寸且未声明 unoptimized 时走 /_image：1x/2x srcSet 对齐 next/image 固定图行为；
   // fill（渲染尺寸未知）与 unoptimized 调用点保持原图直连
-  const optimizable = !fill && !unoptimized && typeof width === 'number' && typeof height === 'number';
+  const optimizable =
+    !fill && !unoptimized && typeof width === 'number' && typeof height === 'number';
   let srcSet: string | undefined;
   if (optimizable) {
     const one = nearestWidth(width);
@@ -55,9 +56,7 @@ export function Img({
       loading={priority ? 'eager' : 'lazy'}
       decoding="async"
       style={
-        fill
-          ? { position: 'absolute', inset: 0, width: '100%', height: '100%', ...style }
-          : style
+        fill ? { position: 'absolute', inset: 0, width: '100%', height: '100%', ...style } : style
       }
       width={width}
       height={height}

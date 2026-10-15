@@ -8,13 +8,13 @@
 
 | 作品 | 能做什么 |
 | --- | --- |
-| [布局参考](apps/web/app/products/layout-compositions) | 按 8 个分类和主题浏览 350 张排版构图图鉴；支持搜索、双页画册翻页，点击图片即可放大。 |
-| [灵感集](apps/web/app/products/muse) | 按中文分类或关键词浏览图像与视频；滚动自动加载，可查看详情、作者并前往原作。 |
-| [设计工程工具](apps/web/app/products/design-engineer-tools) | 按分类浏览设计工程工具，直接打开工具原站。 |
-| [个人网站](apps/web/app/products/personal-sites) | 先看 36 秒宣传片，再打开独立部署的个人网站。 |
-| [AI Coding 词典](apps/web/app/products/ai-coding-dictionary) | 在可搜索的知识网中探索术语，中英文逐段对照阅读。 |
-| [AI 问答](apps/web/app/products/ai-chat) | 选择或创建智能体，用文字、表格、图表和交互卡片对话；会话保存在当前浏览器。 |
-| [文字游乐场](apps/web/app/products/word-arcade) | 五款以标题文字为目标的本机小游戏，随时切换、暂停与重来。 |
+| [布局参考](apps/web/src/routes/products/layout-compositions.tsx) | 按 8 个分类和主题浏览 350 张排版构图图鉴；支持搜索、双页画册翻页，点击图片即可放大。 |
+| [灵感集](apps/web/src/routes/products/muse) | 按中文分类或关键词浏览图像与视频；滚动自动加载，可查看详情、作者并前往原作。 |
+| [设计工程工具](apps/web/src/routes/products/design-engineer-tools.tsx) | 按分类浏览设计工程工具，直接打开工具原站。 |
+| [个人网站](apps/web/src/routes/products/personal-sites.tsx) | 先看 36 秒宣传片，再打开独立部署的个人网站。 |
+| [AI Coding 词典](apps/web/src/routes/products/ai-coding-dictionary.tsx) | 在可搜索的知识网中探索术语，中英文逐段对照阅读。 |
+| [AI 问答](apps/web/src/routes/products/ai-chat.tsx) | 选择或创建智能体，用文字、表格、图表和交互卡片对话；会话保存在当前浏览器。 |
+| [文字游乐场](apps/web/src/routes/products/word-arcade.tsx) | 五款以标题文字为目标的本机小游戏，随时切换、暂停与重来。 |
 
 ## 本地运行
 

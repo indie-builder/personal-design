@@ -24,9 +24,8 @@
 
 ## 控制搜索范围
 
-先用 `rg --files <任务目录>` 确认路径，再搜符号。默认从 `apps/web/app`、`apps/web/components`、`apps/web/lib` 或对应包的 `src` 搜起。只有分析打包运行资源、生成内容或旧证据时，才进入 `apps/web/public/ai-coding-atlas`、生成 JSON、`docs/design/execution/evidence`；来源快照继续遵循根指引。
+先用 `rg --files <任务目录>` 确认路径，再搜符号。默认从 `apps/web/src`、`apps/web/components`、`apps/web/lib` 或对应包的 `src` 搜起。只有分析打包运行资源、生成内容或旧证据时，才进入 `apps/web/public/ai-coding-atlas`、生成 JSON、`docs/design/execution/evidence`；来源快照继续遵循根指引。
 
-Next 文档从 `apps/web/node_modules/next/dist/docs` 枚举实际文件名，再读取匹配章节；依赖升级后章节编号和后缀可能变化。规范和代码分开读取、按标题或行段收窄；遇到截断先缩小范围，不重复输出同一大批内容。
 
 ## 更新技能集
 

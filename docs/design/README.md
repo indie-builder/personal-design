@@ -68,7 +68,7 @@
 - 每个分类使用与网格间距对齐的浅色线框，分类内部不再额外分隔；首页预览复用四个跨分类的 favicon 工具格。
 - 不搬运目标工具网站内容；同步失败保留上一次成功目录。
 
-实现：[工具页](../../apps/web/app/products/design-engineer-tools/page.tsx)、[页面样式](../../apps/web/src/routes/products/design-engineer-tools.module.css)、[sync.ts](../../packages/design-engineer-tools/scripts/sync.ts)。
+实现：[工具页](../../apps/web/src/routes/products/design-engineer-tools.tsx)、[页面样式](../../apps/web/src/routes/products/design-engineer-tools.module.css)、[sync.ts](../../packages/design-engineer-tools/scripts/sync.ts)。
 
 ### AI Coding 词典 `/products/ai-coding-dictionary`
 
@@ -115,7 +115,7 @@
 
 页头返回作品时间轴，正文保留两段静态介绍、唯一“打开网站”主按钮与真实宣传片。无龙卷风、逐字显现或其他文字入场逻辑。宣传片可视静音循环，点击或空格／Enter 切换播放，悬停、聚焦或暂停时显示播放提示，失败可重试；外链在新标签打开。首页的小票预览与这里的介绍文字是不同组件。
 
-实现：[介绍页](../../apps/web/app/products/personal-sites/page.tsx)、[site-showcase-media.tsx](../../apps/web/components/site-showcase-media.tsx)。
+实现：[介绍页](../../apps/web/src/routes/products/personal-sites.tsx)、[site-showcase-media.tsx](../../apps/web/components/site-showcase-media.tsx)。
 
 ### 灯箱与恢复状态
 

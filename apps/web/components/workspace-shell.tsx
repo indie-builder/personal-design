@@ -53,6 +53,10 @@ export function WorkspaceLink({
       resetScroll={scroll !== false}
       onClick={(event) => {
         onClick?.(event);
+        // 修饰键/非左键点击交给浏览器默认行为（新标签打开）；Next Link 的
+        // onNavigate 对这类点击本就不触发，这里保持同一语义
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+          return;
         // navigate 返回 true 表示成对过渡已接管导航，阻止 Link 默认跳转
         if (!event.defaultPrevented && navigate?.(href, scroll, direction)) event.preventDefault();
       }}

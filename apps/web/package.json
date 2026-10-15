@@ -30,7 +30,6 @@
     "clsx": "2.1.1",
     "effect": "4.0.4",
     "lucide-react": "1.57.0",
-    "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "sharp": "^0.35.5",
@@ -38,17 +37,14 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "4.3.3",
     "@tailwindcss/vite": "4.3.3",
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
-    "babel-plugin-react-compiler": "^1.0.0",
     "nitro": "npm:nitro-nightly@latest",
     "oxc-transform-react": "^0.154.0",
     "oxlint": "^1.88.0",
-    "postcss": "8.5.30",
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
     "vite": "8.3.4"

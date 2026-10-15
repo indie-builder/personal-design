@@ -77,8 +77,11 @@ export const Route = createFileRoute('/api/ai-chat')({
           Effect.catch(respond, (error) => {
             if ('status' in error)
               return Effect.succeed(new Response(error.message, { status: error.status }));
-            if (!request.signal.aborted) console.error('[ai-chat] request:', chatErrorMessage(error));
-            return Effect.succeed(new Response('问答服务暂时不可用，请稍后重试。', { status: 502 }));
+            if (!request.signal.aborted)
+              console.error('[ai-chat] request:', chatErrorMessage(error));
+            return Effect.succeed(
+              new Response('问答服务暂时不可用，请稍后重试。', { status: 502 }),
+            );
           }),
         );
       },

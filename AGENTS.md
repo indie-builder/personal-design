@@ -9,8 +9,8 @@
 
 ## 工程与命令
 
-- 使用 **pnpm 12.x workspace**（Node 24.x）。`apps/web` 是唯一站点（Next.js App Router + Tailwind v4），`packages/<product>` 存放内容、类型与同步脚本。
-- 新增产品：内容包 + `apps/web/app/products/<slug>/` + `apps/web/lib/products.ts` 注册。`date` 必填并按升序排列，不新增装饰线路色。仅需独立部署时拆 `apps/<product>`。
+- 使用 **pnpm 12.x workspace**（Node 24.x）。`apps/web` 是唯一站点（TanStack Start + Tailwind v4），`packages/<product>` 存放内容、类型与同步脚本。
+- 新增产品：内容包 + `apps/web/src/routes/products/<slug>.tsx` + `apps/web/lib/products.ts` 注册。`date` 必填并按升序排列，不新增装饰线路色。仅需独立部署时拆 `apps/<product>`。
 - App 通过包的 `src/index.ts` API 取数与媒体地址，不直接读 DB 或手拼路径。本地媒体由包同步脚本生成到 `apps/web/public/`；远程媒体遵循各包的热链／本地优先策略。
 
 以下命令从仓库根目录执行；lint 的 `<file>` 相对 `apps/web`。
@@ -32,7 +32,7 @@
 
 ## 验证与浏览器
 
-- 后续开发与本地生产预览统一使用根目录 `pnpm dev` / `pnpm start`，不直接运行 `next dev/start` 或指定应用端口。两种模式共用域名，切换前先停止当前服务；worktree 使用启动日志中的独立子域名，定向检查用 `DESIGN_BASE_URL` 指向实际 URL。
+- 后续开发与本地生产预览统一使用根目录 `pnpm dev` / `pnpm start`，不直接运行 `vite dev` / `node .output/server/index.mjs` 或指定应用端口。两种模式共用域名，切换前先停止当前服务；worktree 使用启动日志中的独立子域名，定向检查用 `DESIGN_BASE_URL` 指向实际 URL。
 - 绝不在写完代码后再补写单元测试。复杂功能高度优先 E2E；必须隔离测试系统时，先列出所有可能的失败方式，再写代码。
 - 开发期间只跑相关定向 E2E，开发结束再跑全套。E2E 交付可验证、可重复执行的验收产物，记录复现命令、结果与限制；已有检查入口见 [验收索引](docs/design/execution/README.md)。
 - 浏览器操作使用当前环境可用的工具（如 Playwright、CDP 或浏览器集成），不绑定特定智能体；按页面契约验证真实行为并记录结果。

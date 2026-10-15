@@ -65,9 +65,9 @@ function MuseDetailPage() {
   const description = post.description?.trim();
   const hasDescription = description && description !== post.title.trim();
 
-  // main 地标由外壳提供；此处不再渲染重复地标（原注释意图保留）
+  // main 地标在本页渲染（外壳不提供 main）；loader 已 await 数据，无需原 Suspense 包裹
   return (
-    <>
+    <main className={styles.page}>
       <BrowseNavigation
         listPath="/products/muse"
         returnLabel="返回灵感集"
@@ -117,6 +117,6 @@ function MuseDetailPage() {
           <p className={styles.description}>{description}</p>
         </div>
       ) : null}
-    </>
+    </main>
   );
 }

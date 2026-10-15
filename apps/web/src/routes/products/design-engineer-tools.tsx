@@ -17,7 +17,9 @@ function ToolIcon({ icon }: { icon?: string | null }) {
   const [failed, setFailed] = useState(false);
   return (
     <span className={styles.icon} data-fallback={!icon || failed || undefined} aria-hidden="true">
-      {icon && !failed && <Img src={icon} alt="" width={16} height={16} onError={() => setFailed(true)} />}
+      {icon && !failed && (
+        <Img src={icon} alt="" width={16} height={16} onError={() => setFailed(true)} />
+      )}
       <ArrowUpRight size={16} strokeWidth={2} />
     </span>
   );

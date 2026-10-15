@@ -62,7 +62,12 @@ const CONTENT_TYPES: Record<string, string> = {
 /** 明显的本地/私网 host 字面量兜底；白名单只含域名，IP 字面量一律不放行 */
 function isPrivateHost(hostname: string): boolean {
   const host = hostname.toLowerCase().replace(/\.$/, '');
-  if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host.endsWith('.internal'))
+  if (
+    host === 'localhost' ||
+    host.endsWith('.localhost') ||
+    host.endsWith('.local') ||
+    host.endsWith('.internal')
+  )
     return true;
   if (host === '::1' || host === '[::1]' || host === '[::]') return true;
   if (/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) return true;
@@ -102,7 +107,9 @@ async function resolveSource(raw: string): Promise<{ local?: string; remote?: UR
 }
 
 /** 上游拉取：不可信内容不落盘、20MB 上限、15s 超时（与站内 fetch 超时档一致） */
-async function fetchRemote(url: URL): Promise<{ ok: true; body: Buffer; contentType: string } | { ok: false }> {
+async function fetchRemote(
+  url: URL,
+): Promise<{ ok: true; body: Buffer; contentType: string } | { ok: false }> {
   try {
     const response = await fetch(url, {
       signal: AbortSignal.timeout(15_000),
@@ -132,11 +139,16 @@ function extensionOf(source: string, fallbackContentType: string): string {
 }
 
 /** 按 Accept 协商目标格式；svg/gif 等不优化格式返回 null（原样透传） */
-function negotiateFormat(accept: string | null, sourceExt: string): '.avif' | '.webp' | '.jpeg' | '.png' | null {
+function negotiateFormat(
+  accept: string | null,
+  sourceExt: string,
+): '.avif' | '.webp' | '.jpeg' | '.png' | null {
   if (!OPTIMIZABLE.has(sourceExt)) return null;
   if (accept?.includes('image/avif')) return '.avif';
   if (accept?.includes('image/webp')) return '.webp';
-  return sourceExt === '.jpg' || sourceExt === '.jpeg' ? '.jpeg' : (sourceExt as '.png' | '.webp' | '.avif');
+  return sourceExt === '.jpg' || sourceExt === '.jpeg'
+    ? '.jpeg'
+    : (sourceExt as '.png' | '.webp' | '.avif');
 }
 
 const CACHE_HEADERS = {
@@ -180,7 +192,10 @@ export const Route = createFileRoute('/_image')({
         if (!target) {
           // svg/gif 等不优化格式：原字节透传
           return new Response(new Uint8Array(input), {
-            headers: { 'Content-Type': CONTENT_TYPES[sourceExt] ?? 'application/octet-stream', ...CACHE_HEADERS },
+            headers: {
+              'Content-Type': CONTENT_TYPES[sourceExt] ?? 'application/octet-stream',
+              ...CACHE_HEADERS,
+            },
           });
         }
         try {
@@ -190,7 +205,10 @@ export const Route = createFileRoute('/_image')({
             .toFormat(target.slice(1) as 'avif' | 'webp' | 'jpeg' | 'png', { quality })
             .toBuffer();
           return new Response(new Uint8Array(body), {
-            headers: { 'Content-Type': CONTENT_TYPES[target] ?? 'application/octet-stream', ...CACHE_HEADERS },
+            headers: {
+              'Content-Type': CONTENT_TYPES[target] ?? 'application/octet-stream',
+              ...CACHE_HEADERS,
+            },
           });
         } catch (error) {
           // 记录原因便于排查优化管线问题；不向客户端泄漏上游信息
