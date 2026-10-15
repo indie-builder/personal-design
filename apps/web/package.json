@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/generate-openui-prompt.mjs && next dev --turbopack",
-    "build": "node -e \"require('node:fs').accessSync('public/ai-coding-atlas/index.html')\" && node scripts/generate-openui-prompt.mjs && next build",
-    "start": "next start",
+    "dev": "node scripts/generate-openui-prompt.mjs && vite dev",
+    "build": "node -e \"require('node:fs').accessSync('public/ai-coding-atlas/index.html')\" && node scripts/generate-openui-prompt.mjs && vite build",
+    "start": "node .output/server/index.mjs",
     "lint": "oxlint --deny-warnings .",
     "typecheck": "tsc --noEmit"
   },
@@ -24,10 +24,12 @@
     "@personal-design/layout-compositions": "workspace:*",
     "@personal-design/personal-sites": "workspace:*",
     "@personal-design/word-arcade": "workspace:*",
+    "@tanstack/react-router": "1.170.44",
+    "@tanstack/react-start": "1.169.2",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "effect": "4.0.4",
-    "lucide-react": "1.56.0",
+    "lucide-react": "1.57.0",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -36,13 +38,18 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.3",
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
     "babel-plugin-react-compiler": "^1.0.0",
+    "nitro": "npm:nitro-nightly@latest",
+    "oxc-transform-react": "^0.154.0",
     "oxlint": "^1.88.0",
     "postcss": "8.5.30",
     "tailwindcss": "4.3.3",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "vite": "8.3.4"
   }
 }
