@@ -1,4 +1,4 @@
-import 'server-only';
+import '@tanstack/react-start/server-only';
 import { Effect } from 'effect';
 import { modelMessageContent, type ChatMessage } from '@personal-design/ai-chat';
 import type { Message } from '@earendil-works/pi-ai';

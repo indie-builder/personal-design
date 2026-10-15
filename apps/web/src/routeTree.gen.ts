@@ -10,18 +10,44 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.txt]'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.xml]'
+import { Route as ApiAiChatRouteImport } from './routes/api/ai-chat'
+import { Route as ApiPortfolioRouteImport } from './routes/api/portfolio'
 import { Route as ProductsAiChatRouteImport } from './routes/products/ai-chat'
 import { Route as ProductsAiCodingDictionaryRouteImport } from './routes/products/ai-coding-dictionary'
 import { Route as ProductsDesignEngineerToolsRouteImport } from './routes/products/design-engineer-tools'
 import { Route as ProductsLayoutCompositionsRouteImport } from './routes/products/layout-compositions'
 import { Route as ProductsPersonalSitesRouteImport } from './routes/products/personal-sites'
 import { Route as ProductsWordArcadeRouteImport } from './routes/products/word-arcade'
+import { Route as ApiPortfolioSplatRouteImport } from './routes/api/portfolio/$'
 import { Route as ProductsMuseIndexRouteImport } from './routes/products/muse/index'
 import { Route as ProductsMuseSlugRouteImport } from './routes/products/muse/$slug'
+import { Route as ProductsMuseApiPostsRouteImport } from './routes/products/muse/api/posts'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiChatRoute = ApiAiChatRouteImport.update({
+  id: '/api/ai-chat',
+  path: '/api/ai-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPortfolioRoute = ApiPortfolioRouteImport.update({
+  id: '/api/portfolio',
+  path: '/api/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsAiChatRoute = ProductsAiChatRouteImport.update({
@@ -57,6 +83,11 @@ const ProductsWordArcadeRoute = ProductsWordArcadeRouteImport.update({
   path: '/products/word-arcade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPortfolioSplatRoute = ApiPortfolioSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => ApiPortfolioRoute,
+} as any)
 const ProductsMuseIndexRoute = ProductsMuseIndexRouteImport.update({
   id: '/products/muse/',
   path: '/products/muse/',
@@ -67,79 +98,124 @@ const ProductsMuseSlugRoute = ProductsMuseSlugRouteImport.update({
   path: '/products/muse/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductsMuseApiPostsRoute = ProductsMuseApiPostsRouteImport.update({
+  id: '/products/muse/api/posts',
+  path: '/products/muse/api/posts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/ai-chat': typeof ApiAiChatRoute
+  '/api/portfolio': typeof ApiPortfolioRouteWithChildren
   '/products/ai-chat': typeof ProductsAiChatRoute
   '/products/ai-coding-dictionary': typeof ProductsAiCodingDictionaryRoute
   '/products/design-engineer-tools': typeof ProductsDesignEngineerToolsRoute
   '/products/layout-compositions': typeof ProductsLayoutCompositionsRoute
   '/products/personal-sites': typeof ProductsPersonalSitesRoute
   '/products/word-arcade': typeof ProductsWordArcadeRoute
+  '/api/portfolio/$': typeof ApiPortfolioSplatRoute
   '/products/muse/$slug': typeof ProductsMuseSlugRoute
   '/products/muse/': typeof ProductsMuseIndexRoute
+  '/products/muse/api/posts': typeof ProductsMuseApiPostsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/ai-chat': typeof ApiAiChatRoute
+  '/api/portfolio': typeof ApiPortfolioRouteWithChildren
   '/products/ai-chat': typeof ProductsAiChatRoute
   '/products/ai-coding-dictionary': typeof ProductsAiCodingDictionaryRoute
   '/products/design-engineer-tools': typeof ProductsDesignEngineerToolsRoute
   '/products/layout-compositions': typeof ProductsLayoutCompositionsRoute
   '/products/personal-sites': typeof ProductsPersonalSitesRoute
   '/products/word-arcade': typeof ProductsWordArcadeRoute
+  '/api/portfolio/$': typeof ApiPortfolioSplatRoute
   '/products/muse/$slug': typeof ProductsMuseSlugRoute
   '/products/muse': typeof ProductsMuseIndexRoute
+  '/products/muse/api/posts': typeof ProductsMuseApiPostsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/api/ai-chat': typeof ApiAiChatRoute
+  '/api/portfolio': typeof ApiPortfolioRouteWithChildren
   '/products/ai-chat': typeof ProductsAiChatRoute
   '/products/ai-coding-dictionary': typeof ProductsAiCodingDictionaryRoute
   '/products/design-engineer-tools': typeof ProductsDesignEngineerToolsRoute
   '/products/layout-compositions': typeof ProductsLayoutCompositionsRoute
   '/products/personal-sites': typeof ProductsPersonalSitesRoute
   '/products/word-arcade': typeof ProductsWordArcadeRoute
+  '/api/portfolio/$': typeof ApiPortfolioSplatRoute
   '/products/muse/$slug': typeof ProductsMuseSlugRoute
   '/products/muse/': typeof ProductsMuseIndexRoute
+  '/products/muse/api/posts': typeof ProductsMuseApiPostsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/api/ai-chat'
+    | '/api/portfolio'
     | '/products/ai-chat'
     | '/products/ai-coding-dictionary'
     | '/products/design-engineer-tools'
     | '/products/layout-compositions'
     | '/products/personal-sites'
     | '/products/word-arcade'
+    | '/api/portfolio/$'
     | '/products/muse/$slug'
     | '/products/muse/'
+    | '/products/muse/api/posts'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/api/ai-chat'
+    | '/api/portfolio'
     | '/products/ai-chat'
     | '/products/ai-coding-dictionary'
     | '/products/design-engineer-tools'
     | '/products/layout-compositions'
     | '/products/personal-sites'
     | '/products/word-arcade'
+    | '/api/portfolio/$'
     | '/products/muse/$slug'
     | '/products/muse'
+    | '/products/muse/api/posts'
   id:
     | '__root__'
     | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/api/ai-chat'
+    | '/api/portfolio'
     | '/products/ai-chat'
     | '/products/ai-coding-dictionary'
     | '/products/design-engineer-tools'
     | '/products/layout-compositions'
     | '/products/personal-sites'
     | '/products/word-arcade'
+    | '/api/portfolio/$'
     | '/products/muse/$slug'
     | '/products/muse/'
+    | '/products/muse/api/posts'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiAiChatRoute: typeof ApiAiChatRoute
+  ApiPortfolioRoute: typeof ApiPortfolioRouteWithChildren
   ProductsAiChatRoute: typeof ProductsAiChatRoute
   ProductsAiCodingDictionaryRoute: typeof ProductsAiCodingDictionaryRoute
   ProductsDesignEngineerToolsRoute: typeof ProductsDesignEngineerToolsRoute
@@ -148,6 +224,7 @@ export interface RootRouteChildren {
   ProductsWordArcadeRoute: typeof ProductsWordArcadeRoute
   ProductsMuseSlugRoute: typeof ProductsMuseSlugRoute
   ProductsMuseIndexRoute: typeof ProductsMuseIndexRoute
+  ProductsMuseApiPostsRoute: typeof ProductsMuseApiPostsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -157,6 +234,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-chat': {
+      id: '/api/ai-chat'
+      path: '/api/ai-chat'
+      fullPath: '/api/ai-chat'
+      preLoaderRoute: typeof ApiAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/portfolio': {
+      id: '/api/portfolio'
+      path: '/api/portfolio'
+      fullPath: '/api/portfolio'
+      preLoaderRoute: typeof ApiPortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/products/ai-chat': {
@@ -201,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsWordArcadeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/portfolio/$': {
+      id: '/api/portfolio/$'
+      path: '/$'
+      fullPath: '/api/portfolio/$'
+      preLoaderRoute: typeof ApiPortfolioSplatRouteImport
+      parentRoute: typeof ApiPortfolioRoute
+    }
     '/products/muse/': {
       id: '/products/muse/'
       path: '/products/muse'
@@ -215,11 +327,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsMuseSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/products/muse/api/posts': {
+      id: '/products/muse/api/posts'
+      path: '/products/muse/api/posts'
+      fullPath: '/products/muse/api/posts'
+      preLoaderRoute: typeof ProductsMuseApiPostsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface ApiPortfolioRouteChildren {
+  ApiPortfolioSplatRoute: typeof ApiPortfolioSplatRoute
+}
+
+const ApiPortfolioRouteChildren: ApiPortfolioRouteChildren = {
+  ApiPortfolioSplatRoute: ApiPortfolioSplatRoute,
+}
+
+const ApiPortfolioRouteWithChildren = ApiPortfolioRoute._addFileChildren(
+  ApiPortfolioRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiAiChatRoute: ApiAiChatRoute,
+  ApiPortfolioRoute: ApiPortfolioRouteWithChildren,
   ProductsAiChatRoute: ProductsAiChatRoute,
   ProductsAiCodingDictionaryRoute: ProductsAiCodingDictionaryRoute,
   ProductsDesignEngineerToolsRoute: ProductsDesignEngineerToolsRoute,
@@ -228,16 +363,18 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsWordArcadeRoute: ProductsWordArcadeRoute,
   ProductsMuseSlugRoute: ProductsMuseSlugRoute,
   ProductsMuseIndexRoute: ProductsMuseIndexRoute,
+  ProductsMuseApiPostsRoute: ProductsMuseApiPostsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

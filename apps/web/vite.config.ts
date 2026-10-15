@@ -52,7 +52,46 @@ export default defineConfig({
     tanstackStart(),
     // 本版 Start 已把部署目标从核心拆出：Node 输出（.output/server/index.mjs）按官方
     // hosting 文档经 nitro/vite 插件接入，pnpm start 依赖该产物
-    nitro(),
+    nitro({
+      // nitro 环境构建（server routes/services）会用自身 aliases 覆盖 vite 的 resolve.alias，
+      // 这里同步声明 '@' 才能在 server route 里继续用与页面一致的导入写法
+      alias: { '@': resolve(import.meta.dirname) },
+      // 路径型响应头（对静态文件与动态渲染同等生效）；query 条件的媒体 immutable
+      // 规则表达不了，由下方 modules 注册的运行时插件处理
+      routeRules: {
+        // 全站安全基线；值与原 next.config.ts 逐字节一致
+        '/**': {
+          headers: {
+            'X-Content-Type-Options': 'nosniff',
+            'Referrer-Policy': 'strict-origin-when-cross-origin',
+            'X-Frame-Options': 'DENY',
+            'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+            'Strict-Transport-Security': 'max-age=63072000; includeSubDomains',
+          },
+        },
+        // AI Coding 词典的静态运行资源允许被站点自身 iframe 引用
+        '/ai-coding-atlas/**': {
+          headers: {
+            'X-Frame-Options': 'SAMEORIGIN',
+            'Content-Security-Policy': "frame-ancestors 'self'",
+          },
+        },
+      },
+      // pi-coding-agent 运行时会 createRequire 解析 quickjs-wasm 等资产且自带依赖树，
+      // 保持 server 外置（对应 next.config 的 serverExternalPackages），由 nf3 追踪进产物
+      traceDeps: ['@earendil-works/pi-coding-agent', '@earendil-works/pi-ai'],
+      modules: [
+        {
+          name: 'personal-design:media-version-headers',
+          setup(nitro) {
+            // 运行时插件负责静态媒体响应的 ?v= 缓存头（见 nitro/plugins/）
+            nitro.options.plugins.unshift(
+              resolve(import.meta.dirname, 'nitro/plugins/media-version-headers'),
+            );
+          },
+        },
+      ],
+    }),
     // React Compiler 对应 next.config 的 reactCompiler: true；
     // plugin-react 6 已移除 babel 选项，改用内置 compiler 开关（oxc 实现）
     viteReact({ compiler: true }),
