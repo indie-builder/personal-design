@@ -28,4 +28,4 @@ minimumReleaseAgeExclude:
 
 permissions:
   '@tanstack/react-start':
-    skills: true
+    skills: false
