@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef } from 'react';
 import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 import styles from './home-digital-rain.module.css';

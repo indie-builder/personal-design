@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import { EASE_TRAVEL, instantMotion, observeMotionPolicy } from '@/lib/motion';
 import styles from './timeline-walker.module.css';

@@ -1,5 +1,4 @@
-'use client';
-
+import type { SitePath } from '@/lib/navigation';
 import { WorkspaceLink } from './workspace-shell';
 import { Button, buttonClassName } from './button';
 import styles from './page-error.module.css';
@@ -13,7 +12,8 @@ export function PageError({
 }: {
   reset: () => void;
   title?: string;
-  href?: string;
+  /** 错误恢复的返回目标；限定为 routeTree 已知路径，路由文件里写错即编译红 */
+  href?: SitePath;
   returnLabel?: string;
   /** 覆盖默认提示语；默认文案假设地址中带有可保留的筛选条件 */
   hint?: string;

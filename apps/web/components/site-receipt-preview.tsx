@@ -1,5 +1,3 @@
-'use client';
-
 import { useRef, useState } from 'react';
 import { Check, Printer } from 'lucide-react';
 import { careerReceipt, personalSite } from '@personal-design/personal-sites';

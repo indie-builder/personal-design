@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from '@tanstack/react-router';
 import { MotionVideo } from './motion-video';
@@ -23,7 +21,7 @@ export function PlateCell({
   const router = useRouter();
   const prefetch = () => {
     const { to, search } = splitHref(href);
-    // 悬停/聚焦预热详情 loader，失败静默（与 Next prefetch 语义一致）
+    // 悬停/聚焦预热详情 loader，失败静默（等价于 Link preload="intent"，这里手动触发以复用单元格事件）
     void router.preloadRoute({ to, search }).catch(() => {});
   };
   const preview = item.kind === 'video' ? item.poster : item.src;
@@ -65,7 +63,7 @@ export function PlateCell({
       ref={cellRef}
       id={`muse-${item.key}`}
       href={href}
-      prefetch={false}
+      preload={false}
       onPointerEnter={prefetch}
       onFocus={prefetch}
       data-direction="next"

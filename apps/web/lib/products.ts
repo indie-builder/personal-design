@@ -5,6 +5,10 @@
  */
 import { arcadeProduct } from '@personal-design/word-arcade';
 import { personalSite } from '@personal-design/personal-sites';
+import type { SitePath } from './navigation';
+
+/** 站内产品路径走 routeTree 编译期校验（typed route）；独立部署的作品直接注册线上地址。 */
+export type ProductHref = SitePath | `http://${string}` | `https://${string}`;
 
 export interface Product {
   slug: string;
@@ -15,13 +19,16 @@ export interface Product {
   date: string;
   /** 日期性质只供 API 使用；首页时间轴仅显示 date，不显示任何日期后缀 */
   dateLabel: string;
-  href: string;
+  href: ProductHref;
   /** 首页卡片封面图（public 下路径） */
   cover: string;
 }
 
-/** 按上线日期升序 */
-export const products: Product[] = [
+// 注册表输入形状：dateLabel 由下方 map 补默认值，显式声明优先
+type ProductInput = Omit<Product, 'dateLabel'> & { dateLabel?: Product['dateLabel'] };
+
+// 注册表显式标注：内联字面量 href 不被推断拓宽，逐条参与 routeTree 路径校验
+const registry: ProductInput[] = [
   arcadeProduct,
   personalSite,
   {
@@ -71,9 +78,13 @@ export const products: Product[] = [
     href: '/products/ai-chat',
     cover: '',
   },
-]
-  .map((product) => ({
-    dateLabel: product.slug === 'personal-sites' ? '收录' : '上线',
+];
+
+/** 按上线日期升序 */
+export const products: Product[] = registry
+  // 返回值显式标注 Product：map 重建对象时字面量 href 不被推断拓宽
+  .map((product): Product => ({
     ...product,
+    dateLabel: product.dateLabel ?? (product.slug === 'personal-sites' ? '收录' : '上线'),
   }))
   .sort((a, b) => a.date.localeCompare(b.date));

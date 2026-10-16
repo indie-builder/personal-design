@@ -1,19 +1,25 @@
 import { useRouterState } from '@tanstack/react-router';
 import { useMemo } from 'react';
+import type { FileRouteTypes } from '../src/routeTree.gen';
 
 /**
- * next/navigation 的最小等价层：读侧走 router state（SSR 时 pathname/search 已知），
- * 写侧沿用 window.history.*（@tanstack/history 拦截 pushState/replaceState 并通知 router，
- * URL 仍是筛选条件的唯一事实源，与 Next 的 replaceState 语义一致）。
+ * TanStack Router 全局读取助手：跨路由读取当前 pathname/search 的统一入口，
+ * 三个 hook 都是 useRouterState 的薄包装（官方推荐的跨路由全局读取形态）。
+ * 读侧走 router state（SSR 时 pathname/search 已知），写侧沿用 window.history.*
+ * （@tanstack/history 拦截 pushState/replaceState 并通知 router，
+ * URL 仍是筛选条件的唯一事实源）。
  */
 
-/** 对应 next/navigation 的 usePathname。 */
+/** 站内可导航路径，取自 routeTree 编译期产物：写错即编译红（typed route 的核心收益）。 */
+export type SitePath = FileRouteTypes['to'];
+
+/** 当前路径名。 */
 export function usePathname(): string {
   return useRouterState({ select: (state) => state.location.pathname });
 }
 
 /**
- * 对应 next/navigation 的 useSearchParams：以 URLSearchParams 形态暴露当前查询串，
+ * 当前查询串，以 URLSearchParams 形态暴露，
  * 让既有的 .get/.size/.toString() 调用零改动。
  */
 export function useSearchParams(): URLSearchParams {

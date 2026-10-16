@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSearchParams } from '@/lib/navigation';
 import { ArrowRight } from 'lucide-react';

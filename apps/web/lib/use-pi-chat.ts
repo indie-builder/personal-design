@@ -1,4 +1,3 @@
-'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { EventType, openAIReadableStreamAdapter } from '@openuidev/react-headless';
 import { createChatStream } from './chat-stream';

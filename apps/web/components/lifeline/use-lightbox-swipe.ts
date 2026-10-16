@@ -1,5 +1,3 @@
-'use client';
-
 import { useRef, type PointerEvent, type RefObject } from 'react';
 
 interface SwipeState {

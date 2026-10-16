@@ -1,5 +1,6 @@
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { NotFoundView } from '@/components/not-found-view';
 import { PageError } from '@/components/page-error';
 import { WorkspaceShell } from '@/components/workspace-shell';
@@ -64,6 +65,11 @@ function RootDocument() {
         <WorkspaceShell>
           <Outlet />
         </WorkspaceShell>
+        {/* dev-only：import.meta.env.DEV 被静态替换，生产构建连同 devtools 依赖一起摇树 */}
+        {/* 挂左下角，不遮挡右下角的主题切换钮 */}
+        {import.meta.env.DEV ? (
+          <TanStackRouterDevtools initialIsOpen={false} position="bottom-left" />
+        ) : null}
         <Scripts />
       </body>
     </html>

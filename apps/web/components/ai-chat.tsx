@@ -1,5 +1,3 @@
-'use client';
-
 import { Img } from './img';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, Menu, Plus, X } from 'lucide-react';

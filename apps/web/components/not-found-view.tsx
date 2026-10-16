@@ -1,5 +1,3 @@
-'use client';
-
 import { Link } from '@tanstack/react-router';
 import { buttonClassName } from '@/components/button';
 import styles from './not-found.module.css';

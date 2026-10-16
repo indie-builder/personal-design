@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import {
   Arcade,

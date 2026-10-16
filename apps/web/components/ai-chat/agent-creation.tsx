@@ -1,5 +1,3 @@
-'use client';
-
 import type { RefObject } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { agentSchema, randomAvatarId, type Agent } from '@personal-design/ai-chat';

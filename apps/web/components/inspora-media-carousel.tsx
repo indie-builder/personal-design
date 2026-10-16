@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight, RotateCcw } from 'lucide-react';
 import { Button, buttonClassName } from './button';

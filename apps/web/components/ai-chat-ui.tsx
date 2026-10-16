@@ -1,5 +1,3 @@
-'use client';
-
 import type { FormSubmission } from '@personal-design/ai-chat';
 import { Component, useState, type ReactNode } from 'react';
 import { Renderer, type ParseResult } from '@openuidev/react-lang';

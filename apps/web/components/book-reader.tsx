@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { categoryLabel } from '@/lib/category-label';

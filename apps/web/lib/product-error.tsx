@@ -1,5 +1,3 @@
-'use client';
-
 import type { ErrorComponentProps } from '@tanstack/react-router';
 import type { ComponentProps } from 'react';
 import { PageError } from '@/components/page-error';

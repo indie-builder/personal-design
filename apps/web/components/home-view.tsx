@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { instantMotion } from '@/lib/motion';
@@ -163,7 +161,7 @@ export function HomeView({
                       </div>
                       <WorkspaceLink
                         href={product.href}
-                        prefetch
+                        preload="intent"
                         className={styles.project}
                         aria-label={`进入${product.name}`}
                       >
