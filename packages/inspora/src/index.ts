@@ -16,9 +16,16 @@ const PUBLIC_DIR = path.resolve(PKG_DIR, '../../../apps/web/public');
 const MEDIA_BASE = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL ?? '').replace(/\/+$/, '');
 const MEDIA_VERSION = process.env.NEXT_PUBLIC_MEDIA_VERSION;
 
+/**
+ * Vercel 等 serverless 部署把 public 整体发到 CDN，函数文件系统里没有该目录，
+ * existsSync 探测必然为假。本地副本与 DB 同批写入（sync 管线保证一致），
+ * 部署环境直接信任 DB 记录的本地路径，保持「本地媒体优先」不回退成上游热链。
+ */
+const TRUST_DEPLOYED_PUBLIC = process.env.VERCEL === '1';
+
 /** 本地副本存在用本地（含外置 base），否则回退热链原站 */
 function mediaUrl(localPath: string | null, upstream: string | null): string | null {
-  if (localPath && existsSync(path.join(PUBLIC_DIR, localPath))) {
+  if (localPath && (TRUST_DEPLOYED_PUBLIC || existsSync(path.join(PUBLIC_DIR, localPath)))) {
     return `${MEDIA_BASE}${localPath}${MEDIA_VERSION ? `?v=${MEDIA_VERSION}` : ''}`;
   }
   return upstream;
