@@ -9,22 +9,16 @@
       "hasMain": true
     },
     {
+      "route": "/products/ai-coding-dictionary",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true
+    },
+    {
       "route": "/robots.txt",
       "status": 200,
       "kind": "asset",
       "hasMain": false
-    },
-    {
-      "route": "/sitemap.xml",
-      "status": 200,
-      "kind": "asset",
-      "hasMain": false
-    },
-    {
-      "route": "/products/ai-chat",
-      "status": 200,
-      "kind": "page",
-      "hasMain": true
     },
     {
       "route": "/products/design-engineer-tools",
@@ -33,10 +27,16 @@
       "hasMain": true
     },
     {
-      "route": "/products/ai-coding-dictionary",
+      "route": "/products/ai-chat",
       "status": 200,
       "kind": "page",
       "hasMain": true
+    },
+    {
+      "route": "/sitemap.xml",
+      "status": 200,
+      "kind": "asset",
+      "hasMain": false
     },
     {
       "route": "/products/layout-compositions",
@@ -51,14 +51,14 @@
       "hasMain": true
     },
     {
-      "route": "/_not-found",
-      "status": 404,
+      "route": "/products/word-arcade",
+      "status": 200,
       "kind": "page",
       "hasMain": true
     },
     {
-      "route": "/products/word-arcade",
-      "status": 200,
+      "route": "/_not-found",
+      "status": 404,
       "kind": "page",
       "hasMain": true
     },

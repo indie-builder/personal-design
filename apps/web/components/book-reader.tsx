@@ -260,6 +260,8 @@ function PageContent({ item, number }: { item?: BookPage; number: number }) {
             priority
             fetchPriority="high"
             sizes="(max-width: 640px) 44vw, 440px"
+            // 书页缩略图保持原图直连：翻页即换图，避免每次翻页都经过 /_image 转换
+            unoptimized
             draggable={false}
             onError={() => setFailed(true)}
           />
