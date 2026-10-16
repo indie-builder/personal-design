@@ -23,9 +23,16 @@ const MEDIA_VERSION = process.env.NEXT_PUBLIC_MEDIA_VERSION;
  */
 const TRUST_DEPLOYED_PUBLIC = process.env.VERCEL === '1';
 
-/** 本地副本存在用本地（含外置 base），否则回退热链原站 */
+/**
+ * 本地副本存在用本地（含外置 base），否则回退热链原站。
+ * localPath 是 public 下的站内路径；绝对 URL 是热链（bestx/collectui 头像），
+ * 不能加 base 前缀，否则拼出 `https://media.example.comhttps://cdn...`。
+ */
 function mediaUrl(localPath: string | null, upstream: string | null): string | null {
-  if (localPath && (TRUST_DEPLOYED_PUBLIC || existsSync(path.join(PUBLIC_DIR, localPath)))) {
+  if (
+    localPath?.startsWith('/') &&
+    (TRUST_DEPLOYED_PUBLIC || existsSync(path.join(PUBLIC_DIR, localPath)))
+  ) {
     return `${MEDIA_BASE}${localPath}${MEDIA_VERSION ? `?v=${MEDIA_VERSION}` : ''}`;
   }
   return upstream;

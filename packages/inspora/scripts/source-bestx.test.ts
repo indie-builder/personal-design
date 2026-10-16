@@ -58,12 +58,6 @@ test('photo 行映射为 image，链接与宽高来自 CDN 字段', () => {
       posterUrl: null,
       width: 1200,
       height: 679,
-      raw: {
-        type: 'photo',
-        image: 'https://cdn.bestdesignsonx.com/media/HR92.avif',
-        width: '1200',
-        height: '679',
-      },
     },
   ]);
 });

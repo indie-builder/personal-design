@@ -130,6 +130,44 @@ test('cards preserve local URLs, empty strings, video preview and fallback rules
   assert.deepEqual(api.listPostCards(), originalCards(api.listPosts()));
 });
 
+test('部署环境给热链头像加 base 前缀，本地路径头像不受影响', async (t) => {
+  // 触发 toPost 的部署分支：VERCEL=1 让本地探测短路，MEDIA_BASE 非空才会暴露拼接
+  const previous = { VERCEL: process.env.VERCEL, MEDIA: process.env.NEXT_PUBLIC_MEDIA_BASE_URL };
+  process.env.VERCEL = '1';
+  process.env.NEXT_PUBLIC_MEDIA_BASE_URL = 'https://media.example.test';
+  t.after(() => {
+    if (previous.VERCEL === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = previous.VERCEL;
+    if (previous.MEDIA === undefined) delete process.env.NEXT_PUBLIC_MEDIA_BASE_URL;
+    else process.env.NEXT_PUBLIC_MEDIA_BASE_URL = previous.MEDIA;
+  });
+
+  const root = await mkdtemp(path.join(os.tmpdir(), 'inspora-avatar-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const pkg = path.join(root, 'packages/inspora');
+  await mkdir(path.join(pkg, 'src'), { recursive: true });
+  await copyFile(new URL('./index.ts', import.meta.url), path.join(pkg, 'src/index.ts'));
+  await mkdir(path.join(root, 'apps/web/public/inspora/avatars'), { recursive: true });
+  await writeFile(path.join(root, 'apps/web/public/inspora/avatars/local.webp'), 'fixture');
+  const { db } = openDatabase(path.join(pkg, 'inspora.db'));
+  t.after(() => db.close());
+  const insert = db.prepare(`INSERT INTO posts
+    (id, slug, title, creator_name, creator_avatar, created_at, synced_at, source, tweet_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  const at = '2026-10-10';
+  insert.run('bestx-1', 'x-1', 'hot', 'Hot', 'https://cdn.example.test/a.jpg', at, at, 'bestx', '1');
+  insert.run('inspora-2', 'local', 'Local', 'Local', '/inspora/avatars/local.webp', at, at, 'inspora', null);
+
+  const api = await import(pathToFileURL(path.join(pkg, 'src/index.ts')).href);
+
+  // 详情页头像走 getPostBySlug（见 apps/web/src/routes/products/muse/$slug.tsx）
+  assert.equal(api.getPostBySlug('x-1').creatorAvatar, 'https://cdn.example.test/a.jpg');
+  assert.equal(
+    api.getPostBySlug('local').creatorAvatar,
+    'https://media.example.test/inspora/avatars/local.webp',
+  );
+});
+
 test('cards never parse secondary media', async (t) => {
   const { api, add } = await fixture(t);
   add('post', [{}, { type: 'video', raw: 'secondary-media-must-not-be-parsed' }]);
