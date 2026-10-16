@@ -86,7 +86,6 @@ interface MappedMedia {
   posterUrl: string | null;
   width: number | null;
   height: number | null;
-  raw: BestxMedia | CollectuiRow;
 }
 
 interface MappedPost {
@@ -104,13 +103,11 @@ interface MappedPost {
   createdAt: string;
   publishedAt: string | null;
   isFeatured: boolean;
-  raw: { entries?: CollectuiRow[]; [key: string]: unknown };
   media: MappedMedia[];
 }
 
 interface MappedCollectuiPost extends MappedPost {
   styles: string[];
-  raw: { entries: CollectuiRow[] };
   media: [MappedMedia, ...MappedMedia[]];
 }
 
@@ -169,7 +166,6 @@ function mapMedia(entry: BestxMedia, tweetId: string, position: number): MappedM
       posterUrl: null,
       width,
       height,
-      raw: entry,
     };
   }
   // video 与 animated_gif（X 的 gif 实为 mp4）都按视频处理
@@ -181,7 +177,6 @@ function mapMedia(entry: BestxMedia, tweetId: string, position: number): MappedM
       posterUrl: entry.cover ?? null,
       width,
       height,
-      raw: entry,
     };
   }
   return null;
@@ -214,19 +209,6 @@ export function mapBestxPost(row: BestxRow): MappedPost | null {
     createdAt,
     publishedAt: isoOf(row.published_at),
     isFeatured: row.featured === true,
-    raw: {
-      id: row.id,
-      handle: row.handle,
-      user_id: row.user_id,
-      post_url: row.post_url,
-      tweet_text: row.tweet_text,
-      time: row.time,
-      published_at: row.published_at,
-      tags: row.tags,
-      featured: row.featured,
-      interaction: row.interaction,
-      media: row.media,
-    },
     media: (row.media ?? [])
       .map((entry, position) => mapMedia(entry, tweetId, position))
       .filter((media) => media !== null),
@@ -263,7 +245,6 @@ export function mapCollectuiPost(row: CollectuiRow): MappedCollectuiPost | null 
     createdAt,
     publishedAt: isoOf(row.published_at),
     isFeatured: row.featured === true,
-    raw: { entries: [row] },
     media: [
       {
         id: `collectui-${row.id}`,
@@ -273,7 +254,6 @@ export function mapCollectuiPost(row: CollectuiRow): MappedCollectuiPost | null 
         posterUrl: row.media_type === 'video' ? poster : null,
         width: intOf(entity?.original_info?.width),
         height: intOf(entity?.original_info?.height),
-        raw: row,
       },
     ],
   };
@@ -294,7 +274,6 @@ const sources = {
     mapRow: mapCollectuiPost,
     merge(previous: MappedCollectuiPost | undefined, item: MappedCollectuiPost) {
       if (!previous) return item;
-      previous.raw.entries.push(...item.raw.entries);
       if (!previous.media.some((media) => media.url === item.media[0].url))
         previous.media.push(...item.media);
       previous.styles = [...new Set([...previous.styles, ...item.styles])];
@@ -404,7 +383,7 @@ function syncPublicSource<Post extends MappedPost>(
         withTransaction(db, () => {
           for (const item of items.values()) {
             const isNew = !stmts.hasPost.get(item.id);
-            stmts.upsertPost({ ...item, raw: item.raw, enrichedAt: now, syncedAt: now, source });
+            stmts.upsertPost({ ...item, enrichedAt: now, syncedAt: now, source });
             item.media.sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
             for (const [position, media] of item.media.entries()) {
               stmts.upsertMedia({ ...media, postId: item.id, position });
