@@ -7,8 +7,8 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@effect/platform-node": "4.0.4",
-    "effect": "4.0.4",
+    "@effect/platform-node": "4.0.5",
+    "effect": "4.0.5",
     "zod": "^4.6.7"
   },
   "devDependencies": {
