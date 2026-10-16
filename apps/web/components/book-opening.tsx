@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, type CSSProperties } from 'react';
 import { EASE_BOOK_OPENING, instantMotion, observeMotionPolicy } from '@/lib/motion';
 import styles from './book-opening.module.css';

@@ -1,5 +1,3 @@
-'use client';
-
 import { buttonClassName } from '../button';
 import styles from './lightbox.module.css';
 import { createPortal } from 'react-dom';

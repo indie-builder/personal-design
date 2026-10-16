@@ -1,5 +1,3 @@
-'use client';
-
 import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 import { useMediaStatus } from '@/lib/use-media-status';
 import { useLightboxSwipe } from './use-lightbox-swipe';

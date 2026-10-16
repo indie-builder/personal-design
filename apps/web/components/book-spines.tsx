@@ -1,5 +1,3 @@
-'use client';
-
 import { Fragment, type CSSProperties } from 'react';
 import { categoryLabel } from '@/lib/category-label';
 import styles from './layout-bookshelf.module.css';

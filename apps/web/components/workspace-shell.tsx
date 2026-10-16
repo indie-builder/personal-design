@@ -1,5 +1,3 @@
-'use client';
-
 import { Link, useRouter } from '@tanstack/react-router';
 import { TaichiAvatar } from './taichi-avatar';
 import { ArrowLeft } from 'lucide-react';
@@ -29,17 +27,23 @@ const WorkspaceNavigationContext = createContext<
 >(null);
 
 /**
- * 既有公共契约是字符串 href（含动态段与查询串）；
- * 拆出查询串交给 Link 的 search，具体路径由路由按 pathname 匹配（如 /products/muse/<slug>）。
- * scroll/prefetch 是 Next Link 时代的既有调用面，映射到 TanStack 的等价选项。
+ * 动态浏览链接专用 facade：browse-context 拼接、DB slug 等 DB 生成 href 无法静态 typed，
+ * 公共契约保留字符串 href；拆出查询串交给 Link 的 search，具体路径由路由按 pathname 匹配
+ * （如 /products/muse/<slug>）。静态内部路径不走这里，直接用类型化 <Link to>（编译期路由校验）。
+ * 除接管成对过渡外，props 即 TanStack Link 原生命名（preload/resetScroll）。
  */
 export function WorkspaceLink({
   href,
-  scroll,
-  prefetch,
+  resetScroll,
+  preload,
   onClick,
   ...props
-}: Omit<ComponentProps<'a'>, 'href'> & { href: string; scroll?: boolean; prefetch?: boolean }) {
+}: Omit<ComponentProps<'a'>, 'href'> & {
+  href: string;
+  resetScroll?: boolean;
+  /** 与 TanStack Link 的 preload 取值一致（不含 true：整页预载不属于本站语义） */
+  preload?: false | 'intent' | 'viewport' | 'render';
+}) {
   const navigate = useContext(WorkspaceNavigationContext);
   const direction = (props as Record<string, unknown>)['data-direction'] as string | undefined;
   const { to, search } = splitHref(href);
@@ -48,17 +52,17 @@ export function WorkspaceLink({
       {...props}
       to={to}
       search={search}
-      // Next 默认在视口/悬停时预取；这里取较轻的 intent（悬停/聚焦），网格单元已有显式控制
-      preload={prefetch === false ? false : 'intent'}
-      resetScroll={scroll !== false}
+      // 缺省取较轻的 'intent'（悬停/聚焦）预载；网格单元等需要显式控制时传 false
+      preload={preload ?? 'intent'}
+      resetScroll={resetScroll !== false}
       onClick={(event) => {
         onClick?.(event);
-        // 修饰键/非左键点击交给浏览器默认行为（新标签打开）；Next Link 的
-        // onNavigate 对这类点击本就不触发，这里保持同一语义
+        // 修饰键/非左键点击交给浏览器默认行为（新标签打开），成对过渡对这类点击不接管
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
           return;
         // navigate 返回 true 表示成对过渡已接管导航，阻止 Link 默认跳转
-        if (!event.defaultPrevented && navigate?.(href, scroll, direction)) event.preventDefault();
+        if (!event.defaultPrevented && navigate?.(href, resetScroll, direction))
+          event.preventDefault();
       }}
     />
   );

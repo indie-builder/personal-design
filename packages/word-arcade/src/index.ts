@@ -43,6 +43,7 @@ export const arcadeProduct = {
   tagline: '五款文字小游戏',
   description: '打砖块、贪吃蛇、文字射击、飞字打靶与文字跑酷。',
   date: '2026-09-29',
-  href: '/products/word-arcade',
+  // as const：以字面量类型进入 web 注册表，参与 routeTree 编译期路径校验（typed route）
+  href: '/products/word-arcade' as const,
   cover: '',
 };

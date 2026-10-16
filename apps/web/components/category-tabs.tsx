@@ -1,5 +1,3 @@
-'use client';
-
 import { usePathname, useSearchParams } from '@/lib/navigation';
 import { useEffect } from 'react';
 import { categoryLabel } from '@/lib/category-label';

@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { instantMotion, useVisiblePlay } from '@/lib/motion';

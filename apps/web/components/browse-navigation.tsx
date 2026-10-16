@@ -1,5 +1,3 @@
-'use client';
-
 import { useMemo } from 'react';
 import { useSearchParams } from '@/lib/navigation';
 import { ArrowLeft, MoveLeft, MoveRight } from 'lucide-react';
@@ -67,7 +65,7 @@ function Navigation({
       <nav className={styles.navigation} aria-label="作品导航">
         <WorkspaceLink
           href={fallbackHref}
-          scroll={false}
+          resetScroll={false}
           data-direction="previous"
           className={`${styles.textControl} ${styles.returnLink}`}
         >

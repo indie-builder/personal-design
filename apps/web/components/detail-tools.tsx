@@ -1,5 +1,3 @@
-'use client';
-
 import { useLayoutEffect } from 'react';
 import { useRouter } from '@tanstack/react-router';
 

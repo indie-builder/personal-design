@@ -1,5 +1,3 @@
-'use client';
-
 import { useLayoutEffect, useRef } from 'react';
 import { paramsHref } from '@/lib/site-url';
 import styles from './dictionary-map.module.css';

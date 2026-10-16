@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, type VideoHTMLAttributes } from 'react';
 import { instantMotion, observeMotionPolicy } from '@/lib/motion';
 

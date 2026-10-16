@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback, useEffect, useRef } from 'react';
 import { Arcade, headlines } from '@personal-design/word-arcade';
 import { instantMotion, useVisiblePlay } from '@/lib/motion';

@@ -8,7 +8,8 @@ export const personalSite = {
   tagline: '工程记录、每日关注与开源收藏',
   description: '陈远的个人工程档案，记录工程经历、每日动态、内容收藏与开源关注。',
   date: '2026-09-09',
-  href: '/products/personal-sites',
+  // as const：以字面量类型进入 web 注册表，参与 routeTree 编译期路径校验（typed route）
+  href: '/products/personal-sites' as const,
   cover: localMedia('/personal-sites/home.webp'),
 };
 

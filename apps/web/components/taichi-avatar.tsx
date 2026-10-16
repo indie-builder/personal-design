@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import { timelineAvatarUrl } from '@personal-design/personal-sites';
 import { instantMotion, observeMotionPolicy } from '@/lib/motion';
