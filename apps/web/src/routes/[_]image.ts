@@ -160,6 +160,50 @@ const CACHE_HEADERS = {
   Vary: 'Accept',
 };
 
+/**
+ * O4：进程内 LRU 转换缓存。
+ * - 键 = 源引用 + w + q + 输出格式维度。输出格式由 Accept 协商决定，因此把原始
+ *   Accept 串入键（同一客户端 Accept 稳定，少量变体只是多占几个槽位，不会跨格式
+ *   碰撞）；源引用保留原始串（含本地 ?v= 版本参数与远程 host），版本或来源不同
+ *   即不同键，天然免失效。
+ * - 只缓存 sharp 转换结果：svg/gif 透传与上游回源的原始 Buffer 都不缓存，控制内存；
+ *   上游或转换失败不缓存负结果，下次请求照常回源重试。
+ * - 选型：媒体与 DB 每部署不可变，无失效需求；Lambda 多实例各自持有进程内缓存即可，
+ *   不引入共享存储；条目数与总字节双上限防止大图撑爆实例内存。
+ */
+const LRU_MAX_ENTRIES = 300;
+const LRU_MAX_BYTES = 64 * 1024 * 1024;
+const responseCache = new Map<string, { body: Buffer; contentType: string }>();
+let responseCacheBytes = 0;
+
+/** 命中并刷新为最近使用（Map 迭代序即插入序，重插实现 LRU 触发） */
+function cacheGet(key: string): { body: Buffer; contentType: string } | null {
+  const hit = responseCache.get(key);
+  if (!hit) return null;
+  responseCache.delete(key);
+  responseCache.set(key, hit);
+  return hit;
+}
+
+function cacheSet(key: string, entry: { body: Buffer; contentType: string }): void {
+  // 单条即超总上限的大图不入缓存
+  if (entry.body.byteLength > LRU_MAX_BYTES) return;
+  const existing = responseCache.get(key);
+  if (existing) {
+    responseCacheBytes -= existing.body.byteLength;
+    responseCache.delete(key);
+  }
+  responseCache.set(key, entry);
+  responseCacheBytes += entry.body.byteLength;
+  while (responseCache.size > LRU_MAX_ENTRIES || responseCacheBytes > LRU_MAX_BYTES) {
+    const oldest = responseCache.keys().next();
+    if (oldest.done) break;
+    const evicted = responseCache.get(oldest.value)!;
+    responseCacheBytes -= evicted.body.byteLength;
+    responseCache.delete(oldest.value);
+  }
+}
+
 export const Route = createFileRoute('/_image')({
   server: {
     handlers: {
@@ -172,6 +216,16 @@ export const Route = createFileRoute('/_image')({
         const quality = Number(params.get('q') ?? '75');
         if (!Number.isSafeInteger(quality) || quality < 1 || quality > 100)
           return new Response('invalid quality', { status: 400 });
+
+        // 转换结果缓存命中：直接返回缓存 Buffer（缓存头照发，内容类型随键固化）
+        const accept = request.headers.get('accept');
+        const cacheKey = `${source}|w=${width}|q=${quality}|accept=${accept ?? ''}`;
+        const cached = cacheGet(cacheKey);
+        if (cached) {
+          return new Response(new Uint8Array(cached.body), {
+            headers: { 'Content-Type': cached.contentType, ...CACHE_HEADERS },
+          });
+        }
 
         const resolved = await resolveSource(source);
         if (!resolved) return new Response('unsupported source', { status: 400 });
@@ -201,7 +255,7 @@ export const Route = createFileRoute('/_image')({
           sourceExt = extensionOf(new URL(source).pathname, upstream.contentType);
         }
 
-        const target = negotiateFormat(request.headers.get('accept'), sourceExt);
+        const target = negotiateFormat(accept, sourceExt);
         if (!target) {
           // svg/gif 等不优化格式：原字节透传
           return new Response(new Uint8Array(input), {
@@ -217,6 +271,10 @@ export const Route = createFileRoute('/_image')({
             .resize({ width, withoutEnlargement: true })
             .toFormat(target.slice(1) as 'avif' | 'webp' | 'jpeg' | 'png', { quality })
             .toBuffer();
+          cacheSet(cacheKey, {
+            body,
+            contentType: CONTENT_TYPES[target] ?? 'application/octet-stream',
+          });
           return new Response(new Uint8Array(body), {
             headers: {
               'Content-Type': CONTENT_TYPES[target] ?? 'application/octet-stream',

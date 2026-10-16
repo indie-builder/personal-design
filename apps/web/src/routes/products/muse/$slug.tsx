@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { ArrowUpRight } from 'lucide-react';
+import type { listPostRefs } from '@personal-design/inspora';
 import { BrowseNavigation } from '@/components/browse-navigation';
 import { MuseMediaCarousel } from '@/components/inspora-media-carousel';
 import { Img } from '@/components/img';
@@ -10,6 +11,12 @@ import { createProductError } from '@/lib/product-error';
 import { siteTitle } from '@/lib/site-url';
 import styles from './$slug.module.css';
 
+// O5：listPostRefs 全量扫描是详情页冷启动 TTFB 的主因（DB 打开 + 全表索引查询）。
+// inspora.db 每部署不可变（由 sync 脚本在独立进程中生成后随部署携带，运行期只读，
+// 不存在同进程内被改写的脏读风险），因此模块级 memo 在 lambda 生命周期内缓存一次
+// 扫描结果即可；sync 重新生成的是下一次部署的新 DB，与本进程缓存天然隔离。
+let postRefsCache: ReturnType<typeof listPostRefs> | undefined;
+
 // getPostBySlug/listPostRefs 读 inspora.db（node:sqlite），只能在服务端执行
 const getMuseDetail = createServerFn({ method: 'GET' })
   .validator((data: { slug: string }) => data)
@@ -18,9 +25,10 @@ const getMuseDetail = createServerFn({ method: 'GET' })
     const post = getPostBySlug(data.slug);
     if (!post) return null;
     // 浏览导航用轻量索引（不含媒体行），与 Next 时代的模块级 listPostRefs() 等价
+    postRefsCache ??= listPostRefs();
     return {
       post,
-      navigation: museBrowseEntries(post, listPostRefs()),
+      navigation: museBrowseEntries(post, postRefsCache),
       media: museMediaOf(post),
     };
   });

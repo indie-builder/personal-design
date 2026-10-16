@@ -79,7 +79,10 @@ export default defineConfig({
     // hosting 文档经 nitro/vite 插件接入，pnpm start 依赖该产物
     nitro({
       // nitro 环境构建（server routes/services）会用自身 aliases 覆盖 vite 的 resolve.alias，
-      // 这里同步声明 '@' 才能在 server route 里继续用与页面一致的导入写法
+      // 这里同步声明 '@' 才能在 server route 里继续用与页面一致的导入写法。
+      // O2 的 react-syntax-highlighter 替身不进 nitro alias：其对象键是前缀匹配，
+      // 会把替身自身的深路径导入一并改写到文件路径下而构建失败；SSR 侧对话内容
+      // 只来自客户端存储（新对话为空），代码块不会出现在服务端 HTML，维持原包即可。
       alias: { '@': resolve(import.meta.dirname) },
       // 路径型响应头（对静态文件与动态渲染同等生效）；query 条件的媒体 immutable
       // 规则表达不了，由下方 modules 注册的运行时插件处理
@@ -127,7 +130,21 @@ export default defineConfig({
   ],
   resolve: {
     // tsconfig paths 的 '@/*' 映射（本版 TanStack 插件无 tsconfigPaths 选项，用 alias 等价实现）
-    alias: { '@': resolve(import.meta.dirname) },
+    // O2：react-syntax-highlighter 被 @openuidev/react-ui 以三种形式导入（根入口 +
+    // dist/cjs/styles/prism 的两种写法），regex 精确匹配后指到轻量替身，替换全语言
+    // Prism 构建与全量样式 barrel；字符串键是前缀匹配（会连带改写替身自身的深路径
+    // 导入），必须用 regex。未注册语言按纯文本渲染，见替身内注释。
+    alias: [
+      { find: '@', replacement: resolve(import.meta.dirname) },
+      {
+        find: /^react-syntax-highlighter$/,
+        replacement: resolve(import.meta.dirname, 'lib/syntax-highlighter.light.ts'),
+      },
+      {
+        find: /^react-syntax-highlighter\/dist\/cjs\/styles\/prism(\/index\.js)?$/,
+        replacement: resolve(import.meta.dirname, 'lib/syntax-highlighter.styles.ts'),
+      },
+    ],
   },
   define,
   server: {

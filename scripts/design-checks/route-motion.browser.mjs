@@ -231,6 +231,29 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
       .locator('section[aria-label="灵感浏览"] a[id^="muse-"]')
       .first()
       .waitFor({ state: 'visible', timeoutMs: 20000 });
+    // 批量共享页面时，路由滚动恢复会把网格还原到上一检查离开的位置；恢复若落在
+    // pickCell 的坐标计算与点击之间，采样就会把裁剪／漂移误读为动效缺陷。参照
+    // timeline-motion 的加固：先把关键滚动容器滚进视口并锚回顶部，轮询网格就绪
+    // 态（aria-busy 解除 + data-status=ready）且滚动位置连续两帧稳定后再采样。
+    const settled = await evaluate(`(async () => {
+      const section = document.querySelector('section[aria-label="灵感浏览"]');
+      section?.scrollIntoView({ block: 'start', behavior: 'instant' });
+      window.scrollTo(0, 0);
+      const started = performance.now();
+      while (performance.now() - started < 6000) {
+        const ready =
+          section?.getAttribute('aria-busy') !== 'true' &&
+          document.querySelector('p[data-status]')?.getAttribute('data-status') === 'ready';
+        const stable = await new Promise((resolve) => {
+          const first = window.scrollY;
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve(window.scrollY === first)));
+        });
+        if (ready && stable) return { scrollY: Math.round(window.scrollY) };
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      return null;
+    })()`);
+    expect(settled !== null, '网格滚动恢复应落定（ready 且滚动位置稳定）后才开始采样');
   };
 
   try {
@@ -239,11 +262,7 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
     });
     await viewport.set({ width: 1440, height: 900 });
 
-    await tab.goto(base + '/products/muse');
-    await tab.playwright
-      .locator('section[aria-label="灵感浏览"] a[id^="muse-"]')
-      .first()
-      .waitFor({ state: 'visible', timeoutMs: 20000 });
+    await openGrid();
     const cell = await pickCell();
     let frames = await runScenario(() => mouseClick(cell.x, cell.y));
     const gridUrl = pathOf(frames[0].url);
@@ -376,11 +395,7 @@ export async function verifyRouteMotion(tab, cdp, viewport) {
       checks.push('keyboard arrow: instant adjacent navigation');
     } else issues.push('详情页缺少 detailPrev/detailNext，未覆盖键盘相邻导航');
 
-    await tab.goto(base + '/products/muse');
-    await tab.playwright
-      .locator('section[aria-label="灵感浏览"] a[id^="muse-"]')
-      .first()
-      .waitFor({ state: 'visible', timeoutMs: 20000 });
+    await openGrid();
     const quickCell = await pickCell();
     await evaluate(INSTALL_RECORDER);
     await mouseClick(quickCell.x, quickCell.y);
