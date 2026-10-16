@@ -63,8 +63,8 @@ test('missing production build fails before starting any services', async (t) =>
   const root = await mkdtemp(join(tmpdir(), 'chat-build-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   await assert.rejects(requireBuild(root), /pnpm build/);
-  await mkdir(join(root, 'apps/web/.next'), { recursive: true });
-  await writeFile(join(root, 'apps/web/.next/BUILD_ID'), 'fixture');
+  await mkdir(join(root, 'apps/web/.output/server'), { recursive: true });
+  await writeFile(join(root, 'apps/web/.output/server/index.mjs'), 'fixture');
   await requireBuild(root);
 });
 

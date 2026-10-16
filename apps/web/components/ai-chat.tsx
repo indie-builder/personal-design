@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { Img } from './img';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, Menu, Plus, X } from 'lucide-react';
 import {
@@ -248,7 +248,14 @@ export function AiChat() {
             disabled={busy}
           >
             <span className={styles.avatar} aria-hidden="true">
-              <Image src={avatarUrl(agent.avatarId)} alt="" width={36} height={36} unoptimized />
+              <Img
+                src={avatarUrl(agent.avatarId)}
+                alt=""
+                width={36}
+                height={36}
+                priority
+                unoptimized
+              />
             </span>
             <span className={styles.agentName}>{agent.name}</span>
             <ChevronDown size={18} strokeWidth={1.6} />
@@ -323,7 +330,7 @@ export function AiChat() {
                 aria-pressed={item.id === agent.id}
               >
                 <span className={styles.smallAvatar} aria-hidden="true">
-                  <Image src={avatarUrl(item.avatarId)} alt="" width={32} height={32} unoptimized />
+                  <Img src={avatarUrl(item.avatarId)} alt="" width={32} height={32} unoptimized />
                 </span>
                 <span>{item.name}</span>
                 {item.id === agent.id && <Check size={18} strokeWidth={1.6} />}

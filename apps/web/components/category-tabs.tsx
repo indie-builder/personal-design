@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from '@/lib/navigation';
 import { useEffect } from 'react';
 import { categoryLabel } from '@/lib/category-label';
 import { paramsHref } from '@/lib/site-url';

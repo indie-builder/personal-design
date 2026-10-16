@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@tanstack/react-router';
 import { MotionVideo } from './motion-video';
+import { Img } from './img';
 import { WorkspaceLink } from './workspace-shell';
+import { splitHref } from '@/lib/navigation';
 import type { PlateWallItem } from './plate-wall';
 import styles from './plate-wall.module.css';
 
@@ -20,7 +21,11 @@ export function PlateCell({
   priority: boolean;
 }) {
   const router = useRouter();
-  const prefetch = () => router.prefetch(href);
+  const prefetch = () => {
+    const { to, search } = splitHref(href);
+    // 悬停/聚焦预热详情 loader，失败静默（与 Next prefetch 语义一致）
+    void router.preloadRoute({ to, search }).catch(() => {});
+  };
   const preview = item.kind === 'video' ? item.poster : item.src;
   const [failed, setFailed] = useState(!preview);
   const [ready, setReady] = useState(false);
@@ -85,11 +90,11 @@ export function PlateCell({
               onError={() => setFailed(true)}
             />
           ) : preview ? (
-            <Image
+            <Img
               src={preview}
               alt=""
               fill
-              loading={priority ? 'eager' : 'lazy'}
+              priority={priority}
               fetchPriority={priority ? 'high' : undefined}
               sizes="(min-width: 1200px) 25vw, (min-width: 760px) 33vw, (min-width: 360px) 50vw, 100vw"
               onLoad={() => {

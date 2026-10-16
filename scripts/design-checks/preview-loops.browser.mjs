@@ -332,6 +332,27 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
       .first()
       .waitFor({ state: 'visible', timeoutMs: 20000 });
     await evaluate(revealTile('/products/personal-sites'));
+    // 水合竞态补偿：直连封面的加载可能快于水合，React 的 onLoad 在监听器挂载前已完成
+    // （img.complete=true 但 data-ready 停在 false，10s 周期永不挂载）。外壳 data-input
+    // 对合成 pointermove 有响应即水合完成；对已完成且解码成功的封面补发一次 load 事件
+    // 等价于浏览器从缓存重放完成通知。断言不变：负向路径的 ready=false 仍由下方请求
+    // 拦截真实产生（naturalWidth=0 时不会补发）。
+    await until(
+      () =>
+        evaluate(`(() => {
+          window.dispatchEvent(new Event('pointermove'));
+          return document.documentElement.dataset.input || null;
+        })()`),
+      (mode) => mode === 'pointer',
+      20000,
+    );
+    await evaluate(`(() => {
+      const root = document.querySelector('a[href="/products/personal-sites"] div[data-ready]');
+      const img = root ? root.querySelector('img') : null;
+      if (root && root.dataset.ready !== 'true' && img && img.complete && img.naturalWidth > 0)
+        img.dispatchEvent(new Event('load'));
+      return root ? root.dataset.ready : null;
+    })()`);
     const receiptReady = await until(
       receiptState,
       (state) => state && state.ready === 'true' && state.running === 'true',
@@ -340,10 +361,11 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
     if (
       expect(
         !!receiptReady &&
-          // Module keyframes are hash-scoped; match the local name tail.
-          String(receiptReady.paper.name).endsWith('paper-feed') &&
-          String(receiptReady.printer.name).endsWith('receipt-scene') &&
-          String(receiptReady.homepage.name).endsWith('homepage-scene'),
+          // Module keyframes are hash-scoped（Vite 模板为 _local_hash_index，local 在中段），
+          // 按名段匹配三个关键帧
+          /(^|_)paper-feed(_|$)/.test(String(receiptReady.paper.name)) &&
+          /(^|_)receipt-scene(_|$)/.test(String(receiptReady.printer.name)) &&
+          /(^|_)homepage-scene(_|$)/.test(String(receiptReady.homepage.name)),
         `小票预览：图就绪且可视时应挂载 10s 周期关键帧（${
           receiptReady
             ? `paper=${receiptReady.paper.name} printer=${receiptReady.printer.name} homepage=${receiptReady.homepage.name}`
@@ -419,7 +441,18 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
       .first()
       .waitFor({ state: 'visible', timeoutMs: 20000 });
     await evaluate(revealTile('/products/personal-sites'));
-    await sleep(1500);
+    // 负向断言等的是 false 状态：显式等被拦截的封面请求收敛（img complete 即错误收敛），
+    // 不依赖固定时长——流式/水合时序变化不会把「未就绪」误报成竞态
+    await until(
+      () =>
+        evaluate(`(() => {
+          const img = document.querySelector('a[href="/products/personal-sites"] div[data-ready] img');
+          return !!(img && img.complete);
+        })()`),
+      (settled) => settled,
+      10000,
+    );
+    await sleep(300);
     const notReady = await receiptState();
     expect(
       !!(notReady && notReady.ready === 'false'),

@@ -47,7 +47,7 @@ export async function trustTestCertificate(stateDir) {
 
 export async function requireBuild(repository = root) {
   try {
-    await access(join(repository, 'apps/web/.next/BUILD_ID'));
+    await access(join(repository, 'apps/web/.output/server/index.mjs'));
   } catch {
     throw new Error('缺少生产构建，请先从根目录运行 pnpm build。');
   }
@@ -309,7 +309,9 @@ export async function runChat({ httpOnly = false } = {}) {
       await waitForReady(
         async () => {
           const log = await readFile(service.path, 'utf8');
-          appPort = log.match(/Local:\s+http:\/\/localhost:(\d+)/)?.[1];
+          // Nitro（TanStack Start）打印 "➜ Listening on: http://127.0.0.1:<port>/"；
+          // 保留 Next 时代 "Local: http://localhost:<port>" 兼容
+          appPort = log.match(/(?:Local:\s+http:\/\/localhost|Listening on:\s+http:\/\/(?:127\.0\.0\.1|localhost)):(\d+)/)?.[1];
           return !!appPort;
         },
         { alive: service.alive },

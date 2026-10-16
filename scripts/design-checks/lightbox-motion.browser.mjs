@@ -74,6 +74,19 @@ export async function verifyLightboxMotion(tab, cdp, viewport) {
         { timeoutMs: 5000 },
       );
   };
+  // 水合完成等待：SSR 内容（导航、放大按钮）先可见，点击处理器随水合才挂载；
+  // 外壳的 data-input 监听器在水合后存在，对合成 pointermove 有响应即水合完成
+  const waitHydrated = () =>
+    evaluate(`new Promise((resolve) => {
+      const started = performance.now();
+      const poll = () => {
+        window.dispatchEvent(new Event('pointermove'));
+        if (document.documentElement.dataset.input || performance.now() - started > 20000)
+          resolve(document.documentElement.dataset.input || null);
+        else setTimeout(poll, 150);
+      };
+      poll();
+    })`);
   const closeLightbox = async () => {
     await pressEscape();
     await wait(450);
@@ -142,6 +155,8 @@ export async function verifyLightboxMotion(tab, cdp, viewport) {
       const button = [...document.querySelectorAll('button[aria-label^="放大查看"]')]
         .find((b) => !b.closest('figure')?.inert && b.getClientRects().length > 0);
       if (!button) return null;
+      // 详情页媒体常在首屏之外：CDP 原始点击不会自动滚动，先滚到按钮再取视口坐标
+      button.scrollIntoView({ block: 'center', behavior: 'instant' });
       const r = button.getBoundingClientRect();
       return { x: r.x + r.width / 2, y: r.y + r.height / 2, width: r.width, height: r.height, label: button.getAttribute('aria-label') };
     })()`);
@@ -171,23 +186,67 @@ export async function verifyLightboxMotion(tab, cdp, viewport) {
       .locator('section[aria-label="灵感浏览"] a[id^="muse-"]')
       .first()
       .waitFor({ state: 'visible', timeoutMs: 20000 });
-    const candidates = await evaluate(`[...document.querySelectorAll('section[aria-label="灵感浏览"] a[id^="muse-"]')]
-      .map((a) => {
-        const badge = a.querySelector('span[class*="badge"]');
-        const count = badge ? Number(/(\\d+)/.exec(badge.textContent)?.[1] ?? 0) : 1;
-        return { href: a.getAttribute('href'), count };
-      })
-      .sort((x, y) => y.count - x.count)
-      .slice(0, 4)`);
+    // 多媒体作品不一定落在首窗（收录顺序随同步漂移）：像真实读者一样滚动追加网格，
+    // 等「N 项」徽章卡片到达；徽章计数含视频，而灯箱断言需要至少两张图片，
+    // 再经公开详情 API 过滤出图片数 ≥2 的候选
+    const scanMultiImage = () =>
+      evaluate(`(() => {
+        const cards = [...document.querySelectorAll('section[aria-label="灵感浏览"] a[id^="muse-"]')];
+        return {
+          scanned: cards.length,
+          candidates: cards
+            .map((a) => {
+              const badge = a.querySelector('span[class*="badge"]');
+              const count = badge ? Number(/(\\d+)/.exec(badge.textContent)?.[1] ?? 0) : 1;
+              return { href: a.getAttribute('href'), count };
+            })
+            .filter((c) => c.count > 1)
+            .sort((x, y) => y.count - x.count)
+            .slice(0, 4),
+        };
+      })()`);
+    let candidates = [];
+    let scanned = 0;
+    {
+      const started = Date.now();
+      for (;;) {
+        const scan = await scanMultiImage();
+        candidates = scan.candidates;
+        scanned = scan.scanned;
+        if (candidates.length || Date.now() - started > 20000) break;
+        // 滚到页底触发网格的滚动追加（IntersectionObserver 哨兵拉取下一批）
+        await evaluate('window.scrollTo(0, document.documentElement.scrollHeight)');
+        await sleep(400);
+      }
+    }
+    candidates = (
+      await evaluate(`(async (hrefs) => {
+        const keep = [];
+        for (const href of hrefs) {
+          const slug = new URL(href, location.origin).pathname.split('/').pop();
+          const response = await fetch('/api/portfolio/muse/' + slug);
+          if (!response.ok) continue;
+          const data = await response.json();
+          if (data.item && data.item.media.filter((m) => m.kind === 'image').length >= 2)
+            keep.push({ href, count: data.item.media.length });
+        }
+        return keep;
+      })(${JSON.stringify(candidates.map((c) => c.href))})`)
+    ) || [];
     let opened = null;
+    const skipped = [];
     for (const candidate of candidates) {
       const target = new URL(candidate.href, base);
       await tab.goto(base + target.pathname + target.search);
       await tab.playwright
         .locator('nav[aria-label="作品导航"]')
         .waitFor({ state: 'visible', timeoutMs: 20000 });
+      await waitHydrated();
       const trigger = await zoomTrigger();
-      if (!trigger) continue;
+      if (!trigger) {
+        skipped.push(`${candidate.href}: 无放大按钮`);
+        continue;
+      }
       await installRecorder(1600);
       await mouseClick(trigger.x, trigger.y);
       const frames = await harvest(2600);
@@ -197,10 +256,13 @@ export async function verifyLightboxMotion(tab, cdp, viewport) {
         opened = { frames, trigger, total, counter: counterFrame.counter };
         break;
       }
+      skipped.push(`${candidate.href}: dialog=${frames.some((f) => f.dialog)}, total=${total}`);
       if (frames.some((f) => f.dialog)) await closeLightbox();
     }
     if (!opened) {
-      issues.push('未找到含 ≥2 张图片的灵感详情，无法验证灯箱动效');
+      issues.push(
+        `未找到含 ≥2 张图片的灵感详情（扫描 ${scanned} 张卡片、候选 ${candidates.map((c) => c.href).join(', ') || '无'}；${skipped.join('; ') || '未逐个打开'}），无法验证灯箱动效`,
+      );
       return { passed: false, base, checks, issues };
     }
     checks.push(`multi-image detail found, lightbox counter ${opened.counter}`);

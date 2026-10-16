@@ -13,8 +13,8 @@
 | 任务 | 契约与实现起点 | 验证入口 |
 | --- | --- | --- |
 | 首页注册、卡片、预览 | [首页契约](../design/README.md#首页-) → [products.ts](../../apps/web/lib/products.ts)、[home-view.tsx](../../apps/web/components/home-view.tsx)、[home-previews.tsx](../../apps/web/components/home-previews.tsx) | [浏览器回归](../design/execution/README.md#浏览器回归子集)、[首页性能](../design/execution/home-performance.md) |
-| 灵感集路由与数据 | [灵感集契约](../design/README.md#灵感集-productsmuse) → [muse/page.tsx](../../apps/web/app/products/muse/page.tsx)、[muse-catalog.ts](../../apps/web/lib/muse-catalog.ts)、[inspora 指引](../../packages/inspora/AGENTS.md)；对外“灵感集”、路由 `muse`、内部包 `inspora` | `pnpm check:http portfolio`；[浏览与错误状态](../design/execution/README.md#可选的-tabcdp-适配接口) |
-| 智能体行为、问数口径与工具 | [AI 问答运行链路](../design/execution/ai-chat.md#运行链路)、[智能问数](../design/execution/ai-chat.md#智能问数) → [包提示词与模型](../../packages/ai-chat/src/index.ts)、[API 路由](../../apps/web/app/api/ai-chat/route.ts)、[pi-chat.ts](../../apps/web/lib/pi-chat.ts)、[analytics-tools.ts](../../apps/web/lib/analytics-tools.ts)、[analytics-mcp.ts](../../apps/web/lib/analytics-mcp.ts) | `pnpm check:chat`；仅 HTTP 用 `pnpm check:chat --http` |
+| 灵感集路由与数据 | [灵感集契约](../design/README.md#灵感集-productsmuse) → [muse/page.tsx](../../apps/web/src/routes/products/muse/index.tsx)、[muse-catalog.ts](../../apps/web/lib/muse-catalog.ts)、[inspora 指引](../../packages/inspora/AGENTS.md)；对外“灵感集”、路由 `muse`、内部包 `inspora` | `pnpm check:http portfolio`；[浏览与错误状态](../design/execution/README.md#可选的-tabcdp-适配接口) |
+| 智能体行为、问数口径与工具 | [AI 问答运行链路](../design/execution/ai-chat.md#运行链路)、[智能问数](../design/execution/ai-chat.md#智能问数) → [包提示词与模型](../../packages/ai-chat/src/index.ts)、[API 路由](../../apps/web/src/routes/api/ai-chat.ts)、[pi-chat.ts](../../apps/web/lib/pi-chat.ts)、[analytics-tools.ts](../../apps/web/lib/analytics-tools.ts)、[analytics-mcp.ts](../../apps/web/lib/analytics-mcp.ts) | `pnpm check:chat`；仅 HTTP 用 `pnpm check:chat --http` |
 | 聊天存储、流式文本与查询进度 | [运行链路](../design/execution/ai-chat.md#运行链路) → [use-saved-chat.ts](../../apps/web/components/ai-chat/use-saved-chat.ts) → [chat-stream.ts](../../apps/web/lib/chat-stream.ts)；[use-pi-chat.ts](../../apps/web/lib/use-pi-chat.ts) → [chat-stream.ts](../../apps/web/lib/chat-stream.ts) | `pnpm test`；[聊天验收](../design/execution/README.md#聊天隔离环境) |
 | 聊天外壳与生成回答视觉 | [AI 问答契约](../design/README.md#ai-问答-productsai-chat)、[DESIGN 局部适配](../../DESIGN.md#ai-问答的局部适配)、[OpenUI 组件契约](../design/controls/openui-mobile.md) → [ai-chat.tsx](../../apps/web/components/ai-chat.tsx)、[conversation.tsx](../../apps/web/components/ai-chat/conversation.tsx)、[移动组件库](../../apps/web/components/ai-chat-mobile-library.tsx)、[主题映射](../../apps/web/lib/ai-chat-ui-theme.ts) | `pnpm check:chat`；[当前界面覆盖与限制](../design/execution/ai-chat.md#当前验收) |
 | 词典阅读面与运行资源 | [词典契约](../design/README.md#ai-coding-词典-productsai-coding-dictionary)、[详情契约](../design/execution/ai-coding-dictionary-detail.md) → [bridge.js](../../packages/ai-coding-dictionary/runtime/bridge.js)、[detail.css](../../packages/ai-coding-dictionary/runtime/detail.css)、[dictionary-map.tsx](../../apps/web/components/dictionary-map.tsx)；更新边界见 PRODUCT.md | [验收索引](../design/execution/README.md#覆盖缺口与历史入口) |
@@ -24,9 +24,8 @@
 
 ## 控制搜索范围
 
-先用 `rg --files <任务目录>` 确认路径，再搜符号。默认从 `apps/web/app`、`apps/web/components`、`apps/web/lib` 或对应包的 `src` 搜起。只有分析打包运行资源、生成内容或旧证据时，才进入 `apps/web/public/ai-coding-atlas`、生成 JSON、`docs/design/execution/evidence`；来源快照继续遵循根指引。
+先用 `rg --files <任务目录>` 确认路径，再搜符号。默认从 `apps/web/src`、`apps/web/components`、`apps/web/lib` 或对应包的 `src` 搜起。只有分析打包运行资源、生成内容或旧证据时，才进入 `apps/web/public/ai-coding-atlas`、生成 JSON、`docs/design/execution/evidence`；来源快照继续遵循根指引。
 
-Next 文档从 `apps/web/node_modules/next/dist/docs` 枚举实际文件名，再读取匹配章节；依赖升级后章节编号和后缀可能变化。规范和代码分开读取、按标题或行段收窄；遇到截断先缩小范围，不重复输出同一大批内容。
 
 ## 更新技能集
 

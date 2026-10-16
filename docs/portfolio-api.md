@@ -14,7 +14,7 @@
 
 集合参数：`offset` 默认 0，`limit` 默认 24、范围 1–60，`q` 最长 200 字，`cat` 为返回的分类 id。布局另支持 `theme`（主题 id）。集合响应含 `items,total,hasMore,categories,topics,attribution`；详情响应为 `{item}`。无效分页为 400，未知资源为 404。内部 raw、同步信息、媒体大小等不进入响应。
 
-本地启动：`pnpm --filter @personal-design/web exec next dev --hostname 127.0.0.1 --port 7200`。
+本地启动：`pnpm --filter @personal-design/web exec vite dev --port 7200`（vite dev 同样挂载 /api 路由）。
 
 接口回归：对运行中的服务执行 `pnpm test:portfolio-api`；测试默认连 `DESIGN_BASE_URL`（默认 `http://localhost:3000`，与 design-checks 一致），连本机 7200 开发服务时用 `PORTFOLIO_API_BASE=http://127.0.0.1:7200` 覆盖。该检查已纳入 `scripts/design-checks/run-all.mjs` 全站回归。常规 `pnpm test` 不依赖运行中的 HTTP 服务。
 

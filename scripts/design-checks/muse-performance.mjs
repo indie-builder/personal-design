@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, stat } from 'node:fs/promises';
 
-const trace = JSON.parse(await readFile(new URL('../../apps/web/.next/server/app/products/muse/page.js.nft.json', import.meta.url), 'utf8'));
-assert.ok(trace.files.some(file => file.endsWith('/packages/inspora/inspora.db')), '部署包必须包含数据库');
-assert.ok(trace.files.some(file => file.includes('/public/inspora/posters/')), '部署包必须保留本地媒体存在性检查所需文件');
+// 部署包断言改为直接核对 Nitro 产物：数据库经 serverDataAssets 复制进 server 产物，
+// 本地媒体随 public 目录进入 .output/public。
+await access(new URL('../../apps/web/.output/server/inspora.db', import.meta.url));
+await stat(new URL('../../apps/web/.output/public/inspora/posters', import.meta.url));
 
 const base = process.argv[2] || 'http://localhost:3101';
 const response = await fetch(new URL('/products/muse', base));

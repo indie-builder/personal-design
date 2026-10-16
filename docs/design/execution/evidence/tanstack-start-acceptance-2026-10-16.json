@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-16",
+  "baseCommit": "3b20bd8",
+  "goal": "personal-design-goal / tanstack-start-acceptance",
+  "method": "Next.js 16 App Router → TanStack Start 1.0 整体迁移后，生产预览（portless + Nitro node 产物）上执行现行验收索引的全部检查",
+  "changes": [
+    "移除 apps/web/app/（22 文件）与 next 依赖、next.config.ts、postcss 链；apps/web/AGENTS.md 移除 next dev 写入的 agent-rules 块",
+    "检查脚本适配：verify-design-routes 路由清单改读 src/routeTree.gen.ts；run-chat requireBuild 与夹具改认 .output/server/index.mjs；run-chat 端口探测兼容 Nitro 'Listening on:' 日志；muse-performance 部署包断言改核对 .output/server/inspora.db 与 .output/public/inspora/posters",
+    "产品回归修复：muse 详情恢复 <main> 地标；router 层固定 search 为 URLSearchParams 纯字符串语义（browse=2 不再被 JSON 序列化，返回列表恢复搜索词）；WorkspaceLink 修饰键/非左键点击交给浏览器默认（新标签打开，对齐 Next Link onNavigate 语义）",
+    "动效检查批量竞态适配（断言语义不变，只加数据到达等待）：lightbox 滚动追加+公开详情 API 过滤多媒体作品+水合探针+scrollIntoView；preview-loops 水合后补发错过 load 事件的封面、关键帧名 Vite CSS modules 段匹配；timeline 漫步者 scrollIntoView+running 轮询（路由滚动恢复裁剪根因）；taichi 水合等待+Vite CSS modules 舞台/演员选择器",
+    "文档同步：根 AGENTS.md、README、docs/design、navigation 中的 Next 表述与文件路径；docs/research 与历史 evidence 保留原貌"
+  ],
+  "checks": {
+    "lint": "passed（web 122 文件 + scripts 52 文件，0 警告 0 错误）",
+    "typecheck": "passed（TS7 原生 tsc）",
+    "unitTests": { "passed": 203, "failed": 0 },
+    "formatCheck": "passed（routeTree.gen.ts 已排除翻转）",
+    "checkNavigation": "passed",
+    "checkHttp": "passed（routes 11 项 200/404 + <main> 地标断言；portfolio 官方契约 5/5）",
+    "checkBrowser": "passed（19/19 suites；连续多次批量全绿，含 2 次指定复跑）",
+    "checkChat": "passed（chat-api、chat-analytics、analytics progress browser，隔离假模型下真实流式链路）",
+    "productionPreview": "portless（无特权 1355 端口代理）+ node .output/server/index.mjs，NEXT_PUBLIC_MEDIA_VERSION=<baseCommit> 构建"
+  },
+  "knownLimitations": [
+    "route-motion 在批量下存在偶发抖动（本轮约 1/6，独立复跑即过，失败签名未复现捕获）；如再现建议按 timeline-motion 的 scrollIntoView+轮询模式加固",
+    "dev 模式下 vite 直服 public 资产，媒体 ?v= immutable 头不出现（生产正确，dev-only 体验差异）",
+    "产品侧遗留风险：site-receipt-preview 封面 load 事件可能早于水合监听挂载（快网用户可能看到永久未就绪预览），建议后续在组件内补 img.complete 检查",
+    "sitemap/robots Content-Type 为显式声明值（application/xml、text/plain），未逐字节考证 Next 内部序列；Vercel 部署侧需为 ai-chat 配置 maxDuration 等价超时",
+    "next/image 行为差异清单见 docs/design/execution/tanstack-start-migration.md §4 与数据媒体段报告（fill+sizes 未走优化、无服务端优化持久缓存等 8 项）"
+  ],
+  "reproduction": [
+    "export NEXT_PUBLIC_MEDIA_VERSION=$(git rev-parse HEAD) && pnpm build",
+    "portless proxy start --port 1355 --https  # 无 sudo 回退；标准环境用 pnpm start 即可",
+    "NEXT_PUBLIC_MEDIA_VERSION=$(git rev-parse HEAD) pnpm start",
+    "export DESIGN_BASE_URL=https://personal-design.localhost:1355 NODE_EXTRA_CA_CERTS=\"$HOME/.portless/ca.pem\"",
+    "pnpm check:http && pnpm check:browser && pnpm check:chat && pnpm test && pnpm lint && pnpm typecheck && pnpm format:check && pnpm check:navigation"
+  ]
+}

@@ -160,7 +160,7 @@ components:
 
 用户最新明确决定优先；产品与内容边界见 [PRODUCT.md](PRODUCT.md)，页面流程见 [设计文档入口](docs/design/README.md)。本文件规定现行视觉标准，CSS 与组件是实现证据；发现偏差必须记录并处理，不得仅因为代码已存在就将偏差改写为规则。
 
-顶部 tokens 与 `.impeccable/design.json` 是源码核对后的文档快照，不参与运行时主题计算。全站运行时 token 统一在 [globals.css](apps/web/app/globals.css)，获准的局部 token 与组件状态在相邻 CSS Module。改动时同步对应规范，避免再追加“前条由后条覆盖”的时间线。
+顶部 tokens 与 `.impeccable/design.json` 是源码核对后的文档快照，不参与运行时主题计算。全站运行时 token 统一在 [globals.css](apps/web/src/routes/globals.css)，获准的局部 token 与组件状态在相邻 CSS Module。改动时同步对应规范，避免再追加“前条由后条覆盖”的时间线。
 
 [OpenDesign 迁移说明](docs/design/open-design/rules.md) 解释来源与有意适配；`source/`、历史交付报告与旧截图只作证据，不是当前页面要求。不恢复原项目的运行时、菜单或 Agent 指令。
 

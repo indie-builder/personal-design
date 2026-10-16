@@ -1,0 +1,2 @@
+# 生成文件保持生成器原样（每次 build 会重写，oxfmt 会与其格式互相翻转）
+apps/web/src/routeTree.gen.ts

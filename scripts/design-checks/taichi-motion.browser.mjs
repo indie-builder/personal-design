@@ -79,6 +79,19 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
     await viewport.set({ width: 1440, height: 900 });
     await tab.goto(base + '/');
     await tab.playwright.locator(TRIGGER).waitFor({ state: 'visible', timeoutMs: 20000 });
+    // 水合竞态：SSR 下头像先可见、点击处理器随水合才挂载，先点会丢失（后续断言连锁失败）。
+    // 外壳的 data-input 监听器在水合后才存在，对合成 pointermove 有响应即水合完成；
+    // 该探测同时把输入模式置为后续断言所需的 pointer 档。
+    await evaluate(`new Promise((resolve) => {
+      const started = performance.now();
+      const poll = () => {
+        window.dispatchEvent(new Event('pointermove'));
+        if (document.documentElement.dataset.input || performance.now() - started > 20000)
+          resolve(document.documentElement.dataset.input || null);
+        else setTimeout(poll, 150);
+      };
+      poll();
+    })`);
 
     const links = await evaluate(
       `document.querySelectorAll('[data-timeline-stop] a[href^="/products/"]').length`,
@@ -98,8 +111,8 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const frames = [];
       const start = performance.now();
       while (performance.now() - start < 1700) {
-        const stage = root.querySelector('div[class*="__stage"],div[class$="_stage"]');
-        const actor = root.querySelector('div[class*="__actor"],div[class$="_actor"]');
+        const stage = root.querySelector('div[class*="_stage"]');
+        const actor = root.querySelector('div[class*="_actor"]');
         const anims = actor ? actor.getAnimations({ subtree: true }) : [];
         const cts = anims.map((a) => Number(a.currentTime)).filter((n) => !Number.isNaN(n));
         const hit = stage ? document.elementFromPoint(${first.px}, ${first.py}) : null;
@@ -159,7 +172,7 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       window.__taichiEsc = [];
       const start = performance.now();
       const sample = () => {
-        const stage = root.querySelector('div[class*="__stage"],div[class$="_stage"]');
+        const stage = root.querySelector('div[class*="_stage"]');
         window.__taichiEsc.push({ t: Math.round(performance.now() - start), stage: !!stage });
         if (stage) requestAnimationFrame(sample);
       };
@@ -171,7 +184,7 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const button = document.querySelector('${TRIGGER}');
       const root = button.closest('div');
       const frames = window.__taichiEsc ?? [];
-      const stage = root.querySelector('div[class*="__stage"],div[class$="_stage"]');
+      const stage = root.querySelector('div[class*="_stage"]');
       const running = [root, ...root.querySelectorAll('*')]
         .flatMap((el) => el.getAnimations())
         .filter((a) => a.playState === 'running').length;
@@ -204,7 +217,7 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const start = performance.now();
       let goneAt = null;
       while (performance.now() - start < 900) {
-        if (!root.querySelector('div[class*="__stage"],div[class$="_stage"]')) {
+        if (!root.querySelector('div[class*="_stage"]')) {
           goneAt = Math.round(performance.now() - start);
           break;
         }
@@ -231,8 +244,8 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const button = document.querySelector('${TRIGGER}');
       const root = button.closest('div');
       await new Promise((resolve) => setTimeout(resolve, 350));
-      const stage = root.querySelector('div[class*="__stage"],div[class$="_stage"]');
-      const actor = root.querySelector('div[class*="__actor"],div[class$="_actor"]');
+      const stage = root.querySelector('div[class*="_stage"]');
+      const actor = root.querySelector('div[class*="_actor"]');
       const anims = actor ? actor.getAnimations({ subtree: true }) : [];
       const travel = anims[0];
       const keys = travel && travel.effect ? travel.effect.getKeyframes() : [];
@@ -265,7 +278,7 @@ export async function verifyTaichiMotion(tab, cdp, viewport) {
       const button = document.querySelector('${TRIGGER}');
       const root = button.closest('div');
       return {
-        stage: !!root.querySelector('div[class*="__stage"],div[class$="_stage"]'),
+        stage: !!root.querySelector('div[class*="_stage"]'),
         label: button.getAttribute('aria-label'),
       };
     })()`);
