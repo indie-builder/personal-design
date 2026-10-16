@@ -15,7 +15,16 @@ const publicEnvKeys = [
   'NEXT_PUBLIC_MEDIA_VERSION',
 ] as const;
 const define = Object.fromEntries(
-  publicEnvKeys.map((key) => [`process.env.${key}`, JSON.stringify(process.env[key] ?? '')]),
+  publicEnvKeys.map((key) => [
+    `process.env.${key}`,
+    JSON.stringify(
+      process.env[key] ??
+        // next.config 时代 MEDIA_VERSION 的回退链：Vercel 构建注入 commit sha，媒体 URL 随部署版本化
+        (key === 'NEXT_PUBLIC_MEDIA_VERSION'
+          ? (process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.MEDIA_VERSION ?? '')
+          : ''),
+    ),
+  ]),
 );
 
 /**
@@ -29,25 +38,35 @@ function serverDataAssets(): Plugin {
     name: 'personal-design:server-data-assets',
     apply: 'build',
     closeBundle() {
-      const ssrDir = resolve(import.meta.dirname, '.output/server/_ssr');
-      if (!existsSync(ssrDir)) return;
       const dbSource = resolve(import.meta.dirname, '../../packages/inspora/inspora.db');
-      if (existsSync(dbSource)) {
-        copyFileSync(dbSource, resolve(ssrDir, '../inspora.db'));
+      // Node 预设（.output，pnpm start）：DB 按 _ssr/../inspora.db 相对布局落位
+      const ssrDir = resolve(import.meta.dirname, '.output/server/_ssr');
+      if (existsSync(ssrDir)) {
+        if (existsSync(dbSource)) {
+          copyFileSync(dbSource, resolve(ssrDir, '../inspora.db'));
+        }
+        // nf3 追踪的 sharp 副本缺 dist 入口，会遮蔽 apps/web 内的完整安装；SSR chunk 对
+        // sharp 是外部导入，删掉副本后 Node 沿 .output → apps/web/node_modules 找到真身
+        rmSync(resolve(import.meta.dirname, '.output/server/node_modules/sharp'), {
+          recursive: true,
+          force: true,
+        });
+        // chunk 深度比源码包深一层：PUBLIC_DIR 解析到 apps/web/apps/web/public，补软链指回
+        // 真实 public（apps/web/apps/ 已加入 .gitignore）
+        const fakePublicDir = resolve(import.meta.dirname, 'apps/web');
+        mkdirSync(fakePublicDir, { recursive: true });
+        const link = resolve(fakePublicDir, 'public');
+        rmSync(link, { force: true });
+        symlinkSync('../../public', link, 'dir');
       }
-      // nf3 追踪的 sharp 副本缺 dist 入口，会遮蔽 apps/web 内的完整安装；SSR chunk 对
-      // sharp 是外部导入，删掉副本后 Node 沿 .output → apps/web/node_modules 找到真身
-      rmSync(resolve(import.meta.dirname, '.output/server/node_modules/sharp'), {
-        recursive: true,
-        force: true,
-      });
-      // chunk 深度比源码包深一层：PUBLIC_DIR 解析到 apps/web/apps/web/public，补软链指回
-      // 真实 public（apps/web/apps/ 已加入 .gitignore）
-      const fakePublicDir = resolve(import.meta.dirname, 'apps/web');
-      mkdirSync(fakePublicDir, { recursive: true });
-      const link = resolve(fakePublicDir, 'public');
-      rmSync(link, { force: true });
-      symlinkSync('../../public', link, 'dir');
+      // Vercel 预设（.vercel/output，Build Output API）：函数根即运行时 /var/task，
+      // 同一相对布局（_ssr/../inspora.db → 函数根）。sharp 平台二进制由 Vercel 构建机
+      // 自身安装后追踪（linux），无需本地补齐；public 媒体在静态产物走 CDN，
+      // 函数内的存在性检查与本地读取见 inspora 包与 /_image 路由的 VERCEL 分支
+      const vercelFuncDir = resolve(import.meta.dirname, '.vercel/output/functions/__server.func');
+      if (existsSync(vercelFuncDir) && existsSync(dbSource)) {
+        copyFileSync(dbSource, resolve(vercelFuncDir, 'inspora.db'));
+      }
     },
   };
 }

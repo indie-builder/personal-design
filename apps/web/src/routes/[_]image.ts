@@ -37,6 +37,10 @@ const MEDIA_BASE_HOST = process.env.NEXT_PUBLIC_MEDIA_BASE_URL
 /** NEXT_PUBLIC_MEDIA_VERSION（next.config 里由 VERCEL_GIT_COMMIT_SHA/MEDIA_VERSION 注入） */
 const MEDIA_VERSION = process.env.NEXT_PUBLIC_MEDIA_VERSION ?? '';
 
+// Vercel：public 整体在 CDN 上，函数文件系统没有本地媒体目录；本地源改走同源回源
+// （静态产物经 CDN 提供），本地 Node 部署仍直接读文件系统
+const SERVE_STATIC_FROM_CDN = process.env.VERCEL === '1';
+
 // public 目录基准：打包后 chunk 在 .output/server/_ssr（R4，同 vite.config 的构建期补齐方案），
 // 源码运行时在 src/routes；用 public/icon.png 作标记文件探测两种布局
 const PUBLIC_DIR =
@@ -176,10 +180,19 @@ export const Route = createFileRoute('/_image')({
         let sourceExt: string;
         if (resolved.local) {
           sourceExt = path.extname(resolved.local).toLowerCase();
-          try {
-            input = await readFile(resolved.local);
-          } catch {
-            return new Response('not found', { status: 404 });
+          if (SERVE_STATIC_FROM_CDN) {
+            // CDN 部署：本地原件经同源静态网络回源（去掉 ?v= 版本参数取原件）
+            const originUrl = new URL(source, request.url);
+            originUrl.search = '';
+            const upstream = await fetchRemote(originUrl);
+            if (!upstream.ok) return new Response('not found', { status: 404 });
+            input = upstream.body;
+          } else {
+            try {
+              input = await readFile(resolved.local);
+            } catch {
+              return new Response('not found', { status: 404 });
+            }
           }
         } else {
           const upstream = await fetchRemote(resolved.remote!);
