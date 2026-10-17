@@ -1,0 +1,8 @@
+{
+  "enabledPlugins": {
+    "caveman@caveman": true
+  },
+  "enabledMcpjsonServers": [
+    "loopx"
+  ]
+}
