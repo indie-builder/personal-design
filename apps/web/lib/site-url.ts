@@ -1,14 +1,18 @@
 // NEXT_PUBLIC_* 经 vite define 构建期内联，未设置时是空字符串（不是 undefined），
 // 因此用 || 而非 ??，保证空串回落到默认值
+//
+// Vercel 变量是服务端运行时读取；迁移后 lib 会被客户端组件引用
+// （workspace-shell → paramsHref），加 typeof 守卫避免浏览器无 process 时崩溃。
+// VERCEL_URL 是单次部署的唯一地址且受 Deployment Protection 保护，对外不可达，
+// 所以先取 VERCEL_PROJECT_PRODUCTION_URL（项目生产域名，有自定义域时优先自定义域）。
+const vercelHost =
+  typeof process !== 'undefined'
+    ? process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
+    : undefined;
 const envUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  // VERCEL_URL 在 Next 里是服务端运行时读取；迁移后 lib 会被客户端组件引用
-  // （workspace-shell → paramsHref），加 typeof 守卫避免浏览器无 process 时崩溃
-  ((typeof process !== 'undefined' && process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : undefined) as string | undefined);
+  process.env.NEXT_PUBLIC_SITE_URL || (vercelHost ? `https://${vercelHost}` : undefined);
 
-/** 规范站点地址：生产在 Vercel 环境变量里设 NEXT_PUBLIC_SITE_URL 为正式域名。 */
+/** 规范站点地址：生产在 Vercel 环境变量里设 NEXT_PUBLIC_SITE_URL 为正式域名，未设时回落到项目生产域名。 */
 export const siteUrl = new URL(envUrl ?? 'http://localhost:3000');
 
 /** Set/delete params in place ('' deletes) and return `path` or `path?query`. */
