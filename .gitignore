@@ -28,6 +28,8 @@ packages/layout-compositions/.upstream/
 # Local agent goal state
 .loopx/
 .codex/goals/
+.claude/goals/
+.claude/loop.md
 
 # Server-only credentials
 .env*
