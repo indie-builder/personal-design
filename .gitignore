@@ -31,6 +31,10 @@ packages/layout-compositions/.upstream/
 .claude/goals/
 .claude/loop.md
 
+# Vercel CLI 本机项目链接（vercel link 产物），不入库
+.vercel/
+
 # Server-only credentials
 .env*
 !.env.example
+.vercel
