@@ -2,7 +2,7 @@
 
 [English](README.md) · 中文
 
-个人设计作品集。首页按上线日期排列作品时间轴，每个作品点开后都是一个基于真实内容、可以完整浏览的产品。站点基于 Next.js 16、Tailwind CSS v4 和 pnpm workspace。
+个人设计作品集。首页按上线日期排列作品时间轴，每个作品点开后都是一个基于真实内容、可以完整浏览的产品。站点基于 TanStack Start、Tailwind CSS v4 和 pnpm workspace。
 
 ## 作品
 

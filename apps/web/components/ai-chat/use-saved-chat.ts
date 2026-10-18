@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import {
-  analyticsAgent,
-  defaultAgent,
-  isMaleAvatar,
-  randomAvatarId,
+  builtinAgents,
+  normalizeSavedChat,
   savedSchema,
   type SavedChat,
 } from '@personal-design/ai-chat';
@@ -12,31 +10,9 @@ import { createChatPersistence } from '@/lib/chat-stream';
 
 const STORAGE_KEY = 'personal-design:ai-chat:v2';
 const emptyStore: SavedChat = {
-  agents: [defaultAgent, analyticsAgent],
+  agents: [...builtinAgents],
   conversations: [],
 };
-
-/** 补齐内置智能体并强制其资料为包内最新版，再把非男生头像的记录重新随机分配。 */
-function normalize(initial: SavedChat): SavedChat {
-  const builtinIds = new Set([defaultAgent.id, analyticsAgent.id]);
-  const stored = new Map(initial.agents.map((item) => [item.id, item]));
-  const customAgents = initial.agents.filter((item) => !builtinIds.has(item.id));
-  return {
-    ...initial,
-    agents: [...[defaultAgent, analyticsAgent], ...customAgents].map((item) => {
-      const saved = stored.get(item.id);
-      return {
-        ...item,
-        avatarId:
-          item.id === analyticsAgent.id
-            ? analyticsAgent.avatarId
-            : isMaleAvatar(saved?.avatarId)
-              ? saved!.avatarId
-              : randomAvatarId(),
-      };
-    }),
-  };
-}
 
 /**
  * 本机持久化的智能体与会话。浏览器存储在 hydration 后读取（服务端与首帧一致），
@@ -69,7 +45,7 @@ export function useSavedChat(
       } catch {
         setStorageError('本机历史记录无法读取，本次对话仍可使用。');
       }
-      initial = normalize(initial);
+      initial = normalizeSavedChat(initial);
       setSaved(initial);
       setReady(true);
       onLoadRef.current(initial);

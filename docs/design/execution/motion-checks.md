@@ -66,7 +66,7 @@
 ### 既有性能脚本核验
 
 - [layout-first-paint.mjs](../../../scripts/design-checks/layout-first-paint.mjs)（跨页 SSR 首屏）：按当前契约验证通过，已适配 `DESIGN_BASE_URL` 并纳入 `check:browser` 套件。
-- [muse-performance.mjs](../../../scripts/design-checks/muse-performance.mjs)（SSR 窗口化、版本化媒体缓存、分片接口）：需版本化构建前置。**运维注记：`next start` 启动时会重新求值 next.config 的 `images.localPatterns`，启动环境必须携带与构建相同的 `MEDIA_VERSION`／`VERCEL_GIT_COMMIT_SHA`，否则版本化 URL 全部 400**（本轮实测发现；Vercel 两阶段环境一致，本地复现需 `MEDIA_VERSION=<sha> pnpm build && MEDIA_VERSION=<sha> pnpm start`）。验证通过，因前置条件不纳入默认套件。
+- [muse-performance.mjs](../../../scripts/design-checks/muse-performance.mjs)（SSR 窗口化、版本化媒体缓存、分片接口）：需版本化构建前置。**运维注记：当前 TanStack Start 构建由 `vite.config.ts` 的 `define` 内联媒体版本，`/_image` 按构建值校验 `?v=`；启动时不重新读取版本变量。** 显式设置的 `NEXT_PUBLIC_MEDIA_VERSION` 优先，其次为 `VERCEL_GIT_COMMIT_SHA`、`MEDIA_VERSION`；本地复现用 `MEDIA_VERSION=<sha> pnpm build`，再执行 `pnpm start`。原验证通过记录属于 2026-10-06 的旧栈，当前版本化构建仍需定向复测，因前置条件不纳入默认套件。
 
 ## 复现
 

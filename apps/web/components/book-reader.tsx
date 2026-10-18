@@ -247,8 +247,9 @@ function PageContent({ item, number }: { item?: BookPage; number: number }) {
         onClick={(event) => {
           if (item.src)
             lightbox?.open(
-              { src: item.src, thumb: item.thumb ?? undefined, alt: item.name },
-              { rect: event.currentTarget.getBoundingClientRect(), sourceEl: event.currentTarget },
+              [{ src: item.src, thumb: item.thumb ?? undefined, alt: item.name }],
+              0,
+              event.currentTarget,
             );
         }}
       >

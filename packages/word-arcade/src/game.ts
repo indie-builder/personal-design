@@ -103,6 +103,52 @@ export class Arcade {
       scale: 1,
     }));
   }
+  /** Remeasure the same letters in order; pausing remains the caller's choice. */
+  resize(width: number, height: number, layout: LetterLayout[]) {
+    const old = this.bricks;
+    const sx = this.width ? width / this.width : 1,
+      sy = this.height ? height / this.height : 1;
+    this.width = width;
+    this.height = height;
+    this.floor = height - 16;
+    this.setLetters(layout);
+    if (this.state === 'idle') {
+      this.reset();
+      return;
+    }
+    this.bricks = this.bricks.map((b, i) => {
+      const before = old[i]!;
+      return {
+        ...b,
+        alive: before.alive,
+        active: before.active,
+        passed: before.passed,
+        age: before.age,
+        vx: before.vx,
+        vy: before.vy,
+        scale: before.scale,
+        rotation: before.rotation,
+        x: before.active ? before.x * sx : b.homeX + (before.x - before.homeX) * sx,
+        y: before.active ? before.y * sy : b.homeY + (before.y - before.homeY) * sy,
+        w: b.homeW * before.scale,
+        h: b.homeH * before.scale,
+      };
+    });
+    for (const p of [
+      this.ball,
+      this.pointer,
+      this.snake,
+      ...this.shots,
+      ...this.bombs,
+      ...this.body,
+      ...this.trail,
+      ...this.tokens,
+    ]) {
+      p.x *= sx;
+      p.y *= sy;
+    }
+    this.playerX *= sx;
+  }
   reset() {
     this.score = 0;
     this.level = 0;

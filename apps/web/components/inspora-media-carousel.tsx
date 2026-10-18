@@ -258,25 +258,15 @@ function MediaSlide({
           onClick={(event) => {
             const images = siblings.filter((image) => image.type === 'image');
             lightbox?.open(
-              {
-                src: item.src,
-                thumb: item.poster ?? item.src,
-                alt: item.alt,
-                width: item.width ?? undefined,
-                height: item.height ?? undefined,
-              },
-              {
-                sourceEl: event.currentTarget,
-                rect: event.currentTarget.getBoundingClientRect(),
-                siblings: images.map((image) => ({
-                  src: image.src,
-                  thumb: image.poster ?? image.src,
-                  alt: image.alt,
-                  width: image.width ?? undefined,
-                  height: image.height ?? undefined,
-                })),
-                index: images.findIndex((image) => image.id === item.id),
-              },
+              images.map((image) => ({
+                src: image.src,
+                thumb: image.poster ?? image.src,
+                alt: image.alt,
+                width: image.width ?? undefined,
+                height: image.height ?? undefined,
+              })),
+              images.findIndex((image) => image.id === item.id),
+              event.currentTarget,
             );
           }}
         />

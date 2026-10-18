@@ -189,3 +189,25 @@ export const savedSchema = z.object({
 export type SavedChat = z.infer<typeof savedSchema>;
 export type Conversation = SavedChat['conversations'][number];
 export type ChatTranscript = Pick<Conversation, 'messages' | 'memory'>;
+
+/** 补齐内置智能体并强制其资料为包内最新版，再把非男生头像的记录重新随机分配。 */
+export function normalizeSavedChat(initial: SavedChat): SavedChat {
+  const builtinIds = new Set(builtinAgents.map((agent) => agent.id));
+  const stored = new Map(initial.agents.map((item) => [item.id, item]));
+  const customAgents = initial.agents.filter((item) => !builtinIds.has(item.id));
+  return {
+    ...initial,
+    agents: [...builtinAgents, ...customAgents].map((item) => {
+      const saved = stored.get(item.id);
+      return {
+        ...item,
+        avatarId:
+          item.id === analyticsAgent.id
+            ? analyticsAgent.avatarId
+            : isMaleAvatar(saved?.avatarId)
+              ? saved!.avatarId
+              : randomAvatarId(),
+      };
+    }),
+  };
+}

@@ -76,7 +76,8 @@ export function createChatResponse(request: Request, input: ChatTranscript & { a
         start(controller) {
           const output = { text: '' };
           let pending = '';
-          let allowText = false;
+          // A tool end cannot identify the final round: buffer analytics until prompt completes.
+          // This delays the final body; tool statuses stay live and ordinary chat still streams.
           const emit = (delta: Record<string, unknown>, finish_reason: string | null = null) => {
             if (!abortSignal.aborted)
               controller.enqueue(
@@ -98,9 +99,22 @@ export function createChatResponse(request: Request, input: ChatTranscript & { a
           > = {
             ...(isAnalytics
               ? {
+                  agent_settled(event: AgentSessionEvent) {
+                    if (event.type !== 'agent_settled' || event.aborted || abortSignal.aborted)
+                      return;
+                    const last = session.messages.at(-1);
+                    if (
+                      last?.role !== 'assistant' ||
+                      last.stopReason === 'error' ||
+                      last.stopReason === 'aborted'
+                    )
+                      return;
+                    output.text += pending;
+                    if (pending) emit({ content: pending });
+                    pending = '';
+                  },
                   tool_execution_start(event: AgentSessionEvent) {
                     if (event.type !== 'tool_execution_start') return;
-                    allowText = false;
                     pending = '';
                     output.text = '';
                     emitEvent({
@@ -112,7 +126,6 @@ export function createChatResponse(request: Request, input: ChatTranscript & { a
                   },
                   tool_execution_end(event: AgentSessionEvent) {
                     if (event.type !== 'tool_execution_end') return;
-                    allowText = true;
                     emitEvent({
                       type: 'tool_status',
                       name: event.toolName,
@@ -129,7 +142,7 @@ export function createChatResponse(request: Request, input: ChatTranscript & { a
               )
                 return;
               const { delta } = event.assistantMessageEvent;
-              if (isAnalytics && !allowText) pending += delta;
+              if (isAnalytics) pending += delta;
               else {
                 output.text += delta;
                 emit({ content: delta });
@@ -161,14 +174,6 @@ export function createChatResponse(request: Request, input: ChatTranscript & { a
             });
             if (abortSignal.aborted) return yield* Effect.interrupt;
             yield* assertChatAnswer(session, 'Generation failed');
-            if (isAnalytics && !allowText) {
-              allowText = true;
-              if (pending) {
-                output.text += pending;
-                emit({ content: pending });
-                pending = '';
-              }
-            }
             yield* repairOpenUi(session, output, emit, abortSignal);
             emit({}, 'stop');
           });

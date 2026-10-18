@@ -1,65 +1,30 @@
-import { useMemo } from 'react';
-import { useSearchParams } from '@/lib/navigation';
 import { ArrowLeft, MoveLeft, MoveRight } from 'lucide-react';
 import { DetailKeyboardNav } from './detail-tools';
-import {
-  browseHref,
-  resolveUrlBrowseContext,
-  type BrowseEntry,
-  type FilterableBrowseEntry,
-} from '@/lib/browse-context';
+import { browseHref, type BrowseEntry } from '@/lib/browse-context';
 import styles from './browse-navigation.module.css';
 import { WorkspaceLink } from './workspace-shell';
 
 type Props = {
-  listPath: string;
   returnLabel: string;
   fallbackHref: string;
   currentHref: string;
   entries: BrowseEntry[];
-  browseEntries: FilterableBrowseEntry[];
+  contextHref: string | null;
 };
 
-export function BrowseNavigation(props: Props) {
-  // 原 Suspense 只为圈定 Next 静态渲染下 useSearchParams 的挂起分叉；
-  // TanStack SSR 时查询串已知，直接渲染带上下文的导航。
-  return <ContextNavigation {...props} />;
-}
-
-function ContextNavigation(props: Props) {
-  const params = useSearchParams();
-  const context = useMemo(
-    () =>
-      resolveUrlBrowseContext(
-        params.toString(),
-        props.listPath,
-        props.currentHref,
-        props.browseEntries,
-      ),
-    [props.listPath, props.currentHref, props.browseEntries, params],
-  );
-  return (
-    <Navigation
-      {...props}
-      fallbackHref={context?.href ?? props.fallbackHref}
-      entries={context?.entries ?? props.entries}
-      fromList={!!context}
-    />
-  );
-}
-
-function Navigation({
+export function BrowseNavigation({
   returnLabel,
   fallbackHref,
   currentHref,
   entries,
-  fromList = false,
-}: Props & { fromList?: boolean }) {
+  contextHref,
+}: Props) {
+  fallbackHref = contextHref ?? fallbackHref;
   const index = entries.findIndex((entry) => entry.href === currentHref);
   const prev = entries[index - 1];
   const next = entries[index + 1];
   const href = (entry: BrowseEntry) =>
-    fromList ? browseHref(entry.href, fallbackHref) : entry.href;
+    contextHref ? browseHref(entry.href, fallbackHref) : entry.href;
   return (
     <>
       <nav className={styles.navigation} aria-label="作品导航">

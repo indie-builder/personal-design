@@ -27,17 +27,6 @@ interface Rect {
   height: number;
 }
 
-export interface OpenOptions {
-  /** 触发元素的屏幕 rect，FLIP 动画的起点 */
-  rect: Rect;
-  /** 触发元素引用：关闭动画前重新测量，避免飞回旧位置 */
-  sourceEl?: Element | null;
-  /** 同组条目（左右切换） */
-  siblings?: LightboxItem[];
-  /** 当前条目在 siblings 中的下标 */
-  index?: number;
-}
-
 // Shared 200ms enter / 140ms exit; FLIP keeps the trigger-to-media relationship.
 export const EASE = 'var(--ease-out)';
 export const DURATION = 200;
@@ -45,9 +34,13 @@ const EXIT_DURATION = 140;
 
 interface ActiveImage {
   item: LightboxItem;
+  /** 触发元素引用：关闭动画前重新测量，避免飞回旧位置 */
   sourceEl: Element | null;
+  /** 触发元素的屏幕 rect，FLIP 动画的起点 */
   initialRect: Rect;
+  /** 同组条目（左右切换） */
   siblings: LightboxItem[];
+  /** 当前条目在 siblings 中的下标 */
   index: number;
 }
 
@@ -96,7 +89,10 @@ export function useLightboxController() {
   useEffect(() => cancelPendingMotion, [cancelPendingMotion]);
 
   const open = useCallback(
-    (item: LightboxItem, options: OpenOptions) => {
+    (images: LightboxItem[], index: number, sourceEl: Element) => {
+      const item = images[index];
+      if (!Number.isInteger(index) || !item) return;
+      const initialRect = sourceEl.getBoundingClientRect();
       const immediate = instantMotion() || document.hidden;
       setInstant(immediate);
       setNaturalRatio(null);
@@ -104,10 +100,10 @@ export function useLightboxController() {
       closingRef.current = false;
       setActive({
         item,
-        sourceEl: options.sourceEl ?? null,
-        initialRect: options.rect,
-        siblings: options.siblings ?? [],
-        index: options.index ?? 0,
+        sourceEl,
+        initialRect,
+        siblings: images,
+        index,
       });
       setCloseRect(null);
       setThumbError(false);
@@ -148,6 +144,7 @@ export function useLightboxController() {
       const current = activeRef.current;
       if (!current || current.siblings.length < 2) return;
       cancelPendingMotion();
+      setCloseRect(null);
       closingRef.current = false;
       setExpanded(true);
       setActive((cur) => {

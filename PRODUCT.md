@@ -21,7 +21,7 @@ web
 
 ## Operating Context
 
-pnpm monorepo（apps/web 唯一站点 + packages/* 内容数据包），Next.js 16 App Router + Tailwind v4，portless 本地开发（https://personal-design.localhost）。内容通过各包的 sync 脚本增量同步。
+pnpm monorepo（apps/web 唯一站点 + packages/* 内容数据包），TanStack Start（Vite + Nitro）+ Tailwind v4，portless 本地开发（https://personal-design.localhost）。内容通过各包的 sync 脚本增量同步。
 
 ## Capabilities and Constraints
 

@@ -1,4 +1,5 @@
 import { Arcade, pixelPatterns } from '@personal-design/word-arcade';
+import { WALKER_BODY, WALKER_FEET } from '@/lib/walker-sprite';
 
 /** Cache geometry only: alpha, color and animation time still change every frame. */
 export function arcadeBackgroundPaths(width: number, height: number) {
@@ -132,21 +133,9 @@ export function drawArcade(
     ctx.save();
     ctx.translate(46, floor - game.jump - 32);
     if (game.jump) ctx.rotate(-0.15);
-    for (const [x, y, w, h] of [
-      [0, 0, 8, 24],
-      [12, 0, 8, 8],
-      [7, 4, 16, 4],
-      [12, 4, 4, 12],
-      [20, 4, 4, 12],
-      [7, 12, 20, 4],
-      [4, 15, 19, 13],
-      [8, 15, 4, 13],
-      [16, 20, 4, 8],
-    ])
-      ctx.fillRect(x!, y!, w!, h!);
+    for (const [x, y, w, h] of WALKER_BODY) ctx.fillRect(x, y, w, h);
     const step = Math.floor(game.distance / 22) % 2;
-    ctx.fillRect(step ? 10 : 8, 28, 4, 4);
-    ctx.fillRect(step ? 14 : 16, 28, 4, 4);
+    for (const [x, y, w, h] of WALKER_FEET[step === 0 ? 0 : 1]) ctx.fillRect(x, y, w, h);
     ctx.restore();
   }
   if (!reduced)

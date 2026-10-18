@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { EASE_TRAVEL, instantMotion, observeMotionPolicy } from '@/lib/motion';
+import { WALKER_BODY, WALKER_FEET } from '@/lib/walker-sprite';
 import styles from './timeline-walker.module.css';
 
 /** Reused with the owner's authorization from joeypescatore.com; follows the timeline's vertical rhythm. */
@@ -149,26 +150,12 @@ export function TimelineWalker({
         shapeRendering="crispEdges"
       >
         <g transform={look === 'left' ? 'translate(27 0) scale(-1 1)' : undefined}>
-          <rect x="0" y="0" width="8" height="24" />
-          <rect x="12" y="0" width="8" height="8" />
-          <rect x="7" y="4" width="16" height="4" />
-          <rect x="12" y="4" width="4" height="12" />
-          <rect x="20" y="4" width="4" height="12" />
-          <rect x="7" y="12" width="20" height="4" />
-          <rect x="4" y="15" width="19" height="13" />
-          <rect x="8" y="15" width="4" height="13" />
-          <rect x="16" y="20" width="4" height="8" />
-          {step === 0 ? (
-            <>
-              <rect x="8" y="28" width="4" height="4" />
-              <rect x="16" y="28" width="4" height="4" />
-            </>
-          ) : (
-            <>
-              <rect x="10" y="28" width="4" height="4" />
-              <rect x="14" y="28" width="4" height="4" />
-            </>
-          )}
+          {WALKER_BODY.map(([x, y, width, height]) => (
+            <rect key={`body-${x}-${y}`} x={x} y={y} width={width} height={height} />
+          ))}
+          {WALKER_FEET[step === 0 ? 0 : 1].map(([x, y, width, height]) => (
+            <rect key={`feet-${x}`} x={x} y={y} width={width} height={height} />
+          ))}
         </g>
       </svg>
     </li>

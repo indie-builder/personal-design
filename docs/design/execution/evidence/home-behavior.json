@@ -25,7 +25,8 @@
     "mobile": {
       "width": 390,
       "scroll": 390
-    }
+    },
+    "imageAborts": 5
   },
   "pageErrors": [],
   "passed": true

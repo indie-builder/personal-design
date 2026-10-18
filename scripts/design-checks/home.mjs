@@ -80,11 +80,24 @@ try {
     evidence.checks.mobile = await page.evaluate(() => ({ width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
     assert.equal(evidence.checks.mobile.width, evidence.checks.mobile.scroll, '窄屏不应出现页面级横向溢出');
 
-    // 图片优化通道被拦截时页面仍须无错误渲染（当前首页预览为视频/纯 CSS，图片回退
-    // 占位仅在首个预览无视频时出现，不作为固定断言）。
-    await page.route('**/_next/image?**', (route) => route.abort());
+    // 图片优化通道被拦截时页面仍须无错误渲染。当前仅工具预览图标走 /_image（lazy），
+    // 重载后可能不在视口内；先滚到首张优化图，保证 abort 路径真实命中而不是空断言。
+    const imageAborts = [];
+    await page.route('**/_image?**', (route) => {
+      imageAborts.push(route.request().url());
+      return route.abort();
+    });
     await page.reload();
     await page.getByRole('region', { name: '作品时间轴' }).waitFor();
+    if (!imageAborts.length) {
+      const optimized = page.locator('img[src*="/_image?"]').first();
+      assert(await optimized.count(), '首页缺少经 /_image 优化的图片，无法验证拦截路径');
+      await optimized.scrollIntoViewIfNeeded();
+      const deadline = Date.now() + 5000;
+      while (!imageAborts.length && Date.now() < deadline) await page.waitForTimeout(100);
+    }
+    evidence.checks.imageAborts = imageAborts.length;
+    assert(imageAborts.length > 0, '/_image 拦截未命中：matcher 与实际图片端点不一致');
     assert.deepEqual(evidence.pageErrors, []);
     evidence.passed = true;
   }, { evidence, pageOptions: { viewport: { width: 1440, height: 900 } } });

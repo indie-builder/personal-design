@@ -1,6 +1,6 @@
 import type { PlateWallItem } from '@/components/plate-wall';
 import { listPostCards } from '@personal-design/inspora';
-import { matchesSearch } from '@/lib/browse-context';
+import { matchesBrowseEntry } from '@/lib/browse-context';
 import { categoryLabel } from '@/lib/category-label';
 import { museThumbnailOf, museKeywords } from '@/lib/muse-detail';
 
@@ -43,9 +43,13 @@ export const museTabs = (() => {
 
 type MuseFilter = { q?: string; category?: string };
 export function museMatches(item: PlateWallItem, { q = '', category }: MuseFilter) {
-  return (
-    (!category || category === '全部' || item.category === category) &&
-    matchesSearch(q, [item.name, item.lead, item.keywords, categoryLabel(item.category)])
+  return matchesBrowseEntry(
+    {
+      title: item.name,
+      category: item.category,
+      search: [item.lead ?? '', item.keywords ?? '', categoryLabel(item.category)],
+    },
+    { q, category: category === '全部' ? undefined : category },
   );
 }
 export const filterMuseItems = (filters: MuseFilter) =>

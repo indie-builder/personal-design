@@ -1,5 +1,5 @@
 import type { listPostRefs, InsporaPost, InsporaMedia } from '@personal-design/inspora';
-import { windowed } from '@/lib/browse-context';
+import { resolveUrlBrowseContext, windowed } from '@/lib/browse-context';
 import { categoryLabel } from '@/lib/category-label';
 
 const posterOf = (media: InsporaMedia) => media.poster ?? media.thumb;
@@ -22,30 +22,51 @@ export function museMediaOf(post: Pick<InsporaPost, 'title' | 'media'>) {
     }));
 }
 
+export function museDetailOf(
+  post: InsporaPost,
+  postRefs: ReturnType<typeof listPostRefs>,
+  query = '',
+) {
+  return {
+    post: {
+      slug: post.slug,
+      title: post.title,
+      creatorName: post.creatorName,
+      creatorUrl: post.creatorUrl,
+      creatorAvatar: post.creatorAvatar,
+      description: post.description,
+      category: post.category,
+      sourceUrl: post.sourceUrl,
+    },
+    navigation: museBrowseEntries(post, postRefs, query),
+    media: museMediaOf(post),
+  };
+}
+
 export function museBrowseEntries(
   post: Pick<InsporaPost, 'slug' | 'category'>,
   postRefs: ReturnType<typeof listPostRefs>,
+  query = '',
 ) {
   const currentHref = `/products/muse/${post.slug}`;
   const indexed = postRefs.map((entry) => ({
     href: `/products/muse/${entry.slug}`,
-    post: entry,
+    title: entry.title,
+    category: entry.category ?? '未分类',
+    search: [
+      entry.creatorName ?? '',
+      museKeywords(entry),
+      categoryLabel(entry.category ?? '未分类'),
+    ],
   }));
+  const context = resolveUrlBrowseContext(query, '/products/muse', currentHref, indexed);
+  // Resolve against the full index: a sparse match can be outside the unfiltered window.
+  const entries =
+    context?.entries ??
+    indexed.filter((entry) => !post.category || entry.category === post.category);
   return {
     currentHref,
-    browseEntries: windowed(indexed, currentHref).map(({ href, post: entry }) => ({
-      href,
-      title: entry.title,
-      category: entry.category ?? '未分类',
-      search: [
-        entry.creatorName ?? '',
-        museKeywords(entry),
-        categoryLabel(entry.category ?? '未分类'),
-      ],
-    })),
-    entries: windowed(
-      indexed.filter(({ post: entry }) => !post.category || entry.category === post.category),
-      currentHref,
-    ).map(({ href, post: entry }) => ({ href, title: entry.title })),
+    contextHref: context?.href ?? null,
+    entries: windowed(entries, currentHref).map(({ href, title }) => ({ href, title })),
   };
 }

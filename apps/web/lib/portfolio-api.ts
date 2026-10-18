@@ -1,7 +1,6 @@
 import { products } from '@/lib/products';
 import { categoryLabel } from '@/lib/category-label';
 import { matchesSearch } from '@/lib/browse-context';
-import { musePage, musePreviewOf, museTabs } from '@/lib/muse-catalog';
 import { museMediaOf, museThumbnailOf } from '@/lib/muse-detail';
 import {
   catalog,
@@ -22,7 +21,7 @@ import { promoUrl, promoPosterUrl, websiteUrl } from '@personal-design/personal-
  * 的 node:sqlite / node:fs 依赖在此安全；客户端依然只经页面 loader 间接取数。
  * Public read projection only. Never serialize provider records or raw payloads.
  */
-export function portfolioResponse(request: Request, path: string[]): Response {
+export async function portfolioResponse(request: Request, path: string[]): Promise<Response> {
   const url = new URL(request.url);
   const absolute = (value: string | null | undefined) =>
     value ? new URL(value, url.origin).href : '';
@@ -97,8 +96,10 @@ export function portfolioResponse(request: Request, path: string[]): Response {
           (!theme || item.subcategory_slug === theme) &&
           matchesSearch(q, [item.name, item.category, item.subcategory]),
       );
+      const paged = page(filtered);
       return ok({
-        ...page(filtered.map(layout)),
+        ...paged,
+        items: paged.items.map(layout),
         categories: categories.map((c) => ({
           id: c.slug,
           name: categoryLabel(c.name),
@@ -138,6 +139,7 @@ export function portfolioResponse(request: Request, path: string[]): Response {
         });
       }
       if (path.length !== 1) return missing();
+      const { musePage, musePreviewOf, museTabs } = await import('@/lib/muse-catalog');
       const paged = musePage({ q, category: cat || '全部', offset, limit });
       return ok({
         ...paged,
