@@ -10,6 +10,7 @@ import { Pause, RotateCcw } from 'lucide-react';
 import { Button } from './button';
 import { EASE_ARCADE_LETTER_EXIT, instantMotion } from '@/lib/motion';
 import { drawArcade } from './word-arcade-draw';
+import { useWordArcadeMotion } from './use-word-arcade-motion';
 import styles from './word-arcade.module.css';
 
 type Status = { state: GameState; score: number; lives: number; level: number; remaining: number };
@@ -27,7 +28,28 @@ export function WordArcade() {
   const active = games.find((game) => game.id === kind)!;
   const text = headlines[round % headlines.length]!;
 
-  const begin = useEffectEvent(() => action('start'));
+  const motion = useWordArcadeMotion(
+    kind,
+    (next) => {
+      carry.current = null;
+      engine.current?.reset();
+      setKind(next);
+      setRound(0);
+    },
+    () => action('start'),
+    () => {
+      engine.current?.pause();
+      stage.current?.dispatchEvent(new Event('arcade-action'));
+    },
+  );
+  const measureRevision = motion.measureRevision;
+  const begin = useEffectEvent((keyboard = false) => motion.start(keyboard));
+  const cancelStart = useEffectEvent(() => motion.cancelStart());
+  const beforeMeasure = useEffectEvent((measuredKind: GameKind) =>
+    motion.beforeMeasure(measuredKind),
+  );
+  const measured = useEffectEvent((measuredKind: GameKind) => motion.measured(measuredKind));
+  const resizeMotion = useEffectEvent(() => motion.resize());
 
   // Refresh cycles through a shuffled bag. Storage is optional (private mode still works).
   useEffect(() => {
@@ -170,7 +192,7 @@ export function WordArcade() {
       if (game) paint();
     };
     const measure = () => {
-      if (disposed) return;
+      if (disposed || !beforeMeasure(kind)) return;
       cancelAnimationFrame(frame);
       frame = 0;
       for (const el of letters) {
@@ -206,6 +228,8 @@ export function WordArcade() {
       }
       engine.current = game;
       palette();
+      // measured() can start the game; wake after it so the frame loop sees 'playing'.
+      measured(kind);
       wake();
     };
     const updatePointer = (e: PointerEvent) => {
@@ -230,10 +254,6 @@ export function WordArcade() {
       if (e.button !== 0 || (e.target as Element).closest('button')) return;
       area.focus({ preventScroll: true });
       updatePointer(e);
-      if (game.state === 'cleared') {
-        advance();
-        return;
-      }
       if (e.pointerType !== 'mouse') area.setPointerCapture(e.pointerId);
       if (game.state === 'playing') game.act();
       else begin();
@@ -271,17 +291,15 @@ export function WordArcade() {
       if (e.repeat) return;
       if (key === 'Escape' || key === 'escape' || key === 'p') {
         e.preventDefault();
+        cancelStart();
         game.pause();
         wake();
       }
       if (key === ' ' || key === 'enter') {
         e.preventDefault();
-        if (game.state === 'cleared') advance();
-        else {
-          if (game.state === 'playing') game.act();
-          else begin();
-          wake();
-        }
+        if (game.state === 'playing') game.act();
+        else begin(true);
+        wake();
       }
     };
     const keyup = (e: KeyboardEvent) => {
@@ -289,8 +307,11 @@ export function WordArcade() {
       keys.delete(e.key.toLowerCase());
     };
     const pause = () => {
+      cancelStart();
       keys.clear();
       game.pause();
+      cancelAnimationFrame(frame);
+      frame = 0;
       wake();
     };
     const visibility = () => {
@@ -298,22 +319,32 @@ export function WordArcade() {
     };
     const notifyAction = () => wake();
     measure();
+    if (!engine.current) return;
     const size = new ResizeObserver(() => {
       const r = area.getBoundingClientRect();
-      if (Math.abs(r.width - game.width) > 1 || Math.abs(r.height - game.height) > 1) measure();
+      if (Math.abs(r.width - game.width) > 1 || Math.abs(r.height - game.height) > 1) {
+        resizeMotion();
+        measure();
+      }
     });
     size.observe(area);
     const theme = new MutationObserver(palette);
     theme.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    const fontsLoading = document.fonts.status !== 'loaded';
     document.fonts.ready.then(() => {
-      if (!disposed && game.state === 'idle') measure();
+      if (fontsLoading && !disposed && game.state === 'idle') measure();
     });
     area.addEventListener('pointermove', updatePointer);
     area.addEventListener('pointerdown', press);
     area.addEventListener('pointercancel', pause);
     area.addEventListener('keydown', keydown);
     area.addEventListener('keyup', keyup);
-    area.addEventListener('blur', pause);
+    // blur does not bubble, so focus leaving a child prompt button was invisible.
+    const focusLeave = (event: FocusEvent) => {
+      if (event.relatedTarget instanceof Node && area.contains(event.relatedTarget)) return;
+      pause();
+    };
+    area.addEventListener('focusout', focusLeave);
     area.addEventListener('arcade-action', notifyAction);
     document.addEventListener('visibilitychange', visibility);
     window.addEventListener('blur', pause);
@@ -330,7 +361,7 @@ export function WordArcade() {
       area.removeEventListener('pointercancel', pause);
       area.removeEventListener('keydown', keydown);
       area.removeEventListener('keyup', keyup);
-      area.removeEventListener('blur', pause);
+      area.removeEventListener('focusout', focusLeave);
       area.removeEventListener('arcade-action', notifyAction);
       document.removeEventListener('visibilitychange', visibility);
       window.removeEventListener('blur', pause);
@@ -341,7 +372,7 @@ export function WordArcade() {
         el.style.opacity = '';
       }
     };
-  }, [kind, ready, round]);
+  }, [kind, ready, round, measureRevision]);
 
   function advance() {
     const game = engine.current;
@@ -353,6 +384,7 @@ export function WordArcade() {
     const game = engine.current;
     if (!game) return;
     if (command === 'reset') {
+      motion.reset();
       carry.current = null;
       game.reset();
       if (round) setRound(0);
@@ -393,12 +425,8 @@ export function WordArcade() {
           <button
             key={game.id}
             type="button"
-            aria-pressed={game.id === kind}
-            onClick={() => {
-              carry.current = null;
-              setKind(game.id);
-              setRound(0);
-            }}
+            aria-pressed={game.id === motion.selected}
+            onClick={(event) => motion.choose(game.id, event.detail === 0)}
             className={styles.choice}
           >
             {game.name}
@@ -415,7 +443,24 @@ export function WordArcade() {
         data-arcade-stage
         data-game={kind}
       >
-        <canvas ref={canvas} className={styles.canvas} aria-hidden="true" />
+        <div ref={motion.scene} className={styles.scene}>
+          <canvas ref={canvas} className={styles.canvas} aria-hidden="true" />
+          <div className={styles.headline}>
+            <h1 aria-label={text}>
+              {Array.from(text).map((char, i) => (
+                <span
+                  aria-hidden="true"
+                  data-game-letter={/[\p{L}\p{N}]/u.test(char) ? '' : undefined}
+                  data-game-punctuation={!/[\p{L}\p{N}]/u.test(char) ? '' : undefined}
+                  data-headline="true"
+                  key={`${round}-${i}`}
+                >
+                  {char}
+                </span>
+              ))}
+            </h1>
+          </div>
+        </div>
         <div className={styles.hud} aria-hidden="true">
           <span key={`level-${status.level}`}>第 {status.level + 1} 关</span>
           <span key={`remaining-${status.remaining}`}>剩余 {status.remaining} 字</span>
@@ -427,25 +472,14 @@ export function WordArcade() {
             </span>
           )}
         </div>
-        <div className={styles.headline}>
-          <h1 aria-label={text}>
-            {Array.from(text).map((char, i) => (
-              <span
-                aria-hidden="true"
-                data-game-letter={/[\p{L}\p{N}]/u.test(char) ? '' : undefined}
-                data-game-punctuation={!/[\p{L}\p{N}]/u.test(char) ? '' : undefined}
-                data-headline="true"
-                key={`${round}-${i}`}
-              >
-                {char}
-              </span>
-            ))}
-          </h1>
-        </div>
         {status.state !== 'playing' && (
-          <div className={styles.prompt}>
+          <div ref={motion.prompt} className={styles.prompt}>
             {statusTitle && <p className={styles.promptTitle}>{statusTitle}</p>}
-            <Button variant="primary" disabled={!ready} onClick={() => action('start')}>
+            <Button
+              variant="primary"
+              disabled={!ready}
+              onClick={(event) => motion.start(event.detail === 0)}
+            >
               {ready ? prompt : '准备中…'}
             </Button>
           </div>

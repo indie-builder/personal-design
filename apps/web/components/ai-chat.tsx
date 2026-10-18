@@ -8,12 +8,19 @@ import {
   type ChatTranscript,
   type Conversation,
 } from '@personal-design/ai-chat';
-import { EASE_CHAT_SCREEN, instantMotion, observeMotionPolicy, playExit } from '@/lib/motion';
+import {
+  EASE_CHAT_SCREEN,
+  EASE_EXIT,
+  instantMotion,
+  observeMotionPolicy,
+  playExit,
+} from '@/lib/motion';
 import { Button, buttonClassName } from './button';
 import { AgentCreationScreen } from './ai-chat/agent-creation';
 import { ConversationView } from './ai-chat/conversation';
 import { useSavedChat } from './ai-chat/use-saved-chat';
 import styles from './ai-chat.module.css';
+import conversationMotion from './ai-chat-conversation-motion.module.css';
 
 function newConversation(agentId: string): Conversation {
   return { id: crypto.randomUUID(), agentId, title: '新对话', messages: [] };
@@ -34,6 +41,12 @@ export function AiChat() {
   const agentPopover = useRef<HTMLDivElement>(null);
   const agentButton = useRef<HTMLButtonElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
+  const conversationSurface = useRef<HTMLDivElement>(null);
+  const conversationEntry = useRef<Animation | null>(null);
+  const conversationExit = useRef<ReturnType<typeof playExit> | null>(null);
+  const conversationTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const incomingDirection = useRef(0);
+  const pendingConversation = useRef<string | null>(null);
   const { saved, setSaved, storageError } = useSavedChat(
     (initial) =>
       setActive(
@@ -96,6 +109,10 @@ export function AiChat() {
         if (instantMotion() || document.hidden) {
           creationEntry.current?.finish();
           creationExit.current?.finish();
+          conversationEntry.current?.cancel();
+          clearTimeout(conversationTimer.current);
+          conversationEntry.current = null;
+          conversationExit.current?.finish();
         }
       }),
     [],
@@ -126,6 +143,93 @@ export function AiChat() {
       }
     };
   }, [panel]);
+
+  function enterConversation(from: Keyframe) {
+    const surface = conversationSurface.current;
+    if (!surface || instantMotion() || document.hidden) return;
+    try {
+      const animation = surface.animate([from, { transform: 'translateX(0)', opacity: 1 }], {
+        duration: 200,
+        easing: EASE_CHAT_SCREEN,
+      });
+      conversationEntry.current = animation;
+      const finish = () => {
+        if (conversationEntry.current !== animation) return;
+        clearTimeout(conversationTimer.current);
+        animation.cancel();
+        conversationEntry.current = null;
+      };
+      conversationTimer.current = setTimeout(finish, 320);
+      void animation.finished.then(finish, finish);
+    } catch {
+      // Animation failure leaves the normal, visible conversation usable.
+      conversationEntry.current = null;
+    }
+  }
+
+  useLayoutEffect(() => {
+    const surface = conversationSurface.current;
+    if (surface) surface.inert = false;
+    pendingConversation.current = null;
+    const direction = incomingDirection.current;
+    incomingDirection.current = 0;
+    if (direction) enterConversation({ transform: `translateX(${direction * 16}px)`, opacity: 0 });
+    return () => {
+      clearTimeout(conversationTimer.current);
+      conversationEntry.current?.cancel();
+      conversationEntry.current = null;
+      conversationExit.current?.cancel();
+      conversationExit.current = null;
+      if (surface) surface.inert = false;
+    };
+  }, [active?.id]);
+
+  function switchConversation(next: Conversation, direction = 1, animate = true) {
+    if (next.id === active?.id && !pendingConversation.current) return;
+    if (next.id === pendingConversation.current) {
+      if (instantMotion() || document.hidden) conversationExit.current?.finish();
+      return;
+    }
+    const surface = conversationSurface.current;
+    // Sample before cancellation so a reverse continues from the painted frame.
+    const visual = surface ? getComputedStyle(surface) : null;
+    const from = { transform: visual?.transform ?? 'none', opacity: visual?.opacity ?? '1' };
+    conversationEntry.current?.cancel();
+    conversationEntry.current = null;
+    clearTimeout(conversationTimer.current);
+    conversationExit.current?.cancel();
+    conversationExit.current = null;
+    pendingConversation.current = null;
+    if (surface) surface.inert = false;
+    if (next.id === active?.id) {
+      enterConversation(from);
+      return;
+    }
+    const commit = () => {
+      if (pendingConversation.current !== next.id) return;
+      incomingDirection.current = animate && !instantMotion() && !document.hidden ? direction : 0;
+      setActive(next);
+    };
+    pendingConversation.current = next.id;
+    if (!surface || !animate || instantMotion() || document.hidden) {
+      commit();
+      return;
+    }
+    if (surface.contains(document.activeElement))
+      agentButton.current?.focus({ preventScroll: true });
+    surface.inert = true;
+    try {
+      conversationExit.current = playExit(
+        surface,
+        commit,
+        [from, { transform: `translateX(${-direction * 16}px)`, opacity: 0 }],
+        { duration: 140, hold: true, easing: EASE_EXIT },
+      );
+    } catch {
+      surface.inert = false;
+      commit();
+    }
+  }
 
   function leaveCreation(next: 'agents' | null, complete?: () => void) {
     if (creationExit.current) {
@@ -195,17 +299,18 @@ export function AiChat() {
 
   const agent = saved.agents.find((item) => item.id === active?.agentId) ?? defaultAgent;
   function selectAgent(next: Agent) {
-    if (next.id !== agent.id) setActive(newConversation(next.id));
+    if (next.id !== agent.id) switchConversation(newConversation(next.id));
+    else if (active) switchConversation(active);
     closePanel();
   }
   function startConversation() {
-    setActive(newConversation(agent.id));
-    closePanel();
+    switchConversation(newConversation(agent.id));
+    if (panel) closePanel();
   }
   function createAgent(next: Agent) {
     leaveCreation(null, () => {
       setSaved((current) => ({ ...current, agents: [...current.agents, next] }));
-      setActive(newConversation(next.id));
+      switchConversation(newConversation(next.id), 1, false);
       setAgentDraft({ name: '', prompt: '' });
       requestAnimationFrame(() => agentButton.current?.focus());
     });
@@ -263,7 +368,7 @@ export function AiChat() {
             variant="ghost"
             aria-label="新建对话"
             disabled={busy || !active}
-            onClick={() => setActive(newConversation(agent.id))}
+            onClick={startConversation}
           >
             <Plus size={24} strokeWidth={1.6} />
           </Button>
@@ -274,14 +379,20 @@ export function AiChat() {
           </p>
         )}
         {active ? (
-          <ConversationView
-            key={active.id}
-            conversation={active}
-            agent={agent}
-            onTranscript={updateTranscript}
-            onBusy={setBusy}
-            onHeaderHiddenChange={setHeaderHidden}
-          />
+          <div
+            ref={conversationSurface}
+            className={conversationMotion.surface}
+            data-conversation-id={active.id}
+          >
+            <ConversationView
+              key={active.id}
+              conversation={active}
+              agent={agent}
+              onTranscript={updateTranscript}
+              onBusy={setBusy}
+              onHeaderHiddenChange={setHeaderHidden}
+            />
+          </div>
         ) : (
           <p className={styles.loading} role="status">
             正在打开对话…
@@ -381,7 +492,7 @@ export function AiChat() {
                   key={item.id}
                   aria-current={item.id === active?.id ? 'true' : undefined}
                   onClick={() => {
-                    setActive(item);
+                    switchConversation(item, -1);
                     closePanel();
                   }}
                 >

@@ -1,4 +1,5 @@
 import { button as buttons, cdpEvaluate } from './harness.cjs';
+import { verifyWordArcadeMotion } from './word-arcade-motion.browser.mjs';
 import {
   activeTargetCenter,
   aliveLetterCenter,
@@ -263,9 +264,10 @@ export async function verifyWordArcade(tab, cdp) {
     });
   }
 
+  const motion = await verifyWordArcadeMotion(tab, cdp);
   const errors = await tab.dev.logs({ levels: ['error'], limit: 20 });
   expect(errors.length === 0, `Browser errors: ${JSON.stringify(errors)}`);
-  return { results, errors };
+  return { results, motion, errors };
 }
 
 // Call while a runner letter is rolling on the ground, or after pausing that state.

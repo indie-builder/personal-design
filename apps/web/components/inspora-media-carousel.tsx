@@ -209,8 +209,127 @@ function MediaSlide({
 }) {
   const lightbox = useLightbox();
   const { status, attempt, setStatus, retry } = useMediaStatus(active, 15000);
+  const slideRef = useRef<HTMLElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const previewRef = useRef<HTMLImageElement>(null);
+  const leavingRef = useRef<HTMLDivElement>(null);
+  const noticeFocus = useRef<string | null>(null);
+  const [previewDone, setPreviewDone] = useState<number | null>(null);
+  const notice = active && status !== 'ready' ? status : null;
+  const [notices, setNotices] = useState({ current: notice, leaving: null as typeof notice });
+  if (notices.current !== notice) {
+    setNotices({ current: notice, leaving: notices.current });
+  }
+
+  useLayoutEffect(() => {
+    const leaving = leavingRef.current;
+    if (noticeFocus.current === notices.leaving && notices.leaving) {
+      noticeFocus.current = null;
+      if (leaving?.contains(document.activeElement) || document.activeElement === document.body) {
+        slideRef.current?.closest<HTMLElement>('[role="region"]')?.focus({ preventScroll: true });
+      }
+    }
+    if (!leaving) return;
+    let disposed = false;
+    let animation: Animation | undefined;
+    let stop = () => {};
+    let timer: ReturnType<typeof setTimeout>;
+    const finish = () => {
+      if (disposed) return;
+      disposed = true;
+      clearTimeout(timer);
+      stop();
+      animation?.cancel();
+      setNotices((value) => ({ ...value, leaving: null }));
+    };
+    if (!active || instantMotion() || document.hidden) {
+      finish();
+      return;
+    }
+    try {
+      animation = leaving.animate(
+        [{ opacity: getComputedStyle(leaving).opacity }, { opacity: 0 }],
+        { duration: 140, easing: 'ease', fill: 'forwards' },
+      );
+      void animation.finished.then(finish, finish);
+    } catch {
+      finish();
+      return;
+    }
+    timer = setTimeout(finish, 260);
+    stop = observeMotionPolicy(() => {
+      if (instantMotion() || document.hidden) finish();
+    });
+    return () => {
+      disposed = true;
+      clearTimeout(timer);
+      stop();
+      animation?.cancel();
+    };
+  }, [notices.current, notices.leaving, active]);
+
+  useLayoutEffect(() => {
+    if (item.type !== 'image' || status !== 'ready') return;
+    const image = imageRef.current;
+    const preview = previewRef.current;
+    if (!image || !preview) return;
+    let disposed = false;
+    let fading = false;
+    let animation: Animation | undefined;
+    let stop = () => {};
+    let timer: ReturnType<typeof setTimeout>;
+    const finish = () => {
+      if (disposed) return;
+      disposed = true;
+      clearTimeout(timer);
+      stop();
+      // Cancelling a CSS transition exposes its ready-state target immediately.
+      for (const transition of image.getAnimations()) transition.cancel();
+      animation?.cancel();
+      setPreviewDone(attempt);
+    };
+    const fadePreview = () => {
+      if (disposed || fading) return;
+      fading = true;
+      clearTimeout(timer);
+      for (const transition of image.getAnimations()) transition.cancel();
+      if (!active || instantMotion() || document.hidden) return finish();
+      try {
+        animation = preview.animate([{ opacity: 0.85 }, { opacity: 0 }], {
+          duration: 140,
+          easing: 'ease',
+          fill: 'forwards',
+        });
+        void animation.finished.then(finish, finish);
+      } catch {
+        finish();
+        return;
+      }
+      timer = setTimeout(finish, 260);
+    };
+    if (!active || instantMotion() || document.hidden) {
+      finish();
+      return;
+    }
+    // Flush the existing 160ms CSS reveal before waiting for its final opacity.
+    const opacity = getComputedStyle(image).opacity;
+    const reveals = opacity === '1' ? [] : image.getAnimations();
+    timer = setTimeout(fadePreview, 280);
+    void Promise.allSettled(reveals.map((reveal) => reveal.finished)).then(fadePreview);
+    stop = observeMotionPolicy(() => {
+      if (instantMotion() || document.hidden) finish();
+    });
+    return () => {
+      disposed = true;
+      clearTimeout(timer);
+      stop();
+      animation?.cancel();
+    };
+  }, [status, active, attempt, item.type]);
+
   return (
     <figure
+      ref={slideRef}
       className={styles.slide}
       data-ready={status === 'ready'}
       role="group"
@@ -218,9 +337,12 @@ function MediaSlide({
       aria-label={`${index + 1} / ${total}`}
       inert={!active}
     >
-      {item.type === 'image' && item.poster && item.poster !== item.src && status !== 'ready' ? (
+      {item.type === 'image' &&
+      item.poster &&
+      item.poster !== item.src &&
+      previewDone !== attempt ? (
         // eslint-disable-next-line @next/next/no-img-element -- Local thumbnail remains visible while original loads.
-        <img src={item.poster} alt="" className={styles.preview} />
+        <img ref={previewRef} src={item.poster} alt="" aria-hidden className={styles.preview} />
       ) : null}
       {item.type === 'video' ? (
         <MotionVideo
@@ -240,6 +362,7 @@ function MediaSlide({
       ) : (
         // eslint-disable-next-line @next/next/no-img-element -- Full-size source preserves original media and intrinsic proportions.
         <img
+          ref={imageRef}
           key={attempt}
           src={item.src}
           alt={item.alt}
@@ -271,31 +394,52 @@ function MediaSlide({
           }}
         />
       ) : null}
-      {status !== 'ready' && active ? (
-        <div className={status === 'error' ? styles.message : styles.loading} role="status">
-          <p>{status === 'error' ? '媒体暂时无法加载' : '正在加载媒体…'}</p>
-          {status === 'error' ? (
-            <>
-              <p>可以重试，或在新窗口打开原媒体。</p>
-              <div className={styles.actions}>
-                <Button onClick={retry}>
-                  <RotateCcw size={16} />
-                  重试
-                </Button>
-                <a
-                  href={item.src}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={buttonClassName({ variant: 'ghost' })}
-                >
-                  打开原媒体
-                  <ArrowUpRight size={16} />
-                </a>
-              </div>
-            </>
-          ) : null}
-        </div>
-      ) : null}
+      {[notices.leaving, notice].map((value, position) =>
+        value ? (
+          <div
+            key={value}
+            ref={position === 0 ? leavingRef : undefined}
+            className={value === 'error' ? styles.message : styles.loading}
+            role={position === 0 ? undefined : 'status'}
+            data-leaving={position === 0 ? '' : undefined}
+            aria-hidden={position === 0 ? true : undefined}
+            inert={position === 0}
+            onFocusCapture={() => {
+              noticeFocus.current = value;
+            }}
+            onBlurCapture={(event) => {
+              if (
+                event.relatedTarget &&
+                !event.currentTarget.contains(event.relatedTarget as Node)
+              ) {
+                noticeFocus.current = null;
+              }
+            }}
+          >
+            <p>{value === 'error' ? '媒体暂时无法加载' : '正在加载媒体…'}</p>
+            {value === 'error' ? (
+              <>
+                <p>可以重试，或在新窗口打开原媒体。</p>
+                <div className={styles.actions}>
+                  <Button onClick={retry}>
+                    <RotateCcw size={16} />
+                    重试
+                  </Button>
+                  <a
+                    href={item.src}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={buttonClassName({ variant: 'ghost' })}
+                  >
+                    打开原媒体
+                    <ArrowUpRight size={16} />
+                  </a>
+                </div>
+              </>
+            ) : null}
+          </div>
+        ) : null,
+      )}
     </figure>
   );
 }

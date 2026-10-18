@@ -18,6 +18,7 @@ const motionChecks = [
   ['preview-loops.browser.mjs', 'verifyPreviewLoops'],
   ['timeline-motion.browser.mjs', 'verifyTimelineMotion'],
   ['taichi-motion.browser.mjs', 'verifyTaichiMotion'],
+  ['outward-links.browser.mjs', 'verifyOutwardLinks'],
 ];
 const label = (suite) =>
   suite.file.replace(/^scripts\/design-checks\//, '').replace(/^scripts\//, '../');

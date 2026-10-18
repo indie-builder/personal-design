@@ -30,7 +30,7 @@ function PersonalSitesPage() {
           href={websiteUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className={buttonClassName({ variant: 'primary' })}
+          className={buttonClassName({ variant: 'primary', className: styles.externalLink })}
           aria-label="打开个人网站（新标签页）"
         >
           打开网站

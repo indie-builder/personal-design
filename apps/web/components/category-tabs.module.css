@@ -1,8 +1,13 @@
-.tabs { display:flex; flex-wrap:wrap; align-items:center; gap:4px 20px; min-width:0; max-width:100%; padding:0; margin-bottom:24px; }
+.tabs { position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:4px 20px; min-width:0; max-width:100%; padding:0; margin-bottom:24px; }
+.indicator { position:absolute; top:0; left:0; width:1px; height:1px; background:var(--color-ink); transform-origin:0 0; pointer-events:none; visibility:hidden; }
+.tabs[data-motion-ready] .indicator { visibility:visible; }
+.tabs[data-motion-ready] .tab[aria-pressed=true] { border-bottom-color:transparent; }
+.tabs[data-motion-ready] .tab { transition:color 150ms ease-out,transform 100ms var(--ease-out); }
 .tab { display:inline-flex; align-items:center; justify-content:center; min-height:var(--control-height); padding:10px 0; border:0; border-bottom:1px solid transparent; border-radius:0; background:transparent; font-size:14px; line-height:20px; color:var(--color-ink-soft); white-space:nowrap; cursor:pointer; transition:color 150ms ease-out,border-color 150ms ease-out,transform 100ms var(--ease-out); }
 .tab:active { transform:scale(.97); }
 :global(html[data-input='keyboard']) .tab:active { transform:none; }
+:global(html[data-input='keyboard']) .tabs[data-motion-ready] .tab { transition:none; }
 @media(hover:hover) and (pointer:fine) { .tab:hover { color:var(--color-ink); border-bottom-color:var(--color-border-hover); } }
 .tab[aria-pressed=true] { color:var(--color-ink); border-bottom-color:var(--color-ink); font-weight:500; }
 .tab:focus-visible { outline:2px solid var(--color-ink); outline-offset:4px; }
-@media(prefers-reduced-motion:reduce) { .tab { transition:none; } .tab:active { transform:none; } }
+@media(prefers-reduced-motion:reduce) { .tab,.tabs[data-motion-ready] .tab { transition:none; } .tab:active { transform:none; } }
