@@ -45,7 +45,7 @@ jobs:
 
       - name: Isolated chat acceptance
         run: |
-          npm install --global portless@0.15.7
+          npm install --global portless@0.15.8
           pnpm exec playwright install --with-deps chromium
           pnpm check:chat
 
