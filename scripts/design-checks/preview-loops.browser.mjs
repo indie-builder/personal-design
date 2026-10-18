@@ -1,3 +1,5 @@
+import { createPreviewLoopProbe } from './preview-loops-probes.mjs';
+
 // Pass a compatible production tab, CDP session and viewport adapter.
 // Homepage loop previews per DESIGN.md 动效: the 6s book queue, the 10s receipt
 // scene and the 8s AI chat reply. Visible, offscreen, keyboard and reduced-motion
@@ -10,223 +12,26 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
     if (!ok) issues.push(message);
     return ok;
   };
-  const evaluate = async (expression) => {
-    const result = await cdp.send(
-      'Runtime.evaluate',
-      { expression, awaitPromise: true, returnByValue: true },
-      { timeoutMs: 20000 },
-    );
-    if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
-    return result.result.value;
-  };
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  const until = async (probe, accept, timeoutMs) => {
-    const started = Date.now();
-    for (;;) {
-      const value = await probe();
-      if (accept(value)) return value;
-      if (Date.now() - started > timeoutMs) return null;
-      await sleep(120);
-    }
-  };
-  const mouseClick = async (x, y) => {
-    for (const type of ['mousePressed', 'mouseReleased'])
-      await cdp.send(
-        'Input.dispatchMouseEvent',
-        { type, x, y, button: 'left', clickCount: 1 },
-        { timeoutMs: 5000 },
-      );
-  };
-  // Shift reaches the document-level data-input capture listener like any keydown,
-  // but unlike Tab it moves no focus and activates nothing.
-  const pressShift = async () => {
-    for (const type of ['keyDown', 'keyUp'])
-      await cdp.send(
-        'Input.dispatchKeyEvent',
-        {
-          type,
-          key: 'Shift',
-          code: 'ShiftLeft',
-          windowsVirtualKeyCode: 16,
-          nativeVirtualKeyCode: 16,
-        },
-        { timeoutMs: 5000 },
-      );
-  };
-  const inputMode = () => evaluate('document.documentElement.dataset.input || null');
-  const setReduced = (value) =>
-    cdp.send('Emulation.setEmulatedMedia', {
-      features: [{ name: 'prefers-reduced-motion', value }],
-    });
-  const restorePointer = async () => {
-    const point = await evaluate(`(() => {
-      const date = document.querySelector('#home-timeline time');
-      if (!date) return null;
-      const rect = date.getBoundingClientRect();
-      return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
-    })()`);
-    if (point) await mouseClick(point.x, point.y);
-  };
-  const revealTile = (href) => `(() => {
-    const link = document.querySelector('a[href="${href}"]');
-    if (!link) return false;
-    link.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
-    return true;
-  })()`;
-  const hideTile = (href) => `(() => {
-    const track = document.getElementById('home-timeline');
-    const link = document.querySelector('a[href="${href}"]');
-    if (!track || !link) return false;
-    const tile = link.closest('li');
-    const viewportRect = track.getBoundingClientRect();
-    const tileRect = tile.getBoundingClientRect();
-    const currentLeft = tileRect.left - viewportRect.left + track.scrollLeft;
-    const max = track.scrollWidth - track.clientWidth;
-    const pushLeft = currentLeft + tileRect.width + 24;
-    const target = pushLeft <= max ? pushLeft : Math.max(0, currentLeft - track.clientWidth - 24);
-    track.scrollTo({ left: target, behavior: 'instant' });
-    const after = tile.getBoundingClientRect();
-    return after.right <= viewportRect.left || after.left >= viewportRect.right;
-  })()`;
-  const bookState = () => evaluate(`(() => {
-    const root = document.querySelector('a[href="/products/layout-compositions"] div[data-running]');
-    const spine = root ? root.querySelector('[data-book-active="true"]') : null;
-    if (!root || !spine) return null;
-    const animation = spine.getAnimations()[0];
-    return {
-      running: root.dataset.running,
-      title: spine.getAttribute('data-cover-title'),
-      playState: animation ? animation.playState : null,
-      time: animation ? Math.round(animation.currentTime) : null,
-    };
-  })()`);
-  const bookSubtreeAnimations = () => evaluate(`(() => {
-    const root = document.querySelector('a[href="/products/layout-compositions"] div[data-running]');
-    return root ? root.getAnimations({ subtree: true }).length : null;
-  })()`);
-  const bookAdvance = (limitMs) => evaluate(`new Promise((resolve) => {
-    const titles = [];
-    const started = performance.now();
-    const sample = () => {
-      const spine = document.querySelector('a[href="/products/layout-compositions"] [data-book-active="true"]');
-      const title = spine ? spine.getAttribute('data-cover-title') : null;
-      if (title && titles[titles.length - 1] !== title) titles.push(title);
-      if (titles.length >= 2 || performance.now() - started > ${limitMs}) resolve({ titles, last: title });
-      else setTimeout(sample, 400);
-    };
-    sample();
-  })`);
-  const receiptState = () => evaluate(`(() => {
-    const root = document.querySelector('a[href="/products/personal-sites"] div[data-ready]');
-    if (!root) return null;
-    const name = [...root.querySelectorAll('div')].find(
-      (el) => !el.childElementCount && el.textContent.trim() === '陈远 / CHEN YUAN',
-    );
-    if (!name) return null;
-    const paper = name.parentElement;
-    const printer = paper.parentElement.parentElement;
-    const homepage = root.firstElementChild;
-    const read = (el) => {
-      const styles = getComputedStyle(el);
-      const animation = el.getAnimations()[0];
-      return {
-        name: styles.animationName,
-        playState: styles.animationPlayState,
-        transform: styles.transform,
-        opacity: styles.opacity,
-        time: animation ? Math.round(animation.currentTime) : null,
-        state: animation ? animation.playState : null,
-      };
-    };
-    return {
-      ready: root.dataset.ready,
-      running: root.dataset.running,
-      paper: read(paper),
-      printer: read(printer),
-      homepage: read(homepage),
-      animations: root.getAnimations({ subtree: true }).length,
-    };
-  })()`);
-  const chatState = () => evaluate(`(() => {
-    const root = document.querySelector('[data-chat-preview]');
-    if (!root) return null;
-    return {
-      running: root.hasAttribute('data-running'),
-      motion: root.hasAttribute('data-motion'),
-      playState: getComputedStyle(root).getPropertyValue('--preview-play-state').trim(),
-      animations: root.getAnimations({ subtree: true }).length,
-    };
-  })()`);
-  const chatAnimationProperties = () => evaluate(`(() => {
-    const root = document.querySelector('[data-chat-preview]');
-    if (!root) return null;
-    const animations = root.getAnimations({ subtree: true });
-    // CSSAnimation.getKeyframes is not callable here; collect properties from the
-    // CSSKeyframesRule that animationName points at instead.
-    const keyframeProperties = (name) => {
-      const props = new Set();
-      for (const sheet of document.styleSheets)
-        try {
-          for (const rule of sheet.cssRules) {
-            if (rule instanceof CSSKeyframesRule && rule.name === name)
-              for (const frame of rule.cssRules)
-                for (let i = 0; i < frame.style.length; i++) props.add(frame.style[i]);
-          }
-        } catch {}
-      return [...props];
-    };
-    const properties = new Set();
-    for (const animation of animations) {
-      if (animation.animationName && animation.animationName !== 'none')
-        for (const property of keyframeProperties(animation.animationName)) properties.add(property);
-      else if (animation.transitionProperty) properties.add(animation.transitionProperty);
-    }
-    return {
-      count: animations.length,
-      states: [...new Set(animations.map((animation) => animation.playState))],
-      properties: [...properties].sort(),
-    };
-  })()`);
-  const chatSamples = (intervalMs, limitMs) => evaluate(`new Promise((resolve) => {
-    const root = document.querySelector('[data-chat-preview]');
-    const spans = [...root.querySelectorAll('span')];
-    const question = spans.find((el) => el.textContent === '看看两周试用的效果');
-    const followUp = spans.find((el) => el.textContent === '看看改进建议');
-    if (!question || !followUp) { resolve({ distinct: 0, frozen: false, missing: true }); return; }
-    const answer = followUp.parentElement;
-    const thinking = answer.parentElement.firstElementChild;
-    const bars = [...root.querySelectorAll('b')];
-    const signature = () => [question, thinking, answer, followUp, ...bars]
-      .map((el) => {
-        const styles = getComputedStyle(el);
-        return styles.opacity + '|' + styles.transform;
-      })
-      .join(';');
-    const seen = [];
-    const started = performance.now();
-    const sample = () => {
-      const value = signature();
-      if (seen[seen.length - 1] !== value) seen.push(value);
-      if (seen.length >= 2 || performance.now() - started > ${limitMs})
-        resolve({ distinct: seen.length, frozen: seen.length === 1 });
-      else setTimeout(sample, ${intervalMs});
-    };
-    sample();
-  })`);
-  const chatStaticState = () => evaluate(`(() => {
-    const root = document.querySelector('[data-chat-preview]');
-    if (!root) return null;
-    const spans = [...root.querySelectorAll('span')];
-    const question = spans.find((el) => el.textContent === '看看两周试用的效果');
-    const followUp = spans.find((el) => el.textContent === '看看改进建议');
-    const bars = [...root.querySelectorAll('b')];
-    if (!question || !followUp || bars.length < 2) return null;
-    const read = (el) => {
-      const styles = getComputedStyle(el);
-      return { opacity: styles.opacity, transform: styles.transform };
-    };
-    return { question: read(question), followUp: read(followUp), bars: bars.map(read) };
-  })()`);
+  const {
+    evaluate,
+    sleep,
+    until,
+    pressShift,
+    inputMode,
+    setReduced,
+    restorePointer,
+    revealTile,
+    hideTile,
+    bookState,
+    bookSubtreeAnimations,
+    bookAdvance,
+    receiptState,
+    chatState,
+    chatAnimationProperties,
+    chatSamples,
+    chatStaticState,
+    waitForReceiptCover,
+  } = createPreviewLoopProbe(cdp);
 
   try {
     await setReduced('no-preference');
@@ -240,7 +45,9 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
       (state) => state && state.running === 'true' && state.playState === 'running',
       8000,
     );
-    if (expect(!!bookRunning, '书籍队列：指针可视时应开始运行（data-running=true 且动画 playing）')) {
+    if (
+      expect(!!bookRunning, '书籍队列：指针可视时应开始运行（data-running=true 且动画 playing）')
+    ) {
       const advance = await bookAdvance(11000);
       expect(
         advance.titles.length >= 2,
@@ -269,7 +76,11 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
         `书籍队列：离屏 7 秒不得推进书目（冻结 ${frozen.title}，实际 ${whileHidden ? whileHidden.title : '缺失'}，不得凭零时长 animationend 跳下一本）`,
       );
       expect(
-        !!(whileHidden && whileHidden.time !== null && Math.abs(whileHidden.time - frozen.time) <= 60),
+        !!(
+          whileHidden &&
+          whileHidden.time !== null &&
+          Math.abs(whileHidden.time - frozen.time) <= 60
+        ),
         `书籍队列：离屏动画时间应冻结在约 ${frozen.time}ms（实际 ${whileHidden ? whileHidden.time : '缺失'}ms）`,
       );
       await evaluate(revealTile('/products/layout-compositions'));
@@ -282,7 +93,11 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
         !!(resumed && resumed.time !== null && resumed.time >= frozen.time - 40),
         `书籍队列：恢复应续播动画而非重头开始（冻结 ${frozen.time}ms，恢复 ${resumed ? resumed.time : '缺失'}ms）`,
       );
-      const advanced = await until(bookState, (state) => state && state.title !== frozen.title, 9000);
+      const advanced = await until(
+        bookState,
+        (state) => state && state.title !== frozen.title,
+        9000,
+      );
       expect(!!advanced, '书籍队列：恢复续播完成后应推进到下一本书');
       checks.push(
         `book offscreen: frozen at ${frozen.title} ${frozen.time}ms, resumed and advanced to ${advanced ? advanced.title : '?'}`,
@@ -295,7 +110,11 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
       (await until(inputMode, (mode) => mode === 'keyboard', 3000)) === 'keyboard',
       '输入模式：可信 keydown 应将 html[data-input] 切为 keyboard',
     );
-    const keyboardPaused = await until(bookState, (state) => state && state.running === 'false', 6000);
+    const keyboardPaused = await until(
+      bookState,
+      (state) => state && state.running === 'false',
+      6000,
+    );
     expect(
       !!keyboardPaused && keyboardPaused.playState === 'paused',
       `书籍队列：键盘模式应停止队列（data-running=${keyboardPaused ? keyboardPaused.running : '缺失'}，playState=${keyboardPaused ? keyboardPaused.playState : '缺失'}）`,
@@ -306,11 +125,17 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
       !!(keyboardStill && beforeKeyboard && keyboardStill.title === beforeKeyboard.title),
       `书籍队列：键盘模式 7 秒不得推进书目（起始 ${beforeKeyboard ? beforeKeyboard.title : '缺失'}，实际 ${keyboardStill ? keyboardStill.title : '缺失'}）`,
     );
-    checks.push(`book keyboard: queue stopped on ${keyboardStill ? keyboardStill.title : '?'}, no advance in 7s`);
+    checks.push(
+      `book keyboard: queue stopped on ${keyboardStill ? keyboardStill.title : '?'}, no advance in 7s`,
+    );
     await restorePointer();
 
     await setReduced('reduce');
-    const reducedPaused = await until(bookState, (state) => state && state.running === 'false', 6000);
+    const reducedPaused = await until(
+      bookState,
+      (state) => state && state.running === 'false',
+      6000,
+    );
     const reducedAnimations = await bookSubtreeAnimations();
     expect(!!reducedPaused, '书籍队列：减少动态效果应停止队列');
     expect(
@@ -332,27 +157,7 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
       .first()
       .waitFor({ state: 'visible', timeoutMs: 20000 });
     await evaluate(revealTile('/products/personal-sites'));
-    // 水合竞态补偿：直连封面的加载可能快于水合，React 的 onLoad 在监听器挂载前已完成
-    // （img.complete=true 但 data-ready 停在 false，10s 周期永不挂载）。外壳 data-input
-    // 对合成 pointermove 有响应即水合完成；对已完成且解码成功的封面补发一次 load 事件
-    // 等价于浏览器从缓存重放完成通知。断言不变：负向路径的 ready=false 仍由下方请求
-    // 拦截真实产生（naturalWidth=0 时不会补发）。
-    await until(
-      () =>
-        evaluate(`(() => {
-          window.dispatchEvent(new Event('pointermove'));
-          return document.documentElement.dataset.input || null;
-        })()`),
-      (mode) => mode === 'pointer',
-      20000,
-    );
-    await evaluate(`(() => {
-      const root = document.querySelector('a[href="/products/personal-sites"] div[data-ready]');
-      const img = root ? root.querySelector('img') : null;
-      if (root && root.dataset.ready !== 'true' && img && img.complete && img.naturalWidth > 0)
-        img.dispatchEvent(new Event('load'));
-      return root ? root.dataset.ready : null;
-    })()`);
+    await waitForReceiptCover();
     const receiptReady = await until(
       receiptState,
       (state) => state && state.ready === 'true' && state.running === 'true',
@@ -376,14 +181,24 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
       await sleep(600);
       const playing = await receiptState();
       expect(
-        !!(playing && playing.paper.state === 'running' && playing.paper.time - receiptReady.paper.time >= 350),
+        !!(
+          playing &&
+          playing.paper.state === 'running' &&
+          playing.paper.time - receiptReady.paper.time >= 350
+        ),
         `小票预览：可视时 paper-feed 应推进（${receiptReady.paper.time}ms -> ${playing ? playing.paper.time : '缺失'}ms）`,
       );
-      checks.push(`receipt visible: 10s cycle advancing ${receiptReady.paper.time} -> ${playing ? playing.paper.time : '?'}ms`);
+      checks.push(
+        `receipt visible: 10s cycle advancing ${receiptReady.paper.time} -> ${playing ? playing.paper.time : '?'}ms`,
+      );
     }
 
     await evaluate(hideTile('/products/personal-sites'));
-    const receiptPaused = await until(receiptState, (state) => state && state.running === 'false', 6000);
+    const receiptPaused = await until(
+      receiptState,
+      (state) => state && state.running === 'false',
+      6000,
+    );
     expect(
       !!receiptPaused && receiptPaused.paper.state === 'paused',
       `小票预览：离屏后周期应暂停（data-running=${receiptPaused ? receiptPaused.running : '缺失'}，paper playState=${receiptPaused ? receiptPaused.paper.state : '缺失'}）`,
@@ -392,7 +207,11 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
       await sleep(900);
       const receiptFrozen = await receiptState();
       expect(
-        !!(receiptFrozen && receiptFrozen.paper.time !== null && Math.abs(receiptFrozen.paper.time - receiptPaused.paper.time) <= 40),
+        !!(
+          receiptFrozen &&
+          receiptFrozen.paper.time !== null &&
+          Math.abs(receiptFrozen.paper.time - receiptPaused.paper.time) <= 40
+        ),
         `小票预览：离屏暂停期间动画时间应冻结（${receiptPaused.paper.time}ms -> ${receiptFrozen ? receiptFrozen.paper.time : '缺失'}ms）`,
       );
       checks.push('receipt offscreen: paused and clock frozen');
@@ -402,7 +221,11 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
     await until(receiptState, (state) => state && state.running === 'true', 6000);
     await pressShift();
     await until(inputMode, (mode) => mode === 'keyboard', 3000);
-    const receiptKeyboard = await until(receiptState, (state) => state && state.running === 'false', 6000);
+    const receiptKeyboard = await until(
+      receiptState,
+      (state) => state && state.running === 'false',
+      6000,
+    );
     expect(
       !!receiptKeyboard && receiptKeyboard.animations === 0,
       `小票预览：键盘模式 animation 应归零（ready=${receiptKeyboard ? receiptKeyboard.ready : '缺失'}，实际 ${receiptKeyboard ? receiptKeyboard.animations : '缺失'} 个动画）`,
@@ -421,7 +244,9 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
     await until(receiptState, (state) => state && state.running === 'false', 6000);
     const receiptReduced = await receiptState();
     expect(
-      !!receiptReduced && receiptReduced.animations === 0 && receiptReduced.paper.transform === 'none',
+      !!receiptReduced &&
+        receiptReduced.animations === 0 &&
+        receiptReduced.paper.transform === 'none',
       `小票预览：减少动态效果应为静态完整小票（${receiptReduced ? receiptReduced.animations : '缺失'} 个动画，paper=${receiptReduced ? receiptReduced.paper.transform : '缺失'}）`,
     );
     checks.push('receipt reduced motion: static complete receipt');
@@ -481,14 +306,20 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
     ) {
       const animations = await chatAnimationProperties();
       expect(
-        !!(animations && animations.count > 0 && animations.states.every((state) => state === 'running')),
+        !!(
+          animations &&
+          animations.count > 0 &&
+          animations.states.every((state) => state === 'running')
+        ),
         `AI 问答预览：8s 循环应处于运行态（${animations ? animations.count : '缺失'} 个动画，状态 ${animations ? animations.states.join(',') : '缺失'}）`,
       );
       expect(
         !!(
           animations &&
           animations.properties.length > 0 &&
-          animations.properties.every((property) => property === 'opacity' || property === 'transform')
+          animations.properties.every(
+            (property) => property === 'opacity' || property === 'transform',
+          )
         ),
         `AI 问答预览：循环仅应动画 transform/opacity（实际 ${animations ? animations.properties.join(',') : '缺失'}）`,
       );
@@ -524,7 +355,10 @@ export async function verifyPreviewLoops(tab, cdp, viewport) {
       (state) => state && !state.running && !state.motion,
       6000,
     );
-    expect(!!chatKeyboard, 'AI 问答预览：键盘模式应移除 data-motion 与 data-running（即时策略不挂循环）');
+    expect(
+      !!chatKeyboard,
+      'AI 问答预览：键盘模式应移除 data-motion 与 data-running（即时策略不挂循环）',
+    );
     const chatKeyboardAnimations = await chatAnimationProperties();
     expect(
       !!(chatKeyboardAnimations && chatKeyboardAnimations.count === 0),

@@ -6,6 +6,14 @@
 
 落后或存在并行修改时，先区分已有成果与本轮工作，再选择整合方式。保留用户未提交改动；不自动 reset、覆盖或丢弃。开始修改前明确当前提交、目标分支及本轮范围；提交前再确认一次目标分支，避免把已交付的修复重新实现。
 
+## 提交前文件大小检查
+
+`pnpm install` 的 `prepare` 自动将 Git `core.hooksPath` 设为 `.githooks`；已有依赖的 checkout 可执行 `pnpm run prepare` 安装。手动检查用 `pnpm check:staged-tokens`。
+
+pre-commit 只检查本次暂存的新增、修改和重命名文件，按暂存区完整文件的 bytes / 4 估算 tokens；超过 5,000 tokens（20,000 bytes）拒绝提交。未暂存修改、未跟踪文件及未修改的历史大文件不参与检查。错误信息列出超限路径、大小及按组件、逻辑、数据或文档拆分的步骤；拆分后更新导入并重新 `git add`。
+
+锁文件、代码生成与同步数据、外部来源快照通过 `.gitattributes` 的 `linguist-generated`／`linguist-vendored` 标记豁免，Git 识别的二进制文件也跳过。新增豁免须指向实际生成或导入内容，不能把整个源码目录或所有 JSON 排除；属性规则本身也以暂存版本为准。无法可靠判定编辑者身份，其余可维护文本统一检查。
+
 ## 按任务定位
 
 先按任务选下表的一条路径，再顺着实现导入定位依赖；符号名称不保证等于文件名。产品边界先读 PRODUCT.md，后端或工具链任务按对应契约阅读；改变视觉／交互时再读 DESIGN.md 的相关章节。历史与研究文档只在回溯决策或核验外部接口时进入。
@@ -25,6 +33,10 @@
 ## 控制搜索范围
 
 先用 `rg --files <任务目录>` 确认路径，再搜符号。默认从 `apps/web/src`、`apps/web/components`、`apps/web/lib` 或对应包的 `src` 搜起。只有分析打包运行资源、生成内容或旧证据时，才进入 `apps/web/public/ai-coding-atlas`、生成 JSON、`docs/design/execution/evidence`；来源快照继续遵循根指引。
+
+为减少 Agent 完成任务时的必读上下文，先读取入口的任务索引，再打开对应职责文件；不要一次载入同目录全部实现或历史记录。拆分保持现有外部 interface，在实际职责的 seam 内收拢 implementation，避免按行数拆成编号文件或引入只转发的 module。5,000 tokens 是文件上限，不是复杂度指标；同一次修改所需阅读的文件数量也应保持可控。现有大文件的审查、职责拆分与来源判定见 [Agent 文件阅读成本审查](file-size-review.md)。
+
+Impeccable 面板的维护源在 [.impeccable/design/README.md](../../.impeccable/design/README.md)：按配置、规则及单个示例编辑，执行 `pnpm generate:design` 生成插件读取的 `.impeccable/design.json`，用 `pnpm check:design` 检查漂移。不要手改合成文件；CI 检查维护源与快照一致。OpenUI 提示词只编辑 [generate-openui-prompt.mjs](../../apps/web/scripts/generate-openui-prompt.mjs)，构建会重建对应 JSON。
 
 
 ## 更新技能集

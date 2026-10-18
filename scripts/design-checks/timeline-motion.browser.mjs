@@ -1,3 +1,5 @@
+import { createTimelineMotionProbe } from './timeline-motion-probes.mjs';
+
 // Pass a compatible production tab, CDP session and viewport adapter on the homepage.
 // Timeline pixel-walker per DESIGN.md 时间轴像素精灵 and the homepage contract: one WAAPI
 // clock drives transform/gait/date bump, offscreen pauses keep progress, keyboard and
@@ -11,133 +13,20 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
     if (!ok) issues.push(message);
     return ok;
   };
-  const evaluate = async (expression) => {
-    const result = await cdp.send(
-      'Runtime.evaluate',
-      { expression, awaitPromise: true, returnByValue: true },
-      { timeoutMs: 20000 },
-    );
-    if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
-    return result.result.value;
-  };
-  const key = async (def) => {
-    for (const type of ['keyDown', 'keyUp'])
-      await cdp.send(
-        'Input.dispatchKeyEvent',
-        {
-          type,
-          key: def.key,
-          code: def.code,
-          windowsVirtualKeyCode: def.code0,
-          nativeVirtualKeyCode: def.code0,
-        },
-        { timeoutMs: 5000 },
-      );
-  };
-  const pointerMove = async () => {
-    await cdp.send(
-      'Input.dispatchMouseEvent',
-      { type: 'mouseMoved', x: 600, y: 300 },
-      { timeoutMs: 5000 },
-    );
-  };
-  const waitWalker = async () => {
-    await tab.playwright
-      .locator('[data-timeline-walker]')
-      .waitFor({ state: 'attached', timeoutMs: 20000 });
-    await evaluate(
-      'new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))',
-    );
-  };
-  const WAIT_ROUTE = `new Promise((resolve) => {
-    const started = performance.now();
-    const poll = () => {
-      const scene = document.querySelector('[data-timeline-walker]');
-      if ((scene && scene.getAnimations().length > 0) || performance.now() - started > 6000)
-        resolve(!!(scene && scene.getAnimations().length > 0));
-      else setTimeout(poll, 100);
-    };
-    poll();
-  })`;
-  const matrixXY = (matrix) => {
-    const match = /matrix\(([^)]+)\)/.exec(matrix || '');
-    if (!match) return null;
-    const n = match[1].split(',').map(Number);
-    return { x: n[4], y: n[5] };
-  };
-  const INSTALL_RECORDER = `(() => {
-    window.__walkerLog = null;
-    const scene = document.querySelector('[data-timeline-walker]');
-    const svg = scene ? scene.querySelector('svg') : null;
-    const stops = [...document.querySelectorAll('[data-timeline-stop]')];
-    const date = stops[0] ? stops[0].querySelector('time') : null;
-    const log = [];
-    const start = performance.now();
-    const xy = (matrix) => {
-      const match = /matrix\\(([^)]+)\\)/.exec(matrix || '');
-      if (!match) return null;
-      const n = match[1].split(',').map(Number);
-      return { x: Math.round(n[4]), y: Math.round(n[5]) };
-    };
-    const sample = () => {
-      const route = scene ? scene.getAnimations()[0] : null;
-      const reveal = svg ? svg.getAnimations()[0] : null;
-      log.push({
-        t: Math.round(performance.now() - start),
-        ct: route ? Math.round(Number(route.currentTime)) : -1,
-        revealCt: reveal ? Math.round(Number(reveal.currentTime)) : -1,
-        play: route ? route.playState : null,
-        pos: scene ? xy(getComputedStyle(scene).transform) : null,
-        look: svg ? svg.dataset.look : null,
-        step: svg ? svg.dataset.step : null,
-        run: scene ? scene.dataset.running ?? null : null,
-        hit: stops.findIndex((s) => s.dataset.hit === 'true'),
-        bump: date ? getComputedStyle(date).animationName.includes('timeline-date-bump') : false,
-      });
-      const last = log[log.length - 1];
-      if ((last.ct >= 6200 && last.hit === -1) || performance.now() - start > 9500) {
-        window.__walkerLog = { log, stops: stops.length };
-        return;
-      }
-      requestAnimationFrame(sample);
-    };
-    requestAnimationFrame(sample);
-  })()`;
-  const HARVEST = `new Promise((resolve) => {
-    const started = performance.now();
-    const poll = () => {
-      if (window.__walkerLog || performance.now() - started > 11000)
-        resolve(window.__walkerLog || null);
-      else setTimeout(poll, 80);
-    };
-    poll();
-  })`;
-  const STATIC_PROBE = `(async () => {
-    const scene = document.querySelector('[data-timeline-walker]');
-    const svg = scene.querySelector('svg');
-    await new Promise((resolve) => setTimeout(resolve, 550));
-    const route = scene.getAnimations()[0];
-    const reveal = svg.getAnimations()[0];
-    const ct1 = route ? Math.round(Number(route.currentTime)) : -1;
-    const rv1 = reveal ? Math.round(Number(reveal.currentTime)) : -1;
-    await new Promise((resolve) => setTimeout(resolve, 350));
-    const route2 = scene.getAnimations()[0];
-    return {
-      reduced: matchMedia('(prefers-reduced-motion: reduce)').matches,
-      instant: scene.dataset.instant ?? null,
-      run: scene.dataset.running ?? null,
-      play: route2 ? route2.playState : null,
-      ct1,
-      ct2: route2 ? Math.round(Number(route2.currentTime)) : -2,
-      rv1,
-      rv2: svg.getAnimations()[0] ? Math.round(Number(svg.getAnimations()[0].currentTime)) : -2,
-      visibility: getComputedStyle(scene).visibility,
-      hits: document.querySelectorAll('[data-timeline-stop][data-hit]').length,
-      bumping: [...document.querySelectorAll('[data-timeline-stop] time')].some((el) =>
-        getComputedStyle(el).animationName.includes('timeline-date-bump'),
-      ),
-    };
-  })()`;
+  const {
+    evaluate,
+    key,
+    pointerMove,
+    waitWalker,
+    WAIT_ROUTE,
+    matrixXY,
+    INSTALL_RECORDER,
+    HARVEST,
+    STATIC_PROBE,
+    pauseOffscreen,
+    resumeOnscreen,
+    finishRoute,
+  } = createTimelineMotionProbe(tab, cdp);
 
   try {
     await cdp.send('Emulation.setEmulatedMedia', {
@@ -167,13 +56,20 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
     const first = frames[0] ?? {};
     const last = frames[frames.length - 1] ?? {};
     expect(frames.length > 30, `漫步者采样帧不足（${frames.length} 帧），无法判定路线行为`);
-    expect(walk && walk.stops >= 3, `时间轴作品站点数不足（${walk ? walk.stops : 0}），检查前提失效`);
+    expect(
+      walk && walk.stops >= 3,
+      `时间轴作品站点数不足（${walk ? walk.stops : 0}），检查前提失效`,
+    );
     expect(Number(first.ct) <= 800, `采样开始过晚（首帧 currentTime=${first.ct}），爬出段未被覆盖`);
     expect(
-      frames.filter((f) => f.run === 'true').length > 10 && last.run === 'true' && last.play === 'running',
+      frames.filter((f) => f.run === 'true').length > 10 &&
+        last.run === 'true' &&
+        last.play === 'running',
       `指针模式可见时漫步者应持续运行（run=${last.run}, play=${last.play}）`,
     );
-    const monotonic = frames.every((f, i) => i === 0 || Number(f.ct) + 2 >= Number(frames[i - 1].ct));
+    const monotonic = frames.every(
+      (f, i) => i === 0 || Number(f.ct) + 2 >= Number(frames[i - 1].ct),
+    );
     const wall = Number(last.t) - Number(first.t);
     const clock = Number(last.ct) - Number(first.ct);
     expect(monotonic, '路线时钟不得回退');
@@ -183,7 +79,10 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
       `reveal 与路线应共享时钟（reveal=${last.revealCt}, route=${last.ct}）`,
     );
     const looks = new Set(frames.map((f) => f.look));
-    expect(looks.has('left') && looks.has('right'), `张望朝向应左右翻转（observed ${[...looks].join(',')}）`);
+    expect(
+      looks.has('left') && looks.has('right'),
+      `张望朝向应左右翻转（observed ${[...looks].join(',')}）`,
+    );
     expect(
       frames.every((f) => f.look !== 'left' || (Number(f.ct) >= 1250 && Number(f.ct) <= 2250)) &&
         frames.some((f) => f.look === 'right' && Number(f.ct) > 2250),
@@ -200,7 +99,8 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
     );
     expect(
       frames.some(
-        (f) => Number(f.ct) >= 1100 && Number(f.ct) <= 2900 && f.pos && f.pos.y >= 8 && f.pos.y <= 22,
+        (f) =>
+          Number(f.ct) >= 1100 && Number(f.ct) <= 2900 && f.pos && f.pos.y >= 8 && f.pos.y <= 22,
       ),
       '站稳段应停在线上（y≈15）',
     );
@@ -213,7 +113,10 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
         frames.some((f) => f.bump && Number(f.ct) >= 3650 && Number(f.ct) <= 4350),
       '到达日期下方应触发 timeline-date-bump（520ms）动画',
     );
-    expect(frames.every((f) => f.hit <= 0), '采样窗口内不应推进到第二个日期');
+    expect(
+      frames.every((f) => f.hit <= 0),
+      '采样窗口内不应推进到第二个日期',
+    );
     expect(
       frames.every((f) => Number(f.ct) <= 4450 || (f.hit === -1 && !f.bump)),
       'date bump 窗口结束后应清除 data-hit',
@@ -226,30 +129,7 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
       `pointer route: crawl+stand+look-flip+gait+jump+date-bump across ${frames.length} frames, x→${last.pos && last.pos.x}`,
     );
 
-    const pause = await evaluate(`(async () => {
-      const scene = document.querySelector('[data-timeline-walker]');
-      const track = document.getElementById('home-timeline');
-      const route = scene.getAnimations()[0];
-      const before = {
-        ct: Math.round(Number(route.currentTime)),
-        play: route.playState,
-        run: scene.dataset.running ?? null,
-      };
-      track.scrollTo({ left: track.scrollWidth, behavior: 'instant' });
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      const paused = scene.getAnimations()[0];
-      const ct1 = Math.round(Number(paused.currentTime));
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const still = scene.getAnimations()[0];
-      return {
-        before,
-        ct1,
-        ct2: Math.round(Number(still.currentTime)),
-        run: scene.dataset.running ?? null,
-        play: still.playState,
-        matrix: getComputedStyle(scene).transform,
-      };
-    })()`);
+    const pause = await pauseOffscreen();
     expect(
       pause.before.run === 'true' && pause.before.play === 'running',
       '离屏暂停前漫步者应在运行',
@@ -262,20 +142,7 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
       pause.ct1 === pause.ct2 && pause.ct2 >= pause.before.ct - 10,
       `离屏期间时钟应冻结并保留进度（${pause.before.ct}→${pause.ct1}→${pause.ct2}）`,
     );
-    const resume = await evaluate(`(async () => {
-      const scene = document.querySelector('[data-timeline-walker]');
-      const track = document.getElementById('home-timeline');
-      const frozen = Math.round(Number(scene.getAnimations()[0].currentTime));
-      const pausedMatrix = getComputedStyle(scene).transform;
-      track.scrollTo({ left: 0, behavior: 'instant' });
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const route = scene.getAnimations()[0];
-      const ct1 = Math.round(Number(route.currentTime));
-      const matrix = getComputedStyle(scene).transform;
-      await new Promise((resolve) => setTimeout(resolve, 350));
-      const ct2 = Math.round(Number(scene.getAnimations()[0].currentTime));
-      return { frozen, ct1, ct2, pausedMatrix, matrix, run: scene.dataset.running ?? null, play: route.playState };
-    })()`);
+    const resume = await resumeOnscreen();
     const resumedXY = matrixXY(resume.matrix);
     const pausedXY = matrixXY(resume.pausedMatrix);
     expect(
@@ -288,62 +155,17 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
     );
     expect(resume.ct2 > resume.ct1, '恢复后时钟应继续前进');
     expect(
-      resumedXY && pausedXY && Math.abs(resumedXY.x - pausedXY.x) <= 120 && Math.abs(resumedXY.y - pausedXY.y) <= 60,
+      resumedXY &&
+        pausedXY &&
+        Math.abs(resumedXY.x - pausedXY.x) <= 120 &&
+        Math.abs(resumedXY.y - pausedXY.y) <= 60,
       `恢复瞬间不得跳变或重播（${JSON.stringify(pausedXY)}→${JSON.stringify(resumedXY)}）`,
     );
     checks.push(
       `offscreen pause/resume: frozen at ${resume.frozen}ms, continued to ${resume.ct2}ms without replay`,
     );
 
-    const done = await evaluate(`(async () => {
-      const scene = document.querySelector('[data-timeline-walker]');
-      const svg = scene.querySelector('svg');
-      // A paused (IO-clipped) animation never fires onfinish; bring the walker into view first.
-      scene.scrollIntoView({ block: 'nearest', inline: 'center' });
-      const waitStart = performance.now();
-      while (performance.now() - waitStart < 2000 && scene.dataset.running !== 'true')
-        await new Promise((resolve) => setTimeout(resolve, 50));
-      const wasRunning = scene.dataset.running === 'true';
-      // The route clock is the only multi-second animation; [0] ordering is not guaranteed.
-      const longOf = (list) =>
-        list.filter((a) => Number(a.effect?.getTiming().duration ?? 0) >= 7000);
-      const [route] = longOf(scene.getAnimations());
-      const [reveal] = longOf(svg.getAnimations());
-      if (!route || !reveal) return { error: 'route/reveal animation missing' };
-      const total = Number(route.effect.getTiming().duration);
-      // Teleporting the sprite strands it outside the IO clip at the timeline end; re-center
-      // on it (and nudge the scroller if the IO has not re-evaluated) so the last stretch
-      // actually plays and onfinish can fire.
-      for (const anim of [route, reveal])
-        anim.currentTime = Number(anim.effect.getTiming().duration) - 400;
-      const timeline = document.querySelector('#home-timeline');
-      scene.scrollIntoView({ block: 'nearest', inline: 'center' });
-      let settleStart = performance.now();
-      while (performance.now() - settleStart < 1200 && scene.dataset.running !== 'true')
-        await new Promise((resolve) => setTimeout(resolve, 60));
-      if (scene.dataset.running !== 'true') {
-        timeline.scrollLeft += 80;
-        await new Promise((resolve) => setTimeout(resolve, 150));
-        timeline.scrollLeft -= 80;
-        scene.scrollIntoView({ block: 'nearest', inline: 'center' });
-        settleStart = performance.now();
-        while (performance.now() - settleStart < 1200 && scene.dataset.running !== 'true')
-          await new Promise((resolve) => setTimeout(resolve, 60));
-      }
-      const started = performance.now();
-      while (performance.now() - started < 2600 && scene.dataset.complete !== 'true')
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      const anims = scene.getAnimations().concat(svg.getAnimations());
-      return {
-        wasRunning,
-        total,
-        stops: document.querySelectorAll('[data-timeline-stop]').length,
-        complete: scene.dataset.complete ?? null,
-        run: scene.dataset.running ?? null,
-        visibility: getComputedStyle(scene).visibility,
-        plays: anims.map((a) => a.playState),
-      };
-    })()`);
+    const done = await finishRoute();
     if (done.error) {
       issues.push(`完成态检查失败：${done.error}`);
     } else {
@@ -364,7 +186,9 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
         done.plays.every((p) => p !== 'running'),
         `完成后不应有常驻运行动画（${done.plays.join(',')}）`,
       );
-      checks.push(`completion: ${done.total}ms route exits with data-complete, hidden, no running animations`);
+      checks.push(
+        `completion: ${done.total}ms route exits with data-complete, hidden, no running animations`,
+      );
     }
 
     await viewport.set({ width: 1440, height: 220 });
@@ -409,7 +233,10 @@ export async function verifyTimelineMotion(tab, cdp, viewport) {
     const rmState = await evaluate(STATIC_PROBE);
     expect(rmState.reduced, '模拟 prefers-reduced-motion 未生效');
     expect(
-      rmState.instant === 'true' && rmState.run === 'false' && rmState.play === 'paused' && rmState.visibility === 'hidden',
+      rmState.instant === 'true' &&
+        rmState.run === 'false' &&
+        rmState.play === 'paused' &&
+        rmState.visibility === 'hidden',
       `减少动态效果下路线应保持隐藏静止（instant=${rmState.instant}, run=${rmState.run}, visibility=${rmState.visibility}）`,
     );
     expect(

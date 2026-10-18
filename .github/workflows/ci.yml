@@ -26,7 +26,7 @@ jobs:
           COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
 
       - name: Agent environment contracts
-        run: pnpm check:navigation && pnpm check:skills
+        run: pnpm check:navigation && pnpm check:skills && pnpm check:design
 
       - name: Typecheck
         run: pnpm -r typecheck

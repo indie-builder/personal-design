@@ -1,0 +1,37 @@
+# Machine-maintained dependency and skill locks.
+pnpm-lock.yaml linguist-generated=true
+package-lock.json linguist-generated=true
+npm-shrinkwrap.json linguist-generated=true
+yarn.lock linguist-generated=true
+bun.lock linguist-generated=true
+bun.lockb linguist-generated=true
+skills-lock.json linguist-generated=true
+
+# Code generation and synced catalogs; authored JSON stays checked.
+*.gen.* linguist-generated=true
+*.generated.* linguist-generated=true
+packages/layout-compositions/catalog.json linguist-generated=true
+packages/design-engineer-tools/catalog.json linguist-generated=true
+packages/ai-coding-dictionary/catalog.json linguist-generated=true
+packages/ai-coding-dictionary/source.json linguist-generated=true
+packages/ai-chat/src/avatars.json linguist-generated=true
+apps/web/public/personal-sites/*.webp.json linguist-generated=true
+apps/web/lib/openui-system-prompt.json linguist-generated=true
+.impeccable/design.json linguist-generated=true
+
+# Imported snapshots and upstream skills; the local skill remains authored.
+.agents/skills/** linguist-vendored=true
+.agents/skills/harness-code-check/** -linguist-vendored
+docs/design/open-design/source/** linguist-vendored=true
+apps/web/public/ai-coding-atlas/** linguist-vendored=true
+packages/personal-sites/promo/references/SceneOpen.tsx linguist-vendored=true
+
+# Machine-written acceptance and benchmark results; Markdown stays checked.
+docs/design/execution/evidence/**/*.json linguist-generated=true
+docs/design/execution/evidence/**/*.log linguist-generated=true
+docs/design/redesign-v2/evidence/**/*.json linguist-generated=true
+docs/design/redesign-v2/evidence/**/*.log linguist-generated=true
+docs/design/emil-design-eng/evidence/browser-checks.json linguist-generated=true
+docs/research/evidence/wren-wasm-benchmark/results.json linguist-generated=true
+docs/research/evidence/wren-embedding/result.json linguist-generated=true
+.audit/*.log linguist-generated=true

@@ -41,14 +41,23 @@ test('事务三连只存在于 inspora db.ts 的唯一 helper', () => {
   for (const pkg of ['inspora']) {
     for (const { name, text } of readScripts(pkg)) {
       if (name === 'db.ts') continue;
-      assert.equal(/\b(BEGIN|COMMIT|ROLLBACK)\b/.test(text), false, `${pkg}/${name} 出现裸事务关键字`);
+      assert.equal(
+        /\b(BEGIN|COMMIT|ROLLBACK)\b/.test(text),
+        false,
+        `${pkg}/${name} 出现裸事务关键字`,
+      );
     }
   }
 });
 
-test('browser.close 在 source-inspora.ts 只有一条释放路径', () => {
-  const [source] = readScripts('inspora', (name) => name === 'source-inspora.ts');
-  const count = (source?.text ?? '').match(/browser\.close/g)?.length ?? 0;
+test('inspora 浏览器同步 module 只有一条 browser.close 释放路径', () => {
+  const sources = readScripts('inspora', (name) =>
+    ['source-inspora.ts', 'inspora-browser.ts'].includes(name),
+  );
+  const count = sources.reduce(
+    (total, source) => total + (source.text.match(/browser\.close/g)?.length ?? 0),
+    0,
+  );
   assert.equal(count, 1, `期望单一 browser.close 释放路径，实际 ${count} 处`);
 });
 

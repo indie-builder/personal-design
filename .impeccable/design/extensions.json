@@ -1,0 +1,584 @@
+{
+  "colorMeta": {
+    "workspace": {
+      "role": "neutral",
+      "displayName": "workspace",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "paper": {
+      "role": "neutral",
+      "displayName": "paper",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "plate": {
+      "role": "neutral",
+      "displayName": "plate",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "body": {
+      "role": "neutral",
+      "displayName": "body",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "ink": {
+      "role": "neutral",
+      "displayName": "ink",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "ink-soft": {
+      "role": "neutral",
+      "displayName": "ink-soft",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "ink-faint": {
+      "role": "neutral",
+      "displayName": "ink-faint",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "hairline": {
+      "role": "neutral",
+      "displayName": "hairline",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "hairline-strong": {
+      "role": "neutral",
+      "displayName": "hairline-strong",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "subtle": {
+      "role": "neutral",
+      "displayName": "subtle",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "border-hover": {
+      "role": "neutral",
+      "displayName": "border-hover",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "control-border": {
+      "role": "neutral",
+      "displayName": "control-border",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "accent": {
+      "role": "neutral",
+      "displayName": "accent",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-workspace": {
+      "role": "neutral",
+      "displayName": "dark-workspace",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-paper": {
+      "role": "neutral",
+      "displayName": "dark-paper",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-plate": {
+      "role": "neutral",
+      "displayName": "dark-plate",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-body": {
+      "role": "neutral",
+      "displayName": "dark-body",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-ink": {
+      "role": "neutral",
+      "displayName": "dark-ink",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-ink-soft": {
+      "role": "neutral",
+      "displayName": "dark-ink-soft",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-ink-faint": {
+      "role": "neutral",
+      "displayName": "dark-ink-faint",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-hairline": {
+      "role": "neutral",
+      "displayName": "dark-hairline",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-hairline-strong": {
+      "role": "neutral",
+      "displayName": "dark-hairline-strong",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-subtle": {
+      "role": "neutral",
+      "displayName": "dark-subtle",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-border-hover": {
+      "role": "neutral",
+      "displayName": "dark-border-hover",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-control-border": {
+      "role": "neutral",
+      "displayName": "dark-control-border",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "dark-accent": {
+      "role": "neutral",
+      "displayName": "dark-accent",
+      "tonalRamp": [
+        "#202020",
+        "#353535",
+        "#494949",
+        "#5c5c5c",
+        "#848484",
+        "#bdbdbd",
+        "#ededed",
+        "#fafafa"
+      ]
+    },
+    "book-terracotta": {
+      "role": "secondary",
+      "displayName": "book-terracotta"
+    },
+    "book-linen": {
+      "role": "secondary",
+      "displayName": "book-linen"
+    },
+    "book-teal": {
+      "role": "secondary",
+      "displayName": "book-teal"
+    },
+    "book-ochre": {
+      "role": "secondary",
+      "displayName": "book-ochre"
+    },
+    "book-blue": {
+      "role": "secondary",
+      "displayName": "book-blue"
+    },
+    "book-rust": {
+      "role": "secondary",
+      "displayName": "book-rust"
+    },
+    "book-olive": {
+      "role": "secondary",
+      "displayName": "book-olive"
+    },
+    "book-ivory": {
+      "role": "secondary",
+      "displayName": "book-ivory"
+    },
+    "book-paper": {
+      "role": "secondary",
+      "displayName": "book-paper"
+    },
+    "book-ink": {
+      "role": "secondary",
+      "displayName": "book-ink"
+    },
+    "book-muted": {
+      "role": "secondary",
+      "displayName": "book-muted"
+    },
+    "chat-bubble": {
+      "role": "secondary",
+      "displayName": "AI 问答用户消息底色（亮色，局部）"
+    },
+    "chat-primary": {
+      "role": "secondary",
+      "displayName": "AI 问答输入光标（亮色，局部）"
+    },
+    "chat-primary-hover": {
+      "role": "secondary",
+      "displayName": "AI 问答发送／停止悬停底色（亮色，局部）"
+    },
+    "chat-focus": {
+      "role": "secondary",
+      "displayName": "AI 问答焦点（亮色，局部）"
+    },
+    "chat-selected": {
+      "role": "secondary",
+      "displayName": "AI 问答选中及发送底色（亮色，局部）"
+    },
+    "dark-chat-bubble": {
+      "role": "secondary",
+      "displayName": "AI 问答用户消息底色（暗色，局部）"
+    },
+    "dark-chat-primary": {
+      "role": "secondary",
+      "displayName": "AI 问答输入光标（暗色，局部）"
+    },
+    "dark-chat-primary-hover": {
+      "role": "secondary",
+      "displayName": "AI 问答发送／停止悬停底色（暗色，局部）"
+    },
+    "dark-chat-focus": {
+      "role": "secondary",
+      "displayName": "AI 问答焦点（暗色，局部）"
+    },
+    "dark-chat-selected": {
+      "role": "secondary",
+      "displayName": "AI 问答选中及发送底色（暗色，局部）"
+    },
+    "answer-chart-slate": {
+      "role": "secondary",
+      "displayName": "生成回答图表（亮色）slate"
+    },
+    "answer-chart-mist": {
+      "role": "secondary",
+      "displayName": "生成回答图表（亮色）mist"
+    },
+    "answer-chart-sage": {
+      "role": "secondary",
+      "displayName": "生成回答图表（亮色）sage"
+    },
+    "answer-chart-sand": {
+      "role": "secondary",
+      "displayName": "生成回答图表（亮色）sand"
+    },
+    "dark-answer-chart-slate": {
+      "role": "secondary",
+      "displayName": "生成回答图表（暗色）slate"
+    },
+    "dark-answer-chart-mist": {
+      "role": "secondary",
+      "displayName": "生成回答图表（暗色）mist"
+    },
+    "dark-answer-chart-sage": {
+      "role": "secondary",
+      "displayName": "生成回答图表（暗色）sage"
+    },
+    "dark-answer-chart-sand": {
+      "role": "secondary",
+      "displayName": "生成回答图表（暗色）sand"
+    }
+  },
+  "shadows": [
+    {
+      "name": "book-spread",
+      "value": "0 20px 35px -18px #0006, 0 4px 7px #0002",
+      "purpose": "仅实体画册装订深度；不应用到普通卡片。"
+    }
+  ],
+  "motion": [
+    {
+      "name": "ease-out",
+      "value": "cubic-bezier(.23,1,.32,1)",
+      "purpose": "通用空间过渡。"
+    },
+    {
+      "name": "enter",
+      "value": "200ms",
+      "purpose": "通用进入。"
+    },
+    {
+      "name": "exit",
+      "value": "140ms",
+      "purpose": "通用退出。"
+    },
+    {
+      "name": "workspace-navigation",
+      "value": "360ms",
+      "purpose": "标题位置衔接与内容推进，不延迟路由。"
+    },
+    {
+      "name": "book-turn",
+      "value": "680ms",
+      "purpose": "仅画册翻页。"
+    },
+    {
+      "name": "workspace-exit",
+      "value": "180ms",
+      "purpose": "页面返回前退场；键盘与减少动态效果即时。"
+    },
+    {
+      "name": "book-close",
+      "value": "260ms",
+      "purpose": "画册合拢退场后回书架；保留焦点和筛选。"
+    }
+  ],
+  "breakpoints": [
+    {
+      "name": "book-small",
+      "value": "600px"
+    },
+    {
+      "name": "shell-small",
+      "value": "639px"
+    },
+    {
+      "name": "book-compact",
+      "value": "900px"
+    },
+    {
+      "name": "shell-compact",
+      "value": "1100px"
+    },
+    {
+      "name": "timeline-wide",
+      "value": "1440px"
+    }
+  ],
+  "typographyMeta": {
+    "answer-body": {
+      "displayName": "生成回答正文",
+      "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+    },
+    "answer-label": {
+      "displayName": "生成回答标签与动作",
+      "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+    },
+    "answer-caption": {
+      "displayName": "生成回答说明",
+      "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+    },
+    "answer-heading": {
+      "displayName": "生成回答标题",
+      "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+    },
+    "answer-metric": {
+      "displayName": "生成回答指标",
+      "purpose": "生成回答与官方body portal继承聊天语义尺寸；统一映射官方组件角色。"
+    },
+    "answer-input": {
+      "displayName": "生成回答原生输入",
+      "purpose": "实际输入、占位与空／已选下拉统一正文13px，包括外壳与portal；字段行盒20px，标签与辅助说明12px。"
+    },
+    "answer-code": {
+      "displayName": "生成回答代码",
+      "purpose": "12px等宽代码角色；中性代码表面，复制按钮常显。"
+    },
+    "answer-control": {
+      "displayName": "生成回答控件",
+      "purpose": "动作、Tabs、Accordion与Chips使用13px；动作20px行盒、44px触控。"
+    }
+  }
+}

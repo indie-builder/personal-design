@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-29T14:17:24.563115Z",
+  "title": "Design System: Personal Design 产品集",
+  "componentFiles": [
+    "components/button-default.json",
+    "components/button-primary.json",
+    "components/button-ghost.json",
+    "components/button-subtle.json",
+    "components/button-icon.json",
+    "components/category.json",
+    "components/workspace-return.json",
+    "components/answer-action.json"
+  ]
+}
