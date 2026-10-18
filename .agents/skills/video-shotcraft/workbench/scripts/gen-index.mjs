@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // 生成静态索引与本机清单（全部不进库，npm install 的 prepare 钩子与 dev/build/studio 前置钩子都会跑）：
 //   src/cards/demo-index.ts   demos/ 镜头卡 demo 组件静态索引（webpack/Vite 双兼容——Remotion CLI 不认 import.meta.glob）
+//   src/cards/legacy-index.ts 下架 demo 的旧工程兼容索引（不进入素材库）
 //   src/cards/demoMeta.ts     demo → 中文名 / 画廊分类 / 预览视频（由 gallery/api/library.json + translations.js 生成）
 //   src/mediaManifest.ts      public/ 素材清单（成片工程 public/ 经符号链接接入）+ 仓库音效库 / BGM 库
 //   src/projMeta.ts           已链接成片工程的元数据
@@ -35,6 +36,8 @@ mkdirSync(publicDir, { recursive: true });
 ensureLink(join(publicDir, "cardpreviews"), "../../gallery/media");
 ensureLink(join(publicDir, "sfxlib"), "../../assets/audio/sfx");
 ensureLink(join(publicDir, "bgmlib"), "../../assets/audio/bgm");
+// 独立命名空间，绝不往用户链接的 public/textures 写入旧截图。
+ensureLink(join(publicDir, "legacy-textures"), "../../demos/_legacy/_textures");
 // demo 纹理兜底：成片工程自己带 public/textures 时以工程为准（不往工程目录里塞东西）
 {
   const tex = join(publicDir, "textures");
@@ -115,6 +118,31 @@ export const DEMO_MODULES: DemoModule[] = [
     "\n];\n",
 );
 
+// —— 冻结的旧工程兼容索引：不参与 demos / meta / 素材库计数 ——
+const legacyDir = join(demosDir, "_legacy");
+const legacy = JSON.parse(readFileSync(join(legacyDir, "manifest.json"), "utf8")).cards;
+const legacyStems = new Set();
+for (const card of legacy) {
+  if (!/^\w+$/.test(card.stem) || !/^[a-z0-9-]+\/[a-z0-9-]+\/\w+$/.test(card.path)
+      || !Number.isInteger(card.duration) || card.duration < 2 || legacyStems.has(card.stem))
+    throw new Error(`invalid legacy demo definition: ${card.stem}`);
+  const src = readFileSync(join(legacyDir, `${card.path}.tsx`), "utf8");
+  if (!new RegExp(`export const ${card.stem}\\s*:\\s*React\\.FC\\s*=`).test(src))
+    throw new Error(`legacy demo export missing: ${card.stem}`);
+  legacyStems.add(card.stem);
+}
+writeFileSync(
+  join(wb, "src/cards/legacy-index.ts"),
+  banner + 'import type React from "react";\n' +
+    legacy.map((c, i) => `import { ${c.stem} as c${i} } from "@demos/_legacy/${c.path}";`).join("\n") +
+    `\n\nexport const LEGACY_DEMO_MODULES: {
+  stem: string; name: string; nameEn?: string; category: string; duration: number;
+  component: React.ComponentType<Record<string, unknown>>;
+}[] = [\n` +
+    legacy.map((c, i) => `  { ...${JSON.stringify({ stem: c.stem, name: c.name, nameEn: c.nameEn, category: c.category, duration: c.duration })}, component: c${i} as unknown as React.ComponentType<Record<string, unknown>> },`).join("\n") +
+    "\n];\n",
+);
+
 // —— demo 元数据：画廊 library.json（分类 / 一句话 / 式）+ translations.js（中文名）——
 let lib = { cards: [], categories: {} };
 try { lib = JSON.parse(readFileSync(join(repo, "gallery/api/library.json"), "utf8")); } catch { console.warn("gen-index: 读不到 gallery/api/library.json，demo 用英文名"); }
@@ -136,29 +164,52 @@ for (const d of demos) {
   if (!style && styles.length === 1 && filesPerSlug.get(d.slug) === 1) style = styles[0];
   const cardZh = i18n.cardsZh?.[d.slug] ?? d.slug;
   const name = style ? (i18n.stylesZh?.[style.key] ?? style.key) : `${cardZh} · ${d.stem}`;
+  // 英文名与画廊英文模式一致：式 key / 卡 slug；英文一句话来自 translations.js（没有就留空，面板回退到中文）
+  const nameEn = style ? style.key : `${d.slug} · ${d.stem}`;
+  const summaryEn = (style && i18n.stylesEn?.[style.key]) || i18n.cardsEn?.[d.slug] || undefined;
   const catKey = card?.category ?? d.category;
   const preview = style && existsSync(join(mediaDir, `${style.key}.mp4`)) ? `${style.key}.mp4` : undefined;
   meta[d.stem] = {
     name,
+    nameEn,
     card: cardZh,
     category: lib.categories?.[catKey]?.zh ?? catKey,
     categoryKey: catKey,
     styleKey: style?.key,
     preview,
     summary: style?.description ?? card?.summary,
+    summaryEn,
   };
 }
 const catOrder = Object.keys(lib.categories ?? {});
+const categoryEn = Object.fromEntries(
+  [...new Set(demos.map((d) => meta[d.stem].categoryKey))].map((k) => [lib.categories?.[k]?.zh ?? k, lib.categories?.[k]?.en ?? k]),
+);
 const categories = [...new Set(demos.map((d) => meta[d.stem].categoryKey))]
   .sort((a, b) => (catOrder.indexOf(a) + 1 || 99) - (catOrder.indexOf(b) + 1 || 99))
   .map((k) => lib.categories?.[k]?.zh ?? k);
+// 俄文：workbench/i18n/ru/*.json 是平铺的 { 中文原文: 俄文 }（名称 / 分类 / 一句话），只取当前及旧工程兼容 demo 用到的条目
+const ruAll = {};
+const ruDir = join(wb, "i18n/ru");
+if (existsSync(ruDir))
+  for (const f of readdirSync(ruDir).filter((n) => n.endsWith(".json")).sort())
+    Object.assign(ruAll, JSON.parse(readFileSync(join(ruDir, f), "utf8")));
+const ruUsed = new Set(categories);
+for (const m of Object.values(meta)) {
+  ruUsed.add(m.name).add(m.card);
+  if (m.summary) ruUsed.add(m.summary);
+}
+for (const card of legacy) ruUsed.add(card.name).add(card.category);
+const textRu = Object.fromEntries(Object.entries(ruAll).filter(([zh]) => ruUsed.has(zh)));
 writeFileSync(
   join(wb, "src/cards/demoMeta.ts"),
   banner +
     "// demo 组件名 → 中文名 / 所属镜头卡 / 画廊分类 / 预览视频（gallery/media 本地已拉取时）/ 一句话\n" +
-    `export type DemoMeta = { name: string; card: string; category: string; categoryKey: string; styleKey?: string; preview?: string; summary?: string };\n` +
+    `export type DemoMeta = { name: string; nameEn: string; card: string; category: string; categoryKey: string; styleKey?: string; preview?: string; summary?: string; summaryEn?: string };\n` +
     `export const DEMO_META: Record<string, DemoMeta> = ${JSON.stringify(meta, null, 2)};\n\n` +
-    `/** 画廊分类（中文，按画廊顺序），只含有 demo 的分类 */\nexport const DEMO_CATEGORIES: string[] = ${JSON.stringify(categories)};\n`,
+    `/** 画廊分类（中文，按画廊顺序），只含有 demo 的分类 */\nexport const DEMO_CATEGORIES: string[] = ${JSON.stringify(categories)};\n` +
+    `/** 分类中文名 → 英文名（i18n 词典合并用，英文界面按此显示分类） */\nexport const DEMO_CATEGORY_EN: Record<string, string> = ${JSON.stringify(categoryEn)};\n` +
+    `/** 中文原文 → 俄文（demo 卡名 / 分类 / 一句话，来自 workbench/i18n/ru/*.json，俄文界面按此显示） */\nexport const DEMO_TEXT_RU: Record<string, string> = ${JSON.stringify(textRu, null, 2)};\n`,
 );
 
 // —— 素材清单：扫描 public/（成片工程素材经符号链接接入；cardpreviews / sfxlib / bgmlib 单列）——
@@ -167,7 +218,7 @@ const KIND = {
   ".png": "image", ".jpg": "image", ".jpeg": "image", ".webp": "image", ".gif": "image", ".svg": "image",
   ".wav": "audio", ".mp3": "audio", ".m4a": "audio", ".aac": "audio", ".ogg": "audio", ".flac": "audio",
 };
-const SKIP_TOP = new Set(["cardpreviews", "sfxlib", "bgmlib"]);
+const SKIP_TOP = new Set(["cardpreviews", "sfxlib", "bgmlib", "legacy-textures"]);
 const media = [];
 const walk = (dir, rel) => {
   let ents;
