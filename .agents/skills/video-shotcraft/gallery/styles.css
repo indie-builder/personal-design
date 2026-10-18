@@ -219,12 +219,14 @@ main {
   top: 98px;
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - 98px);
+  height: calc(100dvh - 98px);
+  min-height: 0;
   padding-top: 3.5rem;
   padding-bottom: 1.5rem;
 }
 
 .sidebar-heading {
+  flex: none;
   margin: 0 0 0.9rem;
   padding-left: 1rem;
   font-size: 0.7rem;
@@ -237,11 +239,21 @@ main {
 .category-nav {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: 0.15rem;
+  /* Only the categories scroll; do not clip the follow menu in the footer. */
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  padding: 0.25rem;
+  margin: -0.25rem;
 }
 
 .category-link {
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
@@ -287,6 +299,7 @@ main {
 
 .sidebar-social {
   display: flex;
+  flex: none;
   flex-direction: column;
   gap: 0.4rem;
   margin-top: auto;
@@ -1021,6 +1034,7 @@ kbd { padding: 0.2rem 0.34rem; border: 1px solid var(--line); border-radius: 5px
     top: 66px;
     z-index: 9;
     display: block;
+    height: auto;
     min-height: 0;
     min-width: 0;
     padding: 0.6rem 0;
@@ -1033,8 +1047,12 @@ kbd { padding: 0.2rem 0.34rem; border: 1px solid var(--line); border-radius: 5px
   .category-nav {
     flex-direction: row;
     overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-y: auto;
     scrollbar-width: none;
     gap: 0.25rem;
+    padding: 0;
+    margin: 0;
   }
   .category-nav::-webkit-scrollbar { display: none; }
   .category-link { flex-shrink: 0; padding: 0.5rem 0.85rem; font-size: 0.8rem; }

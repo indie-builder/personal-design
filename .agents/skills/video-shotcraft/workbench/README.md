@@ -1,8 +1,8 @@
-# ShotCraft Workbench · 动效工作台
+# ShotCraft Workbench · Motion Workbench
 
 > 面向使用者的图文指南（各区域与功能、截图）见 [GUIDE.md](GUIDE.md)；本文是技术说明。
 
-剪映式的成片后期台：多轨时间线 + 素材库（成片单元 / 216 个镜头卡 demo / 音效库 / 背景）+
+剪映式的成片后期台：多轨时间线 + 素材库（成片单元 / 150 个镜头卡 demo / 音效库 / 背景）+
 schema 属性面板 + Remotion 实时预览 + 一键导出。skill 交付成片后由
 `scripts/open.mjs` 自动打开，用户不用回到代码里改 tsx 就能挪镜头、改文案、换音效、变速、导出。
 移植自 [video-talkcraft/workbench](https://github.com/Vincentwei1021/video-talkcraft)，
@@ -20,7 +20,7 @@ cd workbench && npm install && npm run dev      # http://localhost:5198
 
 ## 能做什么
 
-- **素材库四 tab**：素材（成片单元 + 工程 public/ 里的图片视频）· 动效库（demos/ 216 个 demo 按画廊
+- **素材库四 tab**：素材（成片单元 + 工程 public/ 里的图片视频）· 动效库（demos/ 150 个 demo 按画廊
   10 类折叠，有本地样片的循环预览，没样片的卡显示定妆帧、悬停才播放）· 音效（本片音频 + `assets/audio/sfx` 149 个音效按 16 类 +
   5 首 BGM）· 背景（纸底 / 纯白 / 墨黑 / 纸底提亮）。**点击=中屏预览，拖拽到时间轨=添加**
 - **时间轨**：多轨道（上层覆盖下层，拖轨道头排序）、拖动、两端裁剪、跨轨、吸附、分割（S）、
@@ -30,6 +30,15 @@ cd workbench && npm install && npm run dev      # http://localhost:5198
 - **成片拆解导入**：按工程 `src/workbench.ts` 清单一键拆成 镜头 / 转场 / 字幕 / 叠加层 / 音乐 /
   音效 的多轨工程，落点与原 `<Sequence>` 逐帧一致（`npm run parity` 可证）
 - **保存**：自动存 localStorage（800ms 防抖），导出/导入工程 JSON，撤销/重做
+- **旧工程兼容**：2026-10 下架的 66 个镜头以冻结实现保留在 `demos/_legacy/`；旧存档 / JSON 仍按原
+  `cardId`、时序、变速和属性预览与导出。兼容卡不重新出现在素材库或 Studio 独立合成列表里。
+- **界面语言**：默认英文，顶栏右侧下拉框切换 English / 中文 / Русский（选择记在
+  localStorage `shotcraft-workbench-locale`）。语言只影响展示，不改写工程 JSON 与轨道名。界面 chrome 走 `src/i18n.ts`
+  的字符串表；卡片名 / schema 字段名 / 分类 / 轨道名 / 清单里的镜头标签照原文写，展示时按同文件的 zh→en / zh→ru
+  词典翻译（中英俄任一写法都能互译），查不到原样显示；demo 卡的英文名与一句话由 gen-index 直接取画廊数据
+  （`nameEn` / `summaryEn`），俄文取 `i18n/ru/*.json`（平铺的「中文原文 → 俄文」，生成 `DEMO_TEXT_RU`，含 `_legacy/` 兼容卡的名称与分类）；
+  主题预设名写成「中文 · English」按语言取半段，俄文按中文半段查词典。加界面文案三种语言都要写；
+  改原生卡或模板清单的中文标签 / 一句话要同步两份词典；新增或改写 demo 时同步补 `i18n/ru/*.json`
 - **导出成片**：顶栏「导出成片」→ dev server 内起 Remotion CLI 渲当前工程为 MP4 → `exports/`
 - **Remotion Studio**：`npm run studio`（每张卡 Zod schema 自动生成；`ProjImported` / `ProjOriginal` 对照）
 - **无损校验**：`npm run parity`——退出码 0 一致 / 1 有差异 / 2 无法比对（缺 python3+Pillow），不假绿
@@ -70,6 +79,7 @@ node scripts/open.mjs <dir> --no-open     # 不弹浏览器
 src/
   types.ts                数据模型：Project → Track → Clip（时间量单位=帧）
   store.ts                zustand 状态（撤销栈 / 自动保存 / ?import=project 自动导入）
+  i18n.ts                 界面语言（en 默认 / zh / ru）：chrome 字符串表 + 内容标签 zh→en / zh→ru 词典 + 主题名双语拆分
   projectImport.ts        清单 → 多轨工程（镜头/转场/字幕/叠加层/音乐/音效贪心装箱）
   dnd.ts                  素材库 → 时间轨拖拽协议
   preview/Composition.tsx clip → <Sequence> + TimeRemap(Freeze) / 媒体原生通道 / durationProp 注入
