@@ -15,7 +15,7 @@ pnpm format:check  # 格式检查
 
 ## 仓库结构
 
-- `apps/web` 是唯一的 Next.js 站点：首页、作品路由（`apps/web/app/products`）和共享组件（`apps/web/components`）。
+- `apps/web` 是唯一的 TanStack Start 站点：首页与作品路由位于 `apps/web/src/routes`（作品在 `products/`），共享组件位于 `apps/web/components`。
 - `packages/<product>` 存放各作品的内容与媒体，统一经包内 `src/index.ts` 查询；各包的 `scripts/` 负责同步，把本地媒体生成到 `apps/web/public`。
 
 内容同步入口：`pnpm sync:layouts`、`pnpm sync:inspora`、`pnpm sync:design-engineer-tools`；其余见 `package.json`。

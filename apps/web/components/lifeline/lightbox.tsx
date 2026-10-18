@@ -3,18 +3,12 @@ import styles from './lightbox.module.css';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 import { createContext, useContext, type ReactNode } from 'react';
-import {
-  useLightboxController,
-  EASE,
-  DURATION,
-  type LightboxItem,
-  type OpenOptions,
-} from './use-lightbox-controller';
+import { useLightboxController, EASE, DURATION } from './use-lightbox-controller';
 
 export type { LightboxItem } from './use-lightbox-controller';
 
 const LightboxContext = createContext<{
-  open: (item: LightboxItem, options: OpenOptions) => void;
+  open: ReturnType<typeof useLightboxController>['open'];
 } | null>(null);
 
 export function useLightbox() {

@@ -23,9 +23,9 @@ const cubeFilterSchema = Type.Object(
       ].map((op) => Type.Literal(op)),
       { description: '比较操作符' },
     ),
-    value: Type.Unknown({
-      description: '比较值；in/not_in 传数组，is_null/is_not_null 可省略',
-    }),
+    value: Type.Optional(
+      Type.Unknown({ description: '比较值；in/not_in 传数组，is_null/is_not_null 可省略' }),
+    ),
   },
   { additionalProperties: false },
 );

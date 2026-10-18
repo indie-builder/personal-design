@@ -46,6 +46,16 @@ export function browseMemoryKey(storageKey: string, listHref: string): string {
   return `${storageKey}:${listHref.split('?')[0]}${params.size ? `?${params}` : ''}`;
 }
 
+export function matchesBrowseEntry(
+  entry: Omit<FilterableBrowseEntry, 'href'>,
+  { q = '', category }: { q?: string; category?: string },
+): boolean {
+  return (
+    (!category || entry.category === category) &&
+    matchesSearch(q, [entry.title, ...(entry.search ?? [])])
+  );
+}
+
 /** Resolve shareable trails from current data, independently of session storage. */
 export function resolveUrlBrowseContext(
   query: string,
@@ -58,11 +68,7 @@ export function resolveUrlBrowseContext(
   const requestedCat = params.get('cat') ?? '';
   const category = catalog.some((entry) => entry.category === requestedCat) ? requestedCat : '';
   const queryText = params.get('q') ?? '';
-  const entries = catalog.filter(
-    (entry) =>
-      matchesSearch(queryText, [entry.title, ...(entry.search ?? [])]) &&
-      (!category || entry.category === category),
-  );
+  const entries = catalog.filter((entry) => matchesBrowseEntry(entry, { q: queryText, category }));
   if (!entries.some((entry) => entry.href === pathname)) return null;
   const filters = new URLSearchParams();
   if (queryText) filters.set('q', queryText);

@@ -16,6 +16,7 @@ const { analyticsToolNames, analyticsToolLabel, createAnalyticsTools } = await i
   './analytics-tools.ts'
 );
 const { connectAnalyticsMcp, truncateToolText } = await import('./analytics-mcp.ts');
+const { validateToolArguments } = await import('@earendil-works/pi-ai');
 
 const noop = async () => {};
 
@@ -51,6 +52,34 @@ test('8 个工具全部只读、串行执行，query_cube 过滤操作符限 12 
   assert.equal(literals.length, 12);
   const planSql = tools.find((tool) => tool.name === 'plan_sql');
   assert.ok(planSql.parameters.properties.sql);
+});
+
+test('query_cube 过滤器允许 is_null/is_not_null 省略 value，其余值原样保留', () => {
+  const tool = createAnalyticsTools(noop).find((item) => item.name === 'query_cube');
+  const toolCall = (filters) => ({
+    type: 'toolCall',
+    id: 't1',
+    name: 'query_cube',
+    arguments: { cube: 'orders', measures: ['revenue'], dimensions: [], filters },
+  });
+  const expected = { bytes: [1, 2], label: 'north', nested: { ok: true } };
+  assert.deepEqual(
+    validateToolArguments(tool, toolCall([{ field: 'region', operator: 'is_null' }])).filters,
+    [{ field: 'region', operator: 'is_null' }],
+  );
+  assert.deepEqual(
+    validateToolArguments(tool, toolCall([{ field: 'region', operator: 'is_not_null' }])).filters,
+    [{ field: 'region', operator: 'is_not_null' }],
+  );
+  assert.deepEqual(
+    validateToolArguments(tool, toolCall([{ field: 'region', operator: 'eq', value: expected }]))
+      .filters[0].value,
+    expected,
+  );
+  assert.throws(
+    () => validateToolArguments(tool, toolCall([{ field: 'region', operator: 'like' }])),
+    /operator/,
+  );
 });
 
 test('工具执行透传参数、透传错误并按上限拦截', async () => {

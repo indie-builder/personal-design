@@ -44,6 +44,8 @@ pnpm check:http
 
 现有 `*.browser.mjs` 导出函数可复用已打开的生产页面，通过调用方注入兼容的 `tab`、`cdp` 与 `viewport`；这些模块本身不创建浏览器，终端直接 `node` 执行文件不会运行验收。可由当前浏览器工具提供接口，也可为 Playwright 编写适配层；没有可用浏览器能力时，完成可运行的静态与 HTTP 检查，并明确报告交互／视觉未验收。
 
+现有动效套件的 Playwright adapter 位于 [motion-browser.mjs](../../../scripts/design-checks/motion-browser.mjs)：`openMotionBrowser(chromium, origin)` 返回 `{ tab, cdp, viewport, close }`，负责初始化失败清理、定位器参数与 CDP 超时转换；调用方复用该结果并在结束时 `await close()`。它覆盖 `run-all.mjs` 中六个动效检查所需的 interface；其他专项需要的截图、reload 或 `domSnapshot` 等能力仍按各自契约提供。
+
 `tab` 不是可直接替换为 Playwright `Page` 的接口。按模块需要包装异步 `url()`、`goto()`、`reload()`、`back()`、截图、`dev.logs()` 及 `tab.playwright` 定位器链；定位器 `waitFor({ state, timeoutMs })` 的 `timeoutMs` 要映射为 Playwright 的 `timeout`，`waitForLoadState({ state })` 要转换调用参数，`domSnapshot()` 需提供对应实现。CDP `send()` 的第三参数超时选项也需适配；直接赋值 `tab.playwright = page` 不足以保证兼容。只有 CDP 参数的函数可在满足所用命令与返回值协议后复用。
 
 以下展示可选的注入接口，`tab` 和 `cdp` 由调用方先准备。例如 Playwright 可通过 `page.context().newCDPSession(page)` 获取 Chromium 标签页的 CDP session，再包装所需接口。尺寸变更使用**被测标签页**的 CDP，避免多标签页时改到其他页面：

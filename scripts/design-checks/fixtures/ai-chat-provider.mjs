@@ -1,49 +1,161 @@
 // Test-only OpenAI-compatible provider for the current Pi + official OpenUI protocol.
 import { createServer } from 'node:http';
-const requests=[];let summaryFailed=false;
-const summary='用户的团队预算为3000元，需要移动端协作与客户只读查看。';
-const basic='root = Stack([card]);\ncard = Card([CardHeader("需求确认"), TextContent("团队预算为3000元，建议先试用团队版。")]);';
-const themeChart=basic.replace('Stack([card])','Stack([card, chart])')+'\nchart = BarChart(["基线", "试用"], [Series("完成任务", [30, 45])], "grouped");';
-createServer(async(req,res)=>{
- if(req.url==='/requests'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify(requests));return;}
- if(req.url==='/reset'){requests.length=0;summaryFailed=false;res.end('ok');return;}
- let body='';for await(const chunk of req)body+=chunk;
- // 非模型请求（如探活）只回错误码，不让夹具进程崩溃退出
- let data;try{data=JSON.parse(body)}catch{res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'invalid JSON body'}}));return;}
- if(!Array.isArray(data?.messages)){res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'messages array required'}}));return;}
- data.messages=data.messages.map(m=>({...m,content:Array.isArray(m.content)?m.content.filter(p=>p.type==='text').map(p=>p.text).join('\n'):m.content}));
- requests.push(data);
- const last=data.messages.at(-1).content;
- if(last.includes('触发服务错误')){res.writeHead(429,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Test rate limit'}}));return;}
- const summarizing=data.messages.some(m=>m.content?.includes('你是对话记忆整理器'));
- if(summarizing&&last.includes('触发摘要失败')&&!summaryFailed){summaryFailed=true;res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:{message:'Test summary failure'}}));return;}
- // 智能问数：第一轮先输出工具前文本再调用工具（服务端必须丢弃工具前文本），第二轮带工具结果回最终界面。
- const isAnalytics=data.messages.some(m=>m.role==='system'&&m.content?.includes('星辰科技'));
- const hasToolResult=data.messages.some(m=>m.role==='tool');
- const analyticsAnswer='root = Stack([card]);\ncard = Card([CardHeader("在职员工总数"), TextContent("全公司在职 528 人（截至快照日，在职口径）。")]);';
- const progressCase=isAnalytics&&data.messages.some(m=>m.role==='user'&&m.content?.includes('步骤状态验收'));
- const called=data.messages.filter(m=>m.role==='assistant').flatMap(m=>m.tool_calls??[]).map(call=>call.function?.name);
- const nextTool=!hasToolResult?'get_context':progressCase&&!called.includes('describe_cube')?'describe_cube':progressCase&&!called.includes('query_cube')?'query_cube':null;
- if(isAnalytics&&nextTool){
-  res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache'});
-  const chunk=(delta,finish_reason=null)=>res.write(`data: ${JSON.stringify({id:'mock',object:'chat.completion.chunk',created:1,model:'glm-5.3-flash',choices:[{index:0,delta,finish_reason}]})}\n\n`);
-  const args=nextTool==='get_context'?{}:nextTool==='describe_cube'?{name:'workforce'}:{cube:'workforce',measures:['headcount'],dimensions:[]};
-  chunk({role:'assistant',content:''});
-  if(!hasToolResult)chunk({content:'我先读取业务口径，再查询在职人数。'});
-  chunk({tool_calls:[{index:0,id:`call_${nextTool}`,type:'function',function:{name:nextTool,arguments:JSON.stringify(args)}}]});
-  chunk({},'tool_calls');
-  res.end('data: [DONE]\n\n');
-  return;
- }
- const output=hasToolResult&&isAnalytics?analyticsAnswer
-  :summarizing?summary
-  :last.includes('修正刚才的界面结构')?'root = Stack([card, next]);'
-  :last.includes('触发结构修复')?basic+'\nnext = Button("继续", Action([@ToAssistant("继续方案")]));'
-  :last.includes('主题图表验收')?themeChart
-  :basic;
- res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache'});
- const emit=(delta,finish_reason=null)=>res.write(`data: ${JSON.stringify({id:'mock',object:'chat.completion.chunk',created:1,model:'glm-5.3-flash',choices:[{index:0,delta,finish_reason}]})}\n\n`);
- emit({role:'assistant',content:''});let index=0;
- const timer=setInterval(()=>{if(index>=output.length){clearInterval(timer);emit({},'stop');res.end('data: [DONE]\n\n');return;}emit({content:output.slice(index,index+24)});index+=24;},last.includes('慢速回答')?250:15);
- res.on('close',()=>clearInterval(timer));
-}).listen(3907,'127.0.0.1',()=>console.log('Test provider: http://127.0.0.1:3907'));
+import { pathToFileURL } from 'node:url';
+const requests = [];
+let summaryFailed = false;
+const summary = '用户的团队预算为3000元，需要移动端协作与客户只读查看。';
+const basic =
+  'root = Stack([card]);\ncard = Card([CardHeader("需求确认"), TextContent("团队预算为3000元，建议先试用团队版。")]);';
+const themeChart =
+  basic.replace('Stack([card])', 'Stack([card, chart])') +
+  '\nchart = BarChart(["基线", "试用"], [Series("完成任务", [30, 45])], "grouped");';
+export async function aiChatProvider(req, res) {
+  if (req.url === '/requests') {
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(requests));
+    return;
+  }
+  if (req.url === '/reset') {
+    requests.length = 0;
+    summaryFailed = false;
+    res.end('ok');
+    return;
+  }
+  let body = '';
+  for await (const chunk of req) body += chunk;
+  // 非模型请求（如探活）只回错误码，不让夹具进程崩溃退出
+  let data;
+  try {
+    data = JSON.parse(body);
+  } catch {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: { message: 'invalid JSON body' } }));
+    return;
+  }
+  if (!Array.isArray(data?.messages)) {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: { message: 'messages array required' } }));
+    return;
+  }
+  data.messages = data.messages.map((m) => ({
+    ...m,
+    content: Array.isArray(m.content)
+      ? m.content
+          .filter((p) => p.type === 'text')
+          .map((p) => p.text)
+          .join('\n')
+      : m.content,
+  }));
+  requests.push(data);
+  const last = data.messages.at(-1).content;
+  if (last.includes('触发服务错误')) {
+    res.writeHead(429, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: { message: 'Test rate limit' } }));
+    return;
+  }
+  const summarizing = data.messages.some((m) => m.content?.includes('你是对话记忆整理器'));
+  if (summarizing && last.includes('触发摘要失败') && !summaryFailed) {
+    summaryFailed = true;
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: { message: 'Test summary failure' } }));
+    return;
+  }
+  // 智能问数：每轮工具前都输出文本；步骤状态验收跨三轮，最终正文才能进入响应。
+  const isAnalytics = data.messages.some(
+    (m) => m.role === 'system' && m.content?.includes('星辰科技'),
+  );
+  const hasToolResult = data.messages.some((m) => m.role === 'tool');
+  const analyticsAnswer =
+    'root = Stack([card]);\ncard = Card([CardHeader("在职员工总数"), TextContent("全公司在职 528 人（截至快照日，在职口径）。")]);';
+  const repairToolsCase =
+    isAnalytics &&
+    data.messages.some((m) => m.role === 'user' && m.content?.includes('修复工具验收'));
+  const repairing = data.messages.some(
+    (m) => m.role === 'user' && m.content?.includes('修正刚才的界面结构'),
+  );
+  const progressCase =
+    isAnalytics &&
+    (data.messages.some((m) => m.role === 'user' && m.content?.includes('步骤状态验收')) ||
+      (repairToolsCase && repairing));
+  const called = data.messages
+    .filter((m) => m.role === 'assistant')
+    .flatMap((m) => m.tool_calls ?? [])
+    .map((call) => call.function?.name);
+  const nextTool = !hasToolResult
+    ? 'get_context'
+    : progressCase && !called.includes('describe_cube')
+      ? 'describe_cube'
+      : progressCase && !called.includes('query_cube')
+        ? 'query_cube'
+        : null;
+  if (isAnalytics && nextTool) {
+    res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' });
+    const chunk = (delta, finish_reason = null) =>
+      res.write(
+        `data: ${JSON.stringify({ id: 'mock', object: 'chat.completion.chunk', created: 1, model: 'glm-5.3-flash', choices: [{ index: 0, delta, finish_reason }] })}\n\n`,
+      );
+    const args =
+      nextTool === 'get_context'
+        ? {}
+        : nextTool === 'describe_cube'
+          ? { name: 'workforce' }
+          : { cube: 'workforce', measures: ['headcount'], dimensions: [] };
+    chunk({ role: 'assistant', content: '' });
+    chunk({
+      content: hasToolResult ? `BETWEEN_TOOLS:${nextTool}。` : '我先读取业务口径，再查询在职人数。',
+    });
+    chunk({
+      tool_calls: [
+        {
+          index: 0,
+          id: `call_${nextTool}`,
+          type: 'function',
+          function: { name: nextTool, arguments: JSON.stringify(args) },
+        },
+      ],
+    });
+    chunk({}, 'tool_calls');
+    res.end('data: [DONE]\n\n');
+    return;
+  }
+  const output =
+    hasToolResult && isAnalytics
+      ? repairToolsCase && !repairing
+        ? 'root = Stack([card]);'
+        : analyticsAnswer
+      : summarizing
+        ? summary
+        : last.includes('修正刚才的界面结构')
+          ? 'root = Stack([card, next]);'
+          : last.includes('触发结构修复')
+            ? basic + '\nnext = Button("继续", Action([@ToAssistant("继续方案")]));'
+            : last.includes('主题图表验收')
+              ? themeChart
+              : basic;
+  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' });
+  const emit = (delta, finish_reason = null) =>
+    res.write(
+      `data: ${JSON.stringify({ id: 'mock', object: 'chat.completion.chunk', created: 1, model: 'glm-5.3-flash', choices: [{ index: 0, delta, finish_reason }] })}\n\n`,
+    );
+  emit({ role: 'assistant', content: '' });
+  let index = 0;
+  const timer = setInterval(
+    () => {
+      if (index >= output.length) {
+        clearInterval(timer);
+        emit({}, 'stop');
+        res.end('data: [DONE]\n\n');
+        return;
+      }
+      emit({ content: output.slice(index, index + 24) });
+      index += 24;
+    },
+    last.includes('慢速回答') ? 250 : 15,
+  );
+  res.on('close', () => clearInterval(timer));
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  createServer(aiChatProvider).listen(3907, '127.0.0.1', () =>
+    console.log('Test provider: http://127.0.0.1:3907'),
+  );
+}

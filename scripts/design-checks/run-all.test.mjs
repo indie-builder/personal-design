@@ -9,11 +9,13 @@ import { testFixture } from '../test-fixture.mjs';
 function fixture(t) {
   const { root, write } = testFixture(t, 'design-run-all-');
   const runner = join(root, 'scripts/design-checks/run-all.mjs');
-  for (const file of ['run-all.mjs', 'runner.mjs', 'current-checks.json'])
+  for (const file of ['run-all.mjs', 'runner.mjs', 'motion-browser.mjs', 'current-checks.json'])
     write(`scripts/design-checks/${file}`, readFileSync(new URL(`./${file}`, import.meta.url)));
   for (const suite of suites) {
-    write(suite.file,
-      'console.log(JSON.stringify({design:process.env.DESIGN_BASE_URL,portfolio:process.env.PORTFOLIO_API_BASE}));\n');
+    write(
+      suite.file,
+      'console.log(JSON.stringify({design:process.env.DESIGN_BASE_URL,portfolio:process.env.PORTFOLIO_API_BASE}));\n',
+    );
   }
   return (overrides = {}) => {
     const env = { ...process.env };
@@ -88,12 +90,20 @@ test('derives every regression check once in the manifest order', () => {
   const manifest = JSON.parse(readFileSync(new URL('./current-checks.json', import.meta.url)));
   const selected = [...manifest.http, ...manifest.browser].filter((suite) => suite.regression);
   assert.equal(selected.length, 13);
-  assert.deepEqual(suites.map((suite) => suite.regression), Array.from({ length: 13 }, (_, i) => i + 1));
+  assert.deepEqual(
+    suites.map((suite) => suite.regression),
+    Array.from({ length: 13 }, (_, i) => i + 1),
+  );
   assert.equal(new Set(suites.map((suite) => suite.file)).size, 13);
-  assert.deepEqual(suites.map((suite) => suite.file).sort(), selected.map((suite) => suite.file).sort());
+  assert.deepEqual(
+    suites.map((suite) => suite.file).sort(),
+    selected.map((suite) => suite.file).sort(),
+  );
   assert(!suites.some((suite) => suite.file.endsWith('/run-all.mjs')));
-  assert.equal(suites.map((suite) => suite.file.split('/').pop()).join(' '),
-    'verify-design.mjs verify-design-routes.mjs portfolio-api.test.mjs home.mjs layouts-check.mjs layouts-states.mjs layout-first-paint.mjs muse-behavior.mjs muse-recovery.mjs shared-browser.cjs shared-autoplay.cjs journeys.mjs personal-sites.mjs');
+  assert.equal(
+    suites.map((suite) => suite.file.split('/').pop()).join(' '),
+    'verify-design.mjs verify-design-routes.mjs portfolio-api.test.mjs home.mjs layouts-check.mjs layouts-states.mjs layout-first-paint.mjs muse-behavior.mjs muse-recovery.mjs shared-browser.cjs shared-autoplay.cjs journeys.mjs personal-sites.mjs',
+  );
 });
 
 test('fails outside fixture mode when a registered motion module is missing', (t) => {

@@ -1,12 +1,13 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import { ArrowUpRight } from 'lucide-react';
+import { z } from 'zod';
 import type { listPostRefs } from '@personal-design/inspora';
 import { BrowseNavigation } from '@/components/browse-navigation';
 import { MuseMediaCarousel } from '@/components/inspora-media-carousel';
 import { Img } from '@/components/img';
 import { categoryLabel } from '@/lib/category-label';
-import { museBrowseEntries, museMediaOf } from '@/lib/muse-detail';
+import { museDetailOf } from '@/lib/muse-detail';
 import { createProductError } from '@/lib/product-error';
 import { siteTitle } from '@/lib/site-url';
 import styles from './$slug.module.css';
@@ -19,23 +20,33 @@ let postRefsCache: ReturnType<typeof listPostRefs> | undefined;
 
 // getPostBySlug/listPostRefs 读 inspora.db（node:sqlite），只能在服务端执行
 const getMuseDetail = createServerFn({ method: 'GET' })
-  .validator((data: { slug: string }) => data)
+  .validator(z.object({ slug: z.string(), query: z.string() }))
   .handler(async ({ data }) => {
     const { getPostBySlug, listPostRefs } = await import('@personal-design/inspora');
     const post = getPostBySlug(data.slug);
     if (!post) return null;
     // 浏览导航用轻量索引（不含媒体行），与 Next 时代的模块级 listPostRefs() 等价
     postRefsCache ??= listPostRefs();
-    return {
-      post,
-      navigation: museBrowseEntries(post, postRefsCache),
-      media: museMediaOf(post),
-    };
+    return museDetailOf(post, postRefsCache, data.query);
   });
 
 export const Route = createFileRoute('/products/muse/$slug')({
-  loader: async ({ params }) => {
-    const detail = await getMuseDetail({ data: { slug: params.slug } });
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { q?: string; cat?: string; browse?: string } => ({
+    q: typeof search.q === 'string' ? search.q : undefined,
+    cat: typeof search.cat === 'string' ? search.cat : undefined,
+    browse: typeof search.browse === 'string' ? search.browse : undefined,
+  }),
+  loaderDeps: ({ search }) => {
+    const query = new URLSearchParams();
+    for (const name of ['q', 'cat', 'browse'] as const) {
+      if (search[name] !== undefined) query.set(name, search[name]);
+    }
+    return { query: query.toString() };
+  },
+  loader: async ({ params, deps }) => {
+    const detail = await getMuseDetail({ data: { slug: params.slug, query: deps.query } });
     // 未命中交给根路由 notFoundComponent（对应原 notFound()）
     if (!detail) throw notFound();
     return detail;
@@ -76,12 +87,7 @@ function MuseDetailPage() {
   // main 地标在本页渲染（外壳不提供 main）；loader 已 await 数据，无需原 Suspense 包裹
   return (
     <main className={styles.page}>
-      <BrowseNavigation
-        listPath="/products/muse"
-        returnLabel="返回灵感集"
-        fallbackHref={listHref}
-        {...navigation}
-      />
+      <BrowseNavigation returnLabel="返回灵感集" fallbackHref={listHref} {...navigation} />
       <header className={styles.heading}>
         <h1 className={styles.title}>{post.title || '未命名灵感'}</h1>
         <div className={styles.byline}>

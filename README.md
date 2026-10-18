@@ -2,7 +2,7 @@
 
 English · [中文](README.zh-CN.md)
 
-A personal design collection. The homepage lists the work on a timeline ordered by launch date, and each entry opens a fully browsable product built on real content. The site runs on Next.js 16, Tailwind CSS v4, and a pnpm workspace.
+A personal design collection. The homepage lists the work on a timeline ordered by launch date, and each entry opens a fully browsable product built on real content. The site runs on TanStack Start, Tailwind CSS v4, and a pnpm workspace.
 
 ## Products
 

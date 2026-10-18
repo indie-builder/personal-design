@@ -183,66 +183,21 @@ export function WordArcade() {
       surface.width = Math.round(box.width * dpr);
       surface.height = Math.round(box.height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const previous = game;
-      game = new Arcade(
-        kind,
-        box.width,
-        box.height,
-        letters.map((el) => {
-          const r = el.getBoundingClientRect();
-          return {
-            text: el.textContent ?? '',
-            x: r.left - box.left,
-            y: r.top - box.top + r.height * 0.12,
-            w: r.width,
-            h: r.height * 0.76,
-            headline: el.dataset.headline === 'true',
-          };
-        }),
-      );
-      if (previous && previous.state !== 'idle') {
-        const measured = game.bricks;
-        const sx = box.width / previous.width,
-          sy = box.height / previous.height;
-        const old = previous.bricks;
-        game = previous;
-        game.width = box.width;
-        game.height = box.height;
-        game.floor = box.height - 16;
-        game.bricks = measured.map((b, i) => {
-          const before = old[i]!;
-          return {
-            ...b,
-            alive: before.alive,
-            active: before.active,
-            passed: before.passed,
-            age: before.age,
-            vx: before.vx,
-            vy: before.vy,
-            scale: before.scale,
-            rotation: before.rotation,
-            x: before.active ? before.x * sx : b.homeX + (before.x - before.homeX) * sx,
-            y: before.active ? before.y * sy : b.homeY + (before.y - before.homeY) * sy,
-            w: b.homeW * before.scale,
-            h: b.homeH * before.scale,
-          };
-        });
-        for (const p of [
-          game.ball,
-          game.pointer,
-          game.snake,
-          ...game.shots,
-          ...game.bombs,
-          ...game.body,
-          ...game.trail,
-          ...game.tokens,
-        ]) {
-          p.x *= sx;
-          p.y *= sy;
-        }
-        game.playerX *= sx;
+      const layout = letters.map((el) => {
+        const r = el.getBoundingClientRect();
+        return {
+          text: el.textContent ?? '',
+          x: r.left - box.left,
+          y: r.top - box.top + r.height * 0.12,
+          w: r.width,
+          h: r.height * 0.76,
+          headline: el.dataset.headline === 'true',
+        };
+      });
+      if (game) {
+        game.resize(box.width, box.height, layout);
         game.pause();
-      }
+      } else game = new Arcade(kind, box.width, box.height, layout);
       if (carry.current) {
         Object.assign(game, carry.current);
         game.baseScore = game.score;

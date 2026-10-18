@@ -55,6 +55,34 @@ checks.push('degraded data client result reaches the model without failing the r
 assert.ok(parser.parse(text).root, 'final analytics output parses with the official schema');
 checks.push('analytics answer renders with the current official schema');
 
+const multipleRounds = await stream(await post([message('步骤状态验收：查询在职人数')]), {
+  requireTools: true,
+});
+assert.deepEqual(
+  multipleRounds.statuses.map(({ name, phase, isError }) => [name, phase, isError]),
+  [
+    ['get_context', 'start', undefined],
+    ['get_context', 'end', true],
+    ['describe_cube', 'start', undefined],
+    ['describe_cube', 'end', true],
+    ['query_cube', 'start', undefined],
+    ['query_cube', 'end', true],
+  ],
+);
+assert(
+  !multipleRounds.text.includes('BETWEEN_TOOLS'),
+  'intermediate tool rounds never emit content',
+);
+assert.equal(multipleRounds.text, text, 'only final analytics answer survives all tool rounds');
+assert.equal(
+  (await fixtureRequests()).length,
+  requests.length + 4,
+  'three tool rounds and one final round',
+);
+checks.push(
+  'three tool rounds keep ordered error statuses before content and discard all between-tool text',
+);
+
 // 非 analytics 智能体不声明任何工具，系统提示词保持客户端内容。
 const plainAgent = { id: 'plain-test', name: '普通', prompt: '你是测试助手。' };
 const plainStream = await stream(
@@ -71,8 +99,5 @@ assert(!plain.messages[0].content.includes('星辰科技'));
 checks.push('non-analytics agents keep zero tools and their own prompt');
 
 const dir = new URL('../../docs/design/execution/evidence/ai-chat/', import.meta.url);
-await writeEvidence(
-  new URL('analytics-result.json', dir),
-  { passed: true, checks },
-);
+await writeEvidence(new URL('analytics-result.json', dir), { passed: true, checks });
 console.log(checks);
