@@ -8,6 +8,7 @@
 .choice:focus-visible { outline:2px solid var(--color-ink); outline-offset:4px; }
 .stage { position:relative; height:clamp(420px,62vh,600px); isolation:isolate; outline:none; touch-action:none; user-select:none; overflow:hidden; }
 .stage:focus-visible { outline:1px dashed var(--color-control-border); outline-offset:4px; }
+.scene { position:absolute; inset:0; isolation:isolate; pointer-events:none; }
 .canvas { position:absolute; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
 .hud { position:absolute; top:20px; left:12px; right:12px; display:flex; justify-content:center; flex-wrap:wrap; align-items:center; gap:14px; font-size:13px; font-weight:500; color:var(--color-ink-soft); font-variant-numeric:tabular-nums; pointer-events:none; }
 /* Value changes remount their span, replaying a short settle-back pulse. */

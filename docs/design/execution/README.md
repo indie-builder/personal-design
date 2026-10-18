@@ -44,7 +44,7 @@ pnpm check:http
 
 现有 `*.browser.mjs` 导出函数可复用已打开的生产页面，通过调用方注入兼容的 `tab`、`cdp` 与 `viewport`；这些模块本身不创建浏览器，终端直接 `node` 执行文件不会运行验收。可由当前浏览器工具提供接口，也可为 Playwright 编写适配层；没有可用浏览器能力时，完成可运行的静态与 HTTP 检查，并明确报告交互／视觉未验收。
 
-现有动效套件的 Playwright adapter 位于 [motion-browser.mjs](../../../scripts/design-checks/motion-browser.mjs)：`openMotionBrowser(chromium, origin)` 返回 `{ tab, cdp, viewport, close }`，负责初始化失败清理、定位器参数与 CDP 超时转换；调用方复用该结果并在结束时 `await close()`。它覆盖 `run-all.mjs` 中六个动效检查所需的 interface；其他专项需要的截图、reload 或 `domSnapshot` 等能力仍按各自契约提供。
+现有动效套件的 Playwright adapter 位于 [motion-browser.mjs](../../../scripts/design-checks/motion-browser.mjs)：`openMotionBrowser(chromium, origin)` 返回 `{ tab, cdp, viewport, close }`，负责初始化失败清理、定位器参数与 CDP 超时转换；调用方复用该结果并在结束时 `await close()`。它覆盖 `run-all.mjs` 中七个动效检查所需的 interface；其他专项需要的截图、reload 或 `domSnapshot` 等能力仍按各自契约提供。
 
 `tab` 不是可直接替换为 Playwright `Page` 的接口。按模块需要包装异步 `url()`、`goto()`、`reload()`、`back()`、截图、`dev.logs()` 及 `tab.playwright` 定位器链；定位器 `waitFor({ state, timeoutMs })` 的 `timeoutMs` 要映射为 Playwright 的 `timeout`，`waitForLoadState({ state })` 要转换调用参数，`domSnapshot()` 需提供对应实现。CDP `send()` 的第三参数超时选项也需适配；直接赋值 `tab.playwright = page` 不足以保证兼容。只有 CDP 参数的函数可在满足所用命令与返回值协议后复用。
 
@@ -79,7 +79,8 @@ if (!result.passed) throw new Error(JSON.stringify(result.issues));
 | 头像彩蛋 | [taichi-motion.browser.mjs](../../../scripts/design-checks/taichi-motion.browser.mjs)：`verifyTaichiMotion(tab, cdp, viewport)` | 9.2s 共享时钟、不捕获输入、Esc 即时收起、策略切换收割、减少动态静态姿态 |
 | 聊天生命周期 | [chat-lifecycle.browser.mjs](../../../scripts/design-checks/chat-lifecycle.browser.mjs)：`verifyChatLifecycle(tab, cdp)` | 假模型隔离 origin；错误后继续、停止、离页中止、摘要、存储版本与图表主题 |
 | 首页性能与预览 | [home-performance.browser.mjs](../../../scripts/design-checks/home-performance.browser.mjs)：`verifyTimelineBounds(cdp)`、`verifyDictionaryReuse(cdp)` | 时间轴边界；先使词典预览可见并等待 Canvas 就绪，再检查实例复用。`verifyPreviewPixels(cdp)` 另需[像素等价性夹具](home-performance.md#复现) |
-| 五款文字游戏 | [word-arcade.browser.mjs](../../../scripts/design-checks/word-arcade.browser.mjs)：`verifyWordArcade(tab, cdp)` | 进入游戏页后运行；真实得分、暂停、重置；附加对齐／重开／中断函数的前置状态见文件注释及[记录](word-arcade.md) |
+| 五款文字游戏 | [word-arcade.browser.mjs](../../../scripts/design-checks/word-arcade.browser.mjs)：`verifyWordArcade(tab, cdp)` | 进入游戏页后运行；真实得分、暂停、重置；内含[模式／提示动效检查](../../../scripts/design-checks/word-arcade-motion.browser.mjs)；附加对齐／重开／中断函数的前置状态见文件注释及[记录](word-arcade.md) |
+| 产品外链反馈 | [outward-links.browser.mjs](../../../scripts/design-checks/outward-links.browser.mjs)：`verifyOutwardLinks(tab, cdp, viewport)` | 已纳入 `pnpm check:browser`；工具与个人网站箭头进入／退出中间帧、快速键盘打断、减少动态效果、fallback与原生链接属性 |
 | 首页游戏预览 | [word-arcade-preview.browser.mjs](../../../scripts/design-checks/word-arcade-preview.browser.mjs)：`assertPreviewMotion(cdp, expected)` | 先用时间轴按钮露出预览；分别在可视、减少动态效果、键盘、离屏状态采样，不能一次调用代表全部状态 |
 
 开发时选择相关项；交付时运行适用的全部当前项，并逐项记录缺少前置条件或未执行的项目。HTTP、行为、状态和视觉分别报告；返回值、异常和 screenshots 均按实际结果留存。

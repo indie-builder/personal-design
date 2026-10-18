@@ -3,4 +3,8 @@
 .header h1 { margin:0; font-size:36px; line-height:1.35; font-weight:500; letter-spacing:0; }
 .header p { margin:12px 0 0; color:var(--color-ink-soft); font-size:16px; }
 .description { max-width:68ch; margin:24px 0 40px; font-size:14px; line-height:1.8; color:var(--color-body); }
+.header a.externalLink svg { transition:transform 100ms var(--ease-out); }
+@media(hover:hover) and (pointer:fine) { .header a.externalLink:hover svg { transform:translate(2px,-2px); transition-duration:140ms; } }
+@media(prefers-reduced-motion:reduce) { .header a.externalLink svg,.header a.externalLink:hover svg { transition:none; transform:none; } }
+:global(html[data-input='keyboard']) .header a.externalLink:hover svg { transform:none; }
 @media(max-width:640px) { .page { padding:24px 20px 64px; } .header { align-items:flex-start; flex-direction:column; margin-top:0; } .header h1 { font-size:28px; } .header p { font-size:16px; } }

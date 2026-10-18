@@ -103,6 +103,20 @@
       ]
     },
     {
+      "id": "arcade-motion",
+      "file": "scripts/design-checks/word-arcade-motion.browser.mjs",
+      "exports": [
+        "verifyWordArcadeMotion"
+      ]
+    },
+    {
+      "id": "outward-links",
+      "file": "scripts/design-checks/outward-links.browser.mjs",
+      "exports": [
+        "verifyOutwardLinks"
+      ]
+    },
+    {
       "id": "arcade-preview",
       "file": "scripts/design-checks/word-arcade-preview.browser.mjs",
       "exports": [

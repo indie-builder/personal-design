@@ -1,0 +1,2 @@
+.surface { position:relative; display:flex; flex-direction:column; flex:1; min-height:0; opacity:1; transform:none; }
+.surface[inert] { pointer-events:none; }
