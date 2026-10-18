@@ -1,0 +1,8 @@
+{
+  "name": "生成回答动作",
+  "kind": "button",
+  "refersTo": "answer-action",
+  "description": "单操作满宽；内容宽于320px时两项等宽，窄容器或三项以上纵向满宽；每组一个填充主操作，其余降低强调。",
+  "html": "<div class=\"ds-answer-scope\"><div class=\"ds-answer-actions\"><button class=\"ds-answer-action\">确认修改</button><button class=\"ds-answer-action ds-answer-secondary\">撤销修改</button></div></div>",
+  "css": ".ds-answer-scope { container-type:inline-size; width:100%; } .ds-answer-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:8px; } .ds-answer-action { width:100%; min-width:0; min-height:44px; padding:10px 12px; border:1px solid var(--color-ink); box-sizing:border-box; border-radius:10px; background:var(--color-ink); color:var(--color-paper); font:500 13px/20px var(--font-sans); letter-spacing:0; white-space:normal; text-align:center; cursor:pointer; } .ds-answer-action:only-child { grid-column:1 / -1; } .ds-answer-actions:has(> button:nth-child(3)) { grid-template-columns:minmax(0,1fr); } @container(max-width:320px) { .ds-answer-actions { grid-template-columns:minmax(0,1fr); } } .ds-answer-secondary { background:var(--color-paper); color:var(--color-ink); border-color:var(--color-hairline-strong); } .ds-answer-action:hover { background:var(--color-accent); } .ds-answer-secondary:hover { background:var(--color-plate); } .ds-answer-action:focus-visible { outline:2px solid var(--chat-focus, #6a8cbb); outline-offset:3px; }"
+}

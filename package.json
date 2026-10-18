@@ -7,6 +7,10 @@
     "node": "24.x"
   },
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
+    "check:staged-tokens": "node scripts/check-staged-tokens.mjs",
+    "generate:design": "node scripts/generate-design-snapshot.mjs",
+    "check:design": "node scripts/generate-design-snapshot.mjs --check",
     "dev": "portless",
     "build": "pnpm --filter @personal-design/web build",
     "start": "portless --script start",

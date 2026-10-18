@@ -1,0 +1,7 @@
+{
+  "name": "Category",
+  "kind": "chip",
+  "description": "分类使用中文下划线标签，灵感数量集中网格结果区。",
+  "html": "<button class=\"ds-tab\" aria-pressed=\"true\">全部</button>",
+  "css": ".ds-tabs { display:flex; flex-wrap:wrap; align-items:center; gap:4px 20px; min-width:0; max-width:100%; padding:0; margin-bottom:24px; }\n.ds-tab { display:inline-flex; align-items:center; justify-content:center; min-height:var(--control-height); padding:10px 0; border:0; border-bottom:1px solid transparent; border-radius:0; background:transparent; font-size:14px; line-height:20px; color:var(--color-ink-soft); white-space:nowrap; cursor:pointer; transition:color 150ms ease-out,border-color 150ms ease-out; }\n@media(hover:hover) and (pointer:fine) { .ds-tab:hover { color:var(--color-ink); border-bottom-color:var(--color-border-hover); } }\n.ds-tab[aria-pressed=true] { color:var(--color-ink); border-bottom-color:var(--color-ink); font-weight:500; }\n.ds-tab:focus-visible { outline:2px solid var(--color-ink); outline-offset:4px; }\n@media(prefers-reduced-motion:reduce) { .ds-tab { transition:none; } }\n"
+}
