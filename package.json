@@ -34,7 +34,7 @@
     "sync:ai-chat-avatars": "pnpm --filter @personal-design/ai-chat sync:avatars"
   },
   "devDependencies": {
-    "oxfmt": "^0.73.0",
+    "oxfmt": "^0.74.0",
     "playwright": "1.64.1"
   }
 }

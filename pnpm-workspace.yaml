@@ -3,11 +3,11 @@ packages:
   - packages/*
 
 overrides:
-  '@remotion/cli@4.0.536>minimist': 1.2.8
-  '@remotion/cli@4.0.536>semver': 7.8.5
-  '@remotion/studio@4.0.536>semver': 7.8.5
-  '@remotion/studio-server@4.0.536>semver': 7.8.5
-  '@remotion/bundler@4.0.536>esbuild': 0.28.2
+  '@remotion/cli@4.0.537>minimist': 1.2.8
+  '@remotion/cli@4.0.537>semver': 7.8.5
+  '@remotion/studio@4.0.537>semver': 7.8.5
+  '@remotion/studio-server@4.0.537>semver': 7.8.5
+  '@remotion/bundler@4.0.537>esbuild': 0.28.2
   'rehype-katex>katex': 0.19.0
   'micromark-extension-math>katex': 0.19.0
 
@@ -23,58 +23,61 @@ minimumReleaseAgeExcludePrune: true
 
 minimumReleaseAgeExclude:
   - '@types/node@24.19.2'
-  - '@tanstack/react-router@1.170.45'
-  - '@tanstack/react-start@1.169.3'
-  - '@tanstack/react-start-client@1.168.43'
-  - '@tanstack/react-start-rsc@0.1.64'
-  - '@tanstack/react-start-server@1.167.51'
-  - '@tanstack/router-core@1.171.38'
-  - '@tanstack/router-generator@1.167.45'
-  - '@tanstack/router-plugin@1.168.47'
-  - '@tanstack/start-client-core@1.170.38'
-  - '@tanstack/start-plugin-core@1.171.54'
-  - '@tanstack/start-server-core@1.169.44'
-  - '@tanstack/start-storage-context@1.167.40'
+  - '@tanstack/react-router@1.170.46'
+  - '@tanstack/react-start@1.169.4'
+  - '@tanstack/react-start-client@1.168.44'
+  - '@tanstack/react-start-rsc@0.1.65'
+  - '@tanstack/react-start-server@1.167.52'
+  - '@tanstack/router-core@1.171.39'
+  - '@tanstack/router-generator@1.167.46'
+  - '@tanstack/router-plugin@1.168.48'
+  - '@tanstack/start-client-core@1.170.39'
+  - '@tanstack/start-plugin-core@1.171.55'
+  - '@tanstack/start-server-core@1.169.45'
+  - '@tanstack/start-storage-context@1.167.41'
   - playwright-core@1.64.1
   - playwright@1.64.1
-  - '@earendil-works/pi-agent-core@1.3.0'
-  - '@earendil-works/pi-ai@1.3.0'
-  - '@earendil-works/pi-codemode@1.3.0'
-  - '@earendil-works/pi-coding-agent@1.3.0'
-  - '@earendil-works/pi-mcp@1.3.0'
-  - '@earendil-works/pi-telemetry@1.3.0'
-  - '@earendil-works/pi-tui@1.3.0'
-  - '@remotion/bundler@4.0.536'
-  - '@remotion/captions@4.0.536'
-  - '@remotion/cli@4.0.536'
-  - '@remotion/codemods@4.0.536'
-  - '@remotion/compositor-darwin-arm64@4.0.536'
-  - '@remotion/compositor-darwin-x64@4.0.536'
-  - '@remotion/compositor-linux-arm64-gnu@4.0.536'
-  - '@remotion/compositor-linux-arm64-musl@4.0.536'
-  - '@remotion/compositor-linux-x64-gnu@4.0.536'
-  - '@remotion/compositor-linux-x64-musl@4.0.536'
-  - '@remotion/compositor-win32-x64-msvc@4.0.536'
-  - '@remotion/elevenlabs@4.0.536'
-  - '@remotion/licensing@4.0.536'
-  - '@remotion/media-utils@4.0.536'
-  - '@remotion/media@4.0.536'
-  - '@remotion/openai-whisper@4.0.536'
-  - '@remotion/paths@4.0.536'
-  - '@remotion/player@4.0.536'
-  - '@remotion/renderer@4.0.536'
-  - '@remotion/sdk@4.0.536'
-  - '@remotion/streaming@4.0.536'
-  - '@remotion/studio-protocol@4.0.536'
-  - '@remotion/studio-server@4.0.536'
-  - '@remotion/studio-shared@4.0.536'
-  - '@remotion/studio@4.0.536'
-  - '@remotion/timeline-utils@4.0.536'
-  - '@remotion/web-renderer@4.0.536'
-  - '@remotion/zod-types@4.0.536'
-  - lucide-react@1.59.0
-  - remotion@4.0.536
-  - typebox@1.4.2
+  - '@earendil-works/pi-agent-core@1.4.0'
+  - '@earendil-works/pi-ai@1.4.0'
+  - '@earendil-works/pi-codemode@1.4.0'
+  - '@earendil-works/pi-coding-agent@1.4.0'
+  - '@earendil-works/pi-mcp@1.4.0'
+  - '@earendil-works/pi-telemetry@1.4.0'
+  - '@earendil-works/pi-tui@1.4.0'
+  - '@remotion/bundler@4.0.537'
+  - '@remotion/captions@4.0.537'
+  - '@remotion/cli@4.0.537'
+  - '@remotion/codemods@4.0.537'
+  - '@remotion/compositor-darwin-arm64@4.0.537'
+  - '@remotion/compositor-darwin-x64@4.0.537'
+  - '@remotion/compositor-linux-arm64-gnu@4.0.537'
+  - '@remotion/compositor-linux-arm64-musl@4.0.537'
+  - '@remotion/compositor-linux-x64-gnu@4.0.537'
+  - '@remotion/compositor-linux-x64-musl@4.0.537'
+  - '@remotion/compositor-win32-x64-msvc@4.0.537'
+  - '@remotion/elevenlabs@4.0.537'
+  - '@remotion/licensing@4.0.537'
+  - '@remotion/media-utils@4.0.537'
+  - '@remotion/media@4.0.537'
+  - '@remotion/openai-whisper@4.0.537'
+  - '@remotion/paths@4.0.537'
+  - '@remotion/player@4.0.537'
+  - '@remotion/renderer@4.0.537'
+  - '@remotion/sdk@4.0.537'
+  - '@remotion/streaming@4.0.537'
+  - '@remotion/studio-protocol@4.0.537'
+  - '@remotion/studio-server@4.0.537'
+  - '@remotion/studio-shared@4.0.537'
+  - '@remotion/studio@4.0.537'
+  - '@remotion/timeline-utils@4.0.537'
+  - '@remotion/web-renderer@4.0.537'
+  - '@remotion/zod-types@4.0.537'
+  - lucide-react@1.61.0
+  - remotion@4.0.537
+  - typebox@1.4.3
+  - '@effect/platform-node@4.0.6'
+  - effect@4.0.6
+  - nitro-nightly@3.0.1-20261023-052727-7e9a0481
 
 permissions:
   '@tanstack/react-start':
