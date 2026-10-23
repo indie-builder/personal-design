@@ -17,11 +17,7 @@ const port = hasPort
     });
 
 const common = ['promo/src/index.tsx', 'PersonalSitePromo'];
-const options = [
-  '--public-dir=promo/public',
-  ...(port ? [`--port=${port}`] : []),
-  ...extraArgs,
-];
+const options = ['--public-dir=promo/public', ...(port ? [`--port=${port}`] : []), ...extraArgs];
 for (const args of [
   [
     'render',
