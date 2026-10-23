@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 
 // Against a production build: DESIGN_BASE_URL=... node scripts/design-checks/layout-first-paint.mjs
-const base = process.env.DESIGN_BASE_URL || process.argv[2] || 'http://localhost:3100';
+const base = process.env.DESIGN_BASE_URL || process.argv[2];
+if (!base) throw new Error('需要 DESIGN_BASE_URL 或首个参数指定站点地址（生产预览用 pnpm start 的 Portless URL）。');
 const url = new URL('/products/layout-compositions', base);
 url.search = new URLSearchParams({ cat: '平面、出版与广告', page: '136' }).toString();
 const response = await fetch(url, { signal: AbortSignal.timeout(30000) });

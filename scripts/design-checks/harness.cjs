@@ -2,7 +2,8 @@ const { mkdir, writeFile } = require('node:fs/promises');
 const { dirname } = require('node:path');
 const { fileURLToPath } = require('node:url');
 
-exports.baseUrl = (fallback = 'http://localhost:3000') =>
+// 与 runner.mjs 的 designOrigin 默认一致，避免回退到硬编码 localhost:3000（该端口常被 Docker 占用）。
+exports.baseUrl = (fallback = 'https://personal-design.localhost') =>
   (process.env.DESIGN_BASE_URL ?? fallback).replace(/\/+$/, '');
 
 exports.capturePageErrors = (page, errors) =>
