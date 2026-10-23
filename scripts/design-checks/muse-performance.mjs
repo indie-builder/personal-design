@@ -6,7 +6,8 @@ import { access, stat } from 'node:fs/promises';
 await access(new URL('../../apps/web/.output/server/inspora.db', import.meta.url));
 await stat(new URL('../../apps/web/.output/public/inspora/posters', import.meta.url));
 
-const base = process.argv[2] || 'http://localhost:3101';
+const base = process.env.DESIGN_BASE_URL || process.argv[2];
+if (!base) throw new Error('需要 DESIGN_BASE_URL 或首个参数指定站点地址（生产预览用 pnpm start 的 Portless URL）。');
 const response = await fetch(new URL('/products/muse', base));
 assert.equal(response.status, 200);
 const html = await response.text();
