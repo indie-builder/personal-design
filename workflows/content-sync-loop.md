@@ -52,13 +52,7 @@ pnpm --filter @personal-design/personal-sites render:promo && pnpm sync:personal
 
 inspora 要点（详见 `packages/inspora/AGENTS.md`）：单源失败不阻塞其他源，整体非零退出；分页失败不得留下半批数据；被隐藏的详情必须 404。
 
-personal-sites 渲染的坑（2026-10-23 实测）：Remotion 默认用 3000 端口，本机 Docker 常占用它，渲染会撞到无关页面并报 `window.getStaticCompositions is undefined`。且 `pnpm ... render:promo -- --port=N` 不会把参数透传。改用空闲端口直跑脚本：
-
-```sh
-PORT=$(node -e 'const n=require("net");const s=n.createServer();s.listen(0,()=>{console.log(s.address().port);s.close()})')
-PATH="$PWD/node_modules/.bin:$PATH" node scripts/render-promo.mjs --port=$PORT
-pnpm sync:personal-sites
-```
+personal-sites 渲染：`render-promo.mjs` 会自动挑空闲端口，无需手工传参。Remotion 默认 3000，若被 Docker 等占用会撞到无关页面并报 `window.getStaticCompositions is undefined`；脚本已规避（显式 `--port=N` 仍可覆盖）。
 
 ### 3. 验证
 
