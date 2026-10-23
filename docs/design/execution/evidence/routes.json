@@ -9,16 +9,22 @@
       "hasMain": true
     },
     {
-      "route": "/products/ai-coding-dictionary",
-      "status": 200,
-      "kind": "page",
-      "hasMain": true
-    },
-    {
       "route": "/robots.txt",
       "status": 200,
       "kind": "asset",
       "hasMain": false
+    },
+    {
+      "route": "/sitemap.xml",
+      "status": 200,
+      "kind": "asset",
+      "hasMain": false
+    },
+    {
+      "route": "/products/ai-coding-dictionary",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true
     },
     {
       "route": "/products/design-engineer-tools",
@@ -33,12 +39,6 @@
       "hasMain": true
     },
     {
-      "route": "/sitemap.xml",
-      "status": 200,
-      "kind": "asset",
-      "hasMain": false
-    },
-    {
       "route": "/products/layout-compositions",
       "status": 200,
       "kind": "page",
@@ -46,6 +46,12 @@
     },
     {
       "route": "/products/personal-sites",
+      "status": 200,
+      "kind": "page",
+      "hasMain": true
+    },
+    {
+      "route": "/products/muse",
       "status": 200,
       "kind": "page",
       "hasMain": true
@@ -59,12 +65,6 @@
     {
       "route": "/_not-found",
       "status": 404,
-      "kind": "page",
-      "hasMain": true
-    },
-    {
-      "route": "/products/muse",
-      "status": 200,
       "kind": "page",
       "hasMain": true
     }
