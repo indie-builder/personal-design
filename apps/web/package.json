@@ -44,7 +44,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
-    "nitro": "npm:nitro-nightly@3.0.1-20261023-052727-7e9a0481",
+    "nitro": "npm:nitro-nightly@3.0.1-20261024-005652-6bccaad1",
     "oxc-transform-react": "0.155.0",
     "oxlint": "^1.89.0",
     "tailwindcss": "4.3.3",
